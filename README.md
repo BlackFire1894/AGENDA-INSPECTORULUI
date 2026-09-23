@@ -12,7 +12,7 @@ Funcționează **offline**, iar datele rămân **doar pe tabletă** (IndexedDB),
 | **Obiectiv** | datele de contact (apel / email dintr-o atingere) și istoricul tuturor controalelor |
 | **Calendar** | controalele marcate pe zile, plus termenele de plată, ANAF și ASI; „Control nou în această zi” |
 | **Istoric** | toate controalele, grupate pe luni, cu căutare și filtre |
-| **Control** | 3 taburi: **Obiectiv** (date, perioadă, construcții și dotări) · **Acte & evidențe** (✓ verde / ✗ roșu) · **Nereguli** (șablon a–z + nereguli suplimentare, trecut/netrecut în PV, amendă, termen ASI) |
+| **Control** | **Obiectiv** (date, perioadă, construcții și dotări) · **Acte & evidențe** (✓ verde / ✗ roșu) · la localități: **Planuri și SVSU** și **Protecție civilă** · **Nereguli** (grupate pe categorii colorate; cele de instalații apar doar dacă instalația e bifată DA la dotări). Peste tot: trecut/netrecut în PV, amendă, rânduri suplimentare |
 
 Salvare automată la fiecare modificare. Mărimea textului (Mic / Mediu / Mare) se alege din **Setări** și scalează proporțional toată interfața. Un control nou pe un obiectiv existent preia automat datele de contact și construcțiile din ultimul control.
 

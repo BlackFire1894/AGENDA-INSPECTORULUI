@@ -62,8 +62,15 @@ export function buildDemo(today) {
   okAll(p, ['comisie', 'contract']);
   nok(p, 'b', { inPV: true, amenda: { suma: '1500' } });
   nok(p, 'h', { inPV: false });
-  const cust = { key: `k${uid()}`, custom: true, label: 'Căi de evacuare blocate cu mobilier', status: 'nok', obs: 'Hol parter', inPV: true, asiTermen: false, asiPrezentat: false, asiDataPrezentare: '', amenda: { aplicata: false, data: '', suma: '', achitata: false, dataAchitare: '' } };
+  const cust = { key: `k${uid()}`, custom: true, sec: 'ner', label: 'Căi de evacuare blocate cu mobilier', status: 'nok', obs: 'Hol parter', inPV: true, asiTermen: false, asiPrezentat: false, asiDataPrezentare: '', amenda: { aplicata: false, data: '', suma: '', achitata: false, dataAchitare: '' } };
   p.nereguli.push(cust);
+  // Planuri și SVSU / Protecție civilă (doar la localități)
+  for (const k of ['paar', 'plInundatii', 'plCutremur', 'svsuAvizat', 'svsuSef', 'svsuPlanPregatire']) p.nereguli.find((x) => x.key === k).status = 'ok';
+  nok(p, 'plEvacuare', { inPV: true, obs: 'Neactualizat din 2021' });
+  nok(p, 'svsuDotare', { inPV: true, obs: 'Lipsă motopompă', amenda: { suma: '3000' } });
+  for (const k of ['pcAudibilitate', 'pcSireneNumar', 'pcSireneMentenanta']) p.nereguli.find((x) => x.key === k).status = 'ok';
+  nok(p, 'pcSireneDefecte', { inPV: false, obs: 'Sirena S3 – sat Poiana' });
+  p.adapostPC = { v: 'NU', obs: '' };
   out.push(p);
 
   // 4. Cămin cultural — amendă achitată

@@ -18,6 +18,7 @@ export const state = {
     expanded: new Set(),      // construcții deschise
     collapsed: new Set(),     // construcții închise explicit
     nerFilter: 'ALL',
+    showAllNer: false,        // arată și neregulile de instalații nebifate DA la dotări
   },
   meta: { lastBackup: null },
 };

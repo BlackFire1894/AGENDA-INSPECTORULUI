@@ -3,7 +3,8 @@ import assert from 'node:assert/strict';
 import { addDays, diffDays, parseDateQuery, zile } from '../js/dates.js';
 import {
   newControl, fineStatus, asiDeadline, matchControl, objectives, controlFromPrevious,
-  normalizeControl, allFines, NEREGULI,
+  normalizeControl, allFines, NEREGULI, SABLON, isApplicable, secStats, sectiuniActive, activeNereguli,
+  neregulaLetter, tabOfNeregula, controlStats,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -112,7 +113,10 @@ test('control nou pe obiectiv existent preia datele, resetează constatările', 
 test('normalizare: completează câmpurile lipsă și păstrează neregulile custom', () => {
   const c = normalizeControl({ id: 'x', objectiveId: 'o', dataInceput: '2026-01-01',
     nereguli: [{ key: 'b', status: 'nok' }, { key: 'k1', custom: true, label: 'Test' }] });
-  assert.equal(c.nereguli.length, NEREGULI.length + 1);
+  assert.equal(c.nereguli.length, SABLON.length + 1);
+  assert.equal(c.nereguli.find((n) => n.key === 'b').sec, 'ner');
+  assert.equal(c.nereguli.at(-1).sec, 'ner');
+  assert.deepEqual(c.adapostPC, { v: '', obs: '' });
   assert.equal(c.nereguli.find((n) => n.key === 'b').status, 'nok');
   assert.equal(c.nereguli.at(-1).label, 'Test');
   assert.ok(c.nereguli.at(-1).amenda);
@@ -134,4 +138,46 @@ test('versiunea din sw.js coincide cu js/version.js și toate modulele sunt în 
   for (const f of fs.readdirSync(new URL('../js/', import.meta.url))) {
     assert.ok(sw.includes(`./js/${f}`), `sw.js nu pune în cache js/${f}`);
   }
+});
+
+test('nereguli de instalații: apar doar dacă instalația e bifată DA la dotări', () => {
+  const c = newControl({ start: '2026-09-01' });
+  const n = (k) => c.nereguli.find((x) => x.key === k);
+  assert.ok(isApplicable(c, n('a')));          // documentație: mereu
+  assert.ok(!isApplicable(c, n('m')));         // IDSAI nefuncțional: fără IDSAI
+  assert.ok(!isApplicable(c, n('c')));
+  assert.ok(!isApplicable(c, n('g')));         // cameră CT: fără centrală
+  c.constructii[0].dotari.idsai.v = 'NEC';
+  assert.ok(!isApplicable(c, n('m')));
+  c.constructii[0].dotari.idsai.v = 'DA';
+  assert.ok(isApplicable(c, n('m')) && isApplicable(c, n('i')) && isApplicable(c, n('c')));
+  c.constructii[0].dotari.centrala.tipuri = ['GAZOS'];
+  assert.ok(isApplicable(c, n('g')) && isApplicable(c, n('h')));
+  // un rând completat nu dispare, chiar dacă instalația e scoasă
+  n('q').status = 'nok';
+  assert.ok(isApplicable(c, n('q')));
+  assert.equal(secStats(c, 'ner').total, 5 + 4 + 2 + 1); // a,b,d,e,f + c,i,l,m + g,h + q
+});
+
+test('Planuri/SVSU și Protecție civilă: doar la Localitate, cu amenzi în Panou', () => {
+  const o = newControl({ tip: 'OPEC', start: '2026-09-01' });
+  assert.deepEqual(sectiuniActive(o), ['ner']);
+  assert.equal(activeNereguli(o).length, NEREGULI.length);
+  const l = newControl({ tip: 'LOCALITATE', start: '2026-09-01' });
+  l.dataIncheiere = '2026-09-01';
+  assert.deepEqual(sectiuniActive(l), ['ner', 'plan', 'pc']);
+  const s = l.nereguli.find((n) => n.key === 'pcSireneDefecte');
+  assert.equal(tabOfNeregula(s), 'pc');
+  assert.equal(neregulaLetter(l, s), '4');
+  assert.equal(neregulaLetter(l, l.nereguli.find((n) => n.key === 'svsuSef')), '2');
+  s.status = 'nok';
+  s.amenda.aplicata = true;
+  assert.equal(allFines([l], '2026-09-05').length, 1);
+  assert.equal(secStats(l, 'pc').constatate, 1);
+  assert.equal(secStats(l, 'pc').total, 7); // 6 rubrici + adăpost
+  // schimbat în OPEC: rubricile de localitate nu mai contează (datele rămân)
+  l.tip = 'OPEC';
+  assert.equal(allFines([l], '2026-09-05').length, 0);
+  assert.equal(controlStats(l).constatate, 0);
+  assert.equal(l.nereguli.find((n) => n.key === 'pcSireneDefecte').status, 'nok');
 });

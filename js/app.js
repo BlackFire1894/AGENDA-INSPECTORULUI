@@ -10,7 +10,7 @@ import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
   viewCalendar, viewSettings, hintText,
 } from './views.js';
-import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS } from './editor.js';
+import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor } from './editor.js';
 import { icon, esc, toast, openModal, closeModal, confirmDialog } from './ui.js';
 import { buildDemo } from './demo.js';
 import { APP_VERSION } from './version.js';
@@ -51,7 +51,9 @@ async function render({ keepScroll = false } = {}) {
     case 'control': {
       const c = getControl(route.id);
       if (!c) { location.hash = '#/panou'; return; }
-      if (prev.name !== 'control' || prev.id !== route.id) state.ui.nerFilter = 'ALL';
+      if (!tabsFor(c).some((t) => t.key === route.tab)) { location.replace(`#/control/${c.id}/obiectiv`); return; }
+      if (prev.name !== 'control' || prev.id !== route.id) state.ui.showAllNer = false;
+      if (prev.name !== 'control' || prev.id !== route.id || prev.tab !== route.tab) state.ui.nerFilter = 'ALL';
       html = viewControl(c, route.tab);
       break;
     }
@@ -295,8 +297,9 @@ document.addEventListener('click', async (e) => {
       return;
     }
     case 'ner-filter': state.ui.nerFilter = el.dataset.val; rerenderEditor(); return;
+    case 'toggle-all-ner': state.ui.showAllNer = !state.ui.showAllNer; rerenderEditor(); return;
     case 'ner-add': {
-      const n = emptyNeregula(`k${uid()}`, true);
+      const n = emptyNeregula(`k${uid()}`, true, el.dataset.sec || 'ner');
       n.status = 'nok';
       c.nereguli.push(n);
       state.ui.nerFilter = 'ALL';
