@@ -14,7 +14,7 @@ Funcționează **offline**, iar datele rămân **doar pe tabletă** (IndexedDB),
 | **Istoric** | toate controalele, grupate pe luni, cu căutare și filtre |
 | **Control** | **Obiectiv** (date, perioadă, construcții și dotări) · **Acte & evidențe** (✓ verde / ✗ roșu) · la localități: **Planuri și SVSU** și **Protecție civilă** · **Nereguli** (grupate pe categorii colorate; cele de instalații apar doar dacă instalația e bifată DA la dotări). Peste tot: trecut/netrecut în PV, amendă, rânduri suplimentare |
 
-Salvare automată la fiecare modificare. Mărimea textului (Mic / Mediu / Mare) se alege din **Setări** și scalează proporțional toată interfața. Un control nou pe un obiectiv existent preia automat datele de contact și construcțiile din ultimul control.
+Salvare automată la fiecare modificare. Din control: **Text PV** (lista neregulilor, gata de copiat în procesul-verbal) și **Fișa (PDF)** (rezumat complet, tipărit sau partajat). Neregulile constatate și la controale anterioare sunt marcate **Neregulă veche** (automat din istoric sau manual). Mărimea textului (Mic / Mediu / Mare) se alege din **Setări** și scalează proporțional toată interfața. Un control nou pe un obiectiv existent preia automat datele de contact și construcțiile din ultimul control.
 
 ## Termene
 
@@ -26,7 +26,7 @@ Toate termenele curg de la data de referință **+ 1 zi**, după data și ora ta
   - 🔴 din ziua 40: *„Mai ai 5 zile până să o trimiți la ANAF, consultă calculatorul de termene”* (termen ANAF: ziua 45 = 15 + 30 de zile, conform art. 39 alin. (1) din OG 2/2001)
   - 🟢 achitată, cu dovada primită
 - **ASI**: 90 de zile de la data încheierii controlului.
-- Aplicația **nu** prelungește termenele care se încheie într-o zi nelucrătoare.
+- Termenele care cad într-o zi nelucrătoare (weekend sau sărbătoare legală, art. 139 Codul muncii) **nu se mută automat**; aplicația afișează avertizarea „cade sâmbătă — verifică prelungirea”.
 
 Logica este acoperită de teste: `npm test`.
 

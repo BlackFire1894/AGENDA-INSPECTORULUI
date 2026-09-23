@@ -4,7 +4,7 @@ import { state, today, getControl, touch, flush, addControl, removeControl, onSa
 import { addDays, fmtDate, fmtDateLong, toISO, parseDateQuery, isISO } from './dates.js';
 import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
-  fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat,
+  fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat, pvText, sectiuniActive, secOf,
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
@@ -14,6 +14,7 @@ import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor } from './e
 import { icon, esc, toast, openModal, closeModal, confirmDialog } from './ui.js';
 import { buildDemo } from './demo.js';
 import { APP_VERSION } from './version.js';
+import { fisaMarkup, fisaDocument, fisaFileName, FISA_CSS } from './fisa.js';
 
 const main = () => document.getElementById('main');
 let persisted = false;
@@ -30,6 +31,7 @@ function parseRoute() {
     case 'calendar': return { name };
     case 'istoric': return { name };
     case 'setari': return { name };
+    case 'fisa': return { name, id: a };
     case 'control': return { name, id: a, tab: TABS.some((t) => t.key === b) ? b : 'obiectiv', focus: c };
     default: return { name: 'panou' };
   }
@@ -38,7 +40,7 @@ function parseRoute() {
 async function render({ keepScroll = false } = {}) {
   const prev = route;
   route = parseRoute();
-  if (route.name !== 'control') state.ui.backTo = location.hash || '#/panou';
+  if (route.name !== 'control' && route.name !== 'fisa') state.ui.backTo = location.hash || '#/panou';
   if (route.name === 'setari') persisted = await store.isPersisted();
   const y = window.scrollY;
   let html;
@@ -48,6 +50,26 @@ async function render({ keepScroll = false } = {}) {
     case 'calendar': html = viewCalendar(); break;
     case 'istoric': html = viewHistory(); break;
     case 'setari': html = viewSettings(persisted); break;
+    case 'fisa': {
+      const c = getControl(route.id);
+      if (!c) { location.hash = '#/panou'; return; }
+      html = `<div class="fisa-page">
+        <header class="page-head fisa-actions">
+          <div class="head-with-back">
+            <a class="icon-btn big" href="#/control/${c.id}/obiectiv" aria-label="Înapoi la control">${icon('back')}</a>
+            <div><div class="eyebrow">${icon('doc')} Rezumatul complet al controlului</div><h1>Fișa controlului</h1></div>
+          </div>
+          <div class="row-gap">
+            <button class="btn btn-primary btn-lg" data-act="fisa-print">${icon('download')} Tipărește / PDF</button>
+            <button class="btn btn-ghost btn-lg" data-act="fisa-share" data-id="${c.id}">${icon('upload')} Partajează fișierul</button>
+          </div>
+        </header>
+        <p class="muted fisa-hint">Pentru PDF: <b>Tipărește / PDF</b> → în fereastra de tipărire, butonul Partajare → <b>Salvează în Fișiere</b>. Dacă tipărirea nu pornește, folosiți <b>Partajează fișierul</b>.</p>
+        <style>${FISA_CSS}</style>
+        <article class="fisa-doc card">${fisaMarkup(c, state.controls)}</article>
+      </div>`;
+      break;
+    }
     case 'control': {
       const c = getControl(route.id);
       if (!c) { location.hash = '#/panou'; return; }
@@ -84,7 +106,7 @@ function focusNeregula(key) {
 }
 
 function updateNav() {
-  const active = route.name === 'control' ? (state.ui.backTo.match(/^#\/(\w+)/)?.[1] || 'panou') : route.name === 'obiectiv' ? 'obiective' : route.name;
+  const active = route.name === 'control' || route.name === 'fisa' ? (state.ui.backTo.match(/^#\/(\w+)/)?.[1] || 'panou') : route.name === 'obiectiv' ? 'obiective' : route.name;
   document.querySelectorAll('[data-nav]').forEach((a) => a.classList.toggle('on', a.dataset.nav === active));
   const t = today();
   const fines = allFines(state.controls, t).filter((f) => f.st.level === 'red' || f.st.level === 'yellow').length;
@@ -249,6 +271,8 @@ document.addEventListener('click', async (e) => {
       return;
     }
     case 'backup-export': exportBackup(); return;
+    case 'fisa-print': window.print(); return;
+    case 'fisa-share': shareFisa(getControl(el.dataset.id)); return;
     case 'demo-load': await loadDemo(); return;
     case 'demo-remove': await removeDemo(); return;
     case 'wipe': await wipeAll(); return;
@@ -319,6 +343,7 @@ document.addEventListener('click', async (e) => {
       return;
     }
     case 'ner-filter': state.ui.nerFilter = el.dataset.val; rerenderEditor(); return;
+    case 'pv-text': openPvText(c); return;
     case 'obs-toggle':
       state.ui.obsHidden = !state.ui.obsHidden;
       state.ui.obsOpen.clear();
@@ -456,6 +481,77 @@ function openNewControl({ date, oid } = {}) {
     startControl(newControl({ tip, denumire: name.value.trim(), start: startDate }));
   });
   setTimeout(() => name.focus(), 250);
+}
+
+// ───────── Text pentru procesul-verbal ─────────
+
+function openPvText(c) {
+  const opts = { doarNetrecute: false, cuActe: true };
+  const m = openModal(`
+    <div class="modal-head"><h2>${icon('pv')} Text pentru procesul-verbal</h2><button class="icon-btn big" data-act="modal-close" aria-label="Închide">${icon('x')}</button></div>
+    <div class="modal-body">
+      <div class="detail-toggles">
+        <button type="button" class="toggle" data-opt="doarNetrecute"><span class="tg-box"></span><span>Doar cele netrecute în PV</span></button>
+        <button type="button" class="toggle on t-accent" data-opt="cuActe"><span class="tg-box">${icon('check')}</span><span>Include actele lipsă</span></button>
+      </div>
+      <textarea class="pv-text" readonly></textarea>
+      <div class="row-gap">
+        <button class="btn btn-primary btn-lg" data-pv="copy">${icon('doc')} Copiază</button>
+        ${navigator.share ? `<button class="btn btn-ghost btn-lg" data-pv="share">${icon('upload')} Partajează</button>` : ''}
+        <button class="btn btn-ghost btn-lg" data-pv="mark">${icon('pv')} Marchează-le trecute în PV</button>
+      </div>
+    </div>`, { wide: true, onClose: () => { if (route.name === 'control') rerenderEditor(); } });
+  const ta = m.querySelector('.pv-text');
+  let current = { text: '', count: 0 };
+  const refresh = () => {
+    current = pvText(c, state.controls, opts);
+    ta.value = current.text;
+    m.querySelector('[data-pv="mark"]').disabled = !current.count;
+  };
+  refresh();
+  m.querySelectorAll('[data-opt]').forEach((b) => b.addEventListener('click', () => {
+    const k = b.dataset.opt;
+    opts[k] = !opts[k];
+    b.classList.toggle('on', opts[k]); b.classList.toggle('t-accent', opts[k]);
+    b.querySelector('.tg-box').innerHTML = opts[k] ? icon('check') : '';
+    refresh();
+  }));
+  m.querySelector('[data-pv="copy"]').addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(current.text); toast('Text copiat — lipiți-l în procesul-verbal'); } catch {
+      ta.focus(); ta.select(); toast('Selectați textul și copiați-l manual', 'warn');
+    }
+  });
+  m.querySelector('[data-pv="share"]')?.addEventListener('click', async () => {
+    try { await navigator.share({ title: `Nereguli – ${c.denumire}`, text: current.text }); } catch { /* anulat */ }
+  });
+  m.querySelector('[data-pv="mark"]').addEventListener('click', () => {
+    let n = 0;
+    for (const x of c.nereguli) {
+      if (x.status === 'nok' && !x.inPV && sectiuniActive(c).includes(secOf(x))) { x.inPV = true; n++; }
+    }
+    if (n) { touch(c, true); toast(`${n} ${n === 1 ? 'neregulă marcată' : 'nereguli marcate'} ca trecute în PV`); }
+    refresh();
+  });
+}
+
+// ───────── Fișa controlului: partajare ca fișier ─────────
+
+async function shareFisa(c) {
+  if (!c) return;
+  const file = new File([fisaDocument(c, state.controls)], fisaFileName(c), { type: 'text/html' });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      await navigator.share({ files: [file], title: file.name });
+    } else {
+      const url = URL.createObjectURL(file);
+      const a = document.createElement('a');
+      a.href = url; a.download = file.name;
+      document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    }
+  } catch (e) {
+    if (e.name !== 'AbortError') toast('Partajarea a eșuat', 'warn');
+  }
 }
 
 // ───────── backup ─────────

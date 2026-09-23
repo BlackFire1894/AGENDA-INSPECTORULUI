@@ -2,10 +2,10 @@
 // Structura este documentată în docs/MODEL_DATE.md (pregătită pentru portare nativă).
 import {
   addDays, diffDays, isISO, todayISO, parseDateQuery, queryRange, rangesOverlap, zile,
-  TERMEN_PLATA, PRAG_ROSU, TERMEN_ANAF, TERMEN_ASI, fmtDate,
+  TERMEN_PLATA, PRAG_ROSU, TERMEN_ANAF, TERMEN_ASI, fmtDate, zinelucratoare,
 } from './dates.js';
 
-export const SCHEMA_VERSION = 3; // 2: secțiuni Planuri/SVSU și PC, adăpost PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții
+export const SCHEMA_VERSION = 4; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche
 
 export const TIP_OBIECTIV = [
   { key: 'OPEC', label: 'OPEC / Instituție' },
@@ -163,6 +163,7 @@ export function emptyNeregula(key, custom = false, sec = 'ner') {
   return {
     key, custom, sec, label: '', status: '', obs: '', inPV: false,
     constructieId: '',   // construcția în care s-a constatat; '' = prima construcție
+    vecheManual: false,  // marcată manual ca „neregulă veche” (constatată și la controale anterioare)
     asiTermen: false, asiPrezentat: false, asiDataPrezentare: '',
     amenda: { aplicata: false, serie: '', numar: '', data: '', suma: '', achitata: false, dataAchitare: '' },
   };
@@ -329,18 +330,23 @@ export function fineStatus(control, n, today = todayISO()) {
   const elapsed = diffDays(d, today);
   const plataPana = addDays(d, TERMEN_PLATA);
   const anafPana = addDays(d, TERMEN_ANAF);
+  // Termenul NU se mută automat; doar se semnalează ziua nelucrătoare.
+  const plataNelucr = zinelucratoare(plataPana);
+  const anafNelucr = zinelucratoare(anafPana);
   const leftAnaf = TERMEN_ANAF - elapsed;
   if (elapsed <= TERMEN_PLATA) {
     const left = TERMEN_PLATA - Math.max(elapsed, 0);
     return {
-      level: 'blue', label: 'În curs', elapsed, plataPana, anafPana, daysLeft: left,
+      level: 'blue', label: 'În curs', elapsed, plataPana, anafPana, plataNelucr, anafNelucr, daysLeft: left,
+      nelucr: plataNelucr ? `Termenul de plată (${fmtDate(plataPana)}) cade ${plataNelucr} — verifică prelungirea` : '',
       msg: left === 0 ? 'Astăzi este ultima zi de plată' : `${maiSunt(left)} din termenul de plată (${fmtDate(plataPana)})`,
     };
   }
   if (elapsed < PRAG_ROSU) {
     const over = elapsed - TERMEN_PLATA;
     return {
-      level: 'yellow', label: 'Termen 15 zile expirat', elapsed, plataPana, anafPana, daysLeft: leftAnaf,
+      level: 'yellow', label: 'Termen 15 zile expirat', elapsed, plataPana, anafPana, plataNelucr, anafNelucr, daysLeft: leftAnaf,
+      nelucr: anafNelucr ? `Termenul ANAF (${fmtDate(anafPana)}) cade ${anafNelucr} — verifică prelungirea` : '',
       msg: `Termenul de plată a expirat de ${zile(over)} (${fmtDate(plataPana)})`,
     };
   }
@@ -348,7 +354,10 @@ export function fineStatus(control, n, today = todayISO()) {
   if (leftAnaf > 0) msg = `Mai ai ${zile(leftAnaf)} până să o trimiți la ANAF, consultă calculatorul de termene`;
   else if (leftAnaf === 0) msg = 'Astăzi este ultima zi pentru trimiterea la ANAF, consultă calculatorul de termene';
   else msg = `Termenul de trimitere la ANAF (${fmtDate(anafPana)}) a fost depășit cu ${zile(-leftAnaf)}`;
-  return { level: 'red', label: 'Trimite la ANAF', elapsed, plataPana, anafPana, daysLeft: leftAnaf, msg };
+  return {
+    level: 'red', label: 'Trimite la ANAF', elapsed, plataPana, anafPana, plataNelucr, anafNelucr, daysLeft: leftAnaf, msg,
+    nelucr: anafNelucr && leftAnaf >= 0 ? `Termenul ANAF (${fmtDate(anafPana)}) cade ${anafNelucr} — verifică prelungirea` : '',
+  };
 }
 
 // Termenul de 90 de zile pentru prezentarea documentației ASI.
@@ -367,7 +376,8 @@ export function asiDeadline(control, today = todayISO()) {
   if (left > 0) msg = `${maiSunt(left)} până la ${fmtDate(deadline)}`;
   else if (left === 0) msg = `Termenul expiră astăzi (${fmtDate(deadline)})`;
   else msg = `Termen depășit cu ${zile(-left)} (${fmtDate(deadline)})`;
-  return { deadline, daysLeft: left, msg };
+  const nl = zinelucratoare(deadline);
+  return { deadline, daysLeft: left, msg, nelucr: nl && left >= 0 ? `Termenul (${fmtDate(deadline)}) cade ${nl} — verifică prelungirea` : '' };
 }
 
 // Statistici pentru un control
@@ -458,4 +468,68 @@ export function allAsi(controls, today = todayISO()) {
     if (a && !a.resolved) out.push({ c, a });
   }
   return out.sort((x, y) => (x.a.daysLeft ?? 9999) - (y.a.daysLeft ?? 9999));
+}
+
+// ───────── Neregulă veche ─────────
+// Același rând (aceeași cheie; la rândurile adăugate: același text) constatat și la un control anterior
+// al aceluiași obiectiv. Întoarce cel mai recent astfel de control, sau null.
+function sameRow(a, b) {
+  if (a.custom || b.custom) return !!(a.custom && b.custom && fold(a.label).trim() && fold(a.label).trim() === fold(b.label).trim());
+  return a.key === b.key;
+}
+export function controaleAnterioare(controls, c) {
+  return controls
+    .filter((x) => x.objectiveId === c.objectiveId && x.id !== c.id
+      && ((x.dataInceput || '') < (c.dataInceput || '') || (x.dataInceput === c.dataInceput && (x.createdAt || '') < (c.createdAt || ''))))
+    .sort(byStartDesc);
+}
+export function constatareAnterioara(controls, c, n) {
+  for (const prev of controaleAnterioare(controls, c)) {
+    if (prev.nereguli.some((m) => m.status === 'nok' && sameRow(m, n))) return prev;
+  }
+  return null;
+}
+// { veche, auto: control anterior | null, manual }
+export function vecheInfo(controls, c, n) {
+  const auto = constatareAnterioara(controls, c, n);
+  const manual = !!n.vecheManual;
+  return { veche: n.status === 'nok' && (!!auto || manual), auto, manual };
+}
+
+// ───────── Text pentru procesul-verbal ─────────
+export function pvText(c, controls = [], { doarNetrecute = false, cuActe = true } = {}) {
+  const lines = [];
+  const perioada = isISO(c.dataIncheiere) && c.dataIncheiere !== c.dataInceput
+    ? `${fmtDate(c.dataInceput)} – ${fmtDate(c.dataIncheiere)}` : fmtDate(c.dataInceput);
+  lines.push(`Nereguli constatate – ${c.denumire || 'obiectiv fără denumire'} (control ${perioada})`);
+  let nr = 0;
+  const multe = (c.constructii || []).length > 1;
+  for (const sec of sectiuniActive(c)) {
+    const rows = c.nereguli.filter((n) => secOf(n) === sec && n.status === 'nok' && (!doarNetrecute || !n.inPV));
+    if (!rows.length) continue;
+    lines.push('', `${SECTIUNI[sec].label}:`);
+    for (const n of rows) {
+      let t = `${++nr}. ${neregulaLabel(n)}`;
+      const k = constructieOf(c, n);
+      if (sec === 'ner' && multe && k) t += ` – construcția: ${k.denumire}`;
+      if (n.obs && n.obs.trim()) t += `. ${n.obs.trim().replace(/\s*\n\s*/g, '; ')}`;
+      const extra = [];
+      if (vecheInfo(controls, c, n).veche) extra.push('neregulă veche');
+      if (n.amenda?.aplicata) extra.push(`sancționat cu amendă${amendaSerieNr(n.amenda) ? ` ${amendaSerieNr(n.amenda)}` : ''}`);
+      if (extra.length) t += ` (${extra.join('; ')})`;
+      lines.push(t);
+    }
+  }
+  if (cuActe) {
+    const lipsa = ACTE.filter((a) => c.acte[a.key]?.status === 'nok');
+    if (lipsa.length) {
+      lines.push('', 'Acte de autoritate și evidențe lipsă:');
+      lipsa.forEach((a) => {
+        const obs = c.acte[a.key].obs?.trim();
+        lines.push(`${++nr}. ${a.label}${obs ? `. ${obs.replace(/\s*\n\s*/g, '; ')}` : ''}`);
+      });
+    }
+  }
+  if (!nr) lines.push('', doarNetrecute ? 'Toate neregulile constatate sunt deja trecute în PV.' : 'Nu au fost constatate nereguli.');
+  return { text: lines.join('\n'), count: nr };
 }

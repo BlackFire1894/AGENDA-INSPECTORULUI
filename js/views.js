@@ -7,7 +7,7 @@ import {
 import {
   objectives, allFines, allAsi, isIncheiat, byStartDesc, controlStats, matchControl, fold,
   neregulaLabel, neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
-  constructieOf, amendaSerieNr,
+  constructieOf, amendaSerieNr, vecheInfo,
 } from './model.js';
 import { icon, esc, pill, tipBadge, empty } from './ui.js';
 import { APP_VERSION } from './version.js';
@@ -47,6 +47,8 @@ export function controlRow(c, { showName = true } = {}) {
   const chips = [statusPill(c)];
   if (st.constatate) chips.push(pill('neutral', `${st.constatate} ${st.constatate === 1 ? 'neregulă' : 'nereguli'}`));
   if (st.netrecute) chips.push(pill('warn', `${st.netrecute} netrecute în PV`, 'pv'));
+  const vechi = activeNereguli(c).filter((n) => vecheInfo(state.controls, c, n).veche).length;
+  if (vechi) chips.push(`<span class="pill pill-veche">${icon('history')}${vechi} ${vechi === 1 ? 'neregulă veche' : 'nereguli vechi'}</span>`);
   const byLevel = {};
   st.fines.forEach((f) => { byLevel[f.st.level] = (byLevel[f.st.level] || 0) + 1; });
   for (const lv of ['red', 'yellow', 'blue', 'green']) {
@@ -164,6 +166,8 @@ export function viewDashboard() {
         <span class="item-sub">${esc(neregulaLetter(c, n))}. ${esc(neregulaLabel(n))}${c.constructii.length > 1 && constructieOf(c, n) ? ` · ${esc(constructieOf(c, n).denumire)}` : ''}</span>
         ${amendaSerieNr(n.amenda) ? `<span class="item-sub">Amenda ${esc(amendaSerieNr(n.amenda))}</span>` : ''}
         <span class="item-msg">${esc(st.msg)}</span>
+        ${st.nelucr ? `<span class="item-warn">⚠ ${esc(st.nelucr)}</span>` : ''}
+        ${vecheInfo(state.controls, c, n).veche ? `<span class="item-veche">${icon('history')} Neregulă veche</span>` : ''}
       </span>
       <span class="item-side">
         ${pill(st.level, st.label)}
@@ -189,6 +193,7 @@ export function viewDashboard() {
         <span class="item-main">
           <span class="item-title">${esc(c.denumire || 'Obiectiv fără denumire')}</span>
           <span class="item-msg">${esc(a.msg)}</span>
+          ${a.nelucr ? `<span class="item-warn">⚠ ${esc(a.nelucr)}</span>` : ''}
         </span>
         <span class="item-side">${a.pending ? pill('neutral', 'neînceput') : `<span class="countdown ${a.daysLeft < 0 ? 'over' : ''}"><b>${Math.abs(a.daysLeft)}</b><small>${a.daysLeft < 0 ? 'zile depășit' : a.daysLeft === 1 ? 'zi' : 'zile'}</small></span>`}</span>
       </a>`).join('')}</div>` : '<p class="muted pad">Niciun termen ASI activ.</p>'}
@@ -215,6 +220,7 @@ export function viewDashboard() {
         <span class="item-main">
           <span class="item-title">${esc(c.denumire || 'Obiectiv fără denumire')}</span>
           <span class="item-sub">${esc(neregulaLetter(c, n))}. ${esc(neregulaLabel(n))}</span>
+          ${vecheInfo(state.controls, c, n).veche ? `<span class="item-veche">${icon('history')} Neregulă veche</span>` : ''}
         </span>
         <span class="item-side">${pill('warn', 'Netrecut')}</span>
       </a>`).join('')}</div>` : '<p class="muted pad">Toate neregulile constatate sunt trecute în PV.</p>'}
@@ -508,7 +514,7 @@ export function viewSettings(persisted) {
         <span class="rule-row"><i class="dot dot-red"></i> din ziua 40: „Mai ai 5 zile până să o trimiți la ANAF” (termen: ziua 45)</span>
         <span class="rule-row"><i class="dot dot-green"></i> achitată, cu dovadă primită</span></li>
       <li><b>ASI:</b> 90 de zile de la data încheierii controlului.</li>
-      <li>Aplicația nu prelungește termenele care se termină în zile nelucrătoare — verifică în calculatorul de termene.</li>
+      <li>Termenele care cad într-o zi nelucrătoare (weekend sau sărbătoare legală) <b>nu se mută automat</b>; aplicația afișează o avertizare ca să verifici prelungirea.</li>
     </ul>
   </section>
   <section class="card set-sec danger-zone">

@@ -4,7 +4,7 @@ import { fmtDate, fmtDateLong, isISO } from './dates.js';
 import {
   TIP_OBIECTIV, DOTARI, CENTRALA_TIPURI, ACTE, STRUCTURI, MATERIALE_PERETI, SECTIUNI, CATEGORII,
   controlStats, secStats, fineStatus, fineDate, asiDeadline, isIncheiat, neregulaLabel, neregulaLetter,
-  neregulaCat, secOf, isApplicable, isLocalitate, constructieOf, amendaSerieNr,
+  neregulaCat, secOf, isApplicable, isLocalitate, constructieOf, amendaSerieNr, vecheInfo, constatareAnterioara,
 } from './model.js';
 import { icon, esc, pill, tipBadge } from './ui.js';
 
@@ -38,7 +38,9 @@ export function edHeadHTML(c) {
     </div>
     <div class="ed-actions">
       <span class="save-ind" id="save-ind">${icon('check')}<span>Salvat</span></span>
-      <a class="btn btn-ghost" href="#/obiectiv/${c.objectiveId}">${icon('history')} Istoric obiectiv</a>
+      <button class="btn btn-ghost" data-act="pv-text">${icon('pv')} Text PV</button>
+      <a class="btn btn-ghost" href="#/fisa/${c.id}">${icon('download')} Fișa (PDF)</a>
+      <a class="btn btn-ghost" href="#/obiectiv/${c.objectiveId}">${icon('history')} Istoric</a>
       <button class="icon-btn big danger" data-act="control-delete" aria-label="Șterge controlul">${icon('trash')}</button>
     </div>`;
 }
@@ -73,10 +75,12 @@ export function tabHTML(c, tab) {
 // ───────── helpers pentru câmpuri ─────────
 
 // Observații: câmp pe mai multe rânduri (Enter = rând nou) care crește doar în jos.
-// Cu „Observații ascunse”, câmpurile goale devin un buton mic „+ Observații”; cele completate rămân vizibile.
+// Cu „Observații ascunse”, toate se ascund: cele completate au indicatorul „Observații scrise”, cele goale „+ Observații”.
 function obsField(path, value, cls = 'row-obs') {
-  if (state.ui.obsHidden && !value && !state.ui.obsOpen.has(path)) {
-    return `<button type="button" class="obs-add" data-act="obs-open" data-path="${path}">${icon('plus')} Observații</button>`;
+  if (state.ui.obsHidden && !state.ui.obsOpen.has(path)) {
+    return value
+      ? `<button type="button" class="obs-add has-obs" data-act="obs-open" data-path="${path}" title="${esc(value.slice(0, 120))}">${icon('doc')} Observații scrise</button>`
+      : `<button type="button" class="obs-add" data-act="obs-open" data-path="${path}">${icon('plus')} Observații</button>`;
   }
   return `<textarea class="obs ${cls}" data-bind="${path}" rows="1" placeholder="Observații" autocomplete="off" enterkeyhint="enter">${esc(value)}</textarea>`;
 }
@@ -404,8 +408,11 @@ function neregulaRow(c, n) {
     chips.push(n.inPV ? pill('green', 'Trecut în PV', 'pv') : pill('warn', 'Netrecut în PV', 'pv'));
     if (n.amenda.aplicata) { const fs = fineStatus(c, n, today()); chips.push(pill(fs.level, `Amendă · ${fs.label}`, 'fine')); }
   }
+  const vi = vecheInfo(state.controls, c, n);
+  if (vi.veche) chips.unshift(`<span class="pill pill-veche">${icon('history')}Neregulă veche</span>`);
+  else if (n.status !== 'nok' && vi.auto) chips.push(pill('neutral', `Constatată la controlul din ${fmtDate(vi.auto.dataInceput)}`, 'history'));
   if (!n.custom && !isApplicable(c, { ...n, status: '' })) chips.push(pill('neutral', 'Instalație nebifată DA la dotări', 'info'));
-  return `<div class="check-row ner-row ${n.status ? `is-${n.status}` : ''}" id="ner-${esc(n.key)}">
+  return `<div class="check-row ner-row ${n.status ? `is-${n.status}` : ''} ${vi.veche ? 'is-veche' : ''}" id="ner-${esc(n.key)}">
     <span class="row-idx letter">${esc(letter)}</span>
     <div class="row-main">
       ${labelHTML}
@@ -433,7 +440,7 @@ function neregulaDetail(c, n, path) {
       </div>
       ${n.asiTermen && d ? `<div class="deadline ${d.resolved ? 'dl-green' : 'dl-red'}">
         ${icon(d.resolved ? 'check' : 'hourglass')}
-        <div><b>${d.resolved ? 'Rezolvat' : d.pending ? 'Termen neînceput' : `Termen: ${esc(fmtDateLong(d.deadline))}`}</b><span>${esc(d.msg)}</span></div>
+        <div><b>${d.resolved ? 'Rezolvat' : d.pending ? 'Termen neînceput' : `Termen: ${esc(fmtDateLong(d.deadline))}`}</b><span>${esc(d.msg)}</span>${d.nelucr ? `<span class="nelucr-inline">⚠ ${esc(d.nelucr)}</span>` : ''}</div>
         ${!d.pending && !d.resolved ? `<span class="countdown big ${d.daysLeft < 0 ? 'over' : ''}"><b>${Math.abs(d.daysLeft)}</b><small>${d.daysLeft < 0 ? 'zile depășit' : d.daysLeft === 1 ? 'zi' : 'zile'}</small></span>` : ''}
       </div>` : ''}
       ${n.asiTermen && n.asiPrezentat ? `<div class="form-grid g3"><label class="field"><span class="lbl">Data prezentării</span><span class="inp-wrap"><input type="date" data-bind="${path}.asiDataPrezentare" data-rerender="1" value="${esc(n.asiDataPrezentare)}"></span></label></div>` : ''}
@@ -464,15 +471,21 @@ function neregulaDetail(c, n, path) {
         ${a.achitata ? `<label class="field"><span class="lbl">Data dovezii de plată</span><span class="inp-wrap"><input type="date" data-bind="${path}.amenda.dataAchitare" data-rerender="1" value="${esc(a.dataAchitare)}"></span></label>` : ''}
       </div>
       ${fs.plataPana && !a.achitata ? `<div class="fine-timeline">
-        <span class="${fs.level === 'blue' ? 'cur' : 'past'}"><i class="dot dot-blue"></i>Plată până la <b>${fmtDate(fs.plataPana)}</b></span>
-        <span class="${fs.level === 'red' ? 'cur' : ''}"><i class="dot dot-red"></i>ANAF până la <b>${fmtDate(fs.anafPana)}</b></span>
+        <span class="${fs.level === 'blue' ? 'cur' : 'past'}"><i class="dot dot-blue"></i>Plată până la <b>${fmtDate(fs.plataPana)}</b>${fs.plataNelucr ? ` <em class="nelucr">(${esc(fs.plataNelucr)})</em>` : ''}</span>
+        <span class="${fs.level === 'red' ? 'cur' : ''}"><i class="dot dot-red"></i>ANAF până la <b>${fmtDate(fs.anafPana)}</b>${fs.anafNelucr ? ` <em class="nelucr">(${esc(fs.anafNelucr)})</em>` : ''}</span>
       </div>` : ''}
+      ${fs.nelucr && !a.achitata ? `<div class="nelucr-warn">${icon('alert')}<span>${esc(fs.nelucr)}</span></div>` : ''}
     </div>`;
   }
+  const vi = vecheInfo(state.controls, c, n);
+  const veche = vi.auto
+    ? `<div class="veche-note">${icon('history')}<span><b>Neregulă veche</b> — constatată și la controlul din ${esc(fmtDate(vi.auto.dataInceput))} (din istoric)</span></div>`
+    : toggle(`${path}.vecheManual`, n.vecheManual, 'Neregulă veche', { level: 'veche', ic: 'history' });
   return `<div class="ner-detail">
     <div class="detail-toggles">
       ${toggle(`${path}.inPV`, n.inPV, 'Trecut în procesul-verbal', { level: 'green', ic: 'pv', offLabel: 'Netrecut în procesul-verbal' })}
       ${toggle(`${path}.amenda.aplicata`, a.aplicata, 'Sancționat cu amendă', { level: 'blue', ic: 'fine' })}
+      ${veche}
     </div>
     ${asi}${fine}
   </div>`;

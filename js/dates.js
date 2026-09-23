@@ -124,3 +124,47 @@ export function queryRange(dq) {
 export function rangesOverlap(a1, a2, b1, b2) {
   return a1 <= b2 && b1 <= a2;
 }
+
+// ───────── Zile nelucrătoare (România) ─────────
+// Sărbătorile legale din Codul muncii, art. 139 (inclusiv 6 și 7 ianuarie, din 2024).
+// Paștele ortodox: algoritmul Meeus (calendar iulian) + 13 zile (valabil 1900–2099).
+export function pasteOrtodox(year) {
+  const a = year % 4, b = year % 7, c = year % 19;
+  const d = (19 * c + 15) % 30;
+  const e = (2 * a + 4 * b - d + 34) % 7;
+  const month = Math.floor((d + e + 114) / 31);
+  const day = ((d + e + 114) % 31) + 1;
+  return addDays(`${year}-${pad(month)}-${pad(day)}`, 13);
+}
+
+const holidayCache = new Map();
+export function sarbatoriLegale(year) {
+  if (holidayCache.has(year)) return holidayCache.get(year);
+  const p = pasteOrtodox(year);
+  const list = [
+    [`${year}-01-01`, 'Anul Nou'], [`${year}-01-02`, 'Anul Nou'],
+    [`${year}-01-06`, 'Boboteaza'], [`${year}-01-07`, 'Sfântul Ioan Botezătorul'],
+    [`${year}-01-24`, 'Ziua Unirii'],
+    [addDays(p, -2), 'Vinerea Mare'], [p, 'Paștele'], [addDays(p, 1), 'a doua zi de Paște'],
+    [`${year}-05-01`, 'Ziua Muncii'], [`${year}-06-01`, 'Ziua Copilului'],
+    [addDays(p, 49), 'Rusaliile'], [addDays(p, 50), 'a doua zi de Rusalii'],
+    [`${year}-08-15`, 'Adormirea Maicii Domnului'], [`${year}-11-30`, 'Sfântul Andrei'],
+    [`${year}-12-01`, 'Ziua Națională'], [`${year}-12-25`, 'Crăciunul'], [`${year}-12-26`, 'a doua zi de Crăciun'],
+  ];
+  const map = new Map();
+  for (const [d, name] of list) map.set(d, map.has(d) ? `${map.get(d)} / ${name}` : name);
+  holidayCache.set(year, map);
+  return map;
+}
+
+// Dacă ziua e nelucrătoare, întoarce motivul („sâmbătă”, „sărbătoare legală – Crăciunul”), altfel ''.
+export function zinelucratoare(iso) {
+  if (!isISO(iso)) return '';
+  const hol = sarbatoriLegale(+iso.slice(0, 4)).get(iso);
+  if (hol) return `sărbătoare legală – ${hol}`;
+  const [y, m, d] = iso.split('-').map(Number);
+  const wd = new Date(y, m - 1, d).getDay();
+  if (wd === 6) return 'sâmbătă';
+  if (wd === 0) return 'duminică';
+  return '';
+}
