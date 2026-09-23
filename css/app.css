@@ -823,3 +823,18 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .guide-step p { margin: 0.2222rem 0 0; font-size: 0.9444rem; color: var(--text); }
 .welcome p { max-width: none; }
 @media (max-width: 700px) { .guide-steps { grid-template-columns: 1fr; } }
+
+/* ───────── Nereguli grave (NU la dotări) ───────── */
+:root { --cat-lipsa: var(--red); --cat-evacuare: #16a34a; --cat-detectoare: #c026d3; }
+.cat-lipsa { --cat: var(--cat-lipsa); } .cat-evacuare { --cat: var(--cat-evacuare); } .cat-detectoare { --cat: var(--cat-detectoare); }
+.cat-lipsa .cat-title { background: var(--red-soft); color: var(--red-ink); }
+.cat-lipsa .check-row:not(.is-ok):not(.is-nok) { border-color: var(--red); border-style: dashed; }
+.cat-lipsa .check-row .row-idx { background: var(--red); color: #fff; }
+.dot-row.is-grav { background: var(--red-soft) !important; box-shadow: inset 0.3333rem 0 0 var(--red); }
+.dot-row.is-grav .seg-dnn button.on.v-NU { background: var(--red); }
+.grav-note { display: flex; align-items: center; gap: 0.2222rem; margin-top: 0.1111rem; font-size: 0.7778rem; font-weight: 800; color: var(--red-ink); }
+.grav-note .ic { width: 0.9444rem; height: 0.9444rem; }
+.constr-nu { display: flex; align-items: center; gap: 0.4444rem; min-height: 2.2rem; font-size: 0.9444rem; color: var(--red-ink); }
+.constr-nu .ic { width: 1.1111rem; height: 1.1111rem; }
+.todo-item.t-grav { background: var(--red); color: #fff; }
+.constr-head .pill { flex: none; }

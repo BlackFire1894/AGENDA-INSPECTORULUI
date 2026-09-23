@@ -1,10 +1,11 @@
 // Editorul unui control: 3 taburi — Obiectiv, Acte & evidențe, Nereguli.
 import { state, today } from './state.js';
-import { fmtDate, fmtDateLong, isISO } from './dates.js';
+import { fmtDate, fmtDateLong } from './dates.js';
 import {
   TIP_OBIECTIV, DOTARI, CENTRALA_TIPURI, ACTE, STRUCTURI, MATERIALE_PERETI, SECTIUNI, CATEGORII,
   controlStats, secStats, fineStatus, fineDate, asiDeadline, isIncheiat, neregulaLabel, neregulaLetter,
-  neregulaCat, secOf, isApplicable, isLocalitate, constructieOf, amendaSerieNr, vecheInfo, constatareAnterioara, todoList,
+  neregulaCat, secOf, isApplicable, isLocalitate, constructieOf, amendaSerieNr, vecheInfo, todoList,
+  LIPSA_DOTARI, constructiiCuNU, sablon,
 } from './model.js';
 import { icon, esc, pill, tipBadge, helpBtn } from './ui.js';
 
@@ -118,6 +119,13 @@ function obsField(path, value, cls = 'row-obs') {
     <textarea class="obs ${cls}" data-bind="${path}" rows="1" placeholder="Observații" autocomplete="off" enterkeyhint="enter">${esc(value)}</textarea>
     <button type="button" class="obs-hide" data-act="obs-hide" data-path="${path}" aria-label="Ascunde aceste observații" title="Ascunde">${icon('chevD', 'up')}</button>
   </div>`;
+}
+
+// Neregulile grave: construcțiile în care instalația e marcată NU (se actualizează singure)
+function constrNU(c, n) {
+  const list = constructiiCuNU(c, sablon(n.key).reqNU);
+  if (!list.length) return '';
+  return `<span class="constr-nu">${icon('building')} NU la dotări în: <b>${list.map((k) => esc(k.denumire)).join(', ')}</b></span>`;
 }
 
 // Construcția în care s-a făcut constatarea (implicit prima construcție)
@@ -235,15 +243,16 @@ function isOpen(c, k, i) {
 }
 
 function dotariSummary(k) {
-  let da = 0, nec = 0, set = 0;
+  let da = 0, nec = 0, set = 0, lipsa = 0;
   for (const d of DOTARI) {
     const v = k.dotari[d.key];
     if (d.centrala) { if (v.tipuri.length || v.nuAre) set++; continue; }
     if (v.v) set++;
     if (v.v === 'DA') da++;
     if (v.v === 'NEC') nec++;
+    if (v.v === 'NU' && LIPSA_DOTARI.includes(d.key)) lipsa++;
   }
-  return { da, nec, set, total: DOTARI.length };
+  return { da, nec, set, lipsa, total: DOTARI.length };
 }
 
 function constructieHTML(c, k, i) {
@@ -254,6 +263,7 @@ function constructieHTML(c, k, i) {
     <div class="constr-head">
       <span class="constr-num">${i + 1}</span>
       <input class="constr-name" data-bind="${p}.denumire" value="${esc(k.denumire)}" placeholder="Denumirea construcției ${i + 1}" autocomplete="off">
+      ${s.lipsa ? `<span class="pill pill-red">${icon('alert')}${s.lipsa} ${s.lipsa === 1 ? 'instalație lipsă' : 'instalații lipsă'}</span>` : ''}
       <span class="constr-sum">${s.set}/${s.total} dotări${k.suprafata ? ` · ${esc(k.suprafata)} m²` : ''}${k.regimInaltime ? ` · ${esc(k.regimInaltime)}` : ''}</span>
       <button class="icon-btn" data-act="constr-toggle" data-id="${k.id}" aria-label="${open ? 'Restrânge' : 'Extinde'}">${icon('chevD', open ? 'rot' : '')}</button>
     </div>
@@ -285,8 +295,9 @@ function dotareRow(p, k, d) {
       ${obsField(`${path}.obs`, v.obs, 'dot-obs')}
     </div>`;
   }
-  return `<div class="dot-row">
-    <span class="dot-label">${esc(d.label)}</span>
+  const grav = v.v === 'NU' && LIPSA_DOTARI.includes(d.key);
+  return `<div class="dot-row ${grav ? 'is-grav' : ''}">
+    <span class="dot-label">${esc(d.label)}${grav ? `<small class="grav-note">${icon('alert')} Neregulă gravă</small>` : ''}</span>
     ${segBtns(`${path}.v`, v.v, d.opts, 'seg-dnn')}
     ${obsField(`${path}.obs`, v.obs, 'dot-obs')}
   </div>`;
@@ -343,7 +354,7 @@ function tabSectiune(c, sec) {
   const f = state.ui.nerFilter;
   const showAll = state.ui.showAllNer;
   const rows = c.nereguli.filter((n) => secOf(n) === sec);
-  const tmpl = rows.filter((n) => !n.custom && (showAll || isApplicable(c, n)));
+  const tmpl = rows.filter((n) => !n.custom && (isApplicable(c, n) || (showAll && !sablon(n.key)?.grav)));
   const custom = rows.filter((n) => n.custom);
   const show = (n) => f === 'ALL' || (f === 'NOK' ? n.status === 'nok' : !n.status);
   const inPV = st.constatate - st.netrecute;
@@ -452,13 +463,15 @@ function neregulaRow(c, n) {
   const vi = vecheInfo(state.controls, c, n);
   if (vi.veche) chips.unshift(`<span class="pill pill-veche">${icon('history')}Neregulă veche</span>`);
   else if (n.status !== 'nok' && vi.auto) chips.push(pill('neutral', `Constatată la controlul din ${fmtDate(vi.auto.dataInceput)}`, 'history'));
-  if (!n.custom && !isApplicable(c, { ...n, status: '' })) chips.push(pill('neutral', 'Instalație nebifată DA la dotări', 'info'));
+  if (!n.custom && !isApplicable(c, { ...n, status: '' })) {
+    chips.push(pill('neutral', sablon(n.key)?.reqNU ? 'Nu mai e marcată NU la dotări' : 'Instalație nebifată DA la dotări', 'info'));
+  }
   return `<div class="check-row ner-row ${n.status ? `is-${n.status}` : ''} ${vi.veche ? 'is-veche' : ''}" id="ner-${esc(n.key)}">
     <span class="row-idx letter">${esc(letter)}</span>
     <div class="row-main">
       ${labelHTML}
       ${chips.length ? `<span class="chips">${chips.join('')}</span>` : ''}
-      ${n.sec === 'ner' || !n.sec ? constrSelect(c, n, path) : ''}
+      ${sablon(n.key)?.reqNU ? constrNU(c, n) : (n.sec === 'ner' || !n.sec ? constrSelect(c, n, path) : '')}
       ${obsField(`${path}.obs`, n.obs)}
     </div>
     <div class="row-side">

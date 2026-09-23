@@ -1,13 +1,13 @@
 // Ecranele de listă: Panou, Obiective, Obiectiv (istoric), Calendar, Istoric, Setări.
 import { state, today } from './state.js';
 import {
-  fmtDate, fmtDateLong, fmtDateMedium, MONTHS, MONTHS_SHORT, WEEKDAYS_SHORT, addDays, diffDays,
-  toISO, zile, parseDateQuery, isISO, ucfirst,
+  fmtDate, fmtDateLong, MONTHS, MONTHS_SHORT, WEEKDAYS_SHORT, addDays, diffDays,
+  toISO, zile, parseDateQuery, ucfirst,
 } from './dates.js';
 import {
   objectives, allFines, allAsi, isIncheiat, byStartDesc, controlStats, matchControl, fold,
-  neregulaLabel, neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
-  constructieOf, amendaSerieNr, vecheInfo, constatareLabel,
+  neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
+  constructieOf, amendaSerieNr, vecheInfo, constatareLabel, sablon, isApplicable,
 } from './model.js';
 import { icon, esc, pill, tipBadge, empty, helpBtn } from './ui.js';
 import { APP_VERSION } from './version.js';
@@ -55,6 +55,8 @@ export function controlRow(c, { showName = true } = {}) {
   const chips = [statusPill(c)];
   if (st.constatate) chips.push(pill('neutral', `${st.constatate} ${st.constatate === 1 ? 'neregulă' : 'nereguli'}`));
   if (st.netrecute) chips.push(pill('warn', `${st.netrecute} netrecute în PV`, 'pv'));
+  const grave = c.nereguli.filter((n) => !n.custom && sablon(n.key)?.grav && n.status !== 'ok' && isApplicable(c, n)).length;
+  if (grave) chips.unshift(pill('red', `${grave} ${grave === 1 ? 'neregulă gravă' : 'nereguli grave'}`, 'alert'));
   const vechi = activeNereguli(c).filter((n) => vecheInfo(state.controls, c, n).veche).length;
   if (vechi) chips.push(`<span class="pill pill-veche">${icon('history')}${vechi} ${vechi === 1 ? 'neregulă veche' : 'nereguli vechi'}</span>`);
   const byLevel = {};
@@ -102,7 +104,7 @@ export function hintText(value) {
 export function viewDashboard() {
   const t = today();
   const cs = state.controls;
-  const now = state.now;
+  const now = new Date();
   const head = `<header class="page-head dash-head">
     <div>
       <div class="eyebrow">${icon('clock')} Data și ora tabletei</div>

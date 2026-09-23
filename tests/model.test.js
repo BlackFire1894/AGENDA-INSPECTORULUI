@@ -5,7 +5,7 @@ import {
   newControl, fineStatus, asiDeadline, matchControl, objectives, controlFromPrevious,
   normalizeControl, allFines, NEREGULI, SABLON, isApplicable, secStats, sectiuniActive, activeNereguli,
   neregulaLetter, tabOfNeregula, controlStats, constructieOf, amendaSerieNr, ACTE, emptyConstructie,
-  vecheInfo, pvText, constatareLabel, todoList,
+  vecheInfo, pvText, constatareLabel, todoList, NEREGULI_GRAVE, constructiiCuNU,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -157,13 +157,13 @@ test('nereguli de instalații: apar doar dacă instalația e bifată DA la dotă
   // un rând completat nu dispare, chiar dacă instalația e scoasă
   n('q').status = 'nok';
   assert.ok(isApplicable(c, n('q')));
-  assert.equal(secStats(c, 'ner').total, 5 + 4 + 2 + 1); // a,b,d,e,f + c,i,l,m + g,h + q
+  assert.equal(secStats(c, 'ner').total, 5 + 5 + 4 + 2 + 1); // a,b,d,e,f + aa…ae (mereu) + c,i,l,m + g,h + q
 });
 
 test('Planuri/SVSU și Protecție civilă: doar la Localitate, cu amenzi în Panou', () => {
   const o = newControl({ tip: 'OPEC', start: '2026-09-01' });
   assert.deepEqual(sectiuniActive(o), ['ner']);
-  assert.equal(activeNereguli(o).length, NEREGULI.length);
+  assert.equal(activeNereguli(o).length, NEREGULI.length + NEREGULI_GRAVE.length);
   const l = newControl({ tip: 'LOCALITATE', start: '2026-09-01' });
   l.dataIncheiere = '2026-09-01';
   assert.deepEqual(sectiuniActive(l), ['ner', 'plan', 'pc']);
@@ -310,4 +310,36 @@ test('„Ce mai am de făcut”: pașii rămași, în ordine, și lista goală l
   for (const n of l.nereguli) if (n.sec === 'pc') n.status = 'ok';
   const pc = todoList(l).find((x) => x.id === 'todo-pc');
   assert.ok(pc && /1 rubrică neverificată/.test(pc.text) && pc.focus === 'adapostPC');
+});
+
+test('v1.7: nereguli noi, detectori autonomi, ignifugare expirată, nereguli grave la NU', () => {
+  const c = newControl({ denumire: 'Hotel', start: '2026-09-01' });
+  c.constructii.push(emptyConstructie(2));
+  c.constructii[1].denumire = 'Anexă';
+  const n = (k) => c.nereguli.find((x) => x.key === k);
+  for (const k of ['aa', 'ab', 'ac', 'ad', 'ae']) assert.ok(isApplicable(c, n(k)), `${k} mereu vizibilă`);
+  assert.ok(!isApplicable(c, n('af')) && !isApplicable(c, n('ag')));
+  c.constructii[0].dotari.detectoriAutonomi.v = 'DA';
+  c.constructii[1].dotari.ignifugare.v = 'DA';
+  assert.ok(isApplicable(c, n('af')) && isApplicable(c, n('ag')));
+  // NU = neregulă gravă; NEC nu
+  const g = n('lipsa-hidInt');
+  assert.equal(neregulaLetter(c, g), 'G1');
+  assert.ok(!isApplicable(c, g));
+  c.constructii[0].dotari.hidInt.v = 'NEC';
+  assert.ok(!isApplicable(c, g));
+  c.constructii[1].dotari.hidInt.v = 'NU';
+  assert.ok(isApplicable(c, g));
+  assert.equal(constructieOf(c, g).denumire, 'Anexă');               // implicit: construcția cu NU
+  c.constructii[0].dotari.hidInt.v = 'NU';
+  assert.deepEqual(constructiiCuNU(c, 'hidInt').map((k) => k.denumire), ['Construcția 1', 'Anexă']);
+  const t = todoList(c);
+  assert.equal(t[0].level, 'grav');
+  assert.match(t[0].text, /lipsă hidranți interiori/);
+  g.status = 'nok';
+  assert.match(pvText(c, [c]).text, /Lipsă hidranți interiori – construcțiile: Construcția 1, Anexă/);
+  assert.ok(!todoList(c).some((x) => x.id === 'grave'));
+  // ASI / AVIZ pe NU nu generează nereguli grave (sunt documente)
+  c.constructii[0].dotari.asi.v = 'NU';
+  assert.ok(!c.nereguli.some((x) => x.key === 'lipsa-asi'));
 });

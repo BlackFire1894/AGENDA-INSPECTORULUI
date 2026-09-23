@@ -5,7 +5,7 @@ import {
   TERMEN_PLATA, PRAG_ROSU, TERMEN_ANAF, TERMEN_ASI, fmtDate, zinelucratoare,
 } from './dates.js';
 
-export const SCHEMA_VERSION = 4; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche
+export const SCHEMA_VERSION = 5; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări)
 
 export const TIP_OBIECTIV = [
   { key: 'OPEC', label: 'OPEC / Instituție' },
@@ -25,6 +25,7 @@ export const DOTARI = [
   { key: 'drencere', label: 'Drencere', opts: DNN },
   { key: 'instSpeciale', label: 'Instalații speciale', opts: DNN },
   { key: 'idsai', label: 'IDSAI', opts: DNN },
+  { key: 'detectoriAutonomi', label: 'Detectori autonomi', opts: DNN },
   { key: 'exit', label: 'EXIT', opts: DNN },
   { key: 'desfumare', label: 'Desfumare', opts: DNN },
   { key: 'ignifugare', label: 'Ignifugare', opts: DNN },
@@ -57,6 +58,7 @@ export const ACTE = [
 
 // Categorii (cod de culori în interfață: bandă colorată + titlu de grup)
 export const CATEGORII = {
+  lipsa: 'Instalații lipsă (NU la dotări) — nereguli grave',
   docs: 'Documentație și verificări',
   stingatoare: 'Stingătoare',
   electric: 'Instalații electrice și compartimentări',
@@ -66,6 +68,8 @@ export const CATEGORII = {
   desfumare: 'Desfumare',
   stingere: 'Sprinklere, drencere, instalații speciale',
   pompe: 'Stație de pompe / generator',
+  evacuare: 'Evacuare și instrucțiuni',
+  detectoare: 'Detectoare și ignifugare',
   planuri: 'Planuri',
   svsu: 'SVSU',
   avertizare: 'Avertizare – sirene',
@@ -112,7 +116,29 @@ export const NEREGULI = [
   { key: 'x', cat: 'stingere', label: 'Instalații speciale nefuncționale', req: ['instSpeciale'] },
   { key: 'y', cat: 'pompe', label: 'Probleme stație de pompe / generator', req: ['statiePompe'] },
   { key: 'z', cat: 'pompe', label: 'Stație de pompe / generator nefuncțional', req: ['statiePompe'] },
+  { key: 'aa', cat: 'evacuare', label: 'Planuri de evacuare neafișate corespunzător' },
+  { key: 'ab', cat: 'evacuare', label: 'Căi de evacuare blocate / obturate' },
+  { key: 'ac', cat: 'evacuare', label: 'Lipsă instrucțiuni de utilizare a echipamentelor de gătit' },
+  { key: 'ad', cat: 'evacuare', label: 'Lipsă instrucțiuni de comportare (turism)' },
+  { key: 'ae', cat: 'detectoare', label: 'Detector de gaz defect / inexistent' },
+  { key: 'af', cat: 'detectoare', label: 'Detectori autonomi nefuncționali', req: ['detectoriAutonomi'] },
+  { key: 'ag', cat: 'detectoare', label: 'Ignifugare expirată', req: ['ignifugare'] },
 ].map((n) => ({ ...n, sec: 'ner' }));
+
+// NU la o instalație (unde NEC = „nu este cazul” e altă opțiune) = instalație necesară care lipsește → neregulă gravă.
+// Pentru fiecare astfel de dotare există un rând „Lipsă …”, afișat doar cât timp cel puțin o construcție are NU.
+// ASI și AVIZ sunt documente, nu instalații (lipsa lor e acoperită de neregula „a”).
+export const LIPSA_DOTARI = ['hidInt', 'hidExt', 'sprinklere', 'drencere', 'instSpeciale', 'idsai', 'detectoriAutonomi',
+  'exit', 'desfumare', 'ignifugare', 'rezervaApa', 'statiePompe'];
+const LIPSA_LABEL = {
+  hidInt: 'Lipsă hidranți interiori', hidExt: 'Lipsă hidranți exteriori', sprinklere: 'Lipsă instalație de sprinklere',
+  drencere: 'Lipsă instalație de drencere', instSpeciale: 'Lipsă instalații speciale de stingere', idsai: 'Lipsă IDSAI',
+  detectoriAutonomi: 'Lipsă detectori autonomi', exit: 'Lipsă marcaje EXIT', desfumare: 'Lipsă instalație de desfumare',
+  ignifugare: 'Lipsă ignifugare', rezervaApa: 'Lipsă rezervă de apă', statiePompe: 'Lipsă stație de pompe',
+};
+export const NEREGULI_GRAVE = LIPSA_DOTARI.map((k, i) => ({
+  key: `lipsa-${k}`, cat: 'lipsa', sec: 'ner', grav: true, reqNU: k, letter: `G${i + 1}`, label: LIPSA_LABEL[k],
+}));
 
 export const PLANURI = [
   { key: 'paar', cat: 'planuri', label: 'PAAR avizat', nokLabel: 'PAAR neavizat' },
@@ -136,7 +162,7 @@ export const PROTECTIE_CIVILA = [
 ].map((n) => ({ ...n, sec: 'pc' }));
 
 // Toate rândurile șablon, în toate secțiunile
-export const SABLON = [...NEREGULI, ...PLANURI, ...PROTECTIE_CIVILA];
+export const SABLON = [...NEREGULI_GRAVE, ...NEREGULI, ...PLANURI, ...PROTECTIE_CIVILA];
 const SABLON_BY_KEY = new Map(SABLON.map((t) => [t.key, t]));
 export const sablon = (key) => SABLON_BY_KEY.get(key);
 
@@ -227,7 +253,14 @@ export const isIncheiat = (c) => isISO(c.dataIncheiere);
 // Dacă construcția aleasă a fost ștearsă, revine la prima.
 export function constructieOf(c, n) {
   const list = c.constructii || [];
-  return list.find((k) => k.id === n.constructieId) || list[0] || null;
+  const t = n && !n.custom ? SABLON_BY_KEY.get(n.key) : null;
+  const implicit = t?.reqNU ? constructiiCuNU(c, t.reqNU)[0] : null;
+  return list.find((k) => k.id === n.constructieId) || implicit || list[0] || null;
+}
+
+// Construcțiile care au NU la o dotare (instalație necesară, lipsă)
+export function constructiiCuNU(c, key) {
+  return (c.constructii || []).filter((k) => k.dotari?.[key]?.v === 'NU');
 }
 
 // „Seria AB nr. 123456” (gol dacă nu s-a completat nimic)
@@ -262,6 +295,7 @@ export function neregulaLetter(c, n) {
     return `+${idx + 1}`;
   }
   const t = sablon(n.key);
+  if (t?.letter) return t.letter;
   if (!t || t.sec === 'ner') return n.key;
   return String(SABLON.filter((x) => x.cat === t.cat).indexOf(t) + 1);
 }
@@ -292,8 +326,9 @@ export function hasDotare(c, key) {
 // Un rând deja completat rămâne mereu vizibil, ca să nu „dispară” date.
 export function isApplicable(c, n) {
   if (n.custom || n.status) return true;
-  const req = sablon(n.key)?.req;
-  return !req || req.some((k) => hasDotare(c, k));
+  const t = sablon(n.key);
+  if (t?.reqNU) return constructiiCuNU(c, t.reqNU).length > 0;
+  return !t?.req || t.req.some((k) => hasDotare(c, k));
 }
 
 // Statistici pentru o secțiune (tab)
@@ -306,7 +341,8 @@ export function secStats(c, sec, today = todayISO()) {
   if (sec === 'pc') { total += 1; if (c.adapostPC?.v) checked += 1; }
   return {
     total, checked,
-    hidden: rows.length - visible.length,
+    // rândurile „Lipsă …” (nereguli grave) nu sunt „ascunse”: există doar când o instalație e pe NU
+    hidden: rows.filter((n) => !isApplicable(c, n) && !sablon(n.key)?.grav).length,
     constatate: nok.length,
     netrecute: nok.filter((n) => !n.inPV).length,
     fines: nok.filter((n) => n.amenda?.aplicata).map((n) => ({ n, st: fineStatus(c, n, today) })),
@@ -519,7 +555,10 @@ export function pvText(c, controls = [], { doarNetrecute = false, cuActe = true 
     for (const n of rows) {
       let t = `${++nr}. ${constatareLabel(n)}`;
       const k = constructieOf(c, n);
-      if (sec === 'ner' && multe && k) t += ` – construcția: ${k.denumire}`;
+      const tNU = sablon(n.key)?.reqNU;
+      const cuNU = tNU && !n.constructieId ? constructiiCuNU(c, tNU) : [];
+      if (sec === 'ner' && multe && cuNU.length > 1) t += ` – construcțiile: ${cuNU.map((x) => x.denumire).join(', ')}`;
+      else if (sec === 'ner' && multe && k) t += ` – construcția: ${k.denumire}`;
       if (n.obs && n.obs.trim()) t += `. ${n.obs.trim().replace(/\s*\n\s*/g, '; ')}`;
       const extra = [];
       if (vecheInfo(controls, c, n).veche) extra.push('neregulă veche');
@@ -554,8 +593,12 @@ export function todoList(c, { includeClose = true } = {}) {
   if (acteTodo.length) {
     out.push({ id: 'acte', level: 'todo', text: `${acteTodo.length} ${acteTodo.length === 1 ? 'act neverificat' : 'acte neverificate'}`, tab: 'acte', focus: `act-${acteTodo[0].key}` });
   }
+  const grave = c.nereguli.filter((n) => !n.custom && sablon(n.key)?.grav && !n.status && isApplicable(c, n));
+  if (grave.length) {
+    out.unshift({ id: 'grave', level: 'grav', text: `${grave.length === 1 ? 'O neregulă gravă' : `${grave.length} nereguli grave`}: ${grave.map((n) => neregulaLabel(n).toLowerCase()).join(', ')} (NU la dotări)`, tab: 'nereguli', focus: grave[0].key });
+  }
   for (const sec of sectiuniActive(c)) {
-    const rows = c.nereguli.filter((n) => secOf(n) === sec && isApplicable(c, n));
+    const rows = c.nereguli.filter((n) => secOf(n) === sec && isApplicable(c, n) && !(sec === 'ner' && sablon(n.key)?.grav));
     const todo = rows.filter((n) => !n.status);
     const adapost = sec === 'pc' && !c.adapostPC?.v ? 1 : 0;
     const k = todo.length + adapost;

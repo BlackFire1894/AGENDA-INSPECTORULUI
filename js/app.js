@@ -1,18 +1,18 @@
 // Punctul de intrare: rutare, evenimente, fluxuri (control nou, backup, date demo).
 import * as store from './store.js';
 import { state, today, getControl, touch, flush, addControl, removeControl, onSaveState, savePref } from './state.js';
-import { addDays, fmtDate, fmtDateLong, toISO, parseDateQuery, isISO } from './dates.js';
+import { fmtDate, fmtDateLong, toISO, parseDateQuery, isISO } from './dates.js';
 import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
   fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat, pvText, sectiuniActive, secOf,
-  todoList, isApplicable, ACTE,
+  todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon,
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
   viewCalendar, viewSettings, hintText, backupAgeText, backupIsStale, guideSteps,
 } from './views.js';
 import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML } from './editor.js';
-import { GHID, AJUTOR } from './help.js';
+import { AJUTOR } from './help.js';
 import { icon, esc, toast, openModal, closeModal, confirmDialog } from './ui.js';
 import { buildDemo } from './demo.js';
 import { APP_VERSION } from './version.js';
@@ -20,6 +20,7 @@ import { fisaMarkup, fisaDocument, fisaFileName, FISA_CSS } from './fisa.js';
 
 const main = () => document.getElementById('main');
 let persisted = false;
+let lastDay = today();   // ultima zi văzută de aplicație (pentru detectarea zilei noi)
 let route = { name: 'panou' };
 
 // ───────── rutare ─────────
@@ -40,6 +41,7 @@ function parseRoute() {
 }
 
 async function render({ keepScroll = false } = {}) {
+  dayChanged();
   const prev = route;
   route = parseRoute();
   if (route.name !== 'control' && route.name !== 'fisa') state.ui.backTo = location.hash || '#/panou';
@@ -275,7 +277,7 @@ document.addEventListener('click', async (e) => {
       render({ keepScroll: true }); return;
     }
     case 'cal-today': {
-      state.ui.calYear = state.now.getFullYear(); state.ui.calMonth = state.now.getMonth(); state.ui.calSelected = today();
+      { const d = new Date(); state.ui.calYear = d.getFullYear(); state.ui.calMonth = d.getMonth(); state.ui.calSelected = today(); }
       render({ keepScroll: true }); return;
     }
     case 'cal-day': {
@@ -312,6 +314,16 @@ document.addEventListener('click', async (e) => {
       const noClear = el.closest('.no-clear');
       const v = el.dataset.toggle && cur === el.dataset.val && !noClear ? '' : el.dataset.val;
       setPath(c, el.dataset.path, v);
+      // NU la o instalație necesară → avertizare: neregulă gravă, adăugată în tabul Nereguli
+      const mDot = el.dataset.path.match(/\.dotari\.(\w+)\.v$/);
+      if (mDot && v === 'NU' && LIPSA_DOTARI.includes(mDot[1])) {
+        const d = DOTARI.find((x) => x.key === mDot[1]);
+        touch(c, true); rerenderEditor();
+        toast(`Neregulă gravă: lipsă ${d.label.toLowerCase()} — apare primul în tabul Nereguli`, 'warn', {
+          label: 'Vezi', fn: () => { location.hash = `#/control/${c.id}/nereguli/lipsa-${mDot[1]}`; },
+        });
+        return;
+      }
       break;
     }
     case 'flag': {
@@ -520,7 +532,7 @@ function openNewControl({ date, oid } = {}) {
 async function restConform(c, sec) {
   let rows;
   if (sec === 'acte') rows = ACTE.map((a) => c.acte[a.key]).filter((v) => !v.status);
-  else rows = c.nereguli.filter((n) => secOf(n) === sec && !n.status && (state.ui.showAllNer || isApplicable(c, n)));
+  else rows = c.nereguli.filter((n) => secOf(n) === sec && !n.status && (isApplicable(c, n) || (state.ui.showAllNer && !sablon(n.key)?.grav)));
   if (!rows.length) return;
   const word = sec === 'acte' ? 'Prezentat' : 'Conform';
   const what = sec === 'acte' ? (rows.length === 1 ? 'act' : 'acte') : (rows.length === 1 ? 'rând' : 'rânduri');
@@ -774,16 +786,24 @@ async function wipeAll() {
 // ───────── ceas: aplicația urmează data și ora tabletei ─────────
 
 function tick() {
-  const prevDay = today();
   state.now = new Date();
   const hh = String(state.now.getHours()).padStart(2, '0');
   const mm = String(state.now.getMinutes()).padStart(2, '0');
   document.querySelectorAll('[data-clock]').forEach((el) => { el.textContent = `${hh}:${mm}`; });
   document.querySelectorAll('[data-clock-date]').forEach((el) => { el.textContent = fmtDateLong(today()); });
-  if (today() !== prevDay) {
-    const typing = document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName);
+  if (dayChanged()) {
+    const typing = document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
     if (!typing) render({ keepScroll: true });
   }
+}
+
+// Zi nouă (aplicația poate sta deschisă zile întregi): calendarul trece pe azi; termenele se recalculează la randare.
+function dayChanged() {
+  if (today() === lastDay) return false;
+  const d = new Date();
+  if (state.ui.calSelected === lastDay) { state.ui.calYear = d.getFullYear(); state.ui.calMonth = d.getMonth(); state.ui.calSelected = today(); }
+  lastDay = today();
+  return true;
 }
 
 document.addEventListener('visibilitychange', () => {

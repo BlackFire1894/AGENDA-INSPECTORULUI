@@ -36,7 +36,8 @@ export const state = {
   meta: { lastBackup: null },
 };
 
-export const today = () => todayISO(state.now);
+// Data de azi se citește mereu direct din ceasul tabletei (nu dintr-o copie), ca să nu rămână în urmă nicio clipă.
+export const today = () => todayISO(new Date());
 
 export function getControl(id) {
   return state.controls.find((c) => c.id === id);

@@ -86,6 +86,7 @@ export const AJUTOR = {
     lines: [
       'Datele obiectivului, perioada controlului și construcțiile, fiecare cu dotările ei (DA / NU / NEC = nu este cazul).',
       'Dotările bifate <b>DA</b> decid ce nereguli de instalații apar în tabul Nereguli.',
+      '<b>NU</b> la o instalație înseamnă că lipsește o instalație necesară: e <b>neregulă gravă</b>, marcată cu roșu, și apare prima în tabul Nereguli (G1, G2…). Pentru „nu e cazul” folosiți <b>NEC</b>.',
       '<b>Încheie controlul</b> vă arată ce ați omis înainte de încheiere și pornește termenele.',
     ],
   },
@@ -100,6 +101,7 @@ export const AJUTOR = {
     title: 'Nereguli',
     lines: [
       '<b>✓ Conform</b> sau <b>✗ Constatat</b>. La constatat: construcția, trecut în PV, amendă (serie, nr., sumă), neregulă veche.',
+      'Sus, cu roșu: <b>nereguli grave</b> (G1, G2…) — instalații marcate NU la dotări. Apar și dispar singure, după dotări.',
       'Apar doar neregulile pentru instalațiile bifate DA la dotări; <b>Arată toate</b> le afișează și pe celelalte.',
       'Categoriile se strâng din titlul lor; observațiile se ascund individual (săgeata) sau toate deodată.',
       '<b>Restul conform</b> bifează tot ce n-ați marcat; <b>Adaugă rând</b> pentru nereguli din afara listei.',
