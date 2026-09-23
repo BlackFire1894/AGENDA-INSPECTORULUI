@@ -4,7 +4,7 @@ import { fmtDate, fmtDateLong, isISO } from './dates.js';
 import {
   TIP_OBIECTIV, DOTARI, CENTRALA_TIPURI, ACTE, STRUCTURI, MATERIALE_PERETI, SECTIUNI, CATEGORII,
   controlStats, secStats, fineStatus, fineDate, asiDeadline, isIncheiat, neregulaLabel, neregulaLetter,
-  neregulaCat, secOf, isApplicable, isLocalitate,
+  neregulaCat, secOf, isApplicable, isLocalitate, constructieOf, amendaSerieNr, vecheInfo, constatareAnterioara,
 } from './model.js';
 import { icon, esc, pill, tipBadge } from './ui.js';
 
@@ -38,7 +38,9 @@ export function edHeadHTML(c) {
     </div>
     <div class="ed-actions">
       <span class="save-ind" id="save-ind">${icon('check')}<span>Salvat</span></span>
-      <a class="btn btn-ghost" href="#/obiectiv/${c.objectiveId}">${icon('history')} Istoric obiectiv</a>
+      <button class="btn btn-ghost" data-act="pv-text">${icon('pv')} Text PV</button>
+      <a class="btn btn-ghost" href="#/fisa/${c.id}">${icon('download')} Fișa (PDF)</a>
+      <a class="btn btn-ghost" href="#/obiectiv/${c.objectiveId}">${icon('history')} Istoric</a>
       <button class="icon-btn big danger" data-act="control-delete" aria-label="Șterge controlul">${icon('trash')}</button>
     </div>`;
 }
@@ -71,6 +73,29 @@ export function tabHTML(c, tab) {
 }
 
 // ───────── helpers pentru câmpuri ─────────
+
+// Observații: câmp pe mai multe rânduri (Enter = rând nou) care crește doar în jos.
+// Cu „Observații ascunse”, toate se ascund: cele completate au indicatorul „Observații scrise”, cele goale „+ Observații”.
+function obsField(path, value, cls = 'row-obs') {
+  if (state.ui.obsHidden && !state.ui.obsOpen.has(path)) {
+    return value
+      ? `<button type="button" class="obs-add has-obs" data-act="obs-open" data-path="${path}" title="${esc(value.slice(0, 120))}">${icon('doc')} Observații scrise</button>`
+      : `<button type="button" class="obs-add" data-act="obs-open" data-path="${path}">${icon('plus')} Observații</button>`;
+  }
+  return `<textarea class="obs ${cls}" data-bind="${path}" rows="1" placeholder="Observații" autocomplete="off" enterkeyhint="enter">${esc(value)}</textarea>`;
+}
+
+// Construcția în care s-a făcut constatarea (implicit prima construcție)
+function constrSelect(c, n, path) {
+  const cur = constructieOf(c, n);
+  if (!cur) return '';
+  return `<label class="constr-sel">
+    ${icon('building')}<span class="constr-sel-lbl">Construcția</span>
+    <select data-bind="${path}.constructieId" data-rerender="1" aria-label="Construcția în care s-a făcut constatarea">
+      ${c.constructii.map((k, i) => `<option value="${k.id}" ${k.id === cur.id ? 'selected' : ''}>${i + 1}. ${esc(k.denumire || `Construcția ${i + 1}`)}</option>`).join('')}
+    </select>
+  </label>`;
+}
 
 function field(label, path, value, { type = 'text', ph = '', list = '', mode = '', unit = '', wide = false, live = '' } = {}) {
   return `<label class="field ${wide ? 'wide' : ''}">
@@ -206,7 +231,7 @@ function constructieHTML(c, k, i) {
         ${field('Structura de rezistență', `${p}.structura`, k.structura, { list: 'dl-structura', ph: 'Alege sau scrie' })}
         ${field('Material pereți', `${p}.materialPereti`, k.materialPereti, { list: 'dl-pereti', ph: 'Alege sau scrie' })}
       </div>
-      <h3 class="mini-title">Dotări și instalații <small>NEC = nu este cazul</small></h3>
+      <div class="mini-row"><h3 class="mini-title">Dotări și instalații <small>NEC = nu este cazul</small></h3>${i === 0 || state.ui.obsHidden ? obsToggleBtn() : ''}</div>
       <div class="dotari">${DOTARI.map((d) => dotareRow(p, k, d)).join('')}</div>
       ${c.constructii.length > 1 ? `<div class="constr-foot"><button class="btn btn-ghost danger" data-act="constr-del" data-id="${k.id}">${icon('trash')} Șterge construcția</button></div>` : ''}
     </div>` : ''}
@@ -223,13 +248,13 @@ function dotareRow(p, k, d) {
         ${CENTRALA_TIPURI.map((t) => `<button type="button" class="chip-sel ${v.tipuri.includes(t) ? 'on' : ''}" data-act="centrala" data-path="${path}" data-val="${t}">${t}</button>`).join('')}
         <button type="button" class="chip-sel ${v.nuAre ? 'on off-kind' : ''}" data-act="centrala" data-path="${path}" data-val="NU_ARE">NU ARE</button>
       </div>
-      <input class="dot-obs" data-bind="${path}.obs" value="${esc(v.obs)}" placeholder="Observații" autocomplete="off">
+      ${obsField(`${path}.obs`, v.obs, 'dot-obs')}
     </div>`;
   }
   return `<div class="dot-row">
     <span class="dot-label">${esc(d.label)}</span>
     ${segBtns(`${path}.v`, v.v, d.opts, 'seg-dnn')}
-    <input class="dot-obs" data-bind="${path}.obs" value="${esc(v.obs)}" placeholder="Observații" autocomplete="off">
+    ${obsField(`${path}.obs`, v.obs, 'dot-obs')}
   </div>`;
 }
 
@@ -241,6 +266,7 @@ function tabActe(c) {
   return `<section class="card">
     <div class="sec-title-row">
       <h2 class="sec-title">${icon('doc')} Acte de autoritate și evidențe</h2>
+      ${obsToggleBtn()}
       <div class="progress-txt"><b>${st.acteDone}</b>/${st.acteTotal} verificate · <span class="t-green">${ok} prezentate</span> · <span class="t-red">${st.acteNok} lipsă</span></div>
     </div>
     <div class="progress"><span class="p-ok" style="width:${(ok / st.acteTotal) * 100}%"></span><span class="p-nok" style="width:${(st.acteNok / st.acteTotal) * 100}%"></span></div>
@@ -251,7 +277,7 @@ function tabActe(c) {
         <span class="row-idx">${i + 1}</span>
         <div class="row-main">
           <span class="row-label">${esc(a.label)}</span>
-          <input class="row-obs" data-bind="${path}.obs" value="${esc(v.obs)}" placeholder="Observații" autocomplete="off">
+          ${obsField(`${path}.obs`, v.obs)}
         </div>
         ${okNok(path, v.status, 'Prezentat', 'Lipsă')}
       </div>`;
@@ -302,9 +328,15 @@ function tabSectiune(c, sec) {
     const adapost = sec === 'pc' && g.cat === 'pcdotare' && (f === 'ALL' || (f === 'TODO' && !c.adapostPC.v)) ? adapostRow(c) : '';
     if (!vis.length && !adapost) return '';
     const nok = g.rows.filter((n) => n.status === 'nok').length;
-    return `<div class="cat-group cat-${g.cat}">
-      <h3 class="cat-title"><i class="cat-sw"></i>${esc(CATEGORII[g.cat])}${nok ? `<span class="cat-count">${nok} ${nokWord(sec, nok)}</span>` : ''}</h3>
-      <div class="check-list">${vis.map((n) => neregulaRow(c, n)).join('')}${adapost}</div>
+    const closed = state.ui.catCollapsed.has(g.cat);
+    const nRows = vis.length + (adapost ? 1 : 0);
+    return `<div class="cat-group cat-${g.cat} ${closed ? 'closed' : ''}">
+      <button type="button" class="cat-title" data-act="cat-toggle" data-cat="${g.cat}" aria-expanded="${!closed}">
+        ${icon('chevD', closed ? '' : 'rot')}<span class="cat-name">${esc(CATEGORII[g.cat])}</span>
+        <span class="cat-meta">${nRows} ${nRows === 1 ? 'rând' : 'rânduri'}</span>
+        ${nok ? `<span class="cat-count">${nok} ${nokWord(sec, nok)}</span>` : ''}
+      </button>
+      ${closed ? '' : `<div class="check-list">${vis.map((n) => neregulaRow(c, n)).join('')}${adapost}</div>`}
     </div>`;
   }).join('');
   if (!body) body = '<p class="muted pad">Nimic de afișat pentru acest filtru.</p>';
@@ -324,9 +356,13 @@ function tabSectiune(c, sec) {
     </section>
     ${!isIncheiat(c) && anyFineOrAsi ? `<div class="banner banner-info">${icon('info')}<span>Termenele amenzilor${sec === 'ner' ? ' și ASI' : ''} pornesc după ce completezi <b>data încheierii</b> în tabul Obiectiv.</span></div>` : ''}
     ${hiddenNote}
-    <div class="seg-row">
+    <div class="toolbar">
       <div class="segmented">
         ${[['ALL', 'Toate'], ['NOK', `${ui.nokWord[0].toUpperCase()}${ui.nokWord.slice(1)} (${st.constatate})`], ['TODO', `Neverificate (${st.total - st.checked})`]].map(([k, l]) => `<button class="${f === k ? 'on' : ''}" data-act="ner-filter" data-val="${k}">${l}</button>`).join('')}
+      </div>
+      <div class="tool-btns">
+        ${(() => { const all = groups.length && groups.every((g) => state.ui.catCollapsed.has(g.cat)); return `<button class="btn btn-ghost" data-act="cats-all" data-val="${all ? 'open' : 'close'}">${icon(all ? 'chevD' : 'list')} ${all ? 'Extinde categoriile' : 'Restrânge categoriile'}</button>`; })()}
+        ${obsToggleBtn()}
       </div>
     </div>
     <section class="card">
@@ -343,13 +379,18 @@ function tabSectiune(c, sec) {
 }
 
 // Adăpost de protecție civilă: DA / NU / NEC + observații
+export function obsToggleBtn() {
+  const h = state.ui.obsHidden;
+  return `<button class="btn btn-ghost ${h ? 'is-on' : ''}" data-act="obs-toggle" aria-pressed="${h}">${icon('doc')} ${h ? 'Arată observațiile' : 'Ascunde observațiile'}</button>`;
+}
+
 function adapostRow(c) {
   const v = c.adapostPC;
   return `<div class="check-row adapost-row" id="ner-adapostPC">
     <span class="row-idx letter">2</span>
     <div class="row-main">
       <span class="row-label">Adăpost de protecție civilă <small class="muted">NEC = nu este cazul</small></span>
-      <input class="row-obs" data-bind="adapostPC.obs" value="${esc(v.obs)}" placeholder="Observații" autocomplete="off">
+      ${obsField('adapostPC.obs', v.obs)}
     </div>
     <div class="row-side">${segBtns('adapostPC.v', v.v, ['DA', 'NU', 'NEC'], 'seg-dnn seg-adapost')}</div>
   </div>`;
@@ -367,13 +408,17 @@ function neregulaRow(c, n) {
     chips.push(n.inPV ? pill('green', 'Trecut în PV', 'pv') : pill('warn', 'Netrecut în PV', 'pv'));
     if (n.amenda.aplicata) { const fs = fineStatus(c, n, today()); chips.push(pill(fs.level, `Amendă · ${fs.label}`, 'fine')); }
   }
+  const vi = vecheInfo(state.controls, c, n);
+  if (vi.veche) chips.unshift(`<span class="pill pill-veche">${icon('history')}Neregulă veche</span>`);
+  else if (n.status !== 'nok' && vi.auto) chips.push(pill('neutral', `Constatată la controlul din ${fmtDate(vi.auto.dataInceput)}`, 'history'));
   if (!n.custom && !isApplicable(c, { ...n, status: '' })) chips.push(pill('neutral', 'Instalație nebifată DA la dotări', 'info'));
-  return `<div class="check-row ner-row ${n.status ? `is-${n.status}` : ''}" id="ner-${esc(n.key)}">
+  return `<div class="check-row ner-row ${n.status ? `is-${n.status}` : ''} ${vi.veche ? 'is-veche' : ''}" id="ner-${esc(n.key)}">
     <span class="row-idx letter">${esc(letter)}</span>
     <div class="row-main">
       ${labelHTML}
       ${chips.length ? `<span class="chips">${chips.join('')}</span>` : ''}
-      <input class="row-obs" data-bind="${path}.obs" value="${esc(n.obs)}" placeholder="Observații" autocomplete="off">
+      ${n.sec === 'ner' || !n.sec ? constrSelect(c, n, path) : ''}
+      ${obsField(`${path}.obs`, n.obs)}
     </div>
     <div class="row-side">
       ${okNok(path, n.status, sec.ok, sec.nok)}
@@ -395,7 +440,7 @@ function neregulaDetail(c, n, path) {
       </div>
       ${n.asiTermen && d ? `<div class="deadline ${d.resolved ? 'dl-green' : 'dl-red'}">
         ${icon(d.resolved ? 'check' : 'hourglass')}
-        <div><b>${d.resolved ? 'Rezolvat' : d.pending ? 'Termen neînceput' : `Termen: ${esc(fmtDateLong(d.deadline))}`}</b><span>${esc(d.msg)}</span></div>
+        <div><b>${d.resolved ? 'Rezolvat' : d.pending ? 'Termen neînceput' : `Termen: ${esc(fmtDateLong(d.deadline))}`}</b><span>${esc(d.msg)}</span>${d.nelucr ? `<span class="nelucr-inline">⚠ ${esc(d.nelucr)}</span>` : ''}</div>
         ${!d.pending && !d.resolved ? `<span class="countdown big ${d.daysLeft < 0 ? 'over' : ''}"><b>${Math.abs(d.daysLeft)}</b><small>${d.daysLeft < 0 ? 'zile depășit' : d.daysLeft === 1 ? 'zi' : 'zile'}</small></span>` : ''}
       </div>` : ''}
       ${n.asiTermen && n.asiPrezentat ? `<div class="form-grid g3"><label class="field"><span class="lbl">Data prezentării</span><span class="inp-wrap"><input type="date" data-bind="${path}.asiDataPrezentare" data-rerender="1" value="${esc(n.asiDataPrezentare)}"></span></label></div>` : ''}
@@ -408,9 +453,11 @@ function neregulaDetail(c, n, path) {
     fine = `<div class="fine-box fb-${fs.level}">
       <div class="fine-status">
         <span class="fine-dot"></span>
-        <div><b>${esc(fs.label)}</b><span>${esc(fs.msg)}</span></div>
+        <div><b>${esc(fs.label)}${amendaSerieNr(a) ? ` · ${esc(amendaSerieNr(a))}` : ''}</b><span>${esc(fs.msg)}</span></div>
       </div>
       <div class="form-grid g3">
+        ${field('Seria amenzii', `${path}.amenda.serie`, a.serie, { ph: 'ex: AB' })}
+        ${field('Nr. amenzii', `${path}.amenda.numar`, a.numar, { mode: 'numeric', ph: 'ex: 0012345' })}
         <label class="field">
           <span class="lbl">Data aplicării</span>
           <span class="inp-wrap"><input type="date" data-bind="${path}.amenda.data" data-rerender="1" value="${esc(a.data)}"></span>
@@ -424,15 +471,21 @@ function neregulaDetail(c, n, path) {
         ${a.achitata ? `<label class="field"><span class="lbl">Data dovezii de plată</span><span class="inp-wrap"><input type="date" data-bind="${path}.amenda.dataAchitare" data-rerender="1" value="${esc(a.dataAchitare)}"></span></label>` : ''}
       </div>
       ${fs.plataPana && !a.achitata ? `<div class="fine-timeline">
-        <span class="${fs.level === 'blue' ? 'cur' : 'past'}"><i class="dot dot-blue"></i>Plată până la <b>${fmtDate(fs.plataPana)}</b></span>
-        <span class="${fs.level === 'red' ? 'cur' : ''}"><i class="dot dot-red"></i>ANAF până la <b>${fmtDate(fs.anafPana)}</b></span>
+        <span class="${fs.level === 'blue' ? 'cur' : 'past'}"><i class="dot dot-blue"></i>Plată până la <b>${fmtDate(fs.plataPana)}</b>${fs.plataNelucr ? ` <em class="nelucr">(${esc(fs.plataNelucr)})</em>` : ''}</span>
+        <span class="${fs.level === 'red' ? 'cur' : ''}"><i class="dot dot-red"></i>ANAF până la <b>${fmtDate(fs.anafPana)}</b>${fs.anafNelucr ? ` <em class="nelucr">(${esc(fs.anafNelucr)})</em>` : ''}</span>
       </div>` : ''}
+      ${fs.nelucr && !a.achitata ? `<div class="nelucr-warn">${icon('alert')}<span>${esc(fs.nelucr)}</span></div>` : ''}
     </div>`;
   }
+  const vi = vecheInfo(state.controls, c, n);
+  const veche = vi.auto
+    ? `<div class="veche-note">${icon('history')}<span><b>Neregulă veche</b> — constatată și la controlul din ${esc(fmtDate(vi.auto.dataInceput))} (din istoric)</span></div>`
+    : toggle(`${path}.vecheManual`, n.vecheManual, 'Neregulă veche', { level: 'veche', ic: 'history' });
   return `<div class="ner-detail">
     <div class="detail-toggles">
       ${toggle(`${path}.inPV`, n.inPV, 'Trecut în procesul-verbal', { level: 'green', ic: 'pv', offLabel: 'Netrecut în procesul-verbal' })}
       ${toggle(`${path}.amenda.aplicata`, a.aplicata, 'Sancționat cu amendă', { level: 'blue', ic: 'fine' })}
+      ${veche}
     </div>
     ${asi}${fine}
   </div>`;

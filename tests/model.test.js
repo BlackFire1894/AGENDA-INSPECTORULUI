@@ -1,10 +1,11 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { addDays, diffDays, parseDateQuery, zile } from '../js/dates.js';
+import { addDays, diffDays, parseDateQuery, zile, pasteOrtodox, zinelucratoare } from '../js/dates.js';
 import {
   newControl, fineStatus, asiDeadline, matchControl, objectives, controlFromPrevious,
   normalizeControl, allFines, NEREGULI, SABLON, isApplicable, secStats, sectiuniActive, activeNereguli,
-  neregulaLetter, tabOfNeregula, controlStats,
+  neregulaLetter, tabOfNeregula, controlStats, constructieOf, amendaSerieNr, ACTE, emptyConstructie,
+  vecheInfo, pvText,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -180,4 +181,95 @@ test('Planuri/SVSU și Protecție civilă: doar la Localitate, cu amenzi în Pan
   assert.equal(allFines([l], '2026-09-05').length, 0);
   assert.equal(controlStats(l).constatate, 0);
   assert.equal(l.nereguli.find((n) => n.key === 'pcSireneDefecte').status, 'nok');
+});
+
+test('v1.4: acte exerciții, construcția neregulii, seria și nr. amenzii', () => {
+  assert.ok(['exercitii', 'registreExercitii', 'rapoarteExercitii'].every((k) => ACTE.some((a) => a.key === k)));
+  const c = newControl({ start: '2026-09-01' });
+  c.constructii.push(emptyConstructie(2));
+  const n = c.nereguli.find((x) => x.key === 'd');
+  assert.equal(constructieOf(c, n).id, c.constructii[0].id);      // implicit prima construcție
+  n.constructieId = c.constructii[1].id;
+  assert.equal(constructieOf(c, n).id, c.constructii[1].id);
+  c.constructii.splice(1, 1);                                     // construcția aleasă e ștearsă
+  assert.equal(constructieOf(c, n).id, c.constructii[0].id);
+  assert.equal(amendaSerieNr({ serie: ' AB ', numar: '123' }), 'Seria AB nr. 123');
+  assert.equal(amendaSerieNr({ serie: '', numar: '9' }), 'nr. 9');
+  assert.equal(amendaSerieNr({}), '');
+  // date vechi (schema 2): câmpurile noi apar goale
+  const old = normalizeControl({ id: 'x', objectiveId: 'o', dataInceput: '2026-01-01',
+    acte: { ctpsi: { status: 'ok', obs: '' } },
+    nereguli: [{ key: 'b', status: 'nok', amenda: { aplicata: true, data: '', suma: '100', achitata: false, dataAchitare: '' } }] });
+  const b = old.nereguli.find((x) => x.key === 'b');
+  assert.equal(b.constructieId, '');
+  assert.equal(b.amenda.serie, '');
+  assert.equal(b.amenda.suma, '100');
+  assert.deepEqual(old.acte.exercitii, { status: '', obs: '' });
+  assert.equal(old.acte.ctpsi.status, 'ok');
+});
+
+test('zile nelucrătoare: Paște ortodox, sărbători legale, weekend', () => {
+  assert.equal(pasteOrtodox(2024), '2024-05-05');
+  assert.equal(pasteOrtodox(2025), '2025-04-20');
+  assert.equal(pasteOrtodox(2026), '2026-04-12');
+  assert.equal(pasteOrtodox(2027), '2027-05-02');
+  assert.match(zinelucratoare('2026-04-10'), /Vinerea Mare/);
+  assert.match(zinelucratoare('2026-06-01'), /Ziua Copilului/);           // coincide cu a doua zi de Rusalii
+  assert.match(zinelucratoare('2026-01-07'), /Sfântul Ioan/);
+  assert.match(zinelucratoare('2026-12-01'), /Ziua Națională/);
+  assert.equal(zinelucratoare('2026-10-03'), 'sâmbătă');
+  assert.equal(zinelucratoare('2026-10-04'), 'duminică');
+  assert.equal(zinelucratoare('2026-09-23'), '');
+});
+
+test('termenul de plată într-o zi nelucrătoare: avertizare, fără mutare', () => {
+  const { c, n } = withFine('2026-09-18');                // +15 = 03.10.2026, sâmbătă
+  const st = fineStatus(c, n, '2026-09-20');
+  assert.equal(st.plataPana, '2026-10-03');               // nu se mută
+  assert.equal(st.plataNelucr, 'sâmbătă');
+  assert.match(st.nelucr, /cade sâmbătă — verifică prelungirea/);
+  const ok = fineStatus(withFine('2026-09-16').c, withFine('2026-09-16').n, '2026-09-20'); // +15 = 01.10, joi
+  assert.equal(ok.nelucr, '');
+});
+
+test('neregulă veche: automat din istoric, manual, doar controale anterioare', () => {
+  const a = newControl({ denumire: 'X', start: '2025-03-01' });
+  const b = controlFromPrevious(a, '2026-09-01');
+  const later = controlFromPrevious(a, '2027-01-01');
+  a.nereguli.find((n) => n.key === 'd').status = 'nok';
+  later.nereguli.find((n) => n.key === 'e').status = 'nok';
+  const all = [a, b, later];
+  const d = b.nereguli.find((n) => n.key === 'd');
+  const e = b.nereguli.find((n) => n.key === 'e');
+  assert.equal(vecheInfo(all, b, d).veche, false);        // încă neconstatată acum
+  d.status = 'nok';
+  const vi = vecheInfo(all, b, d);
+  assert.ok(vi.veche && vi.auto.id === a.id);
+  e.status = 'nok';
+  assert.equal(vecheInfo(all, b, e).veche, false);        // constatată doar la un control ULTERIOR
+  e.vecheManual = true;
+  assert.ok(vecheInfo(all, b, e).veche && !vecheInfo(all, b, e).auto);
+  // rânduri adăugate: același text (fără diacritice / majuscule) = aceeași neregulă
+  const ca = { ...b.nereguli[0], key: 'k1', custom: true, sec: 'ner', label: 'Căi de evacuare blocate', status: 'nok' };
+  a.nereguli.push(ca);
+  const cb = { ...b.nereguli[0], key: 'k2', custom: true, sec: 'ner', label: 'cai de EVACUARE blocate ', status: 'nok', vecheManual: false };
+  b.nereguli.push(cb);
+  assert.ok(vecheInfo(all, b, cb).auto);
+});
+
+test('text PV: numerotare, construcție, observații pe un rând, filtru netrecute', () => {
+  const c = newControl({ denumire: 'Școala 1', start: '2026-09-01' });
+  c.constructii.push(emptyConstructie(2));
+  c.constructii[1].denumire = 'Sala de sport';
+  const d = c.nereguli.find((n) => n.key === 'd');
+  Object.assign(d, { status: 'nok', obs: 'P6 nr. 3\nhol', constructieId: c.constructii[1].id, inPV: true });
+  c.nereguli.find((n) => n.key === 'e').status = 'nok';
+  c.acte.lfd.status = 'nok';
+  const t = pvText(c, [c]).text;
+  assert.match(t, /1\. Stingătoare expirate – construcția: Sala de sport\. P6 nr\. 3; hol/);
+  assert.match(t, /2\. Stingătoare neconforme – construcția: Construcția 1/);
+  assert.match(t, /Acte de autoritate și evidențe lipsă:\n3\. Dispoziție LFD/);
+  const n2 = pvText(c, [c], { doarNetrecute: true, cuActe: false });
+  assert.equal(n2.count, 1);
+  assert.doesNotMatch(n2.text, /expirate/);
 });

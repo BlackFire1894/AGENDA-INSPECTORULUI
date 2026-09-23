@@ -2,6 +2,14 @@
 import * as store from './store.js';
 import { todayISO } from './dates.js';
 
+// Preferințe de afișare ale acestei tablete (nu fac parte din date / backup)
+function pref(key, fallback) {
+  try { const v = localStorage.getItem(key); return v === null ? fallback : JSON.parse(v); } catch { return fallback; }
+}
+export function savePref(key, value) {
+  try { localStorage.setItem(key, JSON.stringify(value)); } catch { /* rămâne doar pentru sesiunea curentă */ }
+}
+
 export const state = {
   controls: [],
   now: new Date(),
@@ -19,6 +27,9 @@ export const state = {
     collapsed: new Set(),     // construcții închise explicit
     nerFilter: 'ALL',
     showAllNer: false,        // arată și neregulile de instalații nebifate DA la dotări
+    obsHidden: pref('agenda-obs-hidden', false),                 // câmpurile de observații goale sunt ascunse
+    obsOpen: new Set(),                                          // observații deschise manual cât sunt ascunse
+    catCollapsed: new Set(pref('agenda-cats-collapsed', [])),    // categorii de nereguli restrânse
   },
   meta: { lastBackup: null },
 };
@@ -37,12 +48,14 @@ export function onSaveState(fn) { listeners.add(fn); }
 function emit(s) { listeners.forEach((fn) => fn(s)); }
 
 // Marchează un control ca modificat și programează salvarea.
-export function touch(c) {
+// `now`: salvează imediat (atingeri, selecții, date); textul tastat se salvează după o scurtă pauză.
+export function touch(c, now = false) {
   c.updatedAt = new Date().toISOString();
   pending.set(c.id, c);
   emit('saving');
   clearTimeout(timer);
-  timer = setTimeout(flush, 350);
+  if (now) flush();
+  else timer = setTimeout(flush, 350);
 }
 
 export async function flush() {
