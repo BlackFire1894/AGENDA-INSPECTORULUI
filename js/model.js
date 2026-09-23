@@ -5,7 +5,7 @@ import {
   TERMEN_PLATA, PRAG_ROSU, TERMEN_ANAF, TERMEN_ASI, fmtDate, zinelucratoare,
 } from './dates.js';
 
-export const SCHEMA_VERSION = 7; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS · 7: mai multe construcții pe neregulă
+export const SCHEMA_VERSION = 7; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS · 7: mai multe construcții pe neregulă, GRF/NSI pe construcție
 
 export const TIP_OBIECTIV = [
   { key: 'OPEC', label: 'OPEC / Instituție' },
@@ -59,6 +59,7 @@ export const ACTE = [
 // Categorii (cod de culori în interfață: bandă colorată + titlu de grup)
 export const CATEGORII = {
   lipsa: 'Instalații lipsă (NU la dotări) — nereguli grave',
+  grf: 'Rezistență la foc (GRF/NSI) — neregulă gravă',
   docs: 'Documentație și verificări',
   stingatoare: 'Stingătoare',
   electric: 'Instalații electrice și compartimentări',
@@ -136,9 +137,24 @@ const LIPSA_LABEL = {
   detectoriAutonomi: 'Lipsă detectori autonomi', exit: 'Lipsă marcaje EXIT', desfumare: 'Lipsă instalație de desfumare',
   ignifugare: 'Lipsă ignifugare', rezervaApa: 'Lipsă rezervă de apă', statiePompe: 'Lipsă stație de pompe',
 };
-export const NEREGULI_GRAVE = LIPSA_DOTARI.map((k, i) => ({
-  key: `lipsa-${k}`, cat: 'lipsa', sec: 'ner', grav: true, reqNU: k, letter: `G${i + 1}`, label: LIPSA_LABEL[k],
-}));
+export const NEREGULI_GRAVE = [
+  ...LIPSA_DOTARI.map((k, i) => ({
+    key: `lipsa-${k}`, cat: 'lipsa', sec: 'ner', grav: true, reqNU: k, letter: `G${i + 1}`, label: LIPSA_LABEL[k],
+  })),
+  // GRF/NSI V cu regim de înălțime peste parter (P+1, P+2E, P+M…) — regula stabilită de utilizator
+  { key: 'grav-grfV', cat: 'grf', sec: 'ner', grav: true, reqGrfV: true, letter: `G${LIPSA_DOTARI.length + 1}`,
+    label: 'Construcție cu GRF/NSI V și regim de înălțime peste parter' },
+];
+
+// Gradul de rezistență la foc / nivelul de stabilitate la incendiu al construcției; 'NN' = nu e necesar
+export const GRF_NIVELURI = ['I', 'II', 'III', 'IV', 'V'];
+export const grfText = (v) => (v === 'NN' ? 'Nu e necesar' : v || '');
+// „Peste parter” = regimul de înălțime are ceva după P: P+1, P+2E, S+P+1, D+P+M, Parter + 1 etaj…
+export function pesteParter(regim) {
+  const s = String(regim || '').toUpperCase().replace(/PARTER/g, 'P').replace(/\s+/g, '');
+  return /(^|[^A-Z])P\+[^+]/.test(s);
+}
+export const grfVPesteParter = (k) => k?.grf === 'V' && pesteParter(k.regimInaltime);
 
 export const PLANURI = [
   { key: 'paar', cat: 'planuri', label: 'PAAR avizat', nokLabel: 'PAAR neavizat' },
@@ -181,6 +197,7 @@ export function emptyConstructie(nr = 1) {
   return {
     id: uid(), denumire: `Construcția ${nr}`, suprafata: '', regimInaltime: '', nrAngajati: '',
     structura: '', materialPereti: '', dotari,
+    grf: '',     // GRF/NSI: 'I'…'V' sau 'NN' (nu e necesar); '' = necompletat
     gps: null,   // { lat, lon, acc (m), la (ISO) } — coordonatele construcției, preluate la cerere cu „Completează coordonatele”
   };
 }
@@ -191,6 +208,8 @@ export function emptyNeregula(key, custom = false, sec = 'ner') {
     key, custom, sec, label: '', status: '', obs: '', inPV: false,
     constructieIds: [],  // construcțiile în care s-a constatat (una sau mai multe); [] = implicit (prima / cele cu NU)
     vecheManual: false,  // marcată manual ca „neregulă veche” (constatată și la controale anterioare)
+    grav: false,         // doar la rândurile adăugate: marcată de inspector ca neregulă gravă
+    sigiliu: false,      // la neregulile grave: s-a aplicat sigiliu în baza acestei nereguli
     asiTermen: false, asiPrezentat: false, asiDataPrezentare: '',
     amenda: { aplicata: false, serie: '', numar: '', data: '', suma: '', achitata: false, dataAchitare: '' },
   };
@@ -270,12 +289,19 @@ export function constructiiOf(c, n) {
   const alese = list.filter((k) => ids.has(k.id));
   if (alese.length) return alese;
   const t = n && !n.custom ? SABLON_BY_KEY.get(n.key) : null;
-  const cuNU = t?.reqNU ? constructiiCuNU(c, t.reqNU) : [];
-  if (cuNU.length) return cuNU;
+  const decl = (t && constructiiDeclansate(c, t)) || [];
+  if (decl.length) return decl;
   return list.length ? [list[0]] : [];
 }
 export const constructieOf = (c, n) => constructiiOf(c, n)[0] || null;
 export const constructiiNume = (c, n) => constructiiOf(c, n).map((k) => k.denumire || `Construcția ${c.constructii.indexOf(k) + 1}`).join(', ');
+
+// Construcțiile care declanșează o neregulă gravă (NU la dotare sau GRF/NSI V peste parter); null = nu e gravă
+export function constructiiDeclansate(c, t) {
+  if (t?.reqNU) return constructiiCuNU(c, t.reqNU);
+  if (t?.reqGrfV) return (c.constructii || []).filter(grfVPesteParter);
+  return null;
+}
 
 // Construcțiile care au NU la o dotare (instalație necesară, lipsă)
 export function constructiiCuNU(c, key) {
@@ -302,6 +328,9 @@ export function constatareLabel(n) {
   const t = sablon(n.key);
   return (n.status === 'nok' && t?.nokLabel) || neregulaLabel(n);
 }
+
+// Neregulă gravă: din listă (NU la dotări, GRF/NSI V peste parter) sau rând adăugat bifat „Neregulă gravă”
+export const isGrav = (n) => (n.custom ? !!n.grav : !!sablon(n.key)?.grav);
 
 export const neregulaCat = (n) => (n.custom ? 'custom' : sablon(n.key)?.cat || 'custom');
 export const secOf = (n) => n.sec || 'ner';
@@ -346,7 +375,8 @@ export function hasDotare(c, key) {
 export function isApplicable(c, n) {
   if (n.custom || n.status) return true;
   const t = sablon(n.key);
-  if (t?.reqNU) return constructiiCuNU(c, t.reqNU).length > 0;
+  const decl = constructiiDeclansate(c, t);
+  if (decl) return decl.length > 0;
   return !t?.req || t.req.some((k) => hasDotare(c, k));
 }
 
@@ -590,6 +620,8 @@ export function pvText(c, controls = [], { doarNetrecute = false, cuActe = true 
       if (sec === 'ner' && multe && ks.length) t += ` – ${ks.length > 1 ? 'construcțiile' : 'construcția'}: ${constructiiNume(c, n)}`;
       if (n.obs && n.obs.trim()) t += `. ${n.obs.trim().replace(/\s*\n\s*/g, '; ')}`;
       const extra = [];
+      if (n.custom && n.grav) extra.push('neregulă gravă');
+      if (isGrav(n) && n.sigiliu) extra.push('sigiliu aplicat');
       if (vecheInfo(controls, c, n).veche) extra.push('neregulă veche');
       if (n.amenda?.aplicata) extra.push(`sancționat cu amendă${amendaSerieNr(n.amenda) ? ` ${amendaSerieNr(n.amenda)}` : ''}`);
       if (extra.length) t += ` (${extra.join('; ')})`;
@@ -624,7 +656,7 @@ export function todoList(c, { includeClose = true } = {}) {
   }
   const grave = c.nereguli.filter((n) => !n.custom && sablon(n.key)?.grav && !n.status && isApplicable(c, n));
   if (grave.length) {
-    out.unshift({ id: 'grave', level: 'grav', text: `${grave.length === 1 ? 'O neregulă gravă' : `${grave.length} nereguli grave`}: ${grave.map((n) => neregulaLabel(n).toLowerCase()).join(', ')} (NU la dotări)`, tab: 'nereguli', focus: grave[0].key });
+    out.unshift({ id: 'grave', level: 'grav', text: `${grave.length === 1 ? 'O neregulă gravă' : `${grave.length} nereguli grave`}: ${grave.map((n) => { const l = neregulaLabel(n); return l[0].toLowerCase() + l.slice(1); }).join(', ')}`, tab: 'nereguli', focus: grave[0].key });
   }
   for (const sec of sectiuniActive(c)) {
     const rows = c.nereguli.filter((n) => secOf(n) === sec && isApplicable(c, n) && !(sec === 'ner' && sablon(n.key)?.grav));

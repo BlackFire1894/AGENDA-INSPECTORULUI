@@ -878,6 +878,34 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .cat-lipsa .cat-title { background: var(--red-soft); color: var(--red-ink); }
 .cat-lipsa .check-row:not(.is-ok):not(.is-nok) { border-color: var(--red); border-style: dashed; }
 .cat-lipsa .check-row .row-idx { background: var(--red); color: #fff; }
+.cat-grf { --cat: var(--red); }
+.cat-grf .cat-title { background: var(--red-soft); color: var(--red-ink); }
+.cat-grf .check-row:not(.is-ok):not(.is-nok) { border-color: var(--red); border-style: dashed; }
+.cat-grf .check-row .row-idx { background: var(--red); color: #fff; }
+/* Confirmarea marcării în bloc („Restul conform”) */
+.bulk-list { list-style: none; margin: 0.6667rem 0; padding: 0.4444rem 0.6667rem; max-height: 40vh; overflow: auto; border-radius: 0.8889rem; background: var(--surface-2); border: 1px solid var(--line); }
+.bulk-list li { display: flex; align-items: baseline; gap: 0.6667rem; padding: 0.3889rem 0; border-bottom: 1px solid var(--line); font-weight: 600; }
+.bulk-list li:last-child { border-bottom: 0; }
+.bulk-list .ic { width: 1rem; height: 1rem; color: var(--green); flex: none; align-self: center; }
+.bulk-letter { min-width: 2rem; color: var(--accent-ink); }
+.bulk-grav { display: flex; align-items: center; gap: 0.5rem; color: var(--red-ink); background: var(--red-soft); padding: 0.5556rem 0.7778rem; border-radius: 0.6667rem; font-weight: 650; }
+.bulk-grav .ic { width: 1.2222rem; height: 1.2222rem; flex: none; }
+.bulk-confirm { display: flex; align-items: flex-start; gap: 0.7778rem; margin-top: 0.8889rem; padding: 0.7778rem 0.8889rem; border-radius: 0.8889rem; border: 2px solid var(--accent); background: var(--accent-soft); color: var(--accent-ink); font-weight: 700; cursor: pointer; }
+.bulk-confirm input { flex: none; width: max(28px, 1.5556rem); height: max(28px, 1.5556rem); margin: 0; accent-color: var(--accent); }
+/* Rând adăugat marcat „Neregulă gravă” */
+.check-row.is-grav-custom { border-left: 0.3333rem solid var(--red); }
+.check-row.is-grav-custom .row-idx { background: var(--red); color: #fff; }
+/* GRF / NSI pe construcție */
+.grf-field { display: flex; flex-direction: column; gap: 0.4444rem; margin: 0.8889rem 0 0.2222rem; }
+.grf-field .lbl small { font-weight: 600; color: var(--muted); margin-left: 0.3333rem; }
+.grf-opts .chip-sel { min-width: max(44px, 3.1111rem); font-size: 0.9444rem; }
+.grf-field.is-grav .grf-opts .chip-sel.on { background: var(--red); border-color: var(--red); }
+.grav-note {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 0.5556rem 0.7778rem; padding: 0.5556rem 0.8889rem;
+  border-radius: 0.8889rem; background: var(--red-soft); color: var(--red-ink); border: 1.5px solid var(--red); font-weight: 600; font-size: 1rem;
+}
+.grav-note > span { flex: 1 1 14rem; }
+.grav-note > .ic { width: 1.3333rem; height: 1.3333rem; flex: none; }
 .dot-row.is-grav { background: var(--red-soft) !important; box-shadow: inset 0.3333rem 0 0 var(--red); }
 .dot-row.is-grav .seg-dnn button.on.v-NU { background: var(--red); }
 .grav-note { display: flex; align-items: center; gap: 0.2222rem; margin-top: 0.1111rem; font-size: 0.7778rem; font-weight: 800; color: var(--red-ink); }

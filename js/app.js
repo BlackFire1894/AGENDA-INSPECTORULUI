@@ -5,13 +5,13 @@ import { fmtDate, fmtDateLong, toISO, parseDateQuery, isISO } from './dates.js';
 import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
   fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat, pvText, sectiuniActive, secOf,
-  todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality, constructiiOf,
+  todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality, constructiiOf, grfVPesteParter, neregulaLetter, neregulaLabel,
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
   viewCalendar, viewSettings, hintText, backupAgeText, backupIsStale, guideSteps,
 } from './views.js';
-import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML, nerResultsHTML } from './editor.js';
+import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML, nerResultsHTML, grfBlock } from './editor.js';
 import { AJUTOR } from './help.js';
 import { icon, esc, toast, openModal, closeModal, confirmDialog } from './ui.js';
 import { buildDemo } from './demo.js';
@@ -249,6 +249,24 @@ function refreshSearch(key) {
 
 document.addEventListener('change', async (e) => {
   const el = e.target;
+  // regimul de înălțime schimbă starea „GRF/NSI V peste parter” → redesenăm doar atunci (nu la fiecare ieșire din câmp)
+  if (el.dataset.grav !== undefined && route.name === 'control') {
+    const c = getControl(route.id);
+    const [k] = c ? resolvePath(c, el.dataset.bind) : [];   // părintele lui „regimInaltime”
+    const now = grfVPesteParter(k);
+    if (k && now !== (el.dataset.grav === '1')) {
+      // actualizare parțială: câmpul atins după acesta își păstrează focusul (și tastatura)
+      touch(c, true);
+      el.dataset.grav = now ? '1' : '0';
+      document.getElementById(`grf-${k.id}`)?.replaceWith(Object.assign(document.createElement('div'), { innerHTML: grfBlock(c, k) }).firstElementChild);
+      const pillEl = document.getElementById(`grf-pill-${k.id}`);
+      if (pillEl) pillEl.hidden = !now;
+      document.getElementById('ed-todo').innerHTML = todoHTML(c);
+      document.getElementById('ed-tabs').innerHTML = edTabsHTML(c, route.tab);
+      if (now) gravGrfToast(c, k);
+    }
+    return;
+  }
   if (el.dataset.bind && el.dataset.rerender && route.name === 'control') {
     const c = getControl(route.id);
     if (!c) return;
@@ -342,6 +360,11 @@ document.addEventListener('click', async (e) => {
       const noClear = el.closest('.no-clear');
       const v = el.dataset.toggle && cur === el.dataset.val && !noClear ? '' : el.dataset.val;
       setPath(c, el.dataset.path, v);
+      // GRF/NSI V la o construcție cu regim peste parter → avertizare: neregulă gravă
+      if (el.dataset.path.endsWith('.grf') && v === 'V') {
+        const [k] = resolvePath(c, el.dataset.path);   // părintele lui „grf” = construcția
+        if (grfVPesteParter(k)) { touch(c, true); rerenderEditor(); gravGrfToast(c, k); return; }
+      }
       // NU la o instalație necesară → avertizare: neregulă gravă, adăugată în tabul Nereguli
       const mDot = el.dataset.path.match(/\.dotari\.(\w+)\.v$/);
       if (mDot && v === 'NU' && LIPSA_DOTARI.includes(mDot[1])) {
@@ -357,6 +380,8 @@ document.addEventListener('click', async (e) => {
     case 'flag': {
       const v = !getPath(c, el.dataset.path);
       setPath(c, el.dataset.path, v);
+      // rând adăugat care nu mai e grav → nici sigiliul nu mai are temei
+      if (el.dataset.path.endsWith('.grav') && !v) setPath(c, el.dataset.path.replace(/\.grav$/, '.sigiliu'), false);
       if (el.dataset.path.endsWith('.amenda.achitata') && v) {
         const [amenda] = resolvePath(c, el.dataset.path);
         if (!amenda.dataAchitare) amenda.dataAchitare = today();
@@ -591,6 +616,12 @@ function openNewControl({ date, oid } = {}) {
   setTimeout(() => name.focus(), 250);
 }
 
+function gravGrfToast(c, k) {
+  toast(`Neregulă gravă: ${k.denumire || 'construcția'} are GRF/NSI V și regim ${k.regimInaltime} (peste parter)`, 'warn', {
+    label: 'Vezi', fn: () => { location.hash = `#/control/${c.id}/nereguli/grav-grfV`; },
+  });
+}
+
 // ───────── Coordonate GPS ─────────
 // O singură atingere; se caută poziția precisă (GPS), cu limită de timp ca aplicația să nu rămână blocată.
 function getGps(c, k) {
@@ -639,17 +670,42 @@ function gpsActivatePrompt(c, k) {
 
 // ───────── Restul conform (în bloc, cu „Anulează”) ─────────
 
+// Marcare în bloc, cu confirmare manuală: lista exactă a rândurilor + bifa „Am verificat…”, altfel butonul
+// rămâne inactiv (fără bife accidentale). Neregulile grave nu intră niciodată în bloc: se decid individual.
 async function restConform(c, sec) {
-  let rows;
-  if (sec === 'acte') rows = ACTE.map((a) => c.acte[a.key]).filter((v) => !v.status);
-  else rows = c.nereguli.filter((n) => secOf(n) === sec && !n.status && (isApplicable(c, n) || (state.ui.showAllNer && !sablon(n.key)?.grav)));
-  if (!rows.length) return;
+  let rows, items;
+  if (sec === 'acte') {
+    const acte = ACTE.filter((a) => !c.acte[a.key]?.status);
+    rows = acte.map((a) => c.acte[a.key]);
+    items = acte.map((a) => ['', a.label]);
+  } else {
+    rows = c.nereguli.filter((n) => secOf(n) === sec && !n.status && !sablon(n.key)?.grav
+      && (isApplicable(c, n) || state.ui.showAllNer));
+    items = rows.map((n) => [neregulaLetter(c, n), neregulaLabel(n)]);
+  }
+  const grave = sec === 'ner' ? c.nereguli.filter((n) => !n.status && sablon(n.key)?.grav && isApplicable(c, n)).length : 0;
+  if (!rows.length) { if (grave) toast('Neregulile grave rămase se marchează individual', 'warn'); return; }
   const word = sec === 'acte' ? 'Prezentat' : 'Conform';
   const what = sec === 'acte' ? (rows.length === 1 ? 'act' : 'acte') : (rows.length === 1 ? 'rând' : 'rânduri');
-  const ok = await confirmDialog({
-    title: `Marchez ${rows.length} ${what} ca „${word}”?`,
-    text: 'Se schimbă doar rândurile încă nemarcate; cele marcate deja rămân cum sunt. Imediat după puteți apăsa „Anulează”.',
-    ok: `Da, ${rows.length} ${what} „${word}”`,
+  const ok = await new Promise((resolve) => {
+    let done = false;
+    const m = openModal(`<div class="modal-head"><h2>${icon('alert')} Marchez ${rows.length} ${what} ca „${word}”?</h2></div>
+      <div class="modal-body">
+        <p class="lead">Verificați lista. Se schimbă doar rândurile de mai jos, încă nemarcate.</p>
+        <ul class="bulk-list">${items.map(([l, t]) => `<li>${l ? `<b class="bulk-letter">${esc(l)}</b>` : icon('check')}<span>${esc(t)}</span></li>`).join('')}</ul>
+        ${grave ? `<p class="bulk-grav">${icon('alert')} ${grave === 1 ? 'Neregula gravă (G) nu e inclusă' : `Cele ${grave} nereguli grave (G) nu sunt incluse`}: se marchează individual.</p>` : ''}
+        <label class="bulk-confirm"><input type="checkbox" id="bulk-ok"><span>Am verificat la fața locului ${rows.length === 1 ? 'acest rând' : `toate cele ${rows.length} ${what}`} și ${rows.length === 1 ? 'este' : 'sunt'} „${word.toLowerCase()}${rows.length === 1 || sec === 'acte' ? '' : 'e'}”.</span></label>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost btn-lg" data-r="0">Renunță</button>
+        <button class="btn btn-primary btn-lg" data-r="1" disabled>${icon('check')} Marchează ${rows.length} ${what}</button>
+      </div>`, { wide: true, onClose: () => { if (!done) resolve(false); } });
+    const go = m.querySelector('[data-r="1"]');
+    m.querySelector('#bulk-ok').addEventListener('change', (e) => { go.disabled = !e.target.checked; });
+    m.querySelectorAll('[data-r]').forEach((btn) => btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+      done = true; resolve(btn.dataset.r === '1'); closeModal();
+    }));
   });
   if (!ok) return;
   rows.forEach((r) => { r.status = 'ok'; });

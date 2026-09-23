@@ -5,7 +5,7 @@ import {
   TIP_OBIECTIV, DOTARI, CENTRALA_TIPURI, ACTE, STRUCTURI, MATERIALE_PERETI, SECTIUNI, CATEGORII,
   controlStats, secStats, fineStatus, fineDate, asiDeadline, isIncheiat, neregulaLabel, neregulaLetter,
   neregulaCat, secOf, isApplicable, isLocalitate, constructiiOf, constructiiNume, matchNeregula, fold, amendaSerieNr, vecheInfo, todoList,
-  LIPSA_DOTARI, constructiiCuNU, sablon, fmtCoord, googleMapsUrl, appleMapsUrl, gpsQuality,
+  LIPSA_DOTARI, isGrav, constructiiDeclansate, GRF_NIVELURI, grfVPesteParter, sablon, fmtCoord, googleMapsUrl, appleMapsUrl, gpsQuality,
 } from './model.js';
 import { icon, esc, pill, tipBadge, helpBtn } from './ui.js';
 
@@ -121,11 +121,27 @@ function obsField(path, value, cls = 'row-obs') {
   </div>`;
 }
 
-// Neregulile grave: construcțiile în care instalația e marcată NU (se actualizează singure)
+// Neregulile grave: construcțiile care le declanșează (NU la dotare / GRF-NSI V peste parter), actualizate singure
 function constrNU(c, n) {
-  const list = constructiiCuNU(c, sablon(n.key).reqNU);
+  const t = sablon(n.key);
+  const list = constructiiDeclansate(c, t) || [];
   if (!list.length) return '';
-  return `<span class="constr-nu">${icon('building')} NU la dotări în: <b>${list.map((k) => esc(k.denumire)).join(', ')}</b></span>`;
+  const cum = t.reqGrfV ? 'GRF/NSI V peste parter în' : 'NU la dotări în';
+  return `<span class="constr-nu">${icon('building')} ${cum}: <b>${list.map((k) => esc(k.denumire) + (t.reqGrfV && k.regimInaltime ? ` (${esc(k.regimInaltime)})` : '')).join(', ')}</b></span>`;
+}
+
+// GRF / NSI al construcției: I–V sau „Nu e necesar”; V cu regim peste parter = neregulă gravă
+export function grfBlock(c, k, p = `constructii.#${k.id}`) {
+  const grav = grfVPesteParter(k);
+  const opts = [...GRF_NIVELURI.map((v) => [v, v]), ['NN', 'Nu e necesar']];
+  return `<div class="grf-field ${grav ? 'is-grav' : ''}" id="grf-${k.id}">
+    <span class="lbl">GRF / NSI <small>grad de rezistență la foc / nivel de stabilitate la incendiu</small></span>
+    <div class="chips-sel grf-opts" role="radiogroup" aria-label="GRF / NSI">
+      ${opts.map(([v, l]) => `<button type="button" class="chip-sel ${k.grf === v ? 'on' : ''} ${v === 'NN' ? 'grf-nn' : ''}" data-act="set" data-toggle="1" data-path="${p}.grf" data-val="${v}" role="radio" aria-checked="${k.grf === v}">${l}</button>`).join('')}
+    </div>
+    ${grav ? `<div class="grav-note">${icon('alert')}<span><b>Neregulă gravă:</b> GRF/NSI V cu regim de înălțime ${esc(k.regimInaltime)} (peste parter). Apare în tabul Nereguli.</span>
+      <a class="btn btn-ghost" href="#/control/${c.id}/nereguli/grav-grfV">Vezi</a></div>` : ''}
+  </div>`;
 }
 
 // Construcțiile în care s-a făcut constatarea: meniu cu selecție multiplă (implicit prima construcție)
@@ -153,11 +169,11 @@ function constrSelect(c, n) {
   </div>`;
 }
 
-function field(label, path, value, { type = 'text', ph = '', list = '', mode = '', unit = '', wide = false, live = '' } = {}) {
+function field(label, path, value, { type = 'text', ph = '', list = '', mode = '', unit = '', wide = false, live = '', grav } = {}) {
   return `<label class="field ${wide ? 'wide' : ''}">
     <span class="lbl">${esc(label)}</span>
     <span class="inp-wrap">
-      <input type="${type}" data-bind="${path}" value="${esc(value)}" placeholder="${esc(ph)}" ${list ? `list="${list}"` : ''} ${mode ? `inputmode="${mode}"` : ''} ${live ? `data-live-src="${live}"` : ''} autocomplete="off">
+      <input type="${type}" data-bind="${path}" value="${esc(value)}" placeholder="${esc(ph)}" ${list ? `list="${list}"` : ''} ${mode ? `inputmode="${mode}"` : ''} ${live ? `data-live-src="${live}"` : ''} ${grav !== undefined ? `data-grav="${grav ? 1 : 0}"` : ''} autocomplete="off">
       ${unit ? `<span class="unit">${esc(unit)}</span>` : ''}
     </span>
   </label>`;
@@ -315,17 +331,19 @@ function constructieHTML(c, k, i) {
       <span class="constr-num">${i + 1}</span>
       <input class="constr-name" data-bind="${p}.denumire" value="${esc(k.denumire)}" placeholder="Denumirea construcției ${i + 1}" autocomplete="off">
       ${s.lipsa ? `<span class="pill pill-red">${icon('alert')}${s.lipsa} ${s.lipsa === 1 ? 'instalație lipsă' : 'instalații lipsă'}</span>` : ''}
-      <span class="constr-sum">${s.set}/${s.total} dotări${k.suprafata ? ` · ${esc(k.suprafata)} m²` : ''}${k.regimInaltime ? ` · ${esc(k.regimInaltime)}` : ''}${k.gps ? ' · GPS ✓' : ''}</span>
+      <span class="pill pill-red" id="grf-pill-${k.id}" ${grfVPesteParter(k) ? '' : 'hidden'}>${icon('alert')}GRF/NSI V peste parter</span>
+      <span class="constr-sum">${s.set}/${s.total} dotări${k.suprafata ? ` · ${esc(k.suprafata)} m²` : ''}${k.regimInaltime ? ` · ${esc(k.regimInaltime)}` : ''}${k.grf ? ` · ${k.grf === 'NN' ? 'GRF/NSI nu e necesar' : `GRF/NSI ${k.grf}`}` : ''}${k.gps ? ' · GPS ✓' : ''}</span>
       <button class="icon-btn" data-act="constr-toggle" data-id="${k.id}" aria-label="${open ? 'Restrânge' : 'Extinde'}">${icon('chevD', open ? 'rot' : '')}</button>
     </div>
     ${open ? `<div class="constr-body">
       <div class="form-grid g3">
         ${field('Suprafață desfășurată', `${p}.suprafata`, k.suprafata, { mode: 'decimal', unit: 'm²', ph: '0' })}
-        ${field('Regim de înălțime', `${p}.regimInaltime`, k.regimInaltime, { ph: 'ex: S+P+2E' })}
+        ${field('Regim de înălțime', `${p}.regimInaltime`, k.regimInaltime, { ph: 'ex: S+P+2E', grav: grfVPesteParter(k) })}
         ${field('Nr. angajați', `${p}.nrAngajati`, k.nrAngajati, { mode: 'numeric', ph: '0' })}
         ${field('Structura de rezistență', `${p}.structura`, k.structura, { list: 'dl-structura', ph: 'Alege sau scrie' })}
         ${field('Material pereți', `${p}.materialPereti`, k.materialPereti, { list: 'dl-pereti', ph: 'Alege sau scrie' })}
       </div>
+      ${grfBlock(c, k, p)}
       ${gpsBlock(c, k, i)}
       <div class="mini-row"><h3 class="mini-title">Dotări și instalații <small>NEC = nu este cazul</small></h3>${i === 0 || state.ui.obsHidden ? obsToggleBtn() : ''}</div>
       <div class="dotari">${DOTARI.map((d) => dotareRow(p, k, d)).join('')}</div>
@@ -507,7 +525,7 @@ function tabSectiune(c, sec) {
       <div class="tool-btns">
         ${(() => { const all = groups.length && groups.every((g) => state.ui.catCollapsed.has(g.cat)); return `<button class="btn btn-ghost" data-act="cats-all" data-val="${all ? 'open' : 'close'}" ${q ? 'hidden' : ''}>${icon(all ? 'chevD' : 'list')} ${all ? 'Extinde categoriile' : 'Restrânge categoriile'}</button>`; })()}
         ${obsToggleBtn()}
-        ${restBtn(st.total - st.checked - (sec === 'pc' && !c.adapostPC.v ? 1 : 0), sec, sec === 'ner' ? 'Restul conform' : 'Restul conforme')}
+        ${restBtn(c.nereguli.filter((n) => secOf(n) === sec && !n.status && !sablon(n.key)?.grav && (isApplicable(c, n) || showAll)).length, sec, sec === 'ner' ? 'Restul conform' : 'Restul conforme')}
       </div>
     </div>
     <div id="ner-results">${nerResultsHTML(c, sec)}</div>`;
@@ -549,18 +567,21 @@ function neregulaRow(c, n) {
     chips.push(n.inPV ? pill('green', 'Trecut în PV', 'pv') : pill('warn', 'Netrecut în PV', 'pv'));
     if (n.amenda.aplicata) { const fs = fineStatus(c, n, today()); chips.push(pill(fs.level, `Amendă · ${fs.label}`, 'fine')); }
   }
+  if (n.status === 'nok' && n.custom && n.grav) chips.unshift(pill('red', 'Neregulă gravă', 'alert'));
+  if (n.status === 'nok' && isGrav(n) && n.sigiliu) chips.unshift(pill('red', 'Sigiliu', 'lock'));
   const vi = vecheInfo(state.controls, c, n);
   if (vi.veche) chips.unshift(`<span class="pill pill-veche">${icon('history')}Neregulă veche</span>`);
   else if (n.status !== 'nok' && vi.auto) chips.push(pill('neutral', `Constatată la controlul din ${fmtDate(vi.auto.dataInceput)}`, 'history'));
   if (!n.custom && !isApplicable(c, { ...n, status: '' })) {
-    chips.push(pill('neutral', sablon(n.key)?.reqNU ? 'Nu mai e marcată NU la dotări' : 'Instalație nebifată DA la dotări', 'info'));
+    const t = sablon(n.key);
+    chips.push(pill('neutral', t?.reqNU ? 'Nu mai e marcată NU la dotări' : t?.reqGrfV ? 'Nu mai e GRF/NSI V peste parter' : 'Instalație nebifată DA la dotări', 'info'));
   }
-  return `<div class="check-row ner-row ${n.status ? `is-${n.status}` : ''} ${vi.veche ? 'is-veche' : ''}" id="ner-${esc(n.key)}">
+  return `<div class="check-row ner-row ${n.status ? `is-${n.status}` : ''} ${vi.veche ? 'is-veche' : ''} ${n.custom && n.grav ? 'is-grav-custom' : ''}" id="ner-${esc(n.key)}">
     <span class="row-idx letter">${esc(letter)}</span>
     <div class="row-main">
       ${labelHTML}
       ${chips.length ? `<span class="chips">${chips.join('')}</span>` : ''}
-      ${sablon(n.key)?.reqNU ? constrNU(c, n) : (n.sec === 'ner' || !n.sec ? constrSelect(c, n) : '')}
+      ${sablon(n.key)?.grav ? constrNU(c, n) : (n.sec === 'ner' || !n.sec ? constrSelect(c, n) : '')}
       ${obsField(`${path}.obs`, n.obs)}
     </div>
     <div class="row-side">
@@ -629,6 +650,8 @@ function neregulaDetail(c, n, path) {
       ${toggle(`${path}.inPV`, n.inPV, 'Trecut în procesul-verbal', { level: 'green', ic: 'pv', offLabel: 'Netrecut în procesul-verbal' })}
       ${toggle(`${path}.amenda.aplicata`, a.aplicata, 'Sancționat cu amendă', { level: 'blue', ic: 'fine' })}
       ${veche}
+      ${n.custom ? toggle(`${path}.grav`, n.grav, 'Neregulă gravă', { level: 'red', ic: 'alert' }) : ''}
+      ${isGrav(n) ? toggle(`${path}.sigiliu`, n.sigiliu, 'Sigiliu', { level: 'red', ic: 'lock' }) : ''}
     </div>
     ${asi}${fine}
   </div>`;

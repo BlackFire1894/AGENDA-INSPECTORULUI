@@ -3,7 +3,7 @@ import { fmtDate, fmtDateLong, todayISO, isISO } from './dates.js';
 import {
   DOTARI, ACTE, SECTIUNI, CATEGORII, sectiuniActive, secOf, neregulaLetter, neregulaCat,
   constructiiNume, amendaSerieNr, fineStatus, asiDeadline, vecheInfo, isIncheiat, controlStats, isLocalitate, constatareLabel,
-  sablon, isApplicable, fmtCoord, googleMapsUrl,
+  sablon, isGrav, isApplicable, fmtCoord, grfText, grfVPesteParter, googleMapsUrl,
 } from './model.js';
 import { esc } from './ui.js';
 
@@ -62,6 +62,7 @@ export function fisaMarkup(c, controls, now = new Date()) {
       <table class="f-kv"><tr>
         <td><b>Suprafață desf.</b><br>${k.suprafata ? `${esc(k.suprafata)} m²` : '—'}</td>
         <td><b>Regim înălțime</b><br>${esc(k.regimInaltime) || '—'}</td>
+        <td><b>GRF / NSI</b><br>${esc(grfText(k.grf)) || '—'}${grfVPesteParter(k) ? '<br><b>neregulă gravă</b>' : ''}</td>
         <td><b>Nr. angajați</b><br>${esc(k.nrAngajati) || '—'}</td>
         <td><b>Structură</b><br>${esc(k.structura) || '—'}</td>
         <td><b>Pereți</b><br>${esc(k.materialPereti) || '—'}</td>
@@ -97,6 +98,8 @@ export function fisaMarkup(c, controls, now = new Date()) {
         const vi = vecheInfo(controls, c, n);
         const det = [];
         if (obs(n.obs)) det.push(obs(n.obs));
+        if (n.custom && n.grav) det.push('<b>Neregulă gravă</b>');
+        if (n.status === 'nok' && isGrav(n) && n.sigiliu) det.push('<b>Sigiliu aplicat</b>');
         if (vi.veche) det.push(`<b>Neregulă veche</b>${vi.auto ? ` (și la controlul din ${fmtDate(vi.auto.dataInceput)})` : ''}`);
         if (n.status === 'nok' && n.amenda?.aplicata) {
           const fs = fineStatus(c, n, today);

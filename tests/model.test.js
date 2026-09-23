@@ -6,7 +6,7 @@ import {
   normalizeControl, allFines, NEREGULI, SABLON, isApplicable, secStats, sectiuniActive, activeNereguli,
   neregulaLetter, tabOfNeregula, controlStats, constructieOf, amendaSerieNr, ACTE, emptyConstructie,
   vecheInfo, pvText, constatareLabel, todoList, NEREGULI_GRAVE, constructiiCuNU,
-  fmtCoord, googleMapsUrl, gpsQuality, constructiiOf, constructiiNume, matchNeregula,
+  fmtCoord, googleMapsUrl, gpsQuality, constructiiOf, constructiiNume, matchNeregula, pesteParter, grfVPesteParter, sablon, isGrav,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -417,4 +417,51 @@ test('v1.9: căutarea în nereguli — literă exactă sau text fără diacritic
   const custom = { key: 'c1', custom: true, sec: 'ner', label: 'Ușă blocată la subsol', obs: '', status: '' };
   c.nereguli.push(custom);
   assert.ok(matchNeregula(c, custom, '+1') && matchNeregula(c, custom, 'usa blocata'));
+});
+
+test('v1.9: GRF/NSI V cu regim peste parter = neregulă gravă', () => {
+  for (const r of ['P+1', 'P+2E', 'S+P+1', 'D+P+1E+M', 'p + 3', 'P+M', 'Parter + 1 etaj', 'S+P+10']) assert.ok(pesteParter(r), r);
+  for (const r of ['P', 'S+P', 'D+P', '', 'parter', 'Sp']) assert.ok(!pesteParter(r), r || '(gol)');
+  const c = newControl({ denumire: 'Depozit', start: '2026-09-01' });
+  c.constructii.push(emptyConstructie(2));
+  c.constructii[1].denumire = 'Birouri';
+  const g = c.nereguli.find((n) => n.key === 'grav-grfV');
+  assert.ok(g && !isApplicable(c, g));
+  assert.equal(neregulaLetter(c, g), `G${NEREGULI_GRAVE.length}`);
+  c.constructii[1].grf = 'V';
+  c.constructii[1].regimInaltime = 'P';
+  assert.ok(!isApplicable(c, g), 'V la parter: nu');
+  c.constructii[1].regimInaltime = 'P+1';
+  assert.ok(grfVPesteParter(c.constructii[1]) && isApplicable(c, g), 'V la P+1: da');
+  assert.equal(constructiiNume(c, g), 'Birouri');                 // implicit: construcția care o declanșează
+  const t = todoList(c).find((x) => x.id === 'grave');
+  assert.match(t.text, /GRF\/NSI V/);
+  c.constructii[1].grf = 'IV';
+  assert.ok(!isApplicable(c, g), 'IV: nu');
+  c.constructii[1].grf = 'NN';
+  assert.ok(!isApplicable(c, g));
+  // date vechi: construcțiile primesc grf ''
+  assert.equal(normalizeControl({ ...c, constructii: [{ id: 'k' }] }).constructii[0].grf, '');
+});
+
+test('v1.9: „Restul conform” nu atinge neregulile grave', () => {
+  const c = newControl({ start: '2026-09-01' });
+  c.constructii[0].dotari.hidInt.v = 'NU';
+  const g = c.nereguli.find((n) => n.key === 'lipsa-hidInt');
+  assert.ok(isApplicable(c, g) && sablon(g.key).grav);
+});
+
+test('v1.9: sigiliu la neregulile grave; rând adăugat marcat „Neregulă gravă”', () => {
+  const c = newControl({ denumire: 'Hală', start: '2026-09-01' });
+  c.constructii[0].dotari.hidInt.v = 'NU';
+  const g = c.nereguli.find((n) => n.key === 'lipsa-hidInt');
+  assert.ok(isGrav(g) && !isGrav(c.nereguli.find((n) => n.key === 'd')));
+  Object.assign(g, { status: 'nok', sigiliu: true });
+  const custom = { ...normalizeControl({ ...c, nereguli: [{ key: 'x1', custom: true, label: 'Depozitare butelii în subsol', status: 'nok' }] }).nereguli.find((n) => n.key === 'x1') };
+  assert.equal(custom.grav, false); assert.equal(custom.sigiliu, false);
+  assert.ok(!isGrav(custom));
+  c.nereguli.push({ ...custom, grav: true, sigiliu: true });
+  const t = pvText(c, [c]).text;
+  assert.match(t, /Lipsă hidranți interiori[^\n]*\(sigiliu aplicat\)/);
+  assert.match(t, /Depozitare butelii în subsol \(neregulă gravă; sigiliu aplicat\)/);
 });
