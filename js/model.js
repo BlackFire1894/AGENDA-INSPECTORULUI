@@ -5,7 +5,7 @@ import {
   TERMEN_PLATA, PRAG_ROSU, TERMEN_ANAF, TERMEN_ASI, fmtDate, zinelucratoare,
 } from './dates.js';
 
-export const SCHEMA_VERSION = 7; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS · 7: mai multe construcții pe neregulă, GRF/NSI pe construcție
+export const SCHEMA_VERSION = 8; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS · 7: mai multe construcții pe neregulă, GRF/NSI pe construcție · 8: nereguli ah, ai
 
 export const TIP_OBIECTIV = [
   { key: 'OPEC', label: 'OPEC / Instituție' },
@@ -90,6 +90,9 @@ export const SECTIUNI = {
 // („centrala” = are cel puțin un tip de centrală bifat).
 const INST_C = ['idsai', 'hidInt', 'hidExt', 'desfumare', 'sprinklere', 'drencere', 'instSpeciale'];
 export const NEREGULI = [
+  // primele din listă (foarte importante); se completează automat la NU pentru ASI / AVIZ la dotări
+  { key: 'ah', cat: 'docs', label: 'Construcția funcționează fără ASI (autorizație de securitate la incendiu)', autoNU: 'asi' },
+  { key: 'ai', cat: 'docs', label: 'Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz', autoNU: 'aviz' },
   { key: 'a', cat: 'docs', label: 'Nu a prezentat documentație ASI', asi: true },
   { key: 'b', cat: 'docs', label: 'Nu a prezentat / nu are verificare instalații electrice / IPT / CT' },
   { key: 'c', cat: 'docs', label: 'Nu a prezentat / nu are verificare IDSAI / Hint / Hext / Desfumare / Sprinklere / Drencere / Instalații speciale', req: INST_C },
@@ -210,6 +213,8 @@ export function emptyNeregula(key, custom = false, sec = 'ner') {
     vecheManual: false,  // marcată manual ca „neregulă veche” (constatată și la controale anterioare)
     grav: false,         // doar la rândurile adăugate: marcată de inspector ca neregulă gravă
     sigiliu: false,      // la neregulile grave: s-a aplicat sigiliu în baza acestei nereguli
+    auto: false,         // ah / ai: constatată automat din NU la ASI / AVIZ (dotări)
+    obsAuto: '',         // ultimele observații preluate automat din dotări (dacă obs === obsAuto, nu au fost editate)
     asiTermen: false, asiPrezentat: false, asiDataPrezentare: '',
     amenda: { aplicata: false, serie: '', numar: '', data: '', suma: '', achitata: false, dataAchitare: '' },
   };
@@ -250,7 +255,49 @@ export function controlFromPrevious(prev, start) {
   c.constructii = JSON.parse(JSON.stringify(prev.constructii || [])).map((k) => ({ ...k, id: uid() }));
   if (!c.constructii.length) c.constructii = [emptyConstructie(1)];
   if (prev.adapostPC) c.adapostPC = { ...prev.adapostPC };
+  for (const dot of Object.keys(AUTO_NU)) syncAutoNU(c, dot);   // NU la ASI / AVIZ moștenit → neregula apare din start
   return c;
+}
+
+// ───────── NU la ASI / AVIZ (dotări) → neregulile ah / ai, completate automat ─────────
+export const AUTO_NU = { asi: 'ah', aviz: 'ai' };
+
+function obsDinDotari(c, list, dot) {
+  const multe = (c.constructii || []).length > 1;
+  return list.filter((k) => k.dotari?.[dot]?.obs?.trim())
+    .map((k) => `${multe ? `${k.denumire || 'Construcție'}: ` : ''}${k.dotari[dot].obs.trim()}`).join('\n');
+}
+
+// Aduce neregula în acord cu dotările. Returnează 'added' | 'updated' | 'removed' | 'kept' | null.
+// Nu pierde date: observațiile editate de inspector nu se suprascriu; o neregulă lucrată (PV, amendă,
+// sigiliu, observații proprii) nu se șterge când NU dispare, doar încetează să mai fie automată.
+// `obsOnly`: s-au schimbat doar observațiile din dotări → se actualizează doar observațiile.
+export function syncAutoNU(c, dot, { obsOnly = false } = {}) {
+  const n = c.nereguli.find((x) => x.key === AUTO_NU[dot]);
+  if (!n) return null;
+  const list = constructiiCuNU(c, dot);
+  const obs = obsDinDotari(c, list, dot);
+  const obsProprii = !!(n.obs && n.obs.trim() && n.obs !== (n.obsAuto || ''));
+  if (obsOnly) {
+    if (list.length && n.auto && n.status === 'nok' && !obsProprii && n.obs !== obs) { n.obs = obs; n.obsAuto = obs; return 'updated'; }
+    return null;
+  }
+  if (list.length) {
+    const nou = n.status !== 'nok';
+    n.status = 'nok';
+    n.auto = true;
+    n.constructieIds = list.map((k) => k.id);
+    if (!obsProprii) { n.obs = obs; n.obsAuto = obs; }
+    return nou ? 'added' : 'updated';
+  }
+  if (n.auto && n.status === 'nok') {
+    const lucrata = obsProprii || n.inPV || n.amenda?.aplicata || n.sigiliu || n.vecheManual;
+    n.auto = false;
+    if (lucrata) return 'kept';
+    Object.assign(n, { status: '', obs: '', obsAuto: '', constructieIds: [] });
+    return 'removed';
+  }
+  return null;
 }
 
 // Completează câmpurile lipsă (date importate sau versiuni vechi).

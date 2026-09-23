@@ -567,6 +567,7 @@ function neregulaRow(c, n) {
     chips.push(n.inPV ? pill('green', 'Trecut în PV', 'pv') : pill('warn', 'Netrecut în PV', 'pv'));
     if (n.amenda.aplicata) { const fs = fineStatus(c, n, today()); chips.push(pill(fs.level, `Amendă · ${fs.label}`, 'fine')); }
   }
+  if (n.status === 'nok' && n.auto) chips.unshift(pill('neutral', `Din fișa obiectivului: NU la ${sablon(n.key)?.autoNU === 'asi' ? 'ASI' : 'AVIZ'}`, 'building'));
   if (n.status === 'nok' && n.custom && n.grav) chips.unshift(pill('red', 'Neregulă gravă', 'alert'));
   if (n.status === 'nok' && isGrav(n) && n.sigiliu) chips.unshift(pill('red', 'Sigiliu', 'lock'));
   const vi = vecheInfo(state.controls, c, n);

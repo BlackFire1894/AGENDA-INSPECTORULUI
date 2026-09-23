@@ -1,6 +1,6 @@
 // Date demonstrative, relative la data curentă, ca să se vadă toate stările (se pot șterge din Setări).
 import { addDays } from './dates.js';
-import { newControl, controlFromPrevious, emptyConstructie, uid } from './model.js';
+import { newControl, controlFromPrevious, emptyConstructie, uid, AUTO_NU, syncAutoNU } from './model.js';
 
 function fill(k, o) {
   Object.assign(k, o.base || {});
@@ -93,6 +93,12 @@ export function buildDemo(today) {
   m.constructii[0].denumire = 'Hală comercială';
   out.push(m);
 
-  for (const c of out) c.demo = true;
+  for (const c of out) {
+    c.demo = true;
+    // NU la ASI / AVIZ → ah / ai, ca în aplicație; la controalele încheiate, deja trecute în PV
+    for (const dot of Object.keys(AUTO_NU)) {
+      if (syncAutoNU(c, dot) === 'added' && c.dataIncheiere) c.nereguli.find((n) => n.key === AUTO_NU[dot]).inPV = true;
+    }
+  }
   return out;
 }

@@ -88,6 +88,7 @@ export const AJUTOR = {
       'Datele obiectivului (inclusiv adresa și localitatea), perioada controlului și construcțiile, fiecare cu dotările ei (DA / NU / NEC = nu este cazul).',
       '<b>Coordonate GPS</b> la fiecare construcție: stați lângă ea și apăsați <b>Completează coordonatele</b>. Poziția se citește o singură dată, doar la cerere; aplicația nu urmărește locația. Dacă localizarea e oprită, vă arată pașii de activare. Precizie bună: ± sub 30 m, în aer liber.',
       'Dotările bifate <b>DA</b> decid ce nereguli de instalații apar în tabul Nereguli.',
+      '<b>NU la ASI</b> sau <b>NU la AVIZ</b> trece automat neregula „funcționează fără ASI” (ah), respectiv „lucrări fără aviz” (ai), cu construcția și observațiile scrise aici. Revenirea la DA / NEC o retrage, dacă n-ați lucrat pe ea.',
       '<b>NU</b> la o instalație înseamnă că lipsește o instalație necesară: e <b>neregulă gravă</b>, marcată cu roșu, și apare prima în tabul Nereguli (G1, G2…). Pentru „nu e cazul” folosiți <b>NEC</b>.',
       '<b>GRF / NSI</b> la fiecare construcție: grad de rezistență la foc (P118/1999) / nivel de stabilitate la incendiu (P118-1/2025), I–V sau „Nu e necesar”. <b>V</b> cu regim de înălțime peste parter (P+1, P+2E, P+M…) = <b>neregulă gravă</b>, cu alertă.',
       '<b>Încheie controlul</b> vă arată ce ați omis înainte de încheiere și pornește termenele.',
@@ -103,6 +104,7 @@ export const AJUTOR = {
   'ctrl-nereguli': {
     title: 'Nereguli',
     lines: [
+      'Primele rânduri: <b>ah</b> (funcționează fără ASI) și <b>ai</b> (lucrări fără aviz). La NU pentru ASI / AVIZ în tabul Obiectiv se constată singure, cu observațiile de acolo.',
       '<b>Căutare:</b> scrieți litera (d, ag, G1) sau un cuvânt (hidranți, gaz) și lista se restrânge pe loc; ✕ o golește.',
       '<b>✓ Conform</b> sau <b>✗ Constatat</b>. La constatat: construcțiile (una sau mai multe — atingeți meniul și bifați), trecut în PV, amendă (serie, nr., sumă), neregulă veche.',
       'Sus, cu roșu: <b>nereguli grave</b> (G1, G2…) — instalații marcate NU la dotări și construcții cu <b>GRF/NSI V</b> și regim peste parter (P+1, P+2E, P+M…). Apar și dispar singure, după datele din tabul Obiectiv. La constatat, bifa <b>Sigiliu</b> arată în baza cărei nereguli ați aplicat sigiliul.',
