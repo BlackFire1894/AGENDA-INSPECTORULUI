@@ -35,12 +35,12 @@ export function edHeadHTML(c) {
     <div class="ed-title">
       <div class="ed-meta">${tipBadge(c.tip)}${isIncheiat(c) ? pill('done', 'Încheiat', 'check') : pill('open', 'În desfășurare', 'clock')}</div>
       <h1 data-live="denumire">${esc(c.denumire || 'Obiectiv fără denumire')}</h1>
-      <div class="ed-dates">${icon('calendar')} ${esc(fmtDate(c.dataInceput))}${isIncheiat(c) ? ` – ${esc(fmtDate(c.dataIncheiere))}` : ' – în desfășurare'}</div>
+      <div class="ed-dates">${icon('calendar')} ${esc(fmtDate(c.dataInceput))}${isIncheiat(c) ? ` – ${esc(fmtDate(c.dataIncheiere))}` : ' – în desfășurare'}
+        <span class="save-ind" id="save-ind">${icon('check')}<span>Salvat</span></span></div>
     </div>
     <div class="ed-actions">
-      <span class="save-ind" id="save-ind">${icon('check')}<span>Salvat</span></span>
       <button class="btn btn-ghost" data-act="pv-text">${icon('pv')} Text PV</button>
-      <a class="btn btn-ghost" href="#/fisa/${c.id}">${icon('download')} Fișa (PDF)</a>
+      <a class="btn btn-ghost" href="#/fisa/${c.id}">${icon('download')} Fișa PDF</a>
       <a class="btn btn-ghost" href="#/obiectiv/${c.objectiveId}">${icon('history')} Istoric</a>
       <button class="btn btn-ghost" data-act="backup-export" title="Backup rapid al tuturor controalelor">${icon('upload')} Backup</button>
       <button class="icon-btn big danger" data-act="control-delete" aria-label="Șterge controlul">${icon('trash')}</button>

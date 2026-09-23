@@ -5,7 +5,7 @@ import {
   newControl, fineStatus, asiDeadline, matchControl, objectives, controlFromPrevious,
   normalizeControl, allFines, NEREGULI, SABLON, isApplicable, secStats, sectiuniActive, activeNereguli,
   neregulaLetter, tabOfNeregula, controlStats, constructieOf, amendaSerieNr, ACTE, emptyConstructie,
-  vecheInfo, pvText,
+  vecheInfo, pvText, constatareLabel,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -272,4 +272,19 @@ test('text PV: numerotare, construcție, observații pe un rând, filtru netrecu
   const n2 = pvText(c, [c], { doarNetrecute: true, cuActe: false });
   assert.equal(n2.count, 1);
   assert.doesNotMatch(n2.text, /expirate/);
+});
+
+test('rubricile Planuri/PC neconforme apar cu formularea negativă (PV, Panou, fișă)', () => {
+  const c = newControl({ tip: 'LOCALITATE', denumire: 'Comuna X', start: '2026-09-01' });
+  const r = c.nereguli.find((n) => n.key === 'plEvacuare');
+  assert.equal(constatareLabel(r), 'Plan evacuare conform');     // încă neverificată: numele rubricii
+  r.status = 'nok';
+  assert.equal(constatareLabel(r), 'Plan evacuare neconform');
+  c.nereguli.find((n) => n.key === 'pcSireneNumar').status = 'nok';
+  const t = pvText(c, [c]).text;
+  assert.match(t, /Plan evacuare neconform/);
+  assert.match(t, /Număr insuficient de sirene/);
+  assert.doesNotMatch(t, /Plan evacuare conform/);
+  const d = c.nereguli.find((n) => n.key === 'd'); d.status = 'nok';
+  assert.equal(constatareLabel(d), 'Stingătoare expirate');       // neregulile rămân cu textul lor
 });

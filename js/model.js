@@ -115,24 +115,24 @@ export const NEREGULI = [
 ].map((n) => ({ ...n, sec: 'ner' }));
 
 export const PLANURI = [
-  { key: 'paar', cat: 'planuri', label: 'PAAR avizat' },
-  { key: 'plInundatii', cat: 'planuri', label: 'Plan inundații conform' },
-  { key: 'plEvacuare', cat: 'planuri', label: 'Plan evacuare conform' },
-  { key: 'plCutremur', cat: 'planuri', label: 'Plan cutremur conform' },
-  { key: 'svsuAvizat', cat: 'svsu', label: 'SVSU avizat' },
-  { key: 'svsuSef', cat: 'svsu', label: 'Șef SVSU avizat' },
-  { key: 'svsuDotare', cat: 'svsu', label: 'Dotare conformă' },
-  { key: 'svsuPlanPregatire', cat: 'svsu', label: 'Plan de pregătire avizat' },
-  { key: 'svsuGospodarii', cat: 'svsu', label: 'Controale gospodării' },
+  { key: 'paar', cat: 'planuri', label: 'PAAR avizat', nokLabel: 'PAAR neavizat' },
+  { key: 'plInundatii', cat: 'planuri', label: 'Plan inundații conform', nokLabel: 'Plan inundații neconform' },
+  { key: 'plEvacuare', cat: 'planuri', label: 'Plan evacuare conform', nokLabel: 'Plan evacuare neconform' },
+  { key: 'plCutremur', cat: 'planuri', label: 'Plan cutremur conform', nokLabel: 'Plan cutremur neconform' },
+  { key: 'svsuAvizat', cat: 'svsu', label: 'SVSU avizat', nokLabel: 'SVSU neavizat' },
+  { key: 'svsuSef', cat: 'svsu', label: 'Șef SVSU avizat', nokLabel: 'Șef SVSU neavizat' },
+  { key: 'svsuDotare', cat: 'svsu', label: 'Dotare conformă', nokLabel: 'Dotare SVSU neconformă' },
+  { key: 'svsuPlanPregatire', cat: 'svsu', label: 'Plan de pregătire avizat', nokLabel: 'Plan de pregătire neavizat' },
+  { key: 'svsuGospodarii', cat: 'svsu', label: 'Controale gospodării', nokLabel: 'Controale gospodării neefectuate / neconforme' },
 ].map((n) => ({ ...n, sec: 'plan' }));
 
 export const PROTECTIE_CIVILA = [
-  { key: 'pcAudibilitate', cat: 'avertizare', label: 'Studiu de audibilitate' },
-  { key: 'pcSireneNumar', cat: 'avertizare', label: 'Număr suficient de sirene' },
-  { key: 'pcSireneMentenanta', cat: 'avertizare', label: 'Contract mentenanță sirene' },
+  { key: 'pcAudibilitate', cat: 'avertizare', label: 'Studiu de audibilitate', nokLabel: 'Lipsă studiu de audibilitate' },
+  { key: 'pcSireneNumar', cat: 'avertizare', label: 'Număr suficient de sirene', nokLabel: 'Număr insuficient de sirene' },
+  { key: 'pcSireneMentenanta', cat: 'avertizare', label: 'Contract mentenanță sirene', nokLabel: 'Lipsă contract mentenanță sirene' },
   { key: 'pcSireneDefecte', cat: 'avertizare', label: 'Sirene defecte' },
   { key: 'pcSireneNefunctionale', cat: 'avertizare', label: 'Sirene nefuncționale' },
-  { key: 'pcDotare', cat: 'pcdotare', label: 'Dotare conformă planurilor comunei' },
+  { key: 'pcDotare', cat: 'pcdotare', label: 'Dotare conformă planurilor comunei', nokLabel: 'Dotare neconformă cu planurile comunei' },
 ].map((n) => ({ ...n, sec: 'pc' }));
 
 // Toate rândurile șablon, în toate secțiunile
@@ -241,6 +241,14 @@ export function amendaSerieNr(a) {
 export function neregulaLabel(n) {
   if (n.custom) return n.label || 'Neregulă suplimentară';
   return sablon(n.key)?.label || n.label;
+}
+
+// Formularea constatării (ce se trece în PV / Panou): la rubricile formulate pozitiv („PAAR avizat”)
+// se folosește forma negativă („PAAR neavizat”); la nereguli, textul lor.
+export function constatareLabel(n) {
+  if (n.custom) return neregulaLabel(n);
+  const t = sablon(n.key);
+  return (n.status === 'nok' && t?.nokLabel) || neregulaLabel(n);
 }
 
 export const neregulaCat = (n) => (n.custom ? 'custom' : sablon(n.key)?.cat || 'custom');
@@ -509,7 +517,7 @@ export function pvText(c, controls = [], { doarNetrecute = false, cuActe = true 
     if (!rows.length) continue;
     lines.push('', `${SECTIUNI[sec].label}:`);
     for (const n of rows) {
-      let t = `${++nr}. ${neregulaLabel(n)}`;
+      let t = `${++nr}. ${constatareLabel(n)}`;
       const k = constructieOf(c, n);
       if (sec === 'ner' && multe && k) t += ` – construcția: ${k.denumire}`;
       if (n.obs && n.obs.trim()) t += `. ${n.obs.trim().replace(/\s*\n\s*/g, '; ')}`;

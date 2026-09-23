@@ -771,3 +771,15 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .side-backup.stale { background: color-mix(in srgb, var(--warn) 30%, transparent); color: #fff; }
 .side-backup + .side-settings { margin-top: 0; }
 .banner .btn { flex: none; }
+
+/* Panou pe vertical: data pe tot rândul; dedesubt ceasul și Backup rapid, pe același rând */
+@media (max-width: 999px) {
+  .dash-head { align-items: flex-start; }
+  .dash-head > div:first-child { width: 100%; }
+  .dash-right { width: 100%; flex-direction: row; align-items: center; justify-content: space-between; }
+  .dash-right .big-clock { font-size: 3rem; }
+}
+/* Antetul controlului: indicatorul „Salvat” lângă date; ștergerea separată, la dreapta */
+.ed-dates { flex-wrap: wrap; }
+.ed-dates .save-ind { margin-left: 0.4444rem; padding: 0; }
+.ed-actions .danger { margin-left: auto; }

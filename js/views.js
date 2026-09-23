@@ -7,7 +7,7 @@ import {
 import {
   objectives, allFines, allAsi, isIncheiat, byStartDesc, controlStats, matchControl, fold,
   neregulaLabel, neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
-  constructieOf, amendaSerieNr, vecheInfo,
+  constructieOf, amendaSerieNr, vecheInfo, constatareLabel,
 } from './model.js';
 import { icon, esc, pill, tipBadge, empty } from './ui.js';
 import { APP_VERSION } from './version.js';
@@ -166,7 +166,7 @@ export function viewDashboard() {
   const fineItem = ({ c, n, st }) => `<a class="item item-${st.level}" href="#/control/${c.id}/${tabOfNeregula(n)}/${encodeURIComponent(n.key)}">
       <span class="item-main">
         <span class="item-title">${esc(c.denumire || 'Obiectiv fără denumire')}</span>
-        <span class="item-sub">${esc(neregulaLetter(c, n))}. ${esc(neregulaLabel(n))}${c.constructii.length > 1 && constructieOf(c, n) ? ` · ${esc(constructieOf(c, n).denumire)}` : ''}</span>
+        <span class="item-sub">${esc(neregulaLetter(c, n))}. ${esc(constatareLabel(n))}${c.constructii.length > 1 && constructieOf(c, n) ? ` · ${esc(constructieOf(c, n).denumire)}` : ''}</span>
         ${amendaSerieNr(n.amenda) ? `<span class="item-sub">Amenda ${esc(amendaSerieNr(n.amenda))}</span>` : ''}
         <span class="item-msg">${esc(st.msg)}</span>
         ${st.nelucr ? `<span class="item-warn">⚠ ${esc(st.nelucr)}</span>` : ''}
@@ -222,7 +222,7 @@ export function viewDashboard() {
     ${netrecute.length ? `<div class="items">${netrecute.map(({ c, n }) => `<a class="item item-warn" href="#/control/${c.id}/${tabOfNeregula(n)}/${encodeURIComponent(n.key)}">
         <span class="item-main">
           <span class="item-title">${esc(c.denumire || 'Obiectiv fără denumire')}</span>
-          <span class="item-sub">${esc(neregulaLetter(c, n))}. ${esc(neregulaLabel(n))}</span>
+          <span class="item-sub">${esc(neregulaLetter(c, n))}. ${esc(constatareLabel(n))}</span>
           ${vecheInfo(state.controls, c, n).veche ? `<span class="item-veche">${icon('history')} Neregulă veche</span>` : ''}
         </span>
         <span class="item-side">${pill('warn', 'Netrecut')}</span>
@@ -450,7 +450,7 @@ export function viewCalendar() {
     </div>
     ${selData.controls.length ? `<div class="ctl-list">${selData.controls.map((c) => controlRow(c)).join('')}</div>` : '<p class="muted pad">Niciun control în această zi.</p>'}
     ${selData.deadlines.length ? `<h3 class="mini-title">Termene</h3><div class="items">${selData.deadlines.map((x) => `<a class="item item-${x.level}" href="#/control/${x.c.id}/${x.n ? tabOfNeregula(x.n) : 'nereguli'}/${encodeURIComponent(x.n ? x.n.key : 'a')}">
-        <span class="item-main"><span class="item-title">${esc(x.text)}</span><span class="item-sub">${esc(x.c.denumire)}${x.n ? ` · ${esc(neregulaLetter(x.c, x.n))}. ${esc(neregulaLabel(x.n))}` : ''}</span></span>
+        <span class="item-main"><span class="item-title">${esc(x.text)}</span><span class="item-sub">${esc(x.c.denumire)}${x.n ? ` · ${esc(neregulaLetter(x.c, x.n))}. ${esc(constatareLabel(x.n))}` : ''}</span></span>
       </a>`).join('')}</div>` : ''}
     <button class="btn btn-primary btn-lg btn-block" data-act="new-control" data-date="${sel}">${icon('plus')} Control nou în această zi</button>
   </aside>`;

@@ -2,7 +2,7 @@
 import { fmtDate, fmtDateLong, todayISO, isISO } from './dates.js';
 import {
   DOTARI, ACTE, SECTIUNI, CATEGORII, sectiuniActive, secOf, neregulaLabel, neregulaLetter, neregulaCat,
-  constructieOf, amendaSerieNr, fineStatus, asiDeadline, vecheInfo, isIncheiat, controlStats, isLocalitate,
+  constructieOf, amendaSerieNr, fineStatus, asiDeadline, vecheInfo, isIncheiat, controlStats, isLocalitate, constatareLabel,
 } from './model.js';
 import { esc } from './ui.js';
 
@@ -104,7 +104,7 @@ export function fisaMarkup(c, controls, now = new Date()) {
         const k = constructieOf(c, n);
         h.push(`<tr class="${n.status === 'nok' ? 'f-nok' : ''}">
           <td>${esc(neregulaLetter(c, n))}</td>
-          <td>${esc(neregulaLabel(n))}${n.custom ? '' : `<div class="f-cat">${esc(CATEGORII[neregulaCat(n)] || '')}</div>`}</td>
+          <td>${esc(constatareLabel(n))}${n.custom ? '' : `<div class="f-cat">${esc(CATEGORII[neregulaCat(n)] || '')}</div>`}</td>
           ${sec === 'ner' && multe ? `<td>${k ? esc(k.denumire) : '—'}</td>` : ''}
           <td>${n.status === 'nok' ? (sec === 'ner' ? 'Constatat' : 'Neconform') : STATUS.ok}</td>
           <td>${n.status === 'nok' ? (n.inPV ? 'Trecut' : '<b>Netrecut</b>') : ''}</td>
