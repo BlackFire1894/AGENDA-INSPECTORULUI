@@ -6,7 +6,7 @@ import {
   normalizeControl, allFines, NEREGULI, SABLON, isApplicable, secStats, sectiuniActive, activeNereguli,
   neregulaLetter, tabOfNeregula, controlStats, constructieOf, amendaSerieNr, ACTE, emptyConstructie,
   vecheInfo, pvText, constatareLabel, todoList, NEREGULI_GRAVE, constructiiCuNU,
-  fmtCoord, googleMapsUrl, gpsQuality,
+  fmtCoord, googleMapsUrl, gpsQuality, constructiiOf, constructiiNume, matchNeregula,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -190,7 +190,7 @@ test('v1.4: acte exerciții, construcția neregulii, seria și nr. amenzii', () 
   c.constructii.push(emptyConstructie(2));
   const n = c.nereguli.find((x) => x.key === 'd');
   assert.equal(constructieOf(c, n).id, c.constructii[0].id);      // implicit prima construcție
-  n.constructieId = c.constructii[1].id;
+  n.constructieIds = [c.constructii[1].id];
   assert.equal(constructieOf(c, n).id, c.constructii[1].id);
   c.constructii.splice(1, 1);                                     // construcția aleasă e ștearsă
   assert.equal(constructieOf(c, n).id, c.constructii[0].id);
@@ -202,7 +202,8 @@ test('v1.4: acte exerciții, construcția neregulii, seria și nr. amenzii', () 
     acte: { ctpsi: { status: 'ok', obs: '' } },
     nereguli: [{ key: 'b', status: 'nok', amenda: { aplicata: true, data: '', suma: '100', achitata: false, dataAchitare: '' } }] });
   const b = old.nereguli.find((x) => x.key === 'b');
-  assert.equal(b.constructieId, '');
+  assert.deepEqual(b.constructieIds, []);
+  assert.ok(!('constructieId' in b));
   assert.equal(b.amenda.serie, '');
   assert.equal(b.amenda.suma, '100');
   assert.deepEqual(old.acte.exercitii, { status: '', obs: '' });
@@ -263,7 +264,7 @@ test('text PV: numerotare, construcție, observații pe un rând, filtru netrecu
   c.constructii.push(emptyConstructie(2));
   c.constructii[1].denumire = 'Sala de sport';
   const d = c.nereguli.find((n) => n.key === 'd');
-  Object.assign(d, { status: 'nok', obs: 'P6 nr. 3\nhol', constructieId: c.constructii[1].id, inPV: true });
+  Object.assign(d, { status: 'nok', obs: 'P6 nr. 3\nhol', constructieIds: [c.constructii[1].id], inPV: true });
   c.nereguli.find((n) => n.key === 'e').status = 'nok';
   c.acte.lfd.status = 'nok';
   const t = pvText(c, [c]).text;
@@ -370,4 +371,50 @@ test('v1.8: coordonate GPS pe fiecare construcție, preluate la controlul următ
   assert.equal(old.constructii[0].gps.lat, 1);
   assert.ok(!('gps' in old));
   assert.equal(normalizeControl({ ...c, constructii: [{ id: 'k2' }] }).constructii[0].gps, null);
+});
+
+test('v1.9: o neregulă în mai multe construcții; migrarea din constructieId', () => {
+  const c = newControl({ denumire: 'SC Alfa SRL', start: '2026-09-01' });
+  c.constructii.push(emptyConstructie(2), emptyConstructie(3));
+  c.constructii[1].denumire = 'Hală';
+  c.constructii[2].denumire = 'Depozit';
+  const d = c.nereguli.find((n) => n.key === 'd');
+  assert.deepEqual(constructiiOf(c, d).map((k) => k.denumire), ['Construcția 1']);   // implicit prima
+  d.constructieIds = [c.constructii[2].id, c.constructii[1].id];                    // ordinea din tabul Obiectiv
+  assert.equal(constructiiNume(c, d), 'Hală, Depozit');
+  d.status = 'nok';
+  assert.match(pvText(c, [c]).text, /Stingătoare expirate – construcțiile: Hală, Depozit/);
+  c.constructii.splice(2, 1);                                                       // Depozit ștearsă
+  assert.equal(constructiiNume(c, d), 'Hală');
+  assert.match(pvText(c, [c]).text, /Stingătoare expirate – construcția: Hală/);
+  c.constructii.splice(1, 1);                                                       // și Hala
+  assert.equal(constructiiNume(c, d), 'Construcția 1');
+  // gravă: implicit toate construcțiile cu NU
+  const g = newControl({ start: '2026-09-01' });
+  g.constructii.push(emptyConstructie(2), emptyConstructie(3));
+  g.constructii[0].dotari.hidInt.v = 'NU'; g.constructii[2].dotari.hidInt.v = 'NU';
+  assert.equal(constructiiNume(g, g.nereguli.find((n) => n.key === 'lipsa-hidInt')), 'Construcția 1, Construcția 3');
+  // date vechi (schema 6)
+  const old = normalizeControl({ ...c, nereguli: [{ key: 'd', status: 'nok', constructieId: 'k9' }, { key: 'e', constructieId: '' }] });
+  assert.deepEqual(old.nereguli.find((n) => n.key === 'd').constructieIds, ['k9']);
+  assert.deepEqual(old.nereguli.find((n) => n.key === 'e').constructieIds, []);
+  assert.ok(old.nereguli.every((n) => !('constructieId' in n)));
+});
+
+test('v1.9: căutarea în nereguli — literă exactă sau text fără diacritice', () => {
+  const c = newControl({ start: '2026-09-01' });
+  const by = (k) => c.nereguli.find((n) => n.key === k);
+  const hits = (q) => c.nereguli.filter((n) => n.sec === 'ner' && matchNeregula(c, n, q)).map((n) => n.key);
+  assert.deepEqual(hits('d'), ['d']);                           // literă: doar rândul d, nu toate care conțin „d”
+  assert.deepEqual(hits('AG'), ['ag']);
+  assert.ok(hits('G1').length === 1 && hits('G1')[0].startsWith('lipsa-'));
+  assert.ok(hits('stingatoare').includes('d') && hits('stingatoare').includes('e'));
+  assert.ok(hits('STINGĂTOARE expirate').includes('d') && !hits('stingatoare expirate').includes('e'));
+  assert.deepEqual(hits('xyzq'), []);
+  by('e').obs = 'la etajul 2, hol';
+  assert.ok(hits('etajul').includes('e'));
+  assert.ok(matchNeregula(c, by('d'), '  '));                  // căutare goală = tot
+  const custom = { key: 'c1', custom: true, sec: 'ner', label: 'Ușă blocată la subsol', obs: '', status: '' };
+  c.nereguli.push(custom);
+  assert.ok(matchNeregula(c, custom, '+1') && matchNeregula(c, custom, 'usa blocata'));
 });

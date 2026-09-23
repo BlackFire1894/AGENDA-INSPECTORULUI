@@ -5,7 +5,7 @@ import {
   TERMEN_PLATA, PRAG_ROSU, TERMEN_ANAF, TERMEN_ASI, fmtDate, zinelucratoare,
 } from './dates.js';
 
-export const SCHEMA_VERSION = 6; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS
+export const SCHEMA_VERSION = 7; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS · 7: mai multe construcții pe neregulă
 
 export const TIP_OBIECTIV = [
   { key: 'OPEC', label: 'OPEC / Instituție' },
@@ -189,7 +189,7 @@ export function emptyConstructie(nr = 1) {
 export function emptyNeregula(key, custom = false, sec = 'ner') {
   return {
     key, custom, sec, label: '', status: '', obs: '', inPV: false,
-    constructieId: '',   // construcția în care s-a constatat; '' = prima construcție
+    constructieIds: [],  // construcțiile în care s-a constatat (una sau mai multe); [] = implicit (prima / cele cu NU)
     vecheManual: false,  // marcată manual ca „neregulă veche” (constatată și la controale anterioare)
     asiTermen: false, asiPrezentat: false, asiDataPrezentare: '',
     amenda: { aplicata: false, serie: '', numar: '', data: '', suma: '', achitata: false, dataAchitare: '' },
@@ -242,7 +242,13 @@ export function normalizeControl(c) {
   const byKey = new Map((c.nereguli || []).filter((n) => !n.custom).map((n) => [n.key, n]));
   const tmpl = SABLON.map((t) => ({ ...emptyNeregula(t.key, false, t.sec), ...(byKey.get(t.key) || {}), sec: t.sec }));
   const custom = (c.nereguli || []).filter((n) => n.custom).map((n) => ({ ...emptyNeregula(n.key, true), ...n, sec: n.sec || 'ner' }));
-  out.nereguli = [...tmpl, ...custom].map((n) => ({ ...n, amenda: { ...emptyNeregula('').amenda, ...(n.amenda || {}) } }));
+  out.nereguli = [...tmpl, ...custom].map((n) => {
+    // până la v1.8: o singură construcție (constructieId); de la v1.9: listă (constructieIds)
+    const { constructieId, ...rest } = n;
+    // (șablonul gol aduce constructieIds: [], deci lista goală nu trebuie să ascundă alegerea veche)
+    const ids = n.constructieIds?.length ? [...n.constructieIds] : constructieId ? [constructieId] : [];
+    return { ...rest, constructieIds: ids, amenda: { ...emptyNeregula('').amenda, ...(n.amenda || {}) } };
+  });
   out.constructii = (c.constructii && c.constructii.length ? c.constructii : base.constructii).map((k, i) => {
     const e = emptyConstructie(i + 1);
     return { ...e, ...k, dotari: { ...e.dotari, ...(k.dotari || {}) } };
@@ -256,14 +262,20 @@ export function normalizeControl(c) {
 
 export const isIncheiat = (c) => isISO(c.dataIncheiere);
 
-// Construcția în care s-a făcut constatarea: cea aleasă sau, implicit, prima construcție.
-// Dacă construcția aleasă a fost ștearsă, revine la prima.
-export function constructieOf(c, n) {
+// Construcțiile în care s-a făcut constatarea, în ordinea din tabul Obiectiv. Neales nimic (sau alese
+// doar construcții șterse între timp): la neregulile grave, cele cu NU la dotare; altfel, prima construcție.
+export function constructiiOf(c, n) {
   const list = c.constructii || [];
+  const ids = new Set(n.constructieIds || []);
+  const alese = list.filter((k) => ids.has(k.id));
+  if (alese.length) return alese;
   const t = n && !n.custom ? SABLON_BY_KEY.get(n.key) : null;
-  const implicit = t?.reqNU ? constructiiCuNU(c, t.reqNU)[0] : null;
-  return list.find((k) => k.id === n.constructieId) || implicit || list[0] || null;
+  const cuNU = t?.reqNU ? constructiiCuNU(c, t.reqNU) : [];
+  if (cuNU.length) return cuNU;
+  return list.length ? [list[0]] : [];
 }
+export const constructieOf = (c, n) => constructiiOf(c, n)[0] || null;
+export const constructiiNume = (c, n) => constructiiOf(c, n).map((k) => k.denumire || `Construcția ${c.constructii.indexOf(k) + 1}`).join(', ');
 
 // Construcțiile care au NU la o dotare (instalație necesară, lipsă)
 export function constructiiCuNU(c, key) {
@@ -499,6 +511,19 @@ export function matchControl(c, query) {
   return fold(q).split(/\s+/).every((w) => hay.includes(w));
 }
 
+// Căutarea în nereguli: o literă (d, ag, G1, +2) găsește rândul exact; de la 3 caractere, textul
+// (denumire, categorie, observații, construcții), fără diacritice, toate cuvintele.
+export function matchNeregula(c, n, query) {
+  const q = fold(query).trim();
+  if (!q) return true;
+  const letter = fold(neregulaLetter(c, n));
+  if (q === letter) return true;
+  if (q.length < 3 && !/\s/.test(q)) return false;
+  const hay = fold([neregulaLabel(n), constatareLabel(n), n.custom ? '' : CATEGORII[neregulaCat(n)], n.obs,
+    secOf(n) === 'ner' ? constructiiNume(c, n) : ''].join(' '));
+  return q.split(/\s+/).every((w) => hay.includes(w));
+}
+
 // Toate amenzile, cu stadiu, sortate după urgență
 export function allFines(controls, today = todayISO()) {
   const order = { red: 0, yellow: 1, blue: 2, green: 3 };
@@ -561,11 +586,8 @@ export function pvText(c, controls = [], { doarNetrecute = false, cuActe = true 
     lines.push('', `${SECTIUNI[sec].label}:`);
     for (const n of rows) {
       let t = `${++nr}. ${constatareLabel(n)}`;
-      const k = constructieOf(c, n);
-      const tNU = sablon(n.key)?.reqNU;
-      const cuNU = tNU && !n.constructieId ? constructiiCuNU(c, tNU) : [];
-      if (sec === 'ner' && multe && cuNU.length > 1) t += ` – construcțiile: ${cuNU.map((x) => x.denumire).join(', ')}`;
-      else if (sec === 'ner' && multe && k) t += ` – construcția: ${k.denumire}`;
+      const ks = constructiiOf(c, n);
+      if (sec === 'ner' && multe && ks.length) t += ` – ${ks.length > 1 ? 'construcțiile' : 'construcția'}: ${constructiiNume(c, n)}`;
       if (n.obs && n.obs.trim()) t += `. ${n.obs.trim().replace(/\s*\n\s*/g, '; ')}`;
       const extra = [];
       if (vecheInfo(controls, c, n).veche) extra.push('neregulă veche');

@@ -2,8 +2,8 @@
 import { fmtDate, fmtDateLong, todayISO, isISO } from './dates.js';
 import {
   DOTARI, ACTE, SECTIUNI, CATEGORII, sectiuniActive, secOf, neregulaLetter, neregulaCat,
-  constructieOf, amendaSerieNr, fineStatus, asiDeadline, vecheInfo, isIncheiat, controlStats, isLocalitate, constatareLabel,
-  sablon, isApplicable, constructiiCuNU, fmtCoord, googleMapsUrl,
+  constructiiNume, amendaSerieNr, fineStatus, asiDeadline, vecheInfo, isIncheiat, controlStats, isLocalitate, constatareLabel,
+  sablon, isApplicable, fmtCoord, googleMapsUrl,
 } from './model.js';
 import { esc } from './ui.js';
 
@@ -106,11 +106,10 @@ export function fisaMarkup(c, controls, now = new Date()) {
           const d = asiDeadline(c, today);
           if (d) det.push(`<b>ASI 90 zile:</b> ${esc(d.msg)}`);
         }
-        const k = constructieOf(c, n);
         h.push(`<tr class="${n.status === 'nok' || gravNeverif(n) ? 'f-nok' : ''}">
           <td>${esc(neregulaLetter(c, n))}</td>
           <td>${esc(constatareLabel(n))}${n.custom ? '' : `<div class="f-cat">${esc(CATEGORII[neregulaCat(n)] || '')}</div>`}</td>
-          ${sec === 'ner' && multe ? `<td>${sablon(n.key)?.reqNU ? esc(constructiiCuNU(c, sablon(n.key).reqNU).map((x) => x.denumire).join(', ') || '—') : k ? esc(k.denumire) : '—'}</td>` : ''}
+          ${sec === 'ner' && multe ? `<td>${esc(constructiiNume(c, n) || '—')}</td>` : ''}
           <td>${n.status === 'nok' ? (sec === 'ner' ? 'Constatat' : 'Neconform') : n.status === 'ok' ? STATUS.ok : '<b>Neverificată — gravă</b>'}</td>
           <td>${n.status === 'nok' ? (n.inPV ? 'Trecut' : '<b>Netrecut</b>') : ''}</td>
           <td>${det.join('<br>')}</td>

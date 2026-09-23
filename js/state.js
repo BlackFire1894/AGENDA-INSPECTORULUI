@@ -26,6 +26,8 @@ export const state = {
     expanded: new Set(),      // construcții deschise
     collapsed: new Set(),     // construcții închise explicit
     nerFilter: 'ALL',
+    nerQuery: '',             // căutarea din tabul de nereguli
+    constrPick: '',           // neregula al cărei meniu de construcții e deschis
     showAllNer: false,        // arată și neregulile de instalații nebifate DA la dotări
     obsHidden: pref('agenda-obs-hidden', false),                 // setarea generală: observațiile ascunse
     // Excepții individuale față de setarea generală: „<idControl>|<cale>” → true (ascuns) / false (afișat)

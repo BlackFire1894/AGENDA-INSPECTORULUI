@@ -77,7 +77,7 @@ export const AJUTOR = {
     title: 'Setări',
     lines: [
       '<b>Backup:</b> exportați regulat în Fișiere / iCloud Drive; la nevoie, importați înapoi (Combină sau Înlocuiește tot).',
-      '<b>Mărimea textului</b> se aplică imediat în toată aplicația.',
+      '<b>Mărimea textului</b> și <b>Tema</b> (Automat / Luminoasă / Întunecată) se aplică imediat în toată aplicația.',
       '<b>Ghid de utilizare</b> reia prezentarea de la prima pornire.',
     ],
   },
@@ -101,7 +101,8 @@ export const AJUTOR = {
   'ctrl-nereguli': {
     title: 'Nereguli',
     lines: [
-      '<b>✓ Conform</b> sau <b>✗ Constatat</b>. La constatat: construcția, trecut în PV, amendă (serie, nr., sumă), neregulă veche.',
+      '<b>Căutare:</b> scrieți litera (d, ag, G1) sau un cuvânt (hidranți, gaz) și lista se restrânge pe loc; ✕ o golește.',
+      '<b>✓ Conform</b> sau <b>✗ Constatat</b>. La constatat: construcțiile (una sau mai multe — atingeți meniul și bifați), trecut în PV, amendă (serie, nr., sumă), neregulă veche.',
       'Sus, cu roșu: <b>nereguli grave</b> (G1, G2…) — instalații marcate NU la dotări. Apar și dispar singure, după dotări.',
       'Apar doar neregulile pentru instalațiile bifate DA la dotări; <b>Arată toate</b> le afișează și pe celelalte.',
       'Categoriile se strâng din titlul lor; observațiile se ascund individual (săgeata) sau toate deodată.',

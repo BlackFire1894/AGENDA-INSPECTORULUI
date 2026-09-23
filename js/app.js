@@ -5,13 +5,13 @@ import { fmtDate, fmtDateLong, toISO, parseDateQuery, isISO } from './dates.js';
 import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
   fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat, pvText, sectiuniActive, secOf,
-  todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality,
+  todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality, constructiiOf,
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
   viewCalendar, viewSettings, hintText, backupAgeText, backupIsStale, guideSteps,
 } from './views.js';
-import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML } from './editor.js';
+import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML, nerResultsHTML } from './editor.js';
 import { AJUTOR } from './help.js';
 import { icon, esc, toast, openModal, closeModal, confirmDialog } from './ui.js';
 import { buildDemo } from './demo.js';
@@ -80,11 +80,14 @@ async function render({ keepScroll = false } = {}) {
       if (!tabsFor(c).some((t) => t.key === route.tab)) { location.replace(`#/control/${c.id}/obiectiv`); return; }
       if (route.focus) {
         state.ui.nerFilter = 'ALL';
+        state.ui.nerQuery = '';
         const fn = c.nereguli.find((x) => x.key === route.focus);
         if (fn && state.ui.catCollapsed.delete(neregulaCat(fn))) savePref('agenda-cats-collapsed', [...state.ui.catCollapsed]);
       }
       if (prev.name !== 'control' || prev.id !== route.id) state.ui.showAllNer = false;
-      if (prev.name !== 'control' || prev.id !== route.id || prev.tab !== route.tab) state.ui.nerFilter = 'ALL';
+      if (prev.name !== 'control' || prev.id !== route.id || prev.tab !== route.tab) {
+        state.ui.nerFilter = 'ALL'; state.ui.nerQuery = ''; state.ui.constrPick = '';
+      }
       html = viewControl(c, route.tab);
       break;
     }
@@ -186,6 +189,13 @@ function setPath(obj, path, v) { const [p, k] = resolvePath(obj, path); if (p) p
 
 document.addEventListener('input', (e) => {
   const el = e.target;
+  if (el.id === 'ner-search' && route.name === 'control') {
+    const c = getControl(route.id);
+    if (!c) return;
+    state.ui.nerQuery = el.value;
+    refreshNerResults(c, el.dataset.sec);
+    return;
+  }
   if (el.dataset.bind && route.name === 'control') {
     const c = getControl(route.id);
     if (!c) return;
@@ -206,6 +216,16 @@ document.addEventListener('input', (e) => {
     refreshSearch(key);
   }
 });
+
+// Doar lista se redesenează: bara de căutare rămâne activă, cu tastatura deschisă.
+function refreshNerResults(c, sec) {
+  const box = document.getElementById('ner-results');
+  if (!box) return;
+  box.innerHTML = nerResultsHTML(c, sec);
+  autosizeAll();
+  const tb = document.querySelector('.toolbar [data-act="cats-all"]');
+  if (tb) tb.hidden = !!state.ui.nerQuery.trim();
+}
 
 function refreshSearch(key) {
   const v = key === 'obj' ? state.ui.objSearch : state.ui.histSearch;
@@ -306,6 +326,7 @@ document.addEventListener('click', async (e) => {
     case 'wipe': await wipeAll(); return;
     case 'apply-update': applyUpdate(); return;
     case 'font-size': setFontSize(el.dataset.val); return;
+    case 'theme': setTheme(el.dataset.val); return;
     case 'check-update': {
       const found = await checkForUpdate();
       if (!found) toast(`Ai cea mai nouă versiune (${APP_VERSION})`);
@@ -379,6 +400,29 @@ document.addEventListener('click', async (e) => {
       return;
     }
     case 'ner-filter': state.ui.nerFilter = el.dataset.val; rerenderEditor(); return;
+    case 'ner-q-clear': {
+      state.ui.nerQuery = '';
+      rerenderEditor();
+      document.getElementById('ner-search')?.focus();
+      return;
+    }
+    case 'constr-pick': state.ui.constrPick = state.ui.constrPick === el.dataset.key ? '' : el.dataset.key; rerenderEditor(); return;
+    case 'constr-opt': case 'constr-opt-all': {
+      const n = c.nereguli.find((x) => x.key === el.dataset.key);
+      if (!n) return;
+      if (act === 'constr-opt-all') n.constructieIds = c.constructii.map((k) => k.id);
+      else {
+        const ids = new Set(constructiiOf(c, n).map((k) => k.id));
+        if (ids.has(el.dataset.id)) {
+          if (ids.size === 1) { toast('Rămâne cel puțin o construcție', 'warn'); return; }
+          ids.delete(el.dataset.id);
+        } else ids.add(el.dataset.id);
+        n.constructieIds = c.constructii.filter((k) => ids.has(k.id)).map((k) => k.id);
+      }
+      touch(c, true);
+      rerenderEditor();
+      return;
+    }
     case 'pv-text': openPvText(c); return;
     case 'todo-toggle': state.ui.todoOpen = !state.ui.todoOpen; rerenderEditor(); return;
     case 'todo-go': {
@@ -819,6 +863,15 @@ function setFontSize(size) {
   const root = document.documentElement;
   if (size === 'mare') delete root.dataset.font; else root.dataset.font = size;
   try { localStorage.setItem('agenda-font', size); } catch { /* setarea rămâne doar pentru sesiunea curentă */ }
+  render({ keepScroll: true });
+}
+
+// ───────── tema (preferință a acestei tablete) ─────────
+
+function setTheme(t) {
+  const root = document.documentElement;
+  if (t === 'light' || t === 'dark') root.dataset.theme = t; else delete root.dataset.theme;
+  try { localStorage.setItem('agenda-theme', t); } catch { /* setarea rămâne doar pentru sesiunea curentă */ }
   render({ keepScroll: true });
 }
 
