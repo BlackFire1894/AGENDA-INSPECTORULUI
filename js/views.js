@@ -9,6 +9,7 @@ import {
   neregulaLabel, neregulaLetter, fineStatus, asiDeadline, controlRange,
 } from './model.js';
 import { icon, esc, pill, tipBadge, empty } from './ui.js';
+import { APP_VERSION } from './version.js';
 
 const LEVEL_LABEL = { blue: 'În curs', yellow: 'Termen expirat', red: 'ANAF', green: 'Achitată' };
 
@@ -462,6 +463,12 @@ export function viewSettings(persisted) {
     ${demo ? `<div class="row-gap"><button class="btn btn-ghost btn-lg" data-act="demo-remove">Șterge datele demonstrative (${demo})</button></div>` : `<div class="row-gap"><button class="btn btn-ghost btn-lg" data-act="demo-load">Încarcă date demonstrative</button></div>`}
   </section>
   <section class="card set-sec">
+    <h2 class="sec-title">${icon('upload')} Actualizări</h2>
+    <div class="set-status"><span class="lbl">Versiunea instalată</span><b>${APP_VERSION}</b></div>
+    <p>Aplicația verifică singură la fiecare deschidere. Când există o versiune nouă, apare un mesaj cu butonul <b>Actualizează</b>.</p>
+    <button class="btn btn-ghost btn-lg" data-act="check-update">${icon('history')} Verifică acum</button>
+  </section>
+  <section class="card set-sec">
     <h2 class="sec-title">${icon('hourglass')} Cum se calculează termenele</h2>
     <ul class="rules">
       <li><b>Toate termenele</b> curg de la data de referință + 1 zi, după data și ora tabletei.</li>
@@ -479,5 +486,5 @@ export function viewSettings(persisted) {
     <p>Șterge definitiv toate controalele de pe această tabletă. Fă întâi un backup.</p>
     <button class="btn btn-danger btn-lg" data-act="wipe">Șterge toate datele</button>
   </section>
-  <p class="muted center">Agenda inspectorului · v1.0 · funcționează offline</p>`;
+  <p class="muted center">Agenda inspectorului · v${APP_VERSION} · funcționează offline</p>`;
 }

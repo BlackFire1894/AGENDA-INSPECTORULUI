@@ -13,6 +13,7 @@ import {
 import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS } from './editor.js';
 import { icon, esc, toast, openModal, closeModal, confirmDialog } from './ui.js';
 import { buildDemo } from './demo.js';
+import { APP_VERSION } from './version.js';
 
 const main = () => document.getElementById('main');
 let persisted = false;
@@ -227,6 +228,12 @@ document.addEventListener('click', async (e) => {
     case 'demo-load': await loadDemo(); return;
     case 'demo-remove': await removeDemo(); return;
     case 'wipe': await wipeAll(); return;
+    case 'apply-update': applyUpdate(); return;
+    case 'check-update': {
+      const found = await checkForUpdate();
+      if (!found) toast(`Ai cea mai nouă versiune (${APP_VERSION})`);
+      return;
+    }
   }
 
   if (!c) return;
@@ -525,7 +532,7 @@ function tick() {
 
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') flush();
-  else tick();
+  else { tick(); checkForUpdate(); }
 });
 window.addEventListener('pagehide', () => flush());
 window.addEventListener('hashchange', () => { closeModal(); render(); });
@@ -554,9 +561,66 @@ async function boot() {
   tick();
   setInterval(tick, 15000);
   render();
-  if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-    navigator.serviceWorker.register('./sw.js').catch((e) => console.warn('SW:', e));
+  registerSW();
+}
+
+// ───────── actualizări: „Versiune nouă disponibilă — Actualizează” ─────────
+
+let swReg = null;
+let updateRequested = false;
+
+function showUpdateBar() {
+  document.getElementById('toast')?.classList.remove('show');
+  document.getElementById('update-bar')?.removeAttribute('hidden');
+}
+
+function watchInstalling(sw) {
+  sw?.addEventListener('statechange', () => {
+    if (sw.state === 'installed' && navigator.serviceWorker.controller) showUpdateBar();
+  });
+}
+
+async function registerSW() {
+  if (!('serviceWorker' in navigator) || location.protocol === 'file:') return;
+  try {
+    swReg = await navigator.serviceWorker.register('./sw.js');
+  } catch (e) {
+    console.warn('SW:', e);
+    return;
   }
+  if (!swReg) return;
+  if (swReg.waiting && navigator.serviceWorker.controller) showUpdateBar();
+  swReg.addEventListener('updatefound', () => watchInstalling(swReg.installing));
+  // La prima instalare, controllerchange apare și fără actualizare — reîncărcăm doar la cererea utilizatorului.
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!updateRequested) return;
+    updateRequested = false;
+    location.reload();
+  });
+}
+
+// Returnează true dacă există (sau tocmai s-a găsit) o versiune nouă.
+async function checkForUpdate() {
+  if (!swReg) return false;
+  try { await swReg.update(); } catch { return false; }
+  if (swReg.installing) {
+    await new Promise((res) => {
+      const sw = swReg.installing;
+      sw.addEventListener('statechange', () => { if (sw.state !== 'installing') res(); });
+    });
+  }
+  const found = !!(swReg.waiting && navigator.serviceWorker.controller);
+  if (found) showUpdateBar();
+  return found;
+}
+
+async function applyUpdate() {
+  await flush();
+  const btn = document.querySelector('[data-act="apply-update"]');
+  if (btn) btn.textContent = 'Se actualizează…';
+  updateRequested = true;
+  if (swReg?.waiting) swReg.waiting.postMessage({ type: 'SKIP_WAITING' });
+  else location.reload();
 }
 
 boot();

@@ -125,3 +125,13 @@ test('allFines sortează după urgență', () => {
   assert.equal(list[0].st.level, 'red');
   assert.equal(list[1].st.level, 'yellow');
 });
+
+test('versiunea din sw.js coincide cu js/version.js și toate modulele sunt în cache-ul offline', async () => {
+  const fs = await import('node:fs');
+  const { APP_VERSION } = await import('../js/version.js');
+  const sw = fs.readFileSync(new URL('../sw.js', import.meta.url), 'utf8');
+  assert.equal(sw.match(/const VERSION = '([^']+)'/)[1], APP_VERSION);
+  for (const f of fs.readdirSync(new URL('../js/', import.meta.url))) {
+    assert.ok(sw.includes(`./js/${f}`), `sw.js nu pune în cache js/${f}`);
+  }
+});

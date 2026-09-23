@@ -1,34 +1,46 @@
 // Service worker: aplicația pornește instant și funcționează offline.
-// Strategie „stale-while-revalidate”: servește din cache, actualizează în fundal
-// (versiunea nouă apare la următoarea deschidere a aplicației).
-const CACHE = 'agenda-v2';
+// Fiecare versiune are propriul cache. Când VERSION se schimbă, iPad-ul descarcă versiunea nouă
+// în fundal, iar aplicația afișează „Versiune nouă disponibilă — Actualizează”.
+// IMPORTANT: VERSION trebuie să fie identic cu APP_VERSION din js/version.js.
+const VERSION = '1.1.0';
+const CACHE = `agenda-${VERSION}`;
 const ASSETS = [
   './', './index.html', './manifest.webmanifest', './css/app.css',
   './js/app.js', './js/state.js', './js/store.js', './js/model.js', './js/dates.js',
-  './js/views.js', './js/editor.js', './js/ui.js', './js/demo.js',
+  './js/views.js', './js/editor.js', './js/ui.js', './js/demo.js', './js/version.js',
   './icons/icon.svg', './icons/apple-touch-icon.png', './icons/icon-192.png', './icons/icon-512.png',
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS)).then(() => self.skipWaiting()));
+  // cache: 'reload' ocolește cache-ul HTTP, ca să luăm sigur fișierele noi
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(ASSETS.map((u) => new Request(u, { cache: 'reload' })))));
 });
 
 self.addEventListener('activate', (e) => {
   e.waitUntil(caches.keys()
-    .then((keys) => Promise.all(keys.filter((k) => k !== CACHE).map((k) => caches.delete(k))))
+    .then((keys) => Promise.all(keys.filter((k) => k.startsWith('agenda-') && k !== CACHE).map((k) => caches.delete(k))))
     .then(() => self.clients.claim()));
+});
+
+// Utilizatorul a apăsat „Actualizează”
+self.addEventListener('message', (e) => {
+  if (e.data?.type === 'SKIP_WAITING') self.skipWaiting();
 });
 
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET' || new URL(req.url).origin !== location.origin) return;
-  e.respondWith(caches.open(CACHE).then(async (cache) => {
+  e.respondWith((async () => {
+    const cache = await caches.open(CACHE);
     const key = req.mode === 'navigate' ? './index.html' : req;
     const cached = await cache.match(key, { ignoreSearch: true });
-    const network = fetch(req).then((res) => {
+    if (cached) return cached;
+    try {
+      const res = await fetch(req);
       if (res.ok) cache.put(key, res.clone());
       return res;
-    }).catch(() => cached);
-    return cached || network;
-  }));
+    } catch (err) {
+      return cached || Response.error();
+    }
+  })());
 });

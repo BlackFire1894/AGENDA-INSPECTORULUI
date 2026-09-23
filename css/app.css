@@ -596,4 +596,15 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .toast-ok .ic { color: #6ee7a8; }
 @media (min-width: 1000px) { .toast { left: calc(50% + var(--side) / 2); bottom: calc(env(safe-area-inset-bottom) + 32px); } }
 
+.update-bar {
+  position: fixed; left: 50%; transform: translateX(-50%); z-index: 90;
+  bottom: calc(env(safe-area-inset-bottom) + 104px); width: min(640px, calc(100vw - 32px));
+  display: flex; align-items: center; gap: 14px; padding: 12px 12px 12px 20px; border-radius: 20px;
+  background: var(--accent); color: #fff; box-shadow: var(--shadow-lg); animation: pop .25s ease;
+}
+.update-bar > .ic { width: 28px; height: 28px; }
+.update-bar span { flex: 1; font-size: 17px; }
+.update-bar .btn { background: #fff; color: var(--accent-ink); }
+@media (min-width: 1000px) { .update-bar { left: calc(50% + var(--side) / 2); bottom: calc(env(safe-area-inset-bottom) + 28px); } }
+
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { animation: none !important; transition: none !important; } }

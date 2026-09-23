@@ -43,6 +43,15 @@ Aplicația trebuie servită prin **HTTPS** (e o cerință pentru service worker 
 
 Rulare locală: `npm start` și apoi `http://localhost:8080`.
 
+## Modificări și actualizări
+
+1. Modificările se fac pe un branch separat și ajung în `main` printr-un **Pull Request** aprobat.
+2. GitHub Pages publică `main` automat, în 1–3 minute după aprobare.
+3. Pe iPad, la următoarea deschidere apare mesajul **„Versiune nouă disponibilă — Actualizează”**. Există și butonul **Setări → Actualizări → Verifică acum**.
+4. Datele controalelor nu sunt atinse de actualizări. Faceți totuși backup înaintea actualizărilor importante.
+
+Regula pentru fiecare versiune publicată: se crește `APP_VERSION` în `js/version.js` **și** `VERSION` în `sw.js`, cu aceeași valoare. Fără asta, iPad-ul nu află de versiunea nouă. `npm test` verifică potrivirea.
+
 ## Widget pe Home / Lock Screen
 
 Widgeturile iOS sunt disponibile doar în aplicațiile native (WidgetKit), deci nu pot exista într-o aplicație web. Pentru compilarea lor e nevoie de Xcode pe Mac. Modelul de date este documentat în [`docs/MODEL_DATE.md`](docs/MODEL_DATE.md) și pregătit pentru portarea în SwiftUI: backupul JSON poate fi importat direct într-o versiune nativă.
@@ -59,6 +68,7 @@ js/model.js           modelul de date + calculul termenelor (fără DOM, testabi
 js/dates.js           utilitare pentru date
 js/store.js           IndexedDB (cu localStorage ca rezervă)
 js/demo.js            date demonstrative
+js/version.js         versiunea aplicației
 sw.js                 funcționare offline
 tests/                teste pentru logica de termene și căutare
 ```
