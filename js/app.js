@@ -10,7 +10,7 @@ import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
   viewCalendar, viewSettings, hintText,
 } from './views.js';
-import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor } from './editor.js';
+import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey } from './editor.js';
 import { icon, esc, toast, openModal, closeModal, confirmDialog } from './ui.js';
 import { buildDemo } from './demo.js';
 import { APP_VERSION } from './version.js';
@@ -345,14 +345,20 @@ document.addEventListener('click', async (e) => {
     case 'ner-filter': state.ui.nerFilter = el.dataset.val; rerenderEditor(); return;
     case 'pv-text': openPvText(c); return;
     case 'obs-toggle':
+      // butonul general: setează toate câmpurile și anulează excepțiile individuale
       state.ui.obsHidden = !state.ui.obsHidden;
-      state.ui.obsOpen.clear();
+      state.ui.obsOverride.clear();
       savePref('agenda-obs-hidden', state.ui.obsHidden);
+      savePref('agenda-obs-override', []);
       rerenderEditor(); return;
-    case 'obs-open': {
-      state.ui.obsOpen.add(el.dataset.path);
+    case 'obs-show': case 'obs-hide': {
+      const show = act === 'obs-show';
+      const key = obsKey(el.dataset.path);
+      if (show === !state.ui.obsHidden) state.ui.obsOverride.delete(key); else state.ui.obsOverride.set(key, !show);
+      const entries = [...state.ui.obsOverride].slice(-1000);   // limită de siguranță pentru memoria locală
+      savePref('agenda-obs-override', entries);
       rerenderEditor();
-      document.querySelector(`textarea[data-bind="${CSS.escape(el.dataset.path)}"]`)?.focus();
+      if (show) document.querySelector(`textarea[data-bind="${CSS.escape(el.dataset.path)}"]`)?.focus();
       return;
     }
     case 'cat-toggle': {

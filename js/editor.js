@@ -22,6 +22,7 @@ export function tabsFor(c) {
 }
 
 export function viewControl(c, tab) {
+  curControlId = c.id;
   return `<div class="editor">
     <header class="ed-head" id="ed-head">${edHeadHTML(c)}</header>
     <nav class="ed-tabs" id="ed-tabs" style="--tabs:${tabsFor(c).length}">${edTabsHTML(c, tab)}</nav>
@@ -66,6 +67,7 @@ export function edTabsHTML(c, tab) {
 }
 
 export function tabHTML(c, tab) {
+  curControlId = c.id;
   const t = tabsFor(c).find((x) => x.key === tab);
   if (!t || t.key === 'obiectiv') return tabObiectiv(c);
   if (t.key === 'acte') return tabActe(c);
@@ -75,14 +77,25 @@ export function tabHTML(c, tab) {
 // ───────── helpers pentru câmpuri ─────────
 
 // Observații: câmp pe mai multe rânduri (Enter = rând nou) care crește doar în jos.
-// Cu „Observații ascunse”, toate se ascund: cele completate au indicatorul „Observații scrise”, cele goale „+ Observații”.
+// Fiecare câmp se poate ascunde / afișa individual; butonul general „Ascunde / Arată observațiile” le setează pe toate.
+// Ascuns: cele completate au indicatorul „Observații scrise”, cele goale „+ Observații”.
+let curControlId = '';
+export const obsKey = (path) => `${curControlId}|${path}`;
+export function obsIsHidden(path) {
+  const o = state.ui.obsOverride.get(obsKey(path));
+  return o === undefined ? state.ui.obsHidden : o;
+}
+
 function obsField(path, value, cls = 'row-obs') {
-  if (state.ui.obsHidden && !state.ui.obsOpen.has(path)) {
+  if (obsIsHidden(path)) {
     return value
-      ? `<button type="button" class="obs-add has-obs" data-act="obs-open" data-path="${path}" title="${esc(value.slice(0, 120))}">${icon('doc')} Observații scrise</button>`
-      : `<button type="button" class="obs-add" data-act="obs-open" data-path="${path}">${icon('plus')} Observații</button>`;
+      ? `<button type="button" class="obs-add has-obs" data-act="obs-show" data-path="${path}" title="${esc(value.slice(0, 120))}">${icon('doc')} Observații scrise</button>`
+      : `<button type="button" class="obs-add" data-act="obs-show" data-path="${path}">${icon('plus')} Observații</button>`;
   }
-  return `<textarea class="obs ${cls}" data-bind="${path}" rows="1" placeholder="Observații" autocomplete="off" enterkeyhint="enter">${esc(value)}</textarea>`;
+  return `<div class="obs-wrap">
+    <textarea class="obs ${cls}" data-bind="${path}" rows="1" placeholder="Observații" autocomplete="off" enterkeyhint="enter">${esc(value)}</textarea>
+    <button type="button" class="obs-hide" data-act="obs-hide" data-path="${path}" aria-label="Ascunde aceste observații" title="Ascunde">${icon('chevD', 'up')}</button>
+  </div>`;
 }
 
 // Construcția în care s-a făcut constatarea (implicit prima construcție)
