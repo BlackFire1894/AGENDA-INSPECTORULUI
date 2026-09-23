@@ -5,7 +5,7 @@ import {
   TERMEN_PLATA, PRAG_ROSU, TERMEN_ANAF, TERMEN_ASI, fmtDate,
 } from './dates.js';
 
-export const SCHEMA_VERSION = 1;
+export const SCHEMA_VERSION = 2; // 2: secțiuni Planuri/SVSU și Protecție civilă, adăpost PC
 
 export const TIP_OBIECTIV = [
   { key: 'OPEC', label: 'OPEC / Instituție' },
@@ -52,35 +52,90 @@ export const ACTE = [
   { key: 'contract', label: 'Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)' },
 ];
 
+// Categorii (cod de culori în interfață: bandă colorată + titlu de grup)
+export const CATEGORII = {
+  docs: 'Documentație și verificări',
+  stingatoare: 'Stingătoare',
+  electric: 'Instalații electrice și compartimentări',
+  semnalizare: 'Semnalizare și iluminat',
+  idsai: 'IDSAI',
+  hidranti: 'Hidranți',
+  desfumare: 'Desfumare',
+  stingere: 'Sprinklere, drencere, instalații speciale',
+  pompe: 'Stație de pompe / generator',
+  planuri: 'Planuri',
+  svsu: 'SVSU',
+  avertizare: 'Avertizare – sirene',
+  pcdotare: 'Dotare și adăpost',
+  custom: 'Nereguli suplimentare',
+};
+
+// Secțiunile de constatări: fiecare are propriul tab în editor.
+// „plan” și „pc” există doar la controalele de tip LOCALITATE.
+export const SECTIUNI = {
+  ner: { tab: 'nereguli', label: 'Nereguli', ok: 'Conform', nok: 'Constatat', onlyLocalitate: false },
+  plan: { tab: 'planuri', label: 'Planuri și SVSU', ok: 'Conform', nok: 'Neconform', onlyLocalitate: true },
+  pc: { tab: 'pc', label: 'Protecție civilă', ok: 'Conform', nok: 'Neconform', onlyLocalitate: true },
+};
+
+// `req`: neregula de instalație apare doar dacă cel puțin o construcție are DA la una din dotările listate
+// („centrala” = are cel puțin un tip de centrală bifat).
+const INST_C = ['idsai', 'hidInt', 'hidExt', 'desfumare', 'sprinklere', 'drencere', 'instSpeciale'];
 export const NEREGULI = [
-  { key: 'a', label: 'Nu a prezentat documentație ASI', asi: true },
-  { key: 'b', label: 'Nu a prezentat / nu are verificare instalații electrice / IPT / CT' },
-  { key: 'c', label: 'Nu a prezentat / nu are verificare IDSAI / Hint / Hext / Desfumare / Sprinklere / Drencere / Instalații speciale' },
-  { key: 'd', label: 'Stingătoare expirate' },
-  { key: 'e', label: 'Stingătoare neconforme' },
-  { key: 'f', label: 'Instalații electrice exploatate incorect' },
-  { key: 'g', label: 'Perete / planșeu / perete + planșeu cameră CT – 90 minute' },
-  { key: 'h', label: 'Ușă RF 15 minute cameră CT' },
-  { key: 'i', label: 'Ușă RF 60 minute cameră IDSAI' },
-  { key: 'j', label: 'EXIT defect' },
-  { key: 'k', label: 'Iluminat Hint defect' },
-  { key: 'l', label: 'Erori IDSAI' },
-  { key: 'm', label: 'IDSAI nefuncțional' },
-  { key: 'n', label: 'Probleme Hint' },
-  { key: 'o', label: 'Hint nefuncțional' },
-  { key: 'p', label: 'Probleme Hext' },
-  { key: 'q', label: 'Hext nefuncțional' },
-  { key: 'r', label: 'Probleme desfumare' },
-  { key: 's', label: 'Desfumare nefuncțională' },
-  { key: 'ș', label: 'Probleme sprinklere' },
-  { key: 't', label: 'Sprinklere nefuncționale' },
-  { key: 'ț', label: 'Probleme drencere' },
-  { key: 'u', label: 'Drencere nefuncționale' },
-  { key: 'v', label: 'Probleme instalații speciale' },
-  { key: 'x', label: 'Instalații speciale nefuncționale' },
-  { key: 'y', label: 'Probleme stație de pompe / generator' },
-  { key: 'z', label: 'Stație de pompe / generator nefuncțional' },
-];
+  { key: 'a', cat: 'docs', label: 'Nu a prezentat documentație ASI', asi: true },
+  { key: 'b', cat: 'docs', label: 'Nu a prezentat / nu are verificare instalații electrice / IPT / CT' },
+  { key: 'c', cat: 'docs', label: 'Nu a prezentat / nu are verificare IDSAI / Hint / Hext / Desfumare / Sprinklere / Drencere / Instalații speciale', req: INST_C },
+  { key: 'd', cat: 'stingatoare', label: 'Stingătoare expirate' },
+  { key: 'e', cat: 'stingatoare', label: 'Stingătoare neconforme' },
+  { key: 'f', cat: 'electric', label: 'Instalații electrice exploatate incorect' },
+  { key: 'g', cat: 'electric', label: 'Perete / planșeu / perete + planșeu cameră CT – 90 minute', req: ['centrala'] },
+  { key: 'h', cat: 'electric', label: 'Ușă RF 15 minute cameră CT', req: ['centrala'] },
+  { key: 'i', cat: 'electric', label: 'Ușă RF 60 minute cameră IDSAI', req: ['idsai'] },
+  { key: 'j', cat: 'semnalizare', label: 'EXIT defect', req: ['exit'] },
+  { key: 'k', cat: 'semnalizare', label: 'Iluminat Hint defect', req: ['ilumHint'] },
+  { key: 'l', cat: 'idsai', label: 'Erori IDSAI', req: ['idsai'] },
+  { key: 'm', cat: 'idsai', label: 'IDSAI nefuncțional', req: ['idsai'] },
+  { key: 'n', cat: 'hidranti', label: 'Probleme Hint', req: ['hidInt'] },
+  { key: 'o', cat: 'hidranti', label: 'Hint nefuncțional', req: ['hidInt'] },
+  { key: 'p', cat: 'hidranti', label: 'Probleme Hext', req: ['hidExt'] },
+  { key: 'q', cat: 'hidranti', label: 'Hext nefuncțional', req: ['hidExt'] },
+  { key: 'r', cat: 'desfumare', label: 'Probleme desfumare', req: ['desfumare'] },
+  { key: 's', cat: 'desfumare', label: 'Desfumare nefuncțională', req: ['desfumare'] },
+  { key: 'ș', cat: 'stingere', label: 'Probleme sprinklere', req: ['sprinklere'] },
+  { key: 't', cat: 'stingere', label: 'Sprinklere nefuncționale', req: ['sprinklere'] },
+  { key: 'ț', cat: 'stingere', label: 'Probleme drencere', req: ['drencere'] },
+  { key: 'u', cat: 'stingere', label: 'Drencere nefuncționale', req: ['drencere'] },
+  { key: 'v', cat: 'stingere', label: 'Probleme instalații speciale', req: ['instSpeciale'] },
+  { key: 'x', cat: 'stingere', label: 'Instalații speciale nefuncționale', req: ['instSpeciale'] },
+  { key: 'y', cat: 'pompe', label: 'Probleme stație de pompe / generator', req: ['statiePompe'] },
+  { key: 'z', cat: 'pompe', label: 'Stație de pompe / generator nefuncțional', req: ['statiePompe'] },
+].map((n) => ({ ...n, sec: 'ner' }));
+
+export const PLANURI = [
+  { key: 'paar', cat: 'planuri', label: 'PAAR avizat' },
+  { key: 'plInundatii', cat: 'planuri', label: 'Plan inundații conform' },
+  { key: 'plEvacuare', cat: 'planuri', label: 'Plan evacuare conform' },
+  { key: 'plCutremur', cat: 'planuri', label: 'Plan cutremur conform' },
+  { key: 'svsuAvizat', cat: 'svsu', label: 'SVSU avizat' },
+  { key: 'svsuSef', cat: 'svsu', label: 'Șef SVSU avizat' },
+  { key: 'svsuDotare', cat: 'svsu', label: 'Dotare conformă' },
+  { key: 'svsuPlanPregatire', cat: 'svsu', label: 'Plan de pregătire avizat' },
+  { key: 'svsuGospodarii', cat: 'svsu', label: 'Controale gospodării' },
+].map((n) => ({ ...n, sec: 'plan' }));
+
+export const PROTECTIE_CIVILA = [
+  { key: 'pcAudibilitate', cat: 'avertizare', label: 'Studiu de audibilitate' },
+  { key: 'pcSireneNumar', cat: 'avertizare', label: 'Număr suficient de sirene' },
+  { key: 'pcSireneMentenanta', cat: 'avertizare', label: 'Contract mentenanță sirene' },
+  { key: 'pcSireneDefecte', cat: 'avertizare', label: 'Sirene defecte' },
+  { key: 'pcSireneNefunctionale', cat: 'avertizare', label: 'Sirene nefuncționale' },
+  { key: 'pcDotare', cat: 'pcdotare', label: 'Dotare conformă planurilor comunei' },
+].map((n) => ({ ...n, sec: 'pc' }));
+
+// Toate rândurile șablon, în toate secțiunile
+export const SABLON = [...NEREGULI, ...PLANURI, ...PROTECTIE_CIVILA];
+const SABLON_BY_KEY = new Map(SABLON.map((t) => [t.key, t]));
+export const sablon = (key) => SABLON_BY_KEY.get(key);
 
 export const STRUCTURI = ['Beton armat', 'Cadre din beton armat', 'Zidărie portantă', 'Structură metalică', 'Lemn', 'Mixtă'];
 export const MATERIALE_PERETI = ['Cărămidă', 'BCA', 'Beton', 'Panouri sandwich', 'Gips-carton', 'Lemn', 'Mixt'];
@@ -101,9 +156,9 @@ export function emptyConstructie(nr = 1) {
 }
 
 // Neregulă (șablon sau custom). status: '' | 'ok' (conform) | 'nok' (constatată)
-export function emptyNeregula(key, custom = false) {
+export function emptyNeregula(key, custom = false, sec = 'ner') {
   return {
-    key, custom, label: '', status: '', obs: '', inPV: false,
+    key, custom, sec, label: '', status: '', obs: '', inPV: false,
     asiTermen: false, asiPrezentat: false, asiDataPrezentare: '',
     amenda: { aplicata: false, data: '', suma: '', achitata: false, dataAchitare: '' },
   };
@@ -126,7 +181,8 @@ export function newControl({ objectiveId, tip = 'OPEC', denumire = '', start } =
     dataIncheiere: '',
     constructii: [emptyConstructie(1)],
     acte,
-    nereguli: NEREGULI.map((n) => emptyNeregula(n.key)),
+    nereguli: SABLON.map((n) => emptyNeregula(n.key, false, n.sec)),
+    adapostPC: { v: '', obs: '' },   // Adăpost de protecție civilă: DA / NU / NEC (doar LOCALITATE)
   };
 }
 
@@ -139,6 +195,7 @@ export function controlFromPrevious(prev, start) {
   c.email = prev.email;
   c.constructii = JSON.parse(JSON.stringify(prev.constructii || [])).map((k) => ({ ...k, id: uid() }));
   if (!c.constructii.length) c.constructii = [emptyConstructie(1)];
+  if (prev.adapostPC) c.adapostPC = { ...prev.adapostPC };
   return c;
 }
 
@@ -147,14 +204,15 @@ export function normalizeControl(c) {
   const base = newControl({ objectiveId: c.objectiveId, start: c.dataInceput });
   const out = { ...base, ...c };
   out.acte = { ...base.acte, ...(c.acte || {}) };
-  const byKey = new Map((c.nereguli || []).map((n) => [n.key, n]));
-  const tmpl = NEREGULI.map((n) => ({ ...emptyNeregula(n.key), ...(byKey.get(n.key) || {}) }));
-  const custom = (c.nereguli || []).filter((n) => n.custom).map((n) => ({ ...emptyNeregula(n.key, true), ...n }));
+  const byKey = new Map((c.nereguli || []).filter((n) => !n.custom).map((n) => [n.key, n]));
+  const tmpl = SABLON.map((t) => ({ ...emptyNeregula(t.key, false, t.sec), ...(byKey.get(t.key) || {}), sec: t.sec }));
+  const custom = (c.nereguli || []).filter((n) => n.custom).map((n) => ({ ...emptyNeregula(n.key, true), ...n, sec: n.sec || 'ner' }));
   out.nereguli = [...tmpl, ...custom].map((n) => ({ ...n, amenda: { ...emptyNeregula('').amenda, ...(n.amenda || {}) } }));
   out.constructii = (c.constructii && c.constructii.length ? c.constructii : base.constructii).map((k, i) => {
     const e = emptyConstructie(i + 1);
     return { ...e, ...k, dotari: { ...e.dotari, ...(k.dotari || {}) } };
   });
+  out.adapostPC = { ...base.adapostPC, ...(c.adapostPC || {}) };
   return out;
 }
 
@@ -162,13 +220,69 @@ export const isIncheiat = (c) => isISO(c.dataIncheiere);
 
 export function neregulaLabel(n) {
   if (n.custom) return n.label || 'Neregulă suplimentară';
-  return NEREGULI.find((t) => t.key === n.key)?.label || n.label;
+  return sablon(n.key)?.label || n.label;
 }
 
+export const neregulaCat = (n) => (n.custom ? 'custom' : sablon(n.key)?.cat || 'custom');
+export const secOf = (n) => n.sec || 'ner';
+export const tabOfNeregula = (n) => SECTIUNI[secOf(n)].tab;
+
+// Numerotarea afișată: literă (a–z) la Nereguli, număr în cadrul grupului la Planuri/PC, „+n” la cele adăugate.
 export function neregulaLetter(c, n) {
-  if (!n.custom) return n.key;
-  const idx = c.nereguli.filter((x) => x.custom).indexOf(n);
-  return `+${idx + 1}`;
+  if (n.custom) {
+    const idx = c.nereguli.filter((x) => x.custom && secOf(x) === secOf(n)).indexOf(n);
+    return `+${idx + 1}`;
+  }
+  const t = sablon(n.key);
+  if (!t || t.sec === 'ner') return n.key;
+  return String(SABLON.filter((x) => x.cat === t.cat).indexOf(t) + 1);
+}
+
+export const isLocalitate = (c) => c.tip === 'LOCALITATE';
+
+// Secțiunile care se aplică acestui control (Planuri/PC doar la localități)
+export function sectiuniActive(c) {
+  return Object.keys(SECTIUNI).filter((k) => !SECTIUNI[k].onlyLocalitate || isLocalitate(c));
+}
+
+// Rândurile care contează (statistici, Panou, amenzi): cele din secțiunile active.
+export function activeNereguli(c) {
+  const secs = sectiuniActive(c);
+  return c.nereguli.filter((n) => secs.includes(secOf(n)));
+}
+
+// Are obiectivul dotarea respectivă bifată DA în cel puțin o construcție?
+export function hasDotare(c, key) {
+  return (c.constructii || []).some((k) => {
+    const v = k.dotari?.[key];
+    if (!v) return false;
+    return key === 'centrala' ? (v.tipuri || []).length > 0 : v.v === 'DA';
+  });
+}
+
+// Neregulile de instalații apar doar dacă instalația există (DA la dotări).
+// Un rând deja completat rămâne mereu vizibil, ca să nu „dispară” date.
+export function isApplicable(c, n) {
+  if (n.custom || n.status) return true;
+  const req = sablon(n.key)?.req;
+  return !req || req.some((k) => hasDotare(c, k));
+}
+
+// Statistici pentru o secțiune (tab)
+export function secStats(c, sec, today = todayISO()) {
+  const rows = c.nereguli.filter((n) => secOf(n) === sec);
+  const visible = rows.filter((n) => isApplicable(c, n));
+  const nok = rows.filter((n) => n.status === 'nok');
+  let total = visible.length;
+  let checked = visible.filter((n) => n.status).length;
+  if (sec === 'pc') { total += 1; if (c.adapostPC?.v) checked += 1; }
+  return {
+    total, checked,
+    hidden: rows.length - visible.length,
+    constatate: nok.length,
+    netrecute: nok.filter((n) => !n.inPV).length,
+    fines: nok.filter((n) => n.amenda?.aplicata).map((n) => ({ n, st: fineStatus(c, n, today) })),
+  };
 }
 
 // Data de la care curg termenele amenzii: data aplicării, implicit data încheierii.
@@ -239,14 +353,15 @@ export function asiDeadline(control, today = todayISO()) {
 
 // Statistici pentru un control
 export function controlStats(c, today = todayISO()) {
-  const nok = c.nereguli.filter((n) => n.status === 'nok');
+  const rows = activeNereguli(c);
+  const nok = rows.filter((n) => n.status === 'nok');
   const acteDone = ACTE.filter((a) => c.acte[a.key]?.status).length;
   const acteNok = ACTE.filter((a) => c.acte[a.key]?.status === 'nok').length;
-  const nereguliChecked = c.nereguli.filter((n) => n.status).length;
+  const nereguliChecked = rows.filter((n) => n.status).length;
   const fines = nok.filter((n) => n.amenda?.aplicata).map((n) => ({ n, st: fineStatus(c, n, today) }));
   return {
     acteDone, acteTotal: ACTE.length, acteNok,
-    nereguliChecked, nereguliTotal: c.nereguli.length,
+    nereguliChecked, nereguliTotal: rows.length,
     constatate: nok.length,
     netrecute: nok.filter((n) => !n.inPV).length,
     fines,
@@ -309,7 +424,7 @@ export function allFines(controls, today = todayISO()) {
   const order = { red: 0, yellow: 1, blue: 2, green: 3 };
   const out = [];
   for (const c of controls) {
-    for (const n of c.nereguli) {
+    for (const n of activeNereguli(c)) {
       if (n.status === 'nok' && n.amenda?.aplicata) out.push({ c, n, st: fineStatus(c, n, today) });
     }
   }

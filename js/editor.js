@@ -2,21 +2,29 @@
 import { state, today } from './state.js';
 import { fmtDate, fmtDateLong, isISO } from './dates.js';
 import {
-  TIP_OBIECTIV, DOTARI, CENTRALA_TIPURI, ACTE, STRUCTURI, MATERIALE_PERETI,
-  controlStats, fineStatus, fineDate, asiDeadline, isIncheiat, neregulaLabel, neregulaLetter,
+  TIP_OBIECTIV, DOTARI, CENTRALA_TIPURI, ACTE, STRUCTURI, MATERIALE_PERETI, SECTIUNI, CATEGORII,
+  controlStats, secStats, fineStatus, fineDate, asiDeadline, isIncheiat, neregulaLabel, neregulaLetter,
+  neregulaCat, secOf, isApplicable, isLocalitate,
 } from './model.js';
 import { icon, esc, pill, tipBadge } from './ui.js';
 
+// Toate taburile posibile; „planuri” și „pc” apar doar la controalele de tip Localitate.
 export const TABS = [
   { key: 'obiectiv', label: 'Obiectiv', ic: 'building' },
   { key: 'acte', label: 'Acte & evidențe', ic: 'doc' },
-  { key: 'nereguli', label: 'Nereguli', ic: 'alert' },
+  { key: 'planuri', label: 'Planuri și SVSU', ic: 'list', sec: 'plan' },
+  { key: 'pc', label: 'Protecție civilă', ic: 'shield', sec: 'pc' },
+  { key: 'nereguli', label: 'Nereguli', ic: 'alert', sec: 'ner' },
 ];
+
+export function tabsFor(c) {
+  return TABS.filter((t) => !t.sec || !SECTIUNI[t.sec].onlyLocalitate || isLocalitate(c));
+}
 
 export function viewControl(c, tab) {
   return `<div class="editor">
     <header class="ed-head" id="ed-head">${edHeadHTML(c)}</header>
-    <nav class="ed-tabs" id="ed-tabs">${edTabsHTML(c, tab)}</nav>
+    <nav class="ed-tabs" id="ed-tabs" style="--tabs:${tabsFor(c).length}">${edTabsHTML(c, tab)}</nav>
     <div id="ed-body" class="ed-body">${tabHTML(c, tab)}</div>
   </div>`;
 }
@@ -37,22 +45,29 @@ export function edHeadHTML(c) {
 
 export function edTabsHTML(c, tab) {
   const st = controlStats(c, today());
-  const badge = {
-    obiectiv: `${c.constructii.length} ${c.constructii.length === 1 ? 'construcție' : 'construcții'}`,
-    acte: `${st.acteDone}/${st.acteTotal}${st.acteNok ? ` · ${st.acteNok} lipsă` : ''}`,
-    nereguli: st.constatate ? `${st.constatate} constatate${st.netrecute ? ` · ${st.netrecute} netrecute` : ''}` : `${st.nereguliChecked}/${st.nereguliTotal} verificate`,
+  const tabs = tabsFor(c);
+  const badge = (t) => {
+    if (t.key === 'obiectiv') return [`${c.constructii.length} ${tabs.length >= 5 ? 'constr.' : c.constructii.length === 1 ? 'construcție' : 'construcții'}`, false];
+    if (t.key === 'acte') return [tabs.length < 5 || !st.acteNok ? `${st.acteDone}/${st.acteTotal}${st.acteNok ? ` · ${st.acteNok} lipsă` : ''}` : `${st.acteNok} lipsă`, st.acteNok > 0];
+    const s2 = secStats(c, t.sec, today());
+    // Cu 5 taburi, textul e scurt ca să încapă; culoarea portocalie semnalează nereguli netrecute în PV.
+    if (s2.constatate) return [`${s2.constatate} ${nokWord(t.sec, s2.constatate)}${s2.netrecute && tabs.length < 5 ? ` · ${s2.netrecute} netrecute` : ''}`, s2.netrecute > 0];
+    return [`${s2.checked}/${s2.total} verificate`, false];
   };
-  const warn = { nereguli: st.netrecute > 0, acte: st.acteNok > 0 };
-  return TABS.map((t, i) => `<a class="ed-tab ${t.key === tab ? 'on' : ''}" href="#/control/${c.id}/${t.key}">
+  return tabs.map((t, i) => {
+    const [txt, warn] = badge(t);
+    return `<a class="ed-tab ${t.key === tab ? 'on' : ''}" href="#/control/${c.id}/${t.key}">
       <span class="tab-num">${i + 1}</span>
-      <span class="tab-txt"><b>${t.label}</b><small class="${warn[t.key] ? 'warn' : ''}">${esc(badge[t.key])}</small></span>
-    </a>`).join('');
+      <span class="tab-txt"><b>${t.label}</b><small class="${warn ? 'warn' : ''}">${esc(txt)}</small></span>
+    </a>`;
+  }).join('');
 }
 
 export function tabHTML(c, tab) {
-  if (tab === 'acte') return tabActe(c);
-  if (tab === 'nereguli') return tabNereguli(c);
-  return tabObiectiv(c);
+  const t = tabsFor(c).find((x) => x.key === tab);
+  if (!t || t.key === 'obiectiv') return tabObiectiv(c);
+  if (t.key === 'acte') return tabActe(c);
+  return tabSectiune(c, t.sec);
 }
 
 // ───────── helpers pentru câmpuri ─────────
@@ -251,51 +266,108 @@ function okNok(path, status, okLabel, nokLabel) {
   </div>`;
 }
 
-// ───────── TAB 3: NEREGULI ─────────
+// ───────── TABURI DE CONSTATĂRI: Nereguli, Planuri și SVSU, Protecție civilă ─────────
 
-function tabNereguli(c) {
-  const st = controlStats(c, today());
+// „1 constatată / 2 constatate”, „1 neconformă / 2 neconforme”
+const nokWord = (sec, n) => (sec === 'ner' ? (n === 1 ? 'constatată' : 'constatate') : (n === 1 ? 'neconformă' : 'neconforme'));
+
+const SEC_UI = {
+  ner: { ic: 'alert', title: 'Nereguli constatate', addTitle: 'Nereguli suplimentare', nokWord: 'constatate', empty: 'Adaugă nereguli care nu se află în lista standard.' },
+  plan: { ic: 'list', title: 'Planuri și SVSU', addTitle: 'Rubrici suplimentare', nokWord: 'neconforme', empty: 'Adaugă rubrici care nu se află în lista standard.' },
+  pc: { ic: 'shield', title: 'Protecție civilă', addTitle: 'Rubrici suplimentare', nokWord: 'neconforme', empty: 'Adaugă rubrici care nu se află în lista standard.' },
+};
+
+function tabSectiune(c, sec) {
+  const ui = SEC_UI[sec];
+  const st = secStats(c, sec, today());
   const f = state.ui.nerFilter;
-  const tmpl = c.nereguli.filter((n) => !n.custom);
-  const custom = c.nereguli.filter((n) => n.custom);
+  const showAll = state.ui.showAllNer;
+  const rows = c.nereguli.filter((n) => secOf(n) === sec);
+  const tmpl = rows.filter((n) => !n.custom && (showAll || isApplicable(c, n)));
+  const custom = rows.filter((n) => n.custom);
   const show = (n) => f === 'ALL' || (f === 'NOK' ? n.status === 'nok' : !n.status);
   const inPV = st.constatate - st.netrecute;
+  const anyFineOrAsi = st.fines.length || (sec === 'ner' && asiDeadline(c, today()));
+
+  // grupare pe categorii, în ordinea din listă
+  const groups = [];
+  for (const n of tmpl) {
+    const cat = neregulaCat(n);
+    let g = groups.find((x) => x.cat === cat);
+    if (!g) { g = { cat, rows: [] }; groups.push(g); }
+    g.rows.push(n);
+  }
+  let body = groups.map((g) => {
+    const vis = g.rows.filter(show);
+    const adapost = sec === 'pc' && g.cat === 'pcdotare' && (f === 'ALL' || (f === 'TODO' && !c.adapostPC.v)) ? adapostRow(c) : '';
+    if (!vis.length && !adapost) return '';
+    const nok = g.rows.filter((n) => n.status === 'nok').length;
+    return `<div class="cat-group cat-${g.cat}">
+      <h3 class="cat-title"><i class="cat-sw"></i>${esc(CATEGORII[g.cat])}${nok ? `<span class="cat-count">${nok} ${nokWord(sec, nok)}</span>` : ''}</h3>
+      <div class="check-list">${vis.map((n) => neregulaRow(c, n)).join('')}${adapost}</div>
+    </div>`;
+  }).join('');
+  if (!body) body = '<p class="muted pad">Nimic de afișat pentru acest filtru.</p>';
+
+  const hiddenNote = sec === 'ner' && st.hidden > 0
+    ? `<div class="banner banner-info">${icon('info')}<span>${showAll
+      ? `Se văd toate neregulile, inclusiv cele ${st.hidden} pentru instalații care nu sunt bifate DA la dotări.`
+      : `<b>${st.hidden} nereguli de instalații sunt ascunse</b>: instalațiile respective nu sunt bifate DA la dotări (tabul Obiectiv).`}</span>
+      <button class="btn btn-ghost" data-act="toggle-all-ner">${showAll ? 'Ascunde-le' : 'Arată toate'}</button></div>`
+    : '';
+
   return `<section class="ner-summary">
-      <div class="sum-box"><b>${st.nereguliChecked}<small>/${st.nereguliTotal}</small></b><span>verificate</span></div>
-      <div class="sum-box s-red"><b>${st.constatate}</b><span>constatate</span></div>
+      <div class="sum-box"><b>${st.checked}<small>/${st.total}</small></b><span>verificate</span></div>
+      <div class="sum-box s-red"><b>${st.constatate}</b><span>${ui.nokWord}</span></div>
       <div class="sum-box ${st.netrecute ? 's-warn' : 's-green'}"><b>${inPV}<small>/${st.constatate}</small></b><span>trecute în PV</span></div>
       <div class="sum-box s-blue"><b>${st.fines.length}</b><span>amenzi</span></div>
     </section>
-    ${!isIncheiat(c) && (st.fines.length || st.asi) ? `<div class="banner banner-info">${icon('info')}<span>Termenele amenzilor și ASI pornesc după ce completezi <b>data încheierii</b> în tabul Obiectiv.</span></div>` : ''}
+    ${!isIncheiat(c) && anyFineOrAsi ? `<div class="banner banner-info">${icon('info')}<span>Termenele amenzilor${sec === 'ner' ? ' și ASI' : ''} pornesc după ce completezi <b>data încheierii</b> în tabul Obiectiv.</span></div>` : ''}
+    ${hiddenNote}
     <div class="seg-row">
       <div class="segmented">
-        ${[['ALL', 'Toate'], ['NOK', `Constatate (${st.constatate})`], ['TODO', `Neverificate (${st.nereguliTotal - st.nereguliChecked})`]].map(([k, l]) => `<button class="${f === k ? 'on' : ''}" data-act="ner-filter" data-val="${k}">${l}</button>`).join('')}
+        ${[['ALL', 'Toate'], ['NOK', `${ui.nokWord[0].toUpperCase()}${ui.nokWord.slice(1)} (${st.constatate})`], ['TODO', `Neverificate (${st.total - st.checked})`]].map(([k, l]) => `<button class="${f === k ? 'on' : ''}" data-act="ner-filter" data-val="${k}">${l}</button>`).join('')}
       </div>
     </div>
     <section class="card">
-      <h2 class="sec-title">${icon('alert')} Nereguli constatate</h2>
-      <div class="check-list">${tmpl.filter(show).map((n) => neregulaRow(c, n)).join('') || '<p class="muted pad">Nimic de afișat pentru acest filtru.</p>'}</div>
+      <h2 class="sec-title">${icon(ui.ic)} ${ui.title}</h2>
+      ${body}
     </section>
     <section class="card">
       <div class="sec-title-row">
-        <h2 class="sec-title">${icon('plus')} Nereguli suplimentare</h2>
-        <button class="btn btn-primary" data-act="ner-add">${icon('plus')} Adaugă neregulă</button>
+        <h2 class="sec-title">${icon('plus')} ${ui.addTitle}</h2>
+        <button class="btn btn-primary" data-act="ner-add" data-sec="${sec}">${icon('plus')} Adaugă rând</button>
       </div>
-      <div class="check-list">${custom.filter(show).map((n) => neregulaRow(c, n)).join('') || '<p class="muted pad">Adaugă nereguli care nu se află în lista standard.</p>'}</div>
+      <div class="cat-group cat-custom"><div class="check-list">${custom.filter(show).map((n) => neregulaRow(c, n)).join('') || `<p class="muted pad">${ui.empty}</p>`}</div></div>
     </section>`;
+}
+
+// Adăpost de protecție civilă: DA / NU / NEC + observații
+function adapostRow(c) {
+  const v = c.adapostPC;
+  return `<div class="check-row adapost-row" id="ner-adapostPC">
+    <span class="row-idx letter">2</span>
+    <div class="row-main">
+      <span class="row-label">Adăpost de protecție civilă <small class="muted">NEC = nu este cazul</small></span>
+      <input class="row-obs" data-bind="adapostPC.obs" value="${esc(v.obs)}" placeholder="Observații" autocomplete="off">
+    </div>
+    <div class="row-side">${segBtns('adapostPC.v', v.v, ['DA', 'NU', 'NEC'], 'seg-dnn seg-adapost')}</div>
+  </div>`;
 }
 
 function neregulaRow(c, n) {
   const path = `nereguli.@${n.key}`;
   const letter = neregulaLetter(c, n);
+  const sec = SECTIUNI[secOf(n)];
   const labelHTML = n.custom
-    ? `<input class="row-label-input" data-bind="${path}.label" value="${esc(n.label)}" placeholder="Descrie neregula…" autocomplete="off">`
+    ? `<input class="row-label-input" data-bind="${path}.label" value="${esc(n.label)}" placeholder="Descrie ${secOf(n) === 'ner' ? 'neregula' : 'rubrica'}…" autocomplete="off">`
     : `<span class="row-label">${esc(neregulaLabel(n))}</span>`;
   const chips = [];
   if (n.status === 'nok') {
     chips.push(n.inPV ? pill('green', 'Trecut în PV', 'pv') : pill('warn', 'Netrecut în PV', 'pv'));
     if (n.amenda.aplicata) { const fs = fineStatus(c, n, today()); chips.push(pill(fs.level, `Amendă · ${fs.label}`, 'fine')); }
   }
+  if (!n.custom && !isApplicable(c, { ...n, status: '' })) chips.push(pill('neutral', 'Instalație nebifată DA la dotări', 'info'));
   return `<div class="check-row ner-row ${n.status ? `is-${n.status}` : ''}" id="ner-${esc(n.key)}">
     <span class="row-idx letter">${esc(letter)}</span>
     <div class="row-main">
@@ -304,7 +376,7 @@ function neregulaRow(c, n) {
       <input class="row-obs" data-bind="${path}.obs" value="${esc(n.obs)}" placeholder="Observații" autocomplete="off">
     </div>
     <div class="row-side">
-      ${okNok(path, n.status, 'Conform', 'Constatat')}
+      ${okNok(path, n.status, sec.ok, sec.nok)}
       ${n.custom ? `<button class="icon-btn danger" data-act="ner-del" data-key="${esc(n.key)}" aria-label="Șterge rândul">${icon('trash')}</button>` : ''}
     </div>
     ${n.status === 'nok' ? neregulaDetail(c, n, path) : ''}
@@ -314,7 +386,7 @@ function neregulaRow(c, n) {
 function neregulaDetail(c, n, path) {
   const a = n.amenda;
   let asi = '';
-  if (n.key === 'a' && !n.custom) {
+  if (n.key === 'a' && !n.custom && secOf(n) === 'ner') {
     const d = asiDeadline(c, today());
     asi = `<div class="detail-block">
       <div class="detail-toggles">

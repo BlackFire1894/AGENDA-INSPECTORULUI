@@ -12,9 +12,9 @@ Funcționează **offline**, iar datele rămân **doar pe tabletă** (IndexedDB),
 | **Obiectiv** | datele de contact (apel / email dintr-o atingere) și istoricul tuturor controalelor |
 | **Calendar** | controalele marcate pe zile, plus termenele de plată, ANAF și ASI; „Control nou în această zi” |
 | **Istoric** | toate controalele, grupate pe luni, cu căutare și filtre |
-| **Control** | 3 taburi: **Obiectiv** (date, perioadă, construcții și dotări) · **Acte & evidențe** (✓ verde / ✗ roșu) · **Nereguli** (șablon a–z + nereguli suplimentare, trecut/netrecut în PV, amendă, termen ASI) |
+| **Control** | **Obiectiv** (date, perioadă, construcții și dotări) · **Acte & evidențe** (✓ verde / ✗ roșu) · la localități: **Planuri și SVSU** și **Protecție civilă** · **Nereguli** (grupate pe categorii colorate; cele de instalații apar doar dacă instalația e bifată DA la dotări). Peste tot: trecut/netrecut în PV, amendă, rânduri suplimentare |
 
-Salvare automată la fiecare modificare. Un control nou pe un obiectiv existent preia automat datele de contact și construcțiile din ultimul control.
+Salvare automată la fiecare modificare. Mărimea textului (Mic / Mediu / Mare) se alege din **Setări** și scalează proporțional toată interfața. Un control nou pe un obiectiv existent preia automat datele de contact și construcțiile din ultimul control.
 
 ## Termene
 
@@ -43,6 +43,15 @@ Aplicația trebuie servită prin **HTTPS** (e o cerință pentru service worker 
 
 Rulare locală: `npm start` și apoi `http://localhost:8080`.
 
+## Modificări și actualizări
+
+1. Modificările se fac pe un branch separat și ajung în `main` printr-un **Pull Request** aprobat.
+2. GitHub Pages publică `main` automat, în 1–3 minute după aprobare.
+3. Pe iPad, la următoarea deschidere apare mesajul **„Versiune nouă disponibilă — Actualizează”**. Există și butonul **Setări → Actualizări → Verifică acum**.
+4. Datele controalelor nu sunt atinse de actualizări. Faceți totuși backup înaintea actualizărilor importante.
+
+Regula pentru fiecare versiune publicată: se crește `APP_VERSION` în `js/version.js` **și** `VERSION` în `sw.js`, cu aceeași valoare. Fără asta, iPad-ul nu află de versiunea nouă. `npm test` verifică potrivirea.
+
 ## Widget pe Home / Lock Screen
 
 Widgeturile iOS sunt disponibile doar în aplicațiile native (WidgetKit), deci nu pot exista într-o aplicație web. Pentru compilarea lor e nevoie de Xcode pe Mac. Modelul de date este documentat în [`docs/MODEL_DATE.md`](docs/MODEL_DATE.md) și pregătit pentru portarea în SwiftUI: backupul JSON poate fi importat direct într-o versiune nativă.
@@ -59,6 +68,7 @@ js/model.js           modelul de date + calculul termenelor (fără DOM, testabi
 js/dates.js           utilitare pentru date
 js/store.js           IndexedDB (cu localStorage ca rezervă)
 js/demo.js            date demonstrative
+js/version.js         versiunea aplicației
 sw.js                 funcționare offline
 tests/                teste pentru logica de termene și căutare
 ```

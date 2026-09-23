@@ -6,9 +6,21 @@ import {
 } from './dates.js';
 import {
   objectives, allFines, allAsi, isIncheiat, byStartDesc, controlStats, matchControl, fold,
-  neregulaLabel, neregulaLetter, fineStatus, asiDeadline, controlRange,
+  neregulaLabel, neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
 } from './model.js';
 import { icon, esc, pill, tipBadge, empty } from './ui.js';
+import { APP_VERSION } from './version.js';
+
+export const FONT_SIZES = [
+  { key: 'mic', label: 'Mic', px: 15, hint: 'mai mult conținut pe ecran' },
+  { key: 'mediu', label: 'Mediu', px: 16.5, hint: 'echilibrat' },
+  { key: 'mare', label: 'Mare', px: 18, hint: 'implicit' },
+];
+
+export function currentFont() {
+  const f = document.documentElement.dataset.font;
+  return f === 'mic' || f === 'mediu' ? f : 'mare';
+}
 
 const LEVEL_LABEL = { blue: 'În curs', yellow: 'Termen expirat', red: 'ANAF', green: 'Achitată' };
 
@@ -109,7 +121,7 @@ export function viewDashboard() {
   const asi = allAsi(cs, t);
   const asiActive = asi.filter((x) => !x.a.pending);
   const netrecute = [];
-  cs.forEach((c) => c.nereguli.forEach((n) => { if (n.status === 'nok' && !n.inPV) netrecute.push({ c, n }); }));
+  cs.forEach((c) => activeNereguli(c).forEach((n) => { if (n.status === 'nok' && !n.inPV) netrecute.push({ c, n }); }));
   const nearestAsi = asiActive[0]?.a.daysLeft;
 
   const backupWarn = backupReminder();
@@ -145,7 +157,7 @@ export function viewDashboard() {
     </button>
   </section>`;
 
-  const fineItem = ({ c, n, st }) => `<a class="item item-${st.level}" href="#/control/${c.id}/nereguli/${encodeURIComponent(n.key)}">
+  const fineItem = ({ c, n, st }) => `<a class="item item-${st.level}" href="#/control/${c.id}/${tabOfNeregula(n)}/${encodeURIComponent(n.key)}">
       <span class="item-main">
         <span class="item-title">${esc(c.denumire || 'Obiectiv fără denumire')}</span>
         <span class="item-sub">${esc(neregulaLetter(c, n))}. ${esc(neregulaLabel(n))}</span>
@@ -197,7 +209,7 @@ export function viewDashboard() {
 
   const secPv = `<section class="card dash-sec" id="sec-pv">
     <h2 class="sec-title">${icon('pv')} Nereguli netrecute în procesul-verbal</h2>
-    ${netrecute.length ? `<div class="items">${netrecute.map(({ c, n }) => `<a class="item item-warn" href="#/control/${c.id}/nereguli/${encodeURIComponent(n.key)}">
+    ${netrecute.length ? `<div class="items">${netrecute.map(({ c, n }) => `<a class="item item-warn" href="#/control/${c.id}/${tabOfNeregula(n)}/${encodeURIComponent(n.key)}">
         <span class="item-main">
           <span class="item-title">${esc(c.denumire || 'Obiectiv fără denumire')}</span>
           <span class="item-sub">${esc(neregulaLetter(c, n))}. ${esc(neregulaLabel(n))}</span>
@@ -358,7 +370,7 @@ function calendarData(from, to) {
       let guard = 0;
       while (d <= end && guard++ < 62) { get(d).controls.push(c); d = addDays(d, 1); }
     }
-    for (const n of c.nereguli) {
+    for (const n of activeNereguli(c)) {
       if (n.status !== 'nok' || !n.amenda?.aplicata) continue;
       const st = fineStatus(c, n, t);
       if (st.level === 'green' || !st.plataPana) continue;
@@ -410,7 +422,7 @@ export function viewCalendar() {
       <div><div class="eyebrow">${sel === t ? 'Astăzi' : 'Ziua selectată'}</div><h2>${esc(ucfirst(fmtDateLong(sel)))}</h2></div>
     </div>
     ${selData.controls.length ? `<div class="ctl-list">${selData.controls.map((c) => controlRow(c)).join('')}</div>` : '<p class="muted pad">Niciun control în această zi.</p>'}
-    ${selData.deadlines.length ? `<h3 class="mini-title">Termene</h3><div class="items">${selData.deadlines.map((x) => `<a class="item item-${x.level}" href="#/control/${x.c.id}/nereguli/${encodeURIComponent(x.n ? x.n.key : 'a')}">
+    ${selData.deadlines.length ? `<h3 class="mini-title">Termene</h3><div class="items">${selData.deadlines.map((x) => `<a class="item item-${x.level}" href="#/control/${x.c.id}/${x.n ? tabOfNeregula(x.n) : 'nereguli'}/${encodeURIComponent(x.n ? x.n.key : 'a')}">
         <span class="item-main"><span class="item-title">${esc(x.text)}</span><span class="item-sub">${esc(x.c.denumire)}${x.n ? ` · ${esc(neregulaLetter(x.c, x.n))}. ${esc(neregulaLabel(x.n))}` : ''}</span></span>
       </a>`).join('')}</div>` : ''}
     <button class="btn btn-primary btn-lg btn-block" data-act="new-control" data-date="${sel}">${icon('plus')} Control nou în această zi</button>
@@ -446,6 +458,15 @@ export function viewSettings(persisted) {
   const demo = state.controls.filter((c) => c.demo).length;
   return `<header class="page-head"><div><div class="eyebrow">${icon('settings')} Date, backup și informații</div><h1>Setări</h1></div></header>
   <section class="card set-sec">
+    <h2 class="sec-title">${icon('settings')} Mărimea textului</h2>
+    <p>Se aplică imediat în toată aplicația: text, butoane, spațieri și iconițe se ajustează împreună.</p>
+    <div class="font-opts" role="radiogroup" aria-label="Mărimea textului">
+      ${FONT_SIZES.map((f) => `<button class="font-opt ${currentFont() === f.key ? 'on' : ''}" data-act="font-size" data-val="${f.key}" role="radio" aria-checked="${currentFont() === f.key}">
+        <span class="aa" style="font-size:${f.px + 8}px">Aa</span><span>${f.label}</span><small>${f.hint}</small>
+      </button>`).join('')}
+    </div>
+  </section>
+  <section class="card set-sec">
     <h2 class="sec-title">${icon('download')} Backup</h2>
     <p>Datele sunt salvate <b>doar pe această tabletă</b>. Exportă periodic un fișier de backup și salvează-l în <b>Fișiere → iCloud Drive</b> (sau alt loc sigur).</p>
     <div class="set-status"><span class="lbl">Ultimul backup</span><b>${last ? `${fmtDateLong(last.slice(0, 10))}, ${last.slice(11, 16)}` : 'niciodată'}</b></div>
@@ -460,6 +481,12 @@ export function viewSettings(persisted) {
     <div class="set-status"><span class="lbl">Obiective</span><b>${objectives(state.controls).length}</b></div>
     <div class="set-status"><span class="lbl">Stocare persistentă</span><b>${persisted ? 'Da' : 'Nu (instalează aplicația pe ecranul principal)'}</b></div>
     ${demo ? `<div class="row-gap"><button class="btn btn-ghost btn-lg" data-act="demo-remove">Șterge datele demonstrative (${demo})</button></div>` : `<div class="row-gap"><button class="btn btn-ghost btn-lg" data-act="demo-load">Încarcă date demonstrative</button></div>`}
+  </section>
+  <section class="card set-sec">
+    <h2 class="sec-title">${icon('upload')} Actualizări</h2>
+    <div class="set-status"><span class="lbl">Versiunea instalată</span><b>${APP_VERSION}</b></div>
+    <p>Aplicația verifică singură la fiecare deschidere. Când există o versiune nouă, apare un mesaj cu butonul <b>Actualizează</b>.</p>
+    <button class="btn btn-ghost btn-lg" data-act="check-update">${icon('history')} Verifică acum</button>
   </section>
   <section class="card set-sec">
     <h2 class="sec-title">${icon('hourglass')} Cum se calculează termenele</h2>
@@ -479,5 +506,5 @@ export function viewSettings(persisted) {
     <p>Șterge definitiv toate controalele de pe această tabletă. Fă întâi un backup.</p>
     <button class="btn btn-danger btn-lg" data-act="wipe">Șterge toate datele</button>
   </section>
-  <p class="muted center">Agenda inspectorului · v1.0 · funcționează offline</p>`;
+  <p class="muted center">Agenda inspectorului · v${APP_VERSION} · funcționează offline</p>`;
 }
