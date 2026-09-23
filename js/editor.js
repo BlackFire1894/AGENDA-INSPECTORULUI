@@ -1,12 +1,13 @@
 // Editorul unui control: 3 taburi — Obiectiv, Acte & evidențe, Nereguli.
 import { state, today } from './state.js';
-import { fmtDate, fmtDateLong, isISO } from './dates.js';
+import { fmtDate, fmtDateLong, toISO } from './dates.js';
 import {
   TIP_OBIECTIV, DOTARI, CENTRALA_TIPURI, ACTE, STRUCTURI, MATERIALE_PERETI, SECTIUNI, CATEGORII,
   controlStats, secStats, fineStatus, fineDate, asiDeadline, isIncheiat, neregulaLabel, neregulaLetter,
-  neregulaCat, secOf, isApplicable, isLocalitate, constructieOf, amendaSerieNr, vecheInfo, constatareAnterioara,
+  neregulaCat, secOf, isApplicable, isLocalitate, constructieOf, amendaSerieNr, vecheInfo, todoList,
+  LIPSA_DOTARI, constructiiCuNU, sablon, fmtCoord, googleMapsUrl, appleMapsUrl, gpsQuality,
 } from './model.js';
-import { icon, esc, pill, tipBadge } from './ui.js';
+import { icon, esc, pill, tipBadge, helpBtn } from './ui.js';
 
 // Toate taburile posibile; „planuri” și „pc” apar doar la controalele de tip Localitate.
 export const TABS = [
@@ -22,8 +23,10 @@ export function tabsFor(c) {
 }
 
 export function viewControl(c, tab) {
+  curControlId = c.id;
   return `<div class="editor">
     <header class="ed-head" id="ed-head">${edHeadHTML(c)}</header>
+    <div id="ed-todo">${todoHTML(c)}</div>
     <nav class="ed-tabs" id="ed-tabs" style="--tabs:${tabsFor(c).length}">${edTabsHTML(c, tab)}</nav>
     <div id="ed-body" class="ed-body">${tabHTML(c, tab)}</div>
   </div>`;
@@ -34,15 +37,36 @@ export function edHeadHTML(c) {
     <div class="ed-title">
       <div class="ed-meta">${tipBadge(c.tip)}${isIncheiat(c) ? pill('done', 'Încheiat', 'check') : pill('open', 'În desfășurare', 'clock')}</div>
       <h1 data-live="denumire">${esc(c.denumire || 'Obiectiv fără denumire')}</h1>
-      <div class="ed-dates">${icon('calendar')} ${esc(fmtDate(c.dataInceput))}${isIncheiat(c) ? ` – ${esc(fmtDate(c.dataIncheiere))}` : ' – în desfășurare'}</div>
+      <div class="ed-dates">${icon('calendar')} ${esc(fmtDate(c.dataInceput))}${isIncheiat(c) ? ` – ${esc(fmtDate(c.dataIncheiere))}` : ' – în desfășurare'}
+        <span class="save-ind" id="save-ind">${icon('check')}<span>Salvat</span></span></div>
     </div>
     <div class="ed-actions">
-      <span class="save-ind" id="save-ind">${icon('check')}<span>Salvat</span></span>
       <button class="btn btn-ghost" data-act="pv-text">${icon('pv')} Text PV</button>
-      <a class="btn btn-ghost" href="#/fisa/${c.id}">${icon('download')} Fișa (PDF)</a>
+      <a class="btn btn-ghost" href="#/fisa/${c.id}">${icon('download')} Fișa PDF</a>
       <a class="btn btn-ghost" href="#/obiectiv/${c.objectiveId}">${icon('history')} Istoric</a>
+      <button class="btn btn-ghost" data-act="backup-export" title="Backup rapid al tuturor controalelor">${icon('upload')} Backup</button>
+      ${helpBtn('ctrl')}
       <button class="icon-btn big danger" data-act="control-delete" aria-label="Șterge controlul">${icon('trash')}</button>
     </div>`;
+}
+
+// „Ce mai ai de făcut”: pasul următor, cu acces direct; lista completă se deschide la cerere.
+export function todoHTML(c) {
+  const items = todoList(c);
+  if (!items.length) {
+    return `<div class="todo todo-done">${icon('check')}<span><b>Totul e completat.</b> Puteți genera Text PV sau Fișa PDF.</span></div>`;
+  }
+  const open = state.ui.todoOpen;
+  const btn = (x) => `<button class="todo-item t-${x.level}" data-act="todo-go" data-tab="${x.tab}" data-focus="${esc(x.focus || '')}">
+      ${icon(x.level === 'warn' ? 'alert' : 'chevR')}<span>${esc(x.text)}</span></button>`;
+  return `<div class="todo ${open ? 'open' : ''}">
+    <div class="todo-head">
+      <span class="todo-title">${icon('list')} Ce mai ai de făcut <b>${items.length}</b></span>
+      ${open ? '' : btn(items[0])}
+      ${items.length > 1 || open ? `<button class="todo-more" data-act="todo-toggle">${open ? 'Ascunde lista' : `Toate (${items.length})`}</button>` : ''}
+    </div>
+    ${open ? `<div class="todo-list">${items.map(btn).join('')}</div>` : ''}
+  </div>`;
 }
 
 export function edTabsHTML(c, tab) {
@@ -66,6 +90,7 @@ export function edTabsHTML(c, tab) {
 }
 
 export function tabHTML(c, tab) {
+  curControlId = c.id;
   const t = tabsFor(c).find((x) => x.key === tab);
   if (!t || t.key === 'obiectiv') return tabObiectiv(c);
   if (t.key === 'acte') return tabActe(c);
@@ -75,14 +100,32 @@ export function tabHTML(c, tab) {
 // ───────── helpers pentru câmpuri ─────────
 
 // Observații: câmp pe mai multe rânduri (Enter = rând nou) care crește doar în jos.
-// Cu „Observații ascunse”, toate se ascund: cele completate au indicatorul „Observații scrise”, cele goale „+ Observații”.
+// Fiecare câmp se poate ascunde / afișa individual; butonul general „Ascunde / Arată observațiile” le setează pe toate.
+// Ascuns: cele completate au indicatorul „Observații scrise”, cele goale „+ Observații”.
+let curControlId = '';
+export const obsKey = (path) => `${curControlId}|${path}`;
+export function obsIsHidden(path) {
+  const o = state.ui.obsOverride.get(obsKey(path));
+  return o === undefined ? state.ui.obsHidden : o;
+}
+
 function obsField(path, value, cls = 'row-obs') {
-  if (state.ui.obsHidden && !state.ui.obsOpen.has(path)) {
+  if (obsIsHidden(path)) {
     return value
-      ? `<button type="button" class="obs-add has-obs" data-act="obs-open" data-path="${path}" title="${esc(value.slice(0, 120))}">${icon('doc')} Observații scrise</button>`
-      : `<button type="button" class="obs-add" data-act="obs-open" data-path="${path}">${icon('plus')} Observații</button>`;
+      ? `<button type="button" class="obs-add has-obs" data-act="obs-show" data-path="${path}" title="${esc(value.slice(0, 120))}">${icon('doc')} Observații scrise</button>`
+      : `<button type="button" class="obs-add" data-act="obs-show" data-path="${path}">${icon('plus')} Observații</button>`;
   }
-  return `<textarea class="obs ${cls}" data-bind="${path}" rows="1" placeholder="Observații" autocomplete="off" enterkeyhint="enter">${esc(value)}</textarea>`;
+  return `<div class="obs-wrap">
+    <textarea class="obs ${cls}" data-bind="${path}" rows="1" placeholder="Observații" autocomplete="off" enterkeyhint="enter">${esc(value)}</textarea>
+    <button type="button" class="obs-hide" data-act="obs-hide" data-path="${path}" aria-label="Ascunde aceste observații" title="Ascunde">${icon('chevD', 'up')}</button>
+  </div>`;
+}
+
+// Neregulile grave: construcțiile în care instalația e marcată NU (se actualizează singure)
+function constrNU(c, n) {
+  const list = constructiiCuNU(c, sablon(n.key).reqNU);
+  if (!list.length) return '';
+  return `<span class="constr-nu">${icon('building')} NU la dotări în: <b>${list.map((k) => esc(k.denumire)).join(', ')}</b></span>`;
 }
 
 // Construcția în care s-a făcut constatarea (implicit prima construcție)
@@ -129,7 +172,6 @@ function tabObiectiv(c) {
         <span class="inp-wrap"><input type="date" data-bind="dataIncheiere" data-rerender="1" value="${esc(c.dataIncheiere)}"></span>
         <span class="field-actions">
           <button class="chip-btn" data-act="end-today">Azi</button>
-          <button class="chip-btn" data-act="end-start">= data începerii</button>
           <button class="chip-btn danger" data-act="reopen">Redeschide</button>
         </span>
         ${c.dataIncheiere < c.dataInceput ? `<span class="field-err">${icon('alert')} Data încheierii este înaintea datei de începere.</span>` : ''}
@@ -144,7 +186,7 @@ function tabObiectiv(c) {
       </div>`;
 
   return `
-  <section class="card form-card">
+  <section class="card form-card" id="sec-date">
     <h2 class="sec-title">${icon('building')} Date obiectiv</h2>
     <div class="field wide">
       <span class="lbl">Tip obiectiv</span>
@@ -163,10 +205,12 @@ function tabObiectiv(c) {
         <span class="inp-wrap"><input type="email" data-bind="email" value="${esc(c.email)}" placeholder="nume@exemplu.ro" inputmode="email" autocomplete="off" autocapitalize="off">
         ${c.email ? `<a class="inp-action" href="mailto:${esc(c.email)}" aria-label="Trimite email">${icon('mail')}</a>` : ''}</span>
       </label>
+      ${field('Adresă', 'adresa', c.adresa, { ph: 'Strada, nr., bloc…' })}
+      ${field('Localitate', 'localitate', c.localitate, { ph: 'ex: Cluj-Napoca' })}
     </div>
   </section>
 
-  <section class="card form-card">
+  <section class="card form-card" id="sec-perioada">
     <h2 class="sec-title">${icon('calendar')} Perioada controlului</h2>
     <div class="form-grid">
       <div class="field">
@@ -193,6 +237,42 @@ function tabObiectiv(c) {
   <datalist id="dl-pereti">${MATERIALE_PERETI.map((s) => `<option value="${esc(s)}">`).join('')}</datalist>`;
 }
 
+// Coordonate GPS pe construcție: preluate doar la cerere (o atingere), cu precizia afișată și legături spre hărți
+function gpsBlock(c, k, i) {
+  const g = k.gps;
+  const busy = state.ui.gpsBusy === k.id;
+  const numeHarta = [c.denumire, k.denumire || `Construcția ${i + 1}`].filter(Boolean).join(' – ');
+  if (!g) {
+    return `<div class="gps-field" id="gps-${k.id}">
+      <span class="lbl">Coordonate GPS</span>
+      <div class="gps-empty">
+        <span class="gps-cell is-empty">Necompletat</span>
+        <button class="btn btn-primary btn-lg" data-act="gps-get" data-id="${k.id}" ${busy ? 'disabled' : ''}>${icon('locate')} ${busy ? 'Se caută semnalul…' : 'Completează coordonatele'}</button>
+      </div>
+      <span class="hint">Doar la cerere: poziția se citește o singură dată, când apăsați, lângă această construcție. Nu se urmărește locația.</span>
+    </div>`;
+  }
+  const q = gpsQuality(g.acc);
+  const la = g.la ? new Date(g.la) : null;
+  return `<div class="gps-field" id="gps-${k.id}">
+    <span class="lbl">Coordonate GPS</span>
+    <div class="gps-box">
+      <div class="gps-main">
+        <b class="gps-coord gps-cell">${esc(fmtCoord(g))}</b>
+        <span class="gps-meta"><span class="gps-q q-${q}">± ${Math.round(g.acc)} m · precizie ${q === 'buna' ? 'bună' : q === 'medie' ? 'medie' : 'slabă'}</span>${la ? ` · preluate ${esc(fmtDate(toISO(la)))}, ${String(la.getHours()).padStart(2, '0')}:${String(la.getMinutes()).padStart(2, '0')}` : ''}</span>
+        ${q === 'slaba' ? `<span class="gps-warn">${icon('alert')} Precizie slabă: ieșiți în aer liber sau lângă o fereastră și apăsați „Actualizează”.</span>` : ''}
+      </div>
+      <div class="gps-actions">
+        <a class="btn btn-ghost" href="${esc(googleMapsUrl(g))}" target="_blank" rel="noopener">${icon('pin')} Google Maps</a>
+        <a class="btn btn-ghost" href="${esc(appleMapsUrl(g, numeHarta))}" target="_blank" rel="noopener">${icon('pin')} Hărți Apple</a>
+        <button class="btn btn-ghost" data-act="gps-copy" data-id="${k.id}">${icon('doc')} Copiază</button>
+        <button class="btn btn-ghost" data-act="gps-get" data-id="${k.id}" ${busy ? 'disabled' : ''}>${icon('history')} ${busy ? 'Se caută…' : 'Actualizează'}</button>
+        <button class="icon-btn danger" data-act="gps-clear" data-id="${k.id}" aria-label="Șterge coordonatele">${icon('trash')}</button>
+      </div>
+    </div>
+  </div>`;
+}
+
 function isOpen(c, k, i) {
   const u = state.ui;
   if (u.collapsed.has(k.id)) return false;
@@ -201,15 +281,16 @@ function isOpen(c, k, i) {
 }
 
 function dotariSummary(k) {
-  let da = 0, nec = 0, set = 0;
+  let da = 0, nec = 0, set = 0, lipsa = 0;
   for (const d of DOTARI) {
     const v = k.dotari[d.key];
     if (d.centrala) { if (v.tipuri.length || v.nuAre) set++; continue; }
     if (v.v) set++;
     if (v.v === 'DA') da++;
     if (v.v === 'NEC') nec++;
+    if (v.v === 'NU' && LIPSA_DOTARI.includes(d.key)) lipsa++;
   }
-  return { da, nec, set, total: DOTARI.length };
+  return { da, nec, set, lipsa, total: DOTARI.length };
 }
 
 function constructieHTML(c, k, i) {
@@ -220,7 +301,8 @@ function constructieHTML(c, k, i) {
     <div class="constr-head">
       <span class="constr-num">${i + 1}</span>
       <input class="constr-name" data-bind="${p}.denumire" value="${esc(k.denumire)}" placeholder="Denumirea construcției ${i + 1}" autocomplete="off">
-      <span class="constr-sum">${s.set}/${s.total} dotări${k.suprafata ? ` · ${esc(k.suprafata)} m²` : ''}${k.regimInaltime ? ` · ${esc(k.regimInaltime)}` : ''}</span>
+      ${s.lipsa ? `<span class="pill pill-red">${icon('alert')}${s.lipsa} ${s.lipsa === 1 ? 'instalație lipsă' : 'instalații lipsă'}</span>` : ''}
+      <span class="constr-sum">${s.set}/${s.total} dotări${k.suprafata ? ` · ${esc(k.suprafata)} m²` : ''}${k.regimInaltime ? ` · ${esc(k.regimInaltime)}` : ''}${k.gps ? ' · GPS ✓' : ''}</span>
       <button class="icon-btn" data-act="constr-toggle" data-id="${k.id}" aria-label="${open ? 'Restrânge' : 'Extinde'}">${icon('chevD', open ? 'rot' : '')}</button>
     </div>
     ${open ? `<div class="constr-body">
@@ -231,6 +313,7 @@ function constructieHTML(c, k, i) {
         ${field('Structura de rezistență', `${p}.structura`, k.structura, { list: 'dl-structura', ph: 'Alege sau scrie' })}
         ${field('Material pereți', `${p}.materialPereti`, k.materialPereti, { list: 'dl-pereti', ph: 'Alege sau scrie' })}
       </div>
+      ${gpsBlock(c, k, i)}
       <div class="mini-row"><h3 class="mini-title">Dotări și instalații <small>NEC = nu este cazul</small></h3>${i === 0 || state.ui.obsHidden ? obsToggleBtn() : ''}</div>
       <div class="dotari">${DOTARI.map((d) => dotareRow(p, k, d)).join('')}</div>
       ${c.constructii.length > 1 ? `<div class="constr-foot"><button class="btn btn-ghost danger" data-act="constr-del" data-id="${k.id}">${icon('trash')} Șterge construcția</button></div>` : ''}
@@ -251,8 +334,9 @@ function dotareRow(p, k, d) {
       ${obsField(`${path}.obs`, v.obs, 'dot-obs')}
     </div>`;
   }
-  return `<div class="dot-row">
-    <span class="dot-label">${esc(d.label)}</span>
+  const grav = v.v === 'NU' && LIPSA_DOTARI.includes(d.key);
+  return `<div class="dot-row ${grav ? 'is-grav' : ''}">
+    <span class="dot-label">${esc(d.label)}${grav ? `<small class="grav-note">${icon('alert')} Neregulă gravă</small>` : ''}</span>
     ${segBtns(`${path}.v`, v.v, d.opts, 'seg-dnn')}
     ${obsField(`${path}.obs`, v.obs, 'dot-obs')}
   </div>`;
@@ -266,14 +350,14 @@ function tabActe(c) {
   return `<section class="card">
     <div class="sec-title-row">
       <h2 class="sec-title">${icon('doc')} Acte de autoritate și evidențe</h2>
-      ${obsToggleBtn()}
+      <div class="tool-btns">${obsToggleBtn()}${restBtn(st.acteTotal - st.acteDone, 'acte', 'Restul prezentate')}</div>
       <div class="progress-txt"><b>${st.acteDone}</b>/${st.acteTotal} verificate · <span class="t-green">${ok} prezentate</span> · <span class="t-red">${st.acteNok} lipsă</span></div>
     </div>
     <div class="progress"><span class="p-ok" style="width:${(ok / st.acteTotal) * 100}%"></span><span class="p-nok" style="width:${(st.acteNok / st.acteTotal) * 100}%"></span></div>
     <div class="check-list">${ACTE.map((a, i) => {
       const v = c.acte[a.key];
       const path = `acte.${a.key}`;
-      return `<div class="check-row ${v.status ? `is-${v.status}` : ''}">
+      return `<div class="check-row ${v.status ? `is-${v.status}` : ''}" id="act-${a.key}">
         <span class="row-idx">${i + 1}</span>
         <div class="row-main">
           <span class="row-label">${esc(a.label)}</span>
@@ -309,7 +393,7 @@ function tabSectiune(c, sec) {
   const f = state.ui.nerFilter;
   const showAll = state.ui.showAllNer;
   const rows = c.nereguli.filter((n) => secOf(n) === sec);
-  const tmpl = rows.filter((n) => !n.custom && (showAll || isApplicable(c, n)));
+  const tmpl = rows.filter((n) => !n.custom && (isApplicable(c, n) || (showAll && !sablon(n.key)?.grav)));
   const custom = rows.filter((n) => n.custom);
   const show = (n) => f === 'ALL' || (f === 'NOK' ? n.status === 'nok' : !n.status);
   const inPV = st.constatate - st.netrecute;
@@ -363,6 +447,7 @@ function tabSectiune(c, sec) {
       <div class="tool-btns">
         ${(() => { const all = groups.length && groups.every((g) => state.ui.catCollapsed.has(g.cat)); return `<button class="btn btn-ghost" data-act="cats-all" data-val="${all ? 'open' : 'close'}">${icon(all ? 'chevD' : 'list')} ${all ? 'Extinde categoriile' : 'Restrânge categoriile'}</button>`; })()}
         ${obsToggleBtn()}
+        ${restBtn(st.total - st.checked - (sec === 'pc' && !c.adapostPC.v ? 1 : 0), sec, sec === 'ner' ? 'Restul conform' : 'Restul conforme')}
       </div>
     </div>
     <section class="card">
@@ -379,6 +464,12 @@ function tabSectiune(c, sec) {
 }
 
 // Adăpost de protecție civilă: DA / NU / NEC + observații
+// „Restul conform”: bifează în bloc rândurile vizibile încă neverificate (cu confirmare și „Anulează”)
+function restBtn(n, sec, label) {
+  if (n <= 0) return '';
+  return `<button class="btn btn-ghost btn-rest" data-act="rest-ok" data-sec="${sec}">${icon('check')} ${label} (${n})</button>`;
+}
+
 export function obsToggleBtn() {
   const h = state.ui.obsHidden;
   return `<button class="btn btn-ghost ${h ? 'is-on' : ''}" data-act="obs-toggle" aria-pressed="${h}">${icon('doc')} ${h ? 'Arată observațiile' : 'Ascunde observațiile'}</button>`;
@@ -411,13 +502,15 @@ function neregulaRow(c, n) {
   const vi = vecheInfo(state.controls, c, n);
   if (vi.veche) chips.unshift(`<span class="pill pill-veche">${icon('history')}Neregulă veche</span>`);
   else if (n.status !== 'nok' && vi.auto) chips.push(pill('neutral', `Constatată la controlul din ${fmtDate(vi.auto.dataInceput)}`, 'history'));
-  if (!n.custom && !isApplicable(c, { ...n, status: '' })) chips.push(pill('neutral', 'Instalație nebifată DA la dotări', 'info'));
+  if (!n.custom && !isApplicable(c, { ...n, status: '' })) {
+    chips.push(pill('neutral', sablon(n.key)?.reqNU ? 'Nu mai e marcată NU la dotări' : 'Instalație nebifată DA la dotări', 'info'));
+  }
   return `<div class="check-row ner-row ${n.status ? `is-${n.status}` : ''} ${vi.veche ? 'is-veche' : ''}" id="ner-${esc(n.key)}">
     <span class="row-idx letter">${esc(letter)}</span>
     <div class="row-main">
       ${labelHTML}
       ${chips.length ? `<span class="chips">${chips.join('')}</span>` : ''}
-      ${n.sec === 'ner' || !n.sec ? constrSelect(c, n, path) : ''}
+      ${sablon(n.key)?.reqNU ? constrNU(c, n) : (n.sec === 'ner' || !n.sec ? constrSelect(c, n, path) : '')}
       ${obsField(`${path}.obs`, n.obs)}
     </div>
     <div class="row-side">

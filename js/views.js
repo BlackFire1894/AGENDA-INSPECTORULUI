@@ -1,16 +1,24 @@
 // Ecranele de listă: Panou, Obiective, Obiectiv (istoric), Calendar, Istoric, Setări.
 import { state, today } from './state.js';
 import {
-  fmtDate, fmtDateLong, fmtDateMedium, MONTHS, MONTHS_SHORT, WEEKDAYS_SHORT, addDays, diffDays,
-  toISO, zile, parseDateQuery, isISO, ucfirst,
+  fmtDate, fmtDateLong, MONTHS, MONTHS_SHORT, WEEKDAYS_SHORT, addDays, diffDays,
+  toISO, zile, parseDateQuery, ucfirst,
 } from './dates.js';
 import {
   objectives, allFines, allAsi, isIncheiat, byStartDesc, controlStats, matchControl, fold,
-  neregulaLabel, neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
-  constructieOf, amendaSerieNr, vecheInfo,
+  neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
+  constructieOf, amendaSerieNr, vecheInfo, constatareLabel, sablon, isApplicable, fmtCoord, googleMapsUrl, appleMapsUrl,
 } from './model.js';
-import { icon, esc, pill, tipBadge, empty } from './ui.js';
+import { icon, esc, pill, tipBadge, empty, helpBtn } from './ui.js';
 import { APP_VERSION } from './version.js';
+import { GHID } from './help.js';
+
+export function guideSteps() {
+  return `<div class="guide-steps">${GHID.map((g, i) => `<div class="guide-step">
+      <span class="guide-num">${i + 1}</span>
+      <div><h3>${icon(g.ic)} ${esc(g.title)}</h3>${g.lines.map((l) => `<p>${l}</p>`).join('')}</div>
+    </div>`).join('')}</div>`;
+}
 
 export const FONT_SIZES = [
   { key: 'mic', label: 'Mic', px: 15, hint: 'mai mult conținut pe ecran' },
@@ -47,6 +55,8 @@ export function controlRow(c, { showName = true } = {}) {
   const chips = [statusPill(c)];
   if (st.constatate) chips.push(pill('neutral', `${st.constatate} ${st.constatate === 1 ? 'neregulă' : 'nereguli'}`));
   if (st.netrecute) chips.push(pill('warn', `${st.netrecute} netrecute în PV`, 'pv'));
+  const grave = c.nereguli.filter((n) => !n.custom && sablon(n.key)?.grav && n.status !== 'ok' && isApplicable(c, n)).length;
+  if (grave) chips.unshift(pill('red', `${grave} ${grave === 1 ? 'neregulă gravă' : 'nereguli grave'}`, 'alert'));
   const vechi = activeNereguli(c).filter((n) => vecheInfo(state.controls, c, n).veche).length;
   if (vechi) chips.push(`<span class="pill pill-veche">${icon('history')}${vechi} ${vechi === 1 ? 'neregulă veche' : 'nereguli vechi'}</span>`);
   const byLevel = {};
@@ -94,20 +104,24 @@ export function hintText(value) {
 export function viewDashboard() {
   const t = today();
   const cs = state.controls;
-  const now = state.now;
+  const now = new Date();
   const head = `<header class="page-head dash-head">
     <div>
       <div class="eyebrow">${icon('clock')} Data și ora tabletei</div>
       <h1 class="dash-date">${esc(ucfirst(fmtDateLong(t)))}</h1>
     </div>
-    <div class="big-clock" data-clock>${pad(now.getHours())}:${pad(now.getMinutes())}</div>
+    <div class="dash-right">
+      <div class="dash-clock-row">${helpBtn('panou')}<div class="big-clock" data-clock>${pad(now.getHours())}:${pad(now.getMinutes())}</div></div>
+      ${cs.length ? `<button class="btn btn-ghost backup-quick ${backupIsStale() ? 'stale' : ''}" data-act="backup-export">${icon('download')}<span><b>Backup rapid</b><small>${esc(backupAgeText())}</small></span></button>` : ''}
+    </div>
   </header>`;
 
   if (!cs.length) {
     return `${head}<div class="welcome card">
       <div class="welcome-art">${icon('shield')}</div>
       <h2>Bun venit în Agenda inspectorului</h2>
-      <p>Începe primul control. Toate datele rămân pe această tabletă; fă periodic un backup din Setări.</p>
+      <p>Toate datele rămân pe această tabletă. Cum lucrați, în 4 pași:</p>
+      ${guideSteps()}
       <div class="row-gap">
         <button class="btn btn-primary btn-xl" data-act="new-control">${icon('plus')} Control nou</button>
         <button class="btn btn-ghost btn-xl" data-act="demo-load">Încarcă date demonstrative</button>
@@ -163,7 +177,7 @@ export function viewDashboard() {
   const fineItem = ({ c, n, st }) => `<a class="item item-${st.level}" href="#/control/${c.id}/${tabOfNeregula(n)}/${encodeURIComponent(n.key)}">
       <span class="item-main">
         <span class="item-title">${esc(c.denumire || 'Obiectiv fără denumire')}</span>
-        <span class="item-sub">${esc(neregulaLetter(c, n))}. ${esc(neregulaLabel(n))}${c.constructii.length > 1 && constructieOf(c, n) ? ` · ${esc(constructieOf(c, n).denumire)}` : ''}</span>
+        <span class="item-sub">${esc(neregulaLetter(c, n))}. ${esc(constatareLabel(n))}${c.constructii.length > 1 && constructieOf(c, n) ? ` · ${esc(constructieOf(c, n).denumire)}` : ''}</span>
         ${amendaSerieNr(n.amenda) ? `<span class="item-sub">Amenda ${esc(amendaSerieNr(n.amenda))}</span>` : ''}
         <span class="item-msg">${esc(st.msg)}</span>
         ${st.nelucr ? `<span class="item-warn">⚠ ${esc(st.nelucr)}</span>` : ''}
@@ -219,7 +233,7 @@ export function viewDashboard() {
     ${netrecute.length ? `<div class="items">${netrecute.map(({ c, n }) => `<a class="item item-warn" href="#/control/${c.id}/${tabOfNeregula(n)}/${encodeURIComponent(n.key)}">
         <span class="item-main">
           <span class="item-title">${esc(c.denumire || 'Obiectiv fără denumire')}</span>
-          <span class="item-sub">${esc(neregulaLetter(c, n))}. ${esc(neregulaLabel(n))}</span>
+          <span class="item-sub">${esc(neregulaLetter(c, n))}. ${esc(constatareLabel(n))}</span>
           ${vecheInfo(state.controls, c, n).veche ? `<span class="item-veche">${icon('history')} Neregulă veche</span>` : ''}
         </span>
         <span class="item-side">${pill('warn', 'Netrecut')}</span>
@@ -229,12 +243,28 @@ export function viewDashboard() {
   return `${head}${backupWarn}${kpis}<div class="dash-grid">${secFines}${secAsi}${secOpen}${secPv}</div>`;
 }
 
-function backupReminder() {
-  if (!state.controls.length) return '';
+// Vechimea ultimului backup (aceeași funcție de backup e disponibilă din Panou, control, bara laterală și Setări)
+export function backupAgeDays() {
   const last = state.meta.lastBackup;
-  const days = last ? diffDays(last.slice(0, 10), today()) : null;
-  if (days !== null && days < 7) return '';
-  return `<a class="banner" href="#/setari">${icon('alert')}<span><b>${last ? `Ultimul backup acum ${zile(days)}.` : 'Nu ai făcut încă niciun backup.'}</b> Datele sunt doar pe această tabletă — exportă un backup în Fișiere / iCloud Drive.</span>${icon('chevR')}</a>`;
+  return last ? diffDays(last.slice(0, 10), today()) : null;
+}
+export function backupIsStale() {
+  const d = backupAgeDays();
+  return state.controls.length > 0 && (d === null || d >= 7);
+}
+export function backupAgeText() {
+  const d = backupAgeDays();
+  if (d === null) return 'niciun backup încă';
+  if (d === 0) return `ultimul: azi, ${state.meta.lastBackup.slice(11, 16)}`;
+  if (d === 1) return 'ultimul: ieri';
+  return `ultimul: acum ${zile(d)}`;
+}
+
+function backupReminder() {
+  if (!backupIsStale()) return '';
+  const d = backupAgeDays();
+  return `<div class="banner">${icon('alert')}<span><b>${d !== null ? `Ultimul backup acum ${zile(d)}.` : 'Nu ai făcut încă niciun backup.'}</b> Datele sunt doar pe această tabletă — salvează un backup în Fișiere / iCloud Drive.</span>
+    <button class="btn btn-primary" data-act="backup-export">${icon('download')} Backup acum</button></div>`;
 }
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -245,7 +275,7 @@ export function viewObjectives() {
   const u = state.ui;
   return `<header class="page-head">
       <div><div class="eyebrow">${icon('building')} Lista obiectivelor controlate</div><h1>Obiective</h1></div>
-      <button class="btn btn-primary btn-lg" data-act="new-control">${icon('plus')} Control nou</button>
+      <div class="row-gap">${helpBtn('obiective')}<button class="btn btn-primary btn-lg" data-act="new-control">${icon('plus')} Control nou</button></div>
     </header>
     ${searchBar('obj', u.objSearch, 'Caută obiectiv după nume sau dată…')}
     <div class="seg-row">
@@ -279,7 +309,7 @@ export function objListHTML() {
       <span class="avatar ${o.tip === 'LOCALITATE' ? 'av-loc' : 'av-opec'}">${esc(init)}</span>
       <span class="obj-main">
         <span class="obj-title">${esc(o.denumire || 'Obiectiv fără denumire')}</span>
-        <span class="obj-sub">${tipBadge(o.tip)}${o.administrator ? `<span>${esc(o.administrator)}</span>` : ''}${o.telefon ? `<span>· ${esc(o.telefon)}</span>` : ''}</span>
+        <span class="obj-sub">${tipBadge(o.tip)}${o.localitate ? `<span>${icon('pin')} ${esc(o.localitate)}</span>` : ''}${o.administrator ? `<span>${esc(o.administrator)}</span>` : ''}${o.telefon ? `<span>· ${esc(o.telefon)}</span>` : ''}</span>
         <span class="chips">
           ${pill('neutral', `${o.controls.length} ${o.controls.length === 1 ? 'control' : 'controale'}`, 'history')}
           ${pill('neutral', `ultimul: ${fmtDate(o.last.dataInceput)}`, 'calendar')}
@@ -304,13 +334,18 @@ export function viewObjective(oid) {
         <a class="icon-btn big" href="#/obiective" aria-label="Înapoi">${icon('back')}</a>
         <div><div class="eyebrow">${tipBadge(o.tip)}</div><h1>${esc(o.denumire || 'Obiectiv fără denumire')}</h1></div>
       </div>
-      <button class="btn btn-primary btn-lg" data-act="new-control" data-oid="${o.id}">${icon('plus')} Control nou pe acest obiectiv</button>
+      <div class="row-gap">${helpBtn('obiectiv')}<button class="btn btn-primary btn-lg" data-act="new-control" data-oid="${o.id}">${icon('plus')} Control nou pe acest obiectiv</button></div>
     </header>
     <section class="card info-grid">
       <div><span class="lbl">Administrator</span><span class="val">${esc(o.administrator || '—')}</span></div>
       <div><span class="lbl">Telefon</span><span class="val">${o.telefon ? `<a href="tel:${esc(o.telefon.replace(/\s/g, ''))}">${icon('phone')} ${esc(o.telefon)}</a>` : '—'}</span></div>
       <div><span class="lbl">Email</span><span class="val">${o.email ? `<a href="mailto:${esc(o.email)}">${icon('mail')} ${esc(o.email)}</a>` : '—'}</span></div>
+      <div><span class="lbl">Adresă</span><span class="val">${esc([o.adresa, o.localitate].filter(Boolean).join(', ') || '—')}</span></div>
       <div><span class="lbl">Construcții</span><span class="val">${o.last.constructii.length}</span></div>
+      <div class="wide"><span class="lbl">Coordonate GPS pe construcții</span><span class="val gps-list">${o.last.constructii.map((k, i) => {
+        const nume = k.denumire || `Construcția ${i + 1}`;
+        return `<span>${esc(nume)}: ${k.gps ? `<a href="${esc(googleMapsUrl(k.gps))}" target="_blank" rel="noopener">${icon('pin')} ${esc(fmtCoord(k.gps))}</a> · <a class="small-link" href="${esc(appleMapsUrl(k.gps, `${o.denumire} – ${nume}`))}" target="_blank" rel="noopener">Hărți Apple</a>` : '<span class="muted">necompletate</span>'}</span>`;
+      }).join('')}</span></div>
     </section>
     <section class="stat-row">
       <div class="stat"><b>${o.controls.length}</b><span>controale</span></div>
@@ -328,7 +363,7 @@ export function viewHistory() {
   const u = state.ui;
   return `<header class="page-head">
       <div><div class="eyebrow">${icon('history')} Toate controalele, pe toate obiectivele</div><h1>Istoric controale</h1></div>
-      <button class="btn btn-primary btn-lg" data-act="new-control">${icon('plus')} Control nou</button>
+      <div class="row-gap">${helpBtn('istoric')}<button class="btn btn-primary btn-lg" data-act="new-control">${icon('plus')} Control nou</button></div>
     </header>
     ${searchBar('hist', u.histSearch, 'Caută după obiectiv, administrator sau dată…')}
     <div class="seg-row">
@@ -431,7 +466,7 @@ export function viewCalendar() {
     </div>
     ${selData.controls.length ? `<div class="ctl-list">${selData.controls.map((c) => controlRow(c)).join('')}</div>` : '<p class="muted pad">Niciun control în această zi.</p>'}
     ${selData.deadlines.length ? `<h3 class="mini-title">Termene</h3><div class="items">${selData.deadlines.map((x) => `<a class="item item-${x.level}" href="#/control/${x.c.id}/${x.n ? tabOfNeregula(x.n) : 'nereguli'}/${encodeURIComponent(x.n ? x.n.key : 'a')}">
-        <span class="item-main"><span class="item-title">${esc(x.text)}</span><span class="item-sub">${esc(x.c.denumire)}${x.n ? ` · ${esc(neregulaLetter(x.c, x.n))}. ${esc(neregulaLabel(x.n))}` : ''}</span></span>
+        <span class="item-main"><span class="item-title">${esc(x.text)}</span><span class="item-sub">${esc(x.c.denumire)}${x.n ? ` · ${esc(neregulaLetter(x.c, x.n))}. ${esc(constatareLabel(x.n))}` : ''}</span></span>
       </a>`).join('')}</div>` : ''}
     <button class="btn btn-primary btn-lg btn-block" data-act="new-control" data-date="${sel}">${icon('plus')} Control nou în această zi</button>
   </aside>`;
@@ -450,6 +485,7 @@ export function viewCalendar() {
           <button class="step-btn" data-act="cal-next" aria-label="Luna următoare">${icon('chevR')}</button>
         </div>
         <button class="btn btn-ghost btn-lg" data-act="cal-today">Azi</button>
+        ${helpBtn('calendar')}
       </div>
     </header>
     <div class="cal-layout">
@@ -472,7 +508,8 @@ export function viewCalendar() {
 export function viewSettings(persisted) {
   const last = state.meta.lastBackup;
   const demo = state.controls.filter((c) => c.demo).length;
-  return `<header class="page-head"><div><div class="eyebrow">${icon('settings')} Date, backup și informații</div><h1>Setări</h1></div></header>
+  return `<header class="page-head"><div><div class="eyebrow">${icon('settings')} Date, backup și informații</div><h1>Setări</h1></div>
+    <div class="row-gap">${helpBtn('setari')}<button class="btn btn-ghost btn-lg" data-act="guide">${icon('info')} Ghid de utilizare</button></div></header>
   <section class="card set-sec">
     <h2 class="sec-title">${icon('settings')} Mărimea textului</h2>
     <p>Se aplică imediat în toată aplicația: text, butoane, spațieri și iconițe se ajustează împreună.</p>
@@ -484,7 +521,7 @@ export function viewSettings(persisted) {
   </section>
   <section class="card set-sec">
     <h2 class="sec-title">${icon('download')} Backup</h2>
-    <p>Datele sunt salvate <b>doar pe această tabletă</b>. Exportă periodic un fișier de backup și salvează-l în <b>Fișiere → iCloud Drive</b> (sau alt loc sigur).</p>
+    <p>Butonul <b>Backup rapid</b> din Panou, din bara laterală și din fiecare control face exact același export ca butonul de aici. Datele sunt salvate <b>doar pe această tabletă</b>. Exportă periodic un fișier de backup și salvează-l în <b>Fișiere → iCloud Drive</b> (sau alt loc sigur).</p>
     <div class="set-status"><span class="lbl">Ultimul backup</span><b>${last ? `${fmtDateLong(last.slice(0, 10))}, ${last.slice(11, 16)}` : 'niciodată'}</b></div>
     <div class="row-gap">
       <button class="btn btn-primary btn-lg" data-act="backup-export">${icon('download')} Exportă backup</button>

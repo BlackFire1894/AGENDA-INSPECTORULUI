@@ -326,6 +326,9 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .info-grid .lbl { display: block; color: var(--muted); font-size: 0.8333rem; font-weight: 600; margin-bottom: 0.2222rem; }
 .info-grid .val { font-size: 1.0556rem; font-weight: 650; word-break: break-word; }
 .info-grid a { display: inline-flex; align-items: center; gap: 0.4444rem; color: var(--accent); }
+.info-grid .wide { grid-column: 1 / -1; }
+.gps-list { display: flex; flex-direction: column; gap: 0.3333rem; }
+.gps-field { margin: 0.8889rem 0 0.4444rem; }
 .stat-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.7778rem; margin-bottom: 0.4444rem; }
 .stat { background: var(--surface); border-radius: var(--radius); box-shadow: var(--shadow); padding: 0.8889rem 1rem; }
 .stat b { display: block; font-size: 2rem; font-weight: 850; line-height: 1.05; }
@@ -542,7 +545,7 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .seg-adapost button { min-width: max(44px, 4rem); }
 .check-row.is-ok { background: var(--green-soft); border-color: color-mix(in srgb, var(--green) 45%, transparent); }
 .check-row.is-nok { background: var(--red-soft); border-color: color-mix(in srgb, var(--red) 55%, transparent); }
-.check-row.flash { animation: flash 1.6s ease; }
+.check-row.flash, .flash { animation: flash 1.6s ease; }
 @keyframes flash { 0%, 60% { box-shadow: 0 0 0 5px var(--accent); } 100% { box-shadow: 0 0 0 0 transparent; } }
 .row-idx { width: max(44px, 2.4444rem); height: max(44px, 2.4444rem); border-radius: 0.7222rem; display: grid; place-items: center; font-weight: 850; background: var(--surface-2); color: var(--muted); font-size: 0.9444rem; }
 .row-idx.letter { font-size: 1.1111rem; }
@@ -742,3 +745,117 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
   .fisa-doc.card { box-shadow: none !important; padding: 0 !important; border-radius: 0; overflow: visible; }
   .fisa-doc .f-sum { grid-template-columns: repeat(5, 1fr) !important; }
 }
+
+/* Observații: buton individual de ascundere, lângă câmp */
+.obs-wrap { display: flex; align-items: flex-start; gap: 0.3333rem; min-width: 0; width: 100%; }
+.obs-wrap textarea { flex: 1; min-width: 0; }
+.obs-hide {
+  flex: none; width: max(44px, 2.5556rem); height: max(44px, 2.5556rem); border-radius: 0.6667rem; display: grid; place-items: center;
+  color: var(--muted); border: 1.5px solid transparent;
+}
+.obs-hide:active { background: var(--surface-2); border-color: var(--line); }
+.obs-hide .ic { width: 1.2222rem; height: 1.2222rem; }
+.obs-hide .ic.up { transform: rotate(180deg); }
+.dot-row .obs-wrap { grid-column: 3; }
+@media (max-width: 999px) { .dot-row .obs-wrap { grid-column: 1 / -1; } }
+
+/* ───────── Backup rapid ───────── */
+.dash-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5556rem; }
+.backup-quick { gap: 0.6667rem; text-align: left; padding: 0.4444rem 0.8889rem; min-height: max(44px, 3.1111rem); }
+.backup-quick span, .side-backup span { display: flex; flex-direction: column; line-height: 1.2; }
+.backup-quick small { font-size: 0.7778rem; color: var(--muted); font-weight: 600; }
+.backup-quick.stale { border-color: var(--warn); background: var(--warn-soft); color: var(--warn-ink); }
+.backup-quick.stale small { color: var(--warn-ink); }
+.side-backup {
+  display: flex; align-items: center; gap: 0.7778rem; min-height: max(44px, 3.2222rem); padding: 0.4444rem 0.8889rem; border-radius: 0.8889rem;
+  margin-top: auto; text-align: left; color: rgba(255, 255, 255, .85); background: rgba(255, 255, 255, .07);
+}
+.side-backup small { font-size: 0.7778rem; opacity: .75; font-weight: 600; }
+.side-backup.stale { background: color-mix(in srgb, var(--warn) 30%, transparent); color: #fff; }
+.side-backup + .side-settings { margin-top: 0; }
+.banner .btn { flex: none; }
+
+/* Panou pe vertical: data pe tot rândul; dedesubt ceasul și Backup rapid, pe același rând */
+@media (max-width: 999px) {
+  .dash-head { align-items: flex-start; }
+  .dash-head > div:first-child { width: 100%; }
+  .dash-right { width: 100%; flex-direction: row; align-items: center; justify-content: space-between; }
+  .dash-right .big-clock { font-size: 3rem; }
+}
+/* Antetul controlului: indicatorul „Salvat” lângă date; ștergerea separată, la dreapta */
+.ed-dates { flex-wrap: wrap; }
+.ed-dates .save-ind { margin-left: 0.4444rem; padding: 0; }
+.ed-actions .danger { margin-left: auto; }
+
+/* ───────── „Ce mai ai de făcut” ───────── */
+.todo { display: flex; flex-direction: column; gap: 0.5556rem; padding: 0.6667rem 0.7778rem; margin-bottom: 0.8889rem; border-radius: 1rem; background: var(--surface); box-shadow: var(--shadow); border-left: 0.3333rem solid var(--accent); }
+.todo-head { display: flex; align-items: center; gap: 0.6667rem; flex-wrap: wrap; }
+.todo-title { display: inline-flex; align-items: center; gap: 0.4444rem; font-weight: 750; color: var(--muted); font-size: 0.9444rem; white-space: nowrap; }
+.todo-title b { display: inline-grid; place-items: center; min-width: 1.5556rem; height: 1.5556rem; padding: 0 0.3333rem; border-radius: 0.7778rem; background: var(--accent); color: #fff; font-size: 0.8333rem; }
+.todo-title .ic { width: 1.2222rem; height: 1.2222rem; color: var(--accent); }
+.todo-head > .todo-item { flex: 1; min-width: 12rem; }
+.todo-more { min-height: 44px; padding: 0 0.7778rem; border-radius: 0.6667rem; color: var(--accent-ink); font-weight: 700; font-size: 0.9444rem; }
+.todo-list { display: flex; flex-direction: column; gap: 0.4444rem; }
+.todo-item {
+  display: flex; align-items: center; gap: 0.5556rem; min-height: 44px; padding: 0.4444rem 0.7778rem; border-radius: 0.6667rem;
+  background: var(--accent-soft); color: var(--accent-ink); font-weight: 700; font-size: 0.9444rem; text-align: left;
+}
+.todo-item .ic { width: 1.1111rem; height: 1.1111rem; flex: none; }
+.todo-item.t-warn { background: var(--warn-soft); color: var(--warn-ink); }
+.todo-done { flex-direction: row; align-items: center; border-left-color: var(--green); color: var(--green-ink); }
+.todo-done .ic { color: var(--green); flex: none; }
+.btn-rest { border-color: color-mix(in srgb, var(--green) 45%, var(--line)); color: var(--green-ink); }
+.btn-rest .ic { color: var(--green); }
+#sec-date.flash, #sec-perioada.flash { animation: flash 1.6s ease; }
+
+/* ───────── Toast cu acțiune (Anulează) ───────── */
+.toast.has-action { pointer-events: auto; padding-right: 0.5556rem; }
+.toast-btn { min-height: 44px; padding: 0 0.8889rem; margin-left: 0.4444rem; border-radius: 0.6667rem; background: rgba(255, 255, 255, .16); color: #fff; font-weight: 800; }
+
+/* ───────── Ajutor „?” și ghid ───────── */
+.help-btn { font-size: 1.3333rem; font-weight: 850; color: var(--accent); }
+.help-q { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--accent); color: #fff; font-size: 1.2222rem; }
+.help-list { margin: 0; padding-left: 1.2222rem; display: flex; flex-direction: column; gap: 0.6667rem; font-size: 1.0556rem; }
+.dash-clock-row { display: flex; align-items: center; gap: 0.6667rem; }
+.guide-steps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7778rem; text-align: left; margin: 1rem 0 1.4444rem; }
+.modal .guide-steps { grid-template-columns: 1fr; margin: 0; }
+.guide-step { display: flex; gap: 0.7778rem; padding: 0.8889rem; border-radius: 1rem; background: var(--surface-2); border: 1.5px solid var(--line); }
+.guide-num { flex: none; width: 2.2222rem; height: 2.2222rem; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #fff; font-weight: 850; }
+.guide-step h3 { display: flex; align-items: center; gap: 0.4444rem; font-size: 1.0556rem; margin-bottom: 0.3333rem; }
+.guide-step h3 .ic { width: 1.2222rem; height: 1.2222rem; color: var(--accent); }
+.guide-step p { margin: 0.2222rem 0 0; font-size: 0.9444rem; color: var(--text); }
+.welcome p { max-width: none; }
+@media (max-width: 700px) { .guide-steps { grid-template-columns: 1fr; } }
+
+/* ───────── Nereguli grave (NU la dotări) ───────── */
+:root { --cat-lipsa: var(--red); --cat-evacuare: #16a34a; --cat-detectoare: #c026d3; }
+.cat-lipsa { --cat: var(--cat-lipsa); } .cat-evacuare { --cat: var(--cat-evacuare); } .cat-detectoare { --cat: var(--cat-detectoare); }
+.cat-lipsa .cat-title { background: var(--red-soft); color: var(--red-ink); }
+.cat-lipsa .check-row:not(.is-ok):not(.is-nok) { border-color: var(--red); border-style: dashed; }
+.cat-lipsa .check-row .row-idx { background: var(--red); color: #fff; }
+.dot-row.is-grav { background: var(--red-soft) !important; box-shadow: inset 0.3333rem 0 0 var(--red); }
+.dot-row.is-grav .seg-dnn button.on.v-NU { background: var(--red); }
+.grav-note { display: flex; align-items: center; gap: 0.2222rem; margin-top: 0.1111rem; font-size: 0.7778rem; font-weight: 800; color: var(--red-ink); }
+.grav-note .ic { width: 0.9444rem; height: 0.9444rem; }
+.constr-nu { display: flex; align-items: center; gap: 0.4444rem; min-height: 2.2rem; font-size: 0.9444rem; color: var(--red-ink); }
+.constr-nu .ic { width: 1.1111rem; height: 1.1111rem; }
+.todo-item.t-grav { background: var(--red); color: #fff; }
+.constr-head .pill { flex: none; }
+
+/* ───────── Coordonate GPS ───────── */
+.gps-empty { display: flex; align-items: center; gap: 0.8889rem; flex-wrap: wrap; padding: 0.5556rem; border-radius: 0.8889rem; border: 2px dashed var(--line-strong); }
+.gps-box { display: flex; flex-direction: column; gap: 0.6667rem; padding: 0.7778rem; border-radius: 0.8889rem; background: var(--surface-2); border: 2px solid var(--line); }
+.gps-main { display: flex; flex-direction: column; gap: 0.2222rem; }
+.gps-coord { font-size: 1.2222rem; font-variant-numeric: tabular-nums; letter-spacing: .01em; }
+.gps-meta { color: var(--muted); font-size: 0.8889rem; font-weight: 600; }
+.gps-q { font-weight: 800; }
+.gps-q.q-buna { color: var(--green); } .gps-q.q-medie { color: var(--yellow-ink); } .gps-q.q-slaba { color: var(--red); }
+.gps-warn { display: flex; align-items: center; gap: 0.3333rem; color: var(--warn-ink); font-weight: 650; font-size: 0.8889rem; }
+.gps-warn .ic { width: 1.1111rem; height: 1.1111rem; }
+.gps-actions { display: flex; flex-wrap: wrap; gap: 0.4444rem; align-items: center; }
+.gps-actions .danger { margin-left: auto; }
+.gps-cell.is-empty { flex: 1 1 10rem; color: var(--muted); font-weight: 650; font-style: italic; padding-left: 0.3333rem; }
+.gps-field > .hint { display: block; margin-top: 0.3333rem; }
+.gps-steps { margin: 0.6667rem 0; padding-left: 1.4444rem; display: flex; flex-direction: column; gap: 0.5556rem; line-height: 1.4; }
+.small-link { font-size: 0.8333rem; font-weight: 600; }
+.obj-sub .ic { width: 1rem; height: 1rem; vertical-align: -0.15em; }

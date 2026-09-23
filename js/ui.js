@@ -31,6 +31,8 @@ const ICONS = {
   hourglass: '<path d="M6 3h12M6 21h12M7 3c0 5 10 6 10 9s-10 4-10 9M17 3c0 5-10 6-10 9s10 4 10 9"/>',
   more: '<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>',
   back: '<path d="M19 12H5M11 5l-7 7 7 7"/>',
+  pin: '<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>',
+  locate: '<circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2.5"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/>',
 };
 
 export function icon(name, cls = '') {
@@ -56,12 +58,21 @@ export function empty(ic, title, text, action = '') {
 }
 
 let toastTimer;
-export function toast(msg, level = 'ok') {
+// `action`: { label, fn } — ex. „Anulează” după o acțiune în bloc; mesajul stă mai mult pe ecran.
+export function toast(msg, level = 'ok', action = null) {
   const el = document.getElementById('toast');
-  el.className = `toast show toast-${level}`;
-  el.innerHTML = `${icon(level === 'ok' ? 'check' : 'alert')}<span>${esc(msg)}</span>`;
+  el.className = `toast show toast-${level} ${action ? 'has-action' : ''}`;
+  el.innerHTML = `${icon(level === 'ok' ? 'check' : 'alert')}<span>${esc(msg)}</span>${action ? `<button class="toast-btn">${esc(action.label)}</button>` : ''}`;
+  if (action) {
+    el.querySelector('.toast-btn').addEventListener('click', () => { el.className = 'toast'; action.fn(); }, { once: true });
+  }
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.className = 'toast'; }, 2600);
+  toastTimer = setTimeout(() => { el.className = 'toast'; }, action ? 7000 : 2600);
+}
+
+// Butonul de ajutor contextual „?”
+export function helpBtn(key) {
+  return `<button class="icon-btn big help-btn" data-act="help" data-key="${key}" aria-label="Ajutor pentru acest ecran" title="Ajutor">?</button>`;
 }
 
 // Fereastră modală. Returnează elementul corpului; închiderea prin closeModal().

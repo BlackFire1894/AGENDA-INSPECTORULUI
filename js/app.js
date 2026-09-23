@@ -1,16 +1,18 @@
 // Punctul de intrare: rutare, evenimente, fluxuri (control nou, backup, date demo).
 import * as store from './store.js';
 import { state, today, getControl, touch, flush, addControl, removeControl, onSaveState, savePref } from './state.js';
-import { addDays, fmtDate, fmtDateLong, toISO, parseDateQuery, isISO } from './dates.js';
+import { fmtDate, fmtDateLong, toISO, parseDateQuery, isISO } from './dates.js';
 import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
   fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat, pvText, sectiuniActive, secOf,
+  todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality,
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
-  viewCalendar, viewSettings, hintText,
+  viewCalendar, viewSettings, hintText, backupAgeText, backupIsStale, guideSteps,
 } from './views.js';
-import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor } from './editor.js';
+import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML } from './editor.js';
+import { AJUTOR } from './help.js';
 import { icon, esc, toast, openModal, closeModal, confirmDialog } from './ui.js';
 import { buildDemo } from './demo.js';
 import { APP_VERSION } from './version.js';
@@ -18,6 +20,7 @@ import { fisaMarkup, fisaDocument, fisaFileName, FISA_CSS } from './fisa.js';
 
 const main = () => document.getElementById('main');
 let persisted = false;
+let lastDay = today();   // ultima zi văzută de aplicație (pentru detectarea zilei noi)
 let route = { name: 'panou' };
 
 // ───────── rutare ─────────
@@ -38,6 +41,7 @@ function parseRoute() {
 }
 
 async function render({ keepScroll = false } = {}) {
+  dayChanged();
   const prev = route;
   route = parseRoute();
   if (route.name !== 'control' && route.name !== 'fisa') state.ui.backTo = location.hash || '#/panou';
@@ -75,6 +79,7 @@ async function render({ keepScroll = false } = {}) {
       if (!c) { location.hash = '#/panou'; return; }
       if (!tabsFor(c).some((t) => t.key === route.tab)) { location.replace(`#/control/${c.id}/obiectiv`); return; }
       if (route.focus) {
+        state.ui.nerFilter = 'ALL';
         const fn = c.nereguli.find((x) => x.key === route.focus);
         if (fn && state.ui.catCollapsed.delete(neregulaCat(fn))) savePref('agenda-cats-collapsed', [...state.ui.catCollapsed]);
       }
@@ -96,7 +101,14 @@ async function render({ keepScroll = false } = {}) {
 }
 
 function focusNeregula(key) {
-  const el = document.getElementById(`ner-${key}`);
+  let el = document.getElementById(`ner-${key}`) || document.getElementById(key);
+  // Coordonatele unei construcții restrânse: întâi o deschidem.
+  if (!el && key.startsWith('gps-')) {
+    const id = key.slice(4);
+    state.ui.collapsed.delete(id); state.ui.expanded.add(id);
+    rerenderEditor();
+    el = document.getElementById(key);
+  }
   if (!el) return;
   requestAnimationFrame(() => {
     el.scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -113,6 +125,8 @@ function updateNav() {
   const open = state.controls.filter((c) => !isIncheiat(c)).length;
   document.querySelectorAll('[data-badge="panou"]').forEach((b) => { b.textContent = fines || ''; b.hidden = !fines; });
   document.querySelectorAll('[data-badge="istoric"]').forEach((b) => { b.textContent = open || ''; b.hidden = !open; });
+  document.querySelectorAll('[data-backup-age]').forEach((el) => { el.textContent = backupAgeText(); });
+  document.querySelectorAll('[data-backup-btn]').forEach((el) => el.classList.toggle('stale', backupIsStale()));
 }
 
 // Re-randare parțială a editorului (păstrează poziția de scroll)
@@ -121,11 +135,22 @@ function rerenderEditor() {
   if (!c) return;
   const y = window.scrollY;
   document.getElementById('ed-head').innerHTML = edHeadHTML(c);
+  document.getElementById('ed-todo').innerHTML = todoHTML(c);
   document.getElementById('ed-tabs').innerHTML = edTabsHTML(c, route.tab);
   document.getElementById('ed-body').innerHTML = tabHTML(c, route.tab);
   autosizeAll();
   window.scrollTo(0, y);
   updateNav();
+}
+
+// Bara „Ce mai ai de făcut” se actualizează și în timpul tastării (fără a atinge câmpul în care se scrie)
+let todoTimer;
+function refreshTodoSoon(c) {
+  clearTimeout(todoTimer);
+  todoTimer = setTimeout(() => {
+    const el = document.getElementById('ed-todo');
+    if (el && route.name === 'control' && route.id === c.id) el.innerHTML = todoHTML(c);
+  }, 250);
 }
 
 // Observațiile cresc în jos pe măsură ce se scrie (lățimea rămâne fixă)
@@ -167,6 +192,7 @@ document.addEventListener('input', (e) => {
     setPath(c, el.dataset.bind, el.value);
     touch(c);
     if (el.tagName === 'TEXTAREA') autosize(el);
+    refreshTodoSoon(c);
     if (el.dataset.liveSrc === 'denumire') {
       const h = document.querySelector('[data-live="denumire"]');
       if (h) h.textContent = el.value || 'Obiectiv fără denumire';
@@ -258,7 +284,7 @@ document.addEventListener('click', async (e) => {
       render({ keepScroll: true }); return;
     }
     case 'cal-today': {
-      state.ui.calYear = state.now.getFullYear(); state.ui.calMonth = state.now.getMonth(); state.ui.calSelected = today();
+      { const d = new Date(); state.ui.calYear = d.getFullYear(); state.ui.calMonth = d.getMonth(); state.ui.calSelected = today(); }
       render({ keepScroll: true }); return;
     }
     case 'cal-day': {
@@ -271,6 +297,8 @@ document.addEventListener('click', async (e) => {
       return;
     }
     case 'backup-export': exportBackup(); return;
+    case 'help': showHelp(el.dataset.key === 'ctrl' ? `ctrl-${route.tab}` : el.dataset.key); return;
+    case 'guide': showGuide(); return;
     case 'fisa-print': window.print(); return;
     case 'fisa-share': shareFisa(getControl(el.dataset.id)); return;
     case 'demo-load': await loadDemo(); return;
@@ -293,6 +321,16 @@ document.addEventListener('click', async (e) => {
       const noClear = el.closest('.no-clear');
       const v = el.dataset.toggle && cur === el.dataset.val && !noClear ? '' : el.dataset.val;
       setPath(c, el.dataset.path, v);
+      // NU la o instalație necesară → avertizare: neregulă gravă, adăugată în tabul Nereguli
+      const mDot = el.dataset.path.match(/\.dotari\.(\w+)\.v$/);
+      if (mDot && v === 'NU' && LIPSA_DOTARI.includes(mDot[1])) {
+        const d = DOTARI.find((x) => x.key === mDot[1]);
+        touch(c, true); rerenderEditor();
+        toast(`Neregulă gravă: lipsă ${d.label.toLowerCase()} — apare primul în tabul Nereguli`, 'warn', {
+          label: 'Vezi', fn: () => { location.hash = `#/control/${c.id}/nereguli/lipsa-${mDot[1]}`; },
+        });
+        return;
+      }
       break;
     }
     case 'flag': {
@@ -317,9 +355,7 @@ document.addEventListener('click', async (e) => {
       break;
     }
     case 'start-today': c.dataInceput = today(); break;
-    case 'close-control': c.dataIncheiere = c.dataInceput; toast(`Control încheiat la ${fmtDate(c.dataIncheiere)} — poți modifica data`); break;
     case 'end-today': c.dataIncheiere = today(); break;
-    case 'end-start': c.dataIncheiere = c.dataInceput; break;
     case 'reopen': c.dataIncheiere = ''; break;
     case 'constr-inc': {
       const k = emptyConstructie(c.constructii.length + 1);
@@ -344,15 +380,43 @@ document.addEventListener('click', async (e) => {
     }
     case 'ner-filter': state.ui.nerFilter = el.dataset.val; rerenderEditor(); return;
     case 'pv-text': openPvText(c); return;
+    case 'todo-toggle': state.ui.todoOpen = !state.ui.todoOpen; rerenderEditor(); return;
+    case 'todo-go': {
+      closeModal();
+      const target = `#/control/${c.id}/${el.dataset.tab}${el.dataset.focus ? `/${encodeURIComponent(el.dataset.focus)}` : ''}`;
+      if (location.hash === target) { if (el.dataset.focus) focusNeregula(el.dataset.focus); } else location.hash = target;
+      return;
+    }
+    case 'rest-ok': restConform(c, el.dataset.sec); return;
+    case 'gps-get': { const k = c.constructii.find((x) => x.id === el.dataset.id); if (k) getGps(c, k); return; }
+    case 'gps-copy': {
+      const k = c.constructii.find((x) => x.id === el.dataset.id);
+      if (!k?.gps) return;
+      try { await navigator.clipboard.writeText(fmtCoord(k.gps)); toast('Coordonate copiate'); } catch { toast(fmtCoord(k.gps), 'warn'); }
+      return;
+    }
+    case 'gps-clear': {
+      const ok = await confirmDialog({ title: 'Ștergi coordonatele?', text: 'Le puteți prelua din nou oricând, cu „Completează coordonatele”.', ok: 'Șterge', danger: true });
+      const k = c.constructii.find((x) => x.id === el.dataset.id);
+      if (ok && k) { k.gps = null; touch(c, true); rerenderEditor(); }
+      return;
+    }
+    case 'close-control': closeControlFlow(c); return;
     case 'obs-toggle':
+      // butonul general: setează toate câmpurile și anulează excepțiile individuale
       state.ui.obsHidden = !state.ui.obsHidden;
-      state.ui.obsOpen.clear();
+      state.ui.obsOverride.clear();
       savePref('agenda-obs-hidden', state.ui.obsHidden);
+      savePref('agenda-obs-override', []);
       rerenderEditor(); return;
-    case 'obs-open': {
-      state.ui.obsOpen.add(el.dataset.path);
+    case 'obs-show': case 'obs-hide': {
+      const show = act === 'obs-show';
+      const key = obsKey(el.dataset.path);
+      if (show === !state.ui.obsHidden) state.ui.obsOverride.delete(key); else state.ui.obsOverride.set(key, !show);
+      const entries = [...state.ui.obsOverride].slice(-1000);   // limită de siguranță pentru memoria locală
+      savePref('agenda-obs-override', entries);
       rerenderEditor();
-      document.querySelector(`textarea[data-bind="${CSS.escape(el.dataset.path)}"]`)?.focus();
+      if (show) document.querySelector(`textarea[data-bind="${CSS.escape(el.dataset.path)}"]`)?.focus();
       return;
     }
     case 'cat-toggle': {
@@ -483,6 +547,121 @@ function openNewControl({ date, oid } = {}) {
   setTimeout(() => name.focus(), 250);
 }
 
+// ───────── Coordonate GPS ─────────
+// O singură atingere; se caută poziția precisă (GPS), cu limită de timp ca aplicația să nu rămână blocată.
+function getGps(c, k) {
+  if (!('geolocation' in navigator)) { toast('Localizarea nu este disponibilă pe acest dispozitiv', 'warn'); return; }
+  if (state.ui.gpsBusy) return;
+  state.ui.gpsBusy = k.id; rerenderEditor();
+  const done = () => { state.ui.gpsBusy = ''; if (route.name === 'control' && route.id === c.id) rerenderEditor(); };
+  navigator.geolocation.getCurrentPosition((pos) => {
+    const { latitude: lat, longitude: lon, accuracy: acc } = pos.coords;
+    k.gps = { lat, lon, acc, la: new Date().toISOString() };
+    touch(c, true);
+    done();
+    const q = gpsQuality(acc);
+    toast(q === 'slaba' ? `Coordonate preluate, dar precizie slabă (± ${Math.round(acc)} m)` : `Coordonate preluate (± ${Math.round(acc)} m)`, q === 'slaba' ? 'warn' : 'ok');
+  }, (err) => {
+    done();
+    // 1 = permisiune refuzată, 2 = Localizarea iPad-ului oprită / fără poziție: ambele se rezolvă din Setări.
+    if (err.code === 3) {
+      toast('Nu s-a găsit semnal la timp. Ieșiți în aer liber sau lângă o fereastră și încercați din nou.', 'warn');
+      return;
+    }
+    gpsActivatePrompt(c, k);
+  }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+}
+
+// Localizarea e oprită sau refuzată. O aplicație web nu poate deschide Setările iPad-ului și nici nu poate porni
+// Localizarea singură, deci arătăm pașii exacți și un buton „Încearcă din nou”.
+function gpsActivatePrompt(c, k) {
+  const m = openModal(`<div class="modal-head"><h2>${icon('locate')} Activați localizarea</h2></div>
+    <div class="modal-body">
+      <p class="lead">Coordonatele nu pot fi completate: localizarea e oprită sau aplicația nu are permisiune. Pe iPad:</p>
+      <ol class="gps-steps">
+        <li><b>Setări → Confidențialitate și securitate → Localizare</b>: porniți <b>Localizare</b>.</li>
+        <li>În aceeași listă, <b>Site-uri Safari</b>: alegeți <b>Cât timp folosesc aplicația</b> și porniți <b>Localizare precisă</b>.</li>
+        <li><b>Setări → Aplicații → Safari → Localizare</b>: alegeți <b>Întreabă</b> sau <b>Permite</b>.</li>
+        <li>Reveniți aici și apăsați <b>Încearcă din nou</b>; la întrebarea iPad-ului, alegeți <b>Permite</b>.</li>
+      </ol>
+      <p class="hint">Aplicația citește poziția doar când apăsați butonul; nu urmărește locația.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-lg" data-act="modal-close">Renunță</button>
+      <button class="btn btn-primary btn-lg" id="gps-retry">${icon('locate')} Încearcă din nou</button>
+    </div>`);
+  m.querySelector('#gps-retry').addEventListener('click', () => { closeModal(); getGps(c, k); });
+}
+
+// ───────── Restul conform (în bloc, cu „Anulează”) ─────────
+
+async function restConform(c, sec) {
+  let rows;
+  if (sec === 'acte') rows = ACTE.map((a) => c.acte[a.key]).filter((v) => !v.status);
+  else rows = c.nereguli.filter((n) => secOf(n) === sec && !n.status && (isApplicable(c, n) || (state.ui.showAllNer && !sablon(n.key)?.grav)));
+  if (!rows.length) return;
+  const word = sec === 'acte' ? 'Prezentat' : 'Conform';
+  const what = sec === 'acte' ? (rows.length === 1 ? 'act' : 'acte') : (rows.length === 1 ? 'rând' : 'rânduri');
+  const ok = await confirmDialog({
+    title: `Marchez ${rows.length} ${what} ca „${word}”?`,
+    text: 'Se schimbă doar rândurile încă nemarcate; cele marcate deja rămân cum sunt. Imediat după puteți apăsa „Anulează”.',
+    ok: `Da, ${rows.length} ${what} „${word}”`,
+  });
+  if (!ok) return;
+  rows.forEach((r) => { r.status = 'ok'; });
+  touch(c, true);
+  rerenderEditor();
+  toast(`${rows.length} ${what} marcate „${word}”`, 'ok', {
+    label: 'Anulează',
+    fn: () => { rows.forEach((r) => { r.status = ''; }); touch(c, true); if (route.name === 'control' && route.id === c.id) rerenderEditor(); toast('Anulat'); },
+  });
+}
+
+// ───────── Încheierea controlului: verificare a omisiunilor ─────────
+
+function closeControlFlow(c) {
+  const doClose = () => {
+    c.dataIncheiere = c.dataInceput;
+    touch(c, true);
+    closeModal();
+    rerenderEditor();
+    toast(`Control încheiat la ${fmtDate(c.dataIncheiere)} — poți modifica data`);
+  };
+  const items = todoList(c, { includeClose: false });
+  if (!items.length) { doClose(); return; }
+  const m = openModal(`
+    <div class="modal-head"><h2>${icon('alert')} Înainte de încheiere</h2><button class="icon-btn big" data-act="modal-close" aria-label="Închide">${icon('x')}</button></div>
+    <div class="modal-body">
+      <p class="lead">Au rămas ${items.length === 1 ? 'un lucru necompletat' : `${items.length} lucruri necompletate`}. Atingeți unul ca să mergeți direct la el, sau încheiați oricum.</p>
+      <div class="todo-list">${items.map((x) => `<button class="todo-item t-${x.level}" data-act="todo-go" data-tab="${x.tab}" data-focus="${esc(x.focus || '')}">${icon(x.level === 'warn' ? 'alert' : 'chevR')}<span>${esc(x.text)}</span></button>`).join('')}</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-lg" data-act="modal-close">Revin să completez</button>
+      <button class="btn btn-success btn-lg" id="close-anyway">${icon('check')} Încheie oricum</button>
+    </div>`, { wide: true });
+  m.querySelector('#close-anyway').addEventListener('click', doClose);
+}
+
+// ───────── Ghid și ajutor contextual ─────────
+
+function showGuide() {
+  openModal(`
+    <div class="modal-head"><h2>${icon('info')} Cum lucrați cu aplicația</h2><button class="icon-btn big" data-act="modal-close" aria-label="Închide">${icon('x')}</button></div>
+    <div class="modal-body">${guideSteps()}</div>
+    <div class="modal-foot"><button class="btn btn-primary btn-lg" data-act="modal-close">Am înțeles</button></div>`, { wide: true });
+}
+
+function showHelp(key) {
+  const h = AJUTOR[key] || AJUTOR.panou;
+  openModal(`
+    <div class="modal-head"><h2><span class="help-q">?</span> ${esc(h.title)}</h2><button class="icon-btn big" data-act="modal-close" aria-label="Închide">${icon('x')}</button></div>
+    <div class="modal-body"><ul class="help-list">${h.lines.map((l) => `<li>${l}</li>`).join('')}</ul></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-lg" data-act="guide">${icon('info')} Ghidul complet</button>
+      <button class="btn btn-primary btn-lg" data-act="modal-close">Am înțeles</button>
+    </div>`);
+}
+
 // ───────── Text pentru procesul-verbal ─────────
 
 function openPvText(c) {
@@ -565,7 +744,8 @@ async function exportBackup() {
   await flush();
   const payload = { app: 'agenda-inspectorului', schema: SCHEMA_VERSION, exportedAt: new Date().toISOString(), controls: state.controls };
   const json = JSON.stringify(payload, null, 1);
-  const name = `agenda-inspectorului-backup-${today()}.json`;
+  const d = new Date();
+  const name = `agenda-inspectorului-backup-${today()}_${String(d.getHours()).padStart(2, '0')}-${String(d.getMinutes()).padStart(2, '0')}.json`;
   const file = new File([json], name, { type: 'application/json' });
   try {
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -586,7 +766,7 @@ async function exportBackup() {
   state.meta.lastBackup = nowStamp();
   await store.setMeta('lastBackup', state.meta.lastBackup);
   toast(`Backup exportat: ${state.controls.length} controale`);
-  render({ keepScroll: true });
+  if (route.name === 'control') rerenderEditor(); else render({ keepScroll: true });
 }
 
 async function importBackup(file) {
@@ -672,16 +852,24 @@ async function wipeAll() {
 // ───────── ceas: aplicația urmează data și ora tabletei ─────────
 
 function tick() {
-  const prevDay = today();
   state.now = new Date();
   const hh = String(state.now.getHours()).padStart(2, '0');
   const mm = String(state.now.getMinutes()).padStart(2, '0');
   document.querySelectorAll('[data-clock]').forEach((el) => { el.textContent = `${hh}:${mm}`; });
   document.querySelectorAll('[data-clock-date]').forEach((el) => { el.textContent = fmtDateLong(today()); });
-  if (today() !== prevDay) {
-    const typing = document.activeElement && /INPUT|TEXTAREA/.test(document.activeElement.tagName);
+  if (dayChanged()) {
+    const typing = document.activeElement && /INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName);
     if (!typing) render({ keepScroll: true });
   }
+}
+
+// Zi nouă (aplicația poate sta deschisă zile întregi): calendarul trece pe azi; termenele se recalculează la randare.
+function dayChanged() {
+  if (today() === lastDay) return false;
+  const d = new Date();
+  if (state.ui.calSelected === lastDay) { state.ui.calYear = d.getFullYear(); state.ui.calMonth = d.getMonth(); state.ui.calSelected = today(); }
+  lastDay = today();
+  return true;
 }
 
 document.addEventListener('visibilitychange', () => {

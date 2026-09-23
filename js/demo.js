@@ -77,7 +77,7 @@ export function buildDemo(today) {
   // 4. Cămin cultural — amendă achitată
   const k = newControl({ tip: 'LOCALITATE', denumire: 'Căminul Cultural Poiana', start: addDays(today, -60) });
   Object.assign(k, { administrator: 'Ion Radu', telefon: '0766 000 111', dataIncheiere: addDays(today, -60) });
-  k.constructii[0] = fill(k.constructii[0], { base: { denumire: 'Clădire cămin', suprafata: '380', regimInaltime: 'P', nrAngajati: '2', structura: 'Zidărie portantă', materialPereti: 'Cărămidă' }, dotari: { asi: 'NU', exit: 'NU' }, centrala: ['SOLID'] });
+  k.constructii[0] = fill(k.constructii[0], { base: { denumire: 'Clădire cămin', suprafata: '380', regimInaltime: 'P', nrAngajati: '2', structura: 'Zidărie portantă', materialPereti: 'Cărămidă' }, dotari: { asi: 'NU', exit: 'DA' }, centrala: ['SOLID'] });
   okAll(k);
   nok(k, 'j', { inPV: true, amenda: { suma: '1000', achitata: true, dataAchitare: addDays(today, -52) } });
   out.push(k);

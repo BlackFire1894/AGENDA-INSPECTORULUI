@@ -5,7 +5,7 @@ import {
   TERMEN_PLATA, PRAG_ROSU, TERMEN_ANAF, TERMEN_ASI, fmtDate, zinelucratoare,
 } from './dates.js';
 
-export const SCHEMA_VERSION = 4; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche
+export const SCHEMA_VERSION = 6; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS
 
 export const TIP_OBIECTIV = [
   { key: 'OPEC', label: 'OPEC / Instituție' },
@@ -25,6 +25,7 @@ export const DOTARI = [
   { key: 'drencere', label: 'Drencere', opts: DNN },
   { key: 'instSpeciale', label: 'Instalații speciale', opts: DNN },
   { key: 'idsai', label: 'IDSAI', opts: DNN },
+  { key: 'detectoriAutonomi', label: 'Detectori autonomi', opts: DNN },
   { key: 'exit', label: 'EXIT', opts: DNN },
   { key: 'desfumare', label: 'Desfumare', opts: DNN },
   { key: 'ignifugare', label: 'Ignifugare', opts: DNN },
@@ -57,6 +58,7 @@ export const ACTE = [
 
 // Categorii (cod de culori în interfață: bandă colorată + titlu de grup)
 export const CATEGORII = {
+  lipsa: 'Instalații lipsă (NU la dotări) — nereguli grave',
   docs: 'Documentație și verificări',
   stingatoare: 'Stingătoare',
   electric: 'Instalații electrice și compartimentări',
@@ -66,6 +68,8 @@ export const CATEGORII = {
   desfumare: 'Desfumare',
   stingere: 'Sprinklere, drencere, instalații speciale',
   pompe: 'Stație de pompe / generator',
+  evacuare: 'Evacuare și instrucțiuni',
+  detectoare: 'Detectoare și ignifugare',
   planuri: 'Planuri',
   svsu: 'SVSU',
   avertizare: 'Avertizare – sirene',
@@ -112,31 +116,53 @@ export const NEREGULI = [
   { key: 'x', cat: 'stingere', label: 'Instalații speciale nefuncționale', req: ['instSpeciale'] },
   { key: 'y', cat: 'pompe', label: 'Probleme stație de pompe / generator', req: ['statiePompe'] },
   { key: 'z', cat: 'pompe', label: 'Stație de pompe / generator nefuncțional', req: ['statiePompe'] },
+  { key: 'aa', cat: 'evacuare', label: 'Planuri de evacuare neafișate corespunzător' },
+  { key: 'ab', cat: 'evacuare', label: 'Căi de evacuare blocate / obturate' },
+  { key: 'ac', cat: 'evacuare', label: 'Lipsă instrucțiuni de utilizare a echipamentelor de gătit' },
+  { key: 'ad', cat: 'evacuare', label: 'Lipsă instrucțiuni de comportare (turism)' },
+  { key: 'ae', cat: 'detectoare', label: 'Detector de gaz defect / inexistent' },
+  { key: 'af', cat: 'detectoare', label: 'Detectori autonomi nefuncționali', req: ['detectoriAutonomi'] },
+  { key: 'ag', cat: 'detectoare', label: 'Ignifugare expirată', req: ['ignifugare'] },
 ].map((n) => ({ ...n, sec: 'ner' }));
 
+// NU la o instalație (unde NEC = „nu este cazul” e altă opțiune) = instalație necesară care lipsește → neregulă gravă.
+// Pentru fiecare astfel de dotare există un rând „Lipsă …”, afișat doar cât timp cel puțin o construcție are NU.
+// ASI și AVIZ sunt documente, nu instalații (lipsa lor e acoperită de neregula „a”).
+export const LIPSA_DOTARI = ['hidInt', 'hidExt', 'sprinklere', 'drencere', 'instSpeciale', 'idsai', 'detectoriAutonomi',
+  'exit', 'desfumare', 'ignifugare', 'rezervaApa', 'statiePompe'];
+const LIPSA_LABEL = {
+  hidInt: 'Lipsă hidranți interiori', hidExt: 'Lipsă hidranți exteriori', sprinklere: 'Lipsă instalație de sprinklere',
+  drencere: 'Lipsă instalație de drencere', instSpeciale: 'Lipsă instalații speciale de stingere', idsai: 'Lipsă IDSAI',
+  detectoriAutonomi: 'Lipsă detectori autonomi', exit: 'Lipsă marcaje EXIT', desfumare: 'Lipsă instalație de desfumare',
+  ignifugare: 'Lipsă ignifugare', rezervaApa: 'Lipsă rezervă de apă', statiePompe: 'Lipsă stație de pompe',
+};
+export const NEREGULI_GRAVE = LIPSA_DOTARI.map((k, i) => ({
+  key: `lipsa-${k}`, cat: 'lipsa', sec: 'ner', grav: true, reqNU: k, letter: `G${i + 1}`, label: LIPSA_LABEL[k],
+}));
+
 export const PLANURI = [
-  { key: 'paar', cat: 'planuri', label: 'PAAR avizat' },
-  { key: 'plInundatii', cat: 'planuri', label: 'Plan inundații conform' },
-  { key: 'plEvacuare', cat: 'planuri', label: 'Plan evacuare conform' },
-  { key: 'plCutremur', cat: 'planuri', label: 'Plan cutremur conform' },
-  { key: 'svsuAvizat', cat: 'svsu', label: 'SVSU avizat' },
-  { key: 'svsuSef', cat: 'svsu', label: 'Șef SVSU avizat' },
-  { key: 'svsuDotare', cat: 'svsu', label: 'Dotare conformă' },
-  { key: 'svsuPlanPregatire', cat: 'svsu', label: 'Plan de pregătire avizat' },
-  { key: 'svsuGospodarii', cat: 'svsu', label: 'Controale gospodării' },
+  { key: 'paar', cat: 'planuri', label: 'PAAR avizat', nokLabel: 'PAAR neavizat' },
+  { key: 'plInundatii', cat: 'planuri', label: 'Plan inundații conform', nokLabel: 'Plan inundații neconform' },
+  { key: 'plEvacuare', cat: 'planuri', label: 'Plan evacuare conform', nokLabel: 'Plan evacuare neconform' },
+  { key: 'plCutremur', cat: 'planuri', label: 'Plan cutremur conform', nokLabel: 'Plan cutremur neconform' },
+  { key: 'svsuAvizat', cat: 'svsu', label: 'SVSU avizat', nokLabel: 'SVSU neavizat' },
+  { key: 'svsuSef', cat: 'svsu', label: 'Șef SVSU avizat', nokLabel: 'Șef SVSU neavizat' },
+  { key: 'svsuDotare', cat: 'svsu', label: 'Dotare conformă', nokLabel: 'Dotare SVSU neconformă' },
+  { key: 'svsuPlanPregatire', cat: 'svsu', label: 'Plan de pregătire avizat', nokLabel: 'Plan de pregătire neavizat' },
+  { key: 'svsuGospodarii', cat: 'svsu', label: 'Controale gospodării', nokLabel: 'Controale gospodării neefectuate / neconforme' },
 ].map((n) => ({ ...n, sec: 'plan' }));
 
 export const PROTECTIE_CIVILA = [
-  { key: 'pcAudibilitate', cat: 'avertizare', label: 'Studiu de audibilitate' },
-  { key: 'pcSireneNumar', cat: 'avertizare', label: 'Număr suficient de sirene' },
-  { key: 'pcSireneMentenanta', cat: 'avertizare', label: 'Contract mentenanță sirene' },
+  { key: 'pcAudibilitate', cat: 'avertizare', label: 'Studiu de audibilitate', nokLabel: 'Lipsă studiu de audibilitate' },
+  { key: 'pcSireneNumar', cat: 'avertizare', label: 'Număr suficient de sirene', nokLabel: 'Număr insuficient de sirene' },
+  { key: 'pcSireneMentenanta', cat: 'avertizare', label: 'Contract mentenanță sirene', nokLabel: 'Lipsă contract mentenanță sirene' },
   { key: 'pcSireneDefecte', cat: 'avertizare', label: 'Sirene defecte' },
   { key: 'pcSireneNefunctionale', cat: 'avertizare', label: 'Sirene nefuncționale' },
-  { key: 'pcDotare', cat: 'pcdotare', label: 'Dotare conformă planurilor comunei' },
+  { key: 'pcDotare', cat: 'pcdotare', label: 'Dotare conformă planurilor comunei', nokLabel: 'Dotare neconformă cu planurile comunei' },
 ].map((n) => ({ ...n, sec: 'pc' }));
 
 // Toate rândurile șablon, în toate secțiunile
-export const SABLON = [...NEREGULI, ...PLANURI, ...PROTECTIE_CIVILA];
+export const SABLON = [...NEREGULI_GRAVE, ...NEREGULI, ...PLANURI, ...PROTECTIE_CIVILA];
 const SABLON_BY_KEY = new Map(SABLON.map((t) => [t.key, t]));
 export const sablon = (key) => SABLON_BY_KEY.get(key);
 
@@ -155,6 +181,7 @@ export function emptyConstructie(nr = 1) {
   return {
     id: uid(), denumire: `Construcția ${nr}`, suprafata: '', regimInaltime: '', nrAngajati: '',
     structura: '', materialPereti: '', dotari,
+    gps: null,   // { lat, lon, acc (m), la (ISO) } — coordonatele construcției, preluate la cerere cu „Completează coordonatele”
   };
 }
 
@@ -182,6 +209,7 @@ export function newControl({ objectiveId, tip = 'OPEC', denumire = '', start } =
     tip,
     denumire,
     administrator: '', telefon: '', email: '',
+    adresa: '', localitate: '',
     dataInceput: today,
     dataIncheiere: '',
     constructii: [emptyConstructie(1)],
@@ -198,6 +226,8 @@ export function controlFromPrevious(prev, start) {
   c.administrator = prev.administrator;
   c.telefon = prev.telefon;
   c.email = prev.email;
+  c.adresa = prev.adresa || '';
+  c.localitate = prev.localitate || '';
   c.constructii = JSON.parse(JSON.stringify(prev.constructii || [])).map((k) => ({ ...k, id: uid() }));
   if (!c.constructii.length) c.constructii = [emptyConstructie(1)];
   if (prev.adapostPC) c.adapostPC = { ...prev.adapostPC };
@@ -217,6 +247,9 @@ export function normalizeControl(c) {
     const e = emptyConstructie(i + 1);
     return { ...e, ...k, dotari: { ...e.dotari, ...(k.dotari || {}) } };
   });
+  // Coordonatele stăteau pe control, nu pe construcție, într-o versiune de probă: se mută la prima construcție.
+  if (out.gps && !out.constructii[0].gps) out.constructii[0] = { ...out.constructii[0], gps: out.gps };
+  delete out.gps;
   out.adapostPC = { ...base.adapostPC, ...(c.adapostPC || {}) };
   return out;
 }
@@ -227,7 +260,14 @@ export const isIncheiat = (c) => isISO(c.dataIncheiere);
 // Dacă construcția aleasă a fost ștearsă, revine la prima.
 export function constructieOf(c, n) {
   const list = c.constructii || [];
-  return list.find((k) => k.id === n.constructieId) || list[0] || null;
+  const t = n && !n.custom ? SABLON_BY_KEY.get(n.key) : null;
+  const implicit = t?.reqNU ? constructiiCuNU(c, t.reqNU)[0] : null;
+  return list.find((k) => k.id === n.constructieId) || implicit || list[0] || null;
+}
+
+// Construcțiile care au NU la o dotare (instalație necesară, lipsă)
+export function constructiiCuNU(c, key) {
+  return (c.constructii || []).filter((k) => k.dotari?.[key]?.v === 'NU');
 }
 
 // „Seria AB nr. 123456” (gol dacă nu s-a completat nimic)
@@ -243,6 +283,14 @@ export function neregulaLabel(n) {
   return sablon(n.key)?.label || n.label;
 }
 
+// Formularea constatării (ce se trece în PV / Panou): la rubricile formulate pozitiv („PAAR avizat”)
+// se folosește forma negativă („PAAR neavizat”); la nereguli, textul lor.
+export function constatareLabel(n) {
+  if (n.custom) return neregulaLabel(n);
+  const t = sablon(n.key);
+  return (n.status === 'nok' && t?.nokLabel) || neregulaLabel(n);
+}
+
 export const neregulaCat = (n) => (n.custom ? 'custom' : sablon(n.key)?.cat || 'custom');
 export const secOf = (n) => n.sec || 'ner';
 export const tabOfNeregula = (n) => SECTIUNI[secOf(n)].tab;
@@ -254,6 +302,7 @@ export function neregulaLetter(c, n) {
     return `+${idx + 1}`;
   }
   const t = sablon(n.key);
+  if (t?.letter) return t.letter;
   if (!t || t.sec === 'ner') return n.key;
   return String(SABLON.filter((x) => x.cat === t.cat).indexOf(t) + 1);
 }
@@ -284,8 +333,9 @@ export function hasDotare(c, key) {
 // Un rând deja completat rămâne mereu vizibil, ca să nu „dispară” date.
 export function isApplicable(c, n) {
   if (n.custom || n.status) return true;
-  const req = sablon(n.key)?.req;
-  return !req || req.some((k) => hasDotare(c, k));
+  const t = sablon(n.key);
+  if (t?.reqNU) return constructiiCuNU(c, t.reqNU).length > 0;
+  return !t?.req || t.req.some((k) => hasDotare(c, k));
 }
 
 // Statistici pentru o secțiune (tab)
@@ -298,7 +348,8 @@ export function secStats(c, sec, today = todayISO()) {
   if (sec === 'pc') { total += 1; if (c.adapostPC?.v) checked += 1; }
   return {
     total, checked,
-    hidden: rows.length - visible.length,
+    // rândurile „Lipsă …” (nereguli grave) nu sunt „ascunse”: există doar când o instalație e pe NU
+    hidden: rows.filter((n) => !isApplicable(c, n) && !sablon(n.key)?.grav).length,
     constatate: nok.length,
     netrecute: nok.filter((n) => !n.inPV).length,
     fines: nok.filter((n) => n.amenda?.aplicata).map((n) => ({ n, st: fineStatus(c, n, today) })),
@@ -412,7 +463,7 @@ export function objectives(controls) {
     out.push({
       id, controls: list, last,
       denumire: last.denumire, tip: last.tip, administrator: last.administrator,
-      telefon: last.telefon, email: last.email,
+      telefon: last.telefon, email: last.email, adresa: last.adresa, localitate: last.localitate,
     });
   }
   return out.sort((a, b) => byStartDesc(a.last, b.last));
@@ -444,7 +495,7 @@ export function matchControl(c, query) {
     const [s, e] = controlRange(c);
     return rangesOverlap(s, e, a, b);
   }
-  const hay = fold([c.denumire, c.administrator, c.telefon, c.email].join(' '));
+  const hay = fold([c.denumire, c.administrator, c.telefon, c.email, c.adresa, c.localitate].join(' '));
   return fold(q).split(/\s+/).every((w) => hay.includes(w));
 }
 
@@ -509,9 +560,12 @@ export function pvText(c, controls = [], { doarNetrecute = false, cuActe = true 
     if (!rows.length) continue;
     lines.push('', `${SECTIUNI[sec].label}:`);
     for (const n of rows) {
-      let t = `${++nr}. ${neregulaLabel(n)}`;
+      let t = `${++nr}. ${constatareLabel(n)}`;
       const k = constructieOf(c, n);
-      if (sec === 'ner' && multe && k) t += ` – construcția: ${k.denumire}`;
+      const tNU = sablon(n.key)?.reqNU;
+      const cuNU = tNU && !n.constructieId ? constructiiCuNU(c, tNU) : [];
+      if (sec === 'ner' && multe && cuNU.length > 1) t += ` – construcțiile: ${cuNU.map((x) => x.denumire).join(', ')}`;
+      else if (sec === 'ner' && multe && k) t += ` – construcția: ${k.denumire}`;
       if (n.obs && n.obs.trim()) t += `. ${n.obs.trim().replace(/\s*\n\s*/g, '; ')}`;
       const extra = [];
       if (vecheInfo(controls, c, n).veche) extra.push('neregulă veche');
@@ -533,3 +587,59 @@ export function pvText(c, controls = [], { doarNetrecute = false, cuActe = true 
   if (!nr) lines.push('', doarNetrecute ? 'Toate neregulile constatate sunt deja trecute în PV.' : 'Nu au fost constatate nereguli.');
   return { text: lines.join('\n'), count: nr };
 }
+
+// ───────── „Ce mai am de făcut” ─────────
+// Lista pașilor rămași într-un control, în ordinea firească a lucrului.
+// Fiecare pas: { id, level: 'todo' | 'warn', text, tab, focus } — focus = cheia rândului (sau „act-<cheie>”).
+export function todoList(c, { includeClose = true } = {}) {
+  const out = [];
+  const tabOf = (sec) => SECTIUNI[sec].tab;
+  if (!String(c.denumire || '').trim()) out.push({ id: 'denumire', level: 'todo', text: 'Completează denumirea obiectivului', tab: 'obiectiv', focus: 'sec-date' });
+
+  const acteTodo = ACTE.filter((a) => !c.acte[a.key]?.status);
+  if (acteTodo.length) {
+    out.push({ id: 'acte', level: 'todo', text: `${acteTodo.length} ${acteTodo.length === 1 ? 'act neverificat' : 'acte neverificate'}`, tab: 'acte', focus: `act-${acteTodo[0].key}` });
+  }
+  const grave = c.nereguli.filter((n) => !n.custom && sablon(n.key)?.grav && !n.status && isApplicable(c, n));
+  if (grave.length) {
+    out.unshift({ id: 'grave', level: 'grav', text: `${grave.length === 1 ? 'O neregulă gravă' : `${grave.length} nereguli grave`}: ${grave.map((n) => neregulaLabel(n).toLowerCase()).join(', ')} (NU la dotări)`, tab: 'nereguli', focus: grave[0].key });
+  }
+  for (const sec of sectiuniActive(c)) {
+    const rows = c.nereguli.filter((n) => secOf(n) === sec && isApplicable(c, n) && !(sec === 'ner' && sablon(n.key)?.grav));
+    const todo = rows.filter((n) => !n.status);
+    const adapost = sec === 'pc' && !c.adapostPC?.v ? 1 : 0;
+    const k = todo.length + adapost;
+    if (k) {
+      const what = sec === 'ner' ? (k === 1 ? 'neregulă neverificată' : 'nereguli neverificate') : (k === 1 ? 'rubrică neverificată' : 'rubrici neverificate');
+      out.push({ id: `todo-${sec}`, level: 'todo', text: `${SECTIUNI[sec].label}: ${k} ${what}`, tab: tabOf(sec), focus: todo[0]?.key || 'adapostPC' });
+    }
+  }
+  const active = activeNereguli(c);
+  for (const n of active.filter((x) => x.custom && x.status && !String(x.label || '').trim())) {
+    out.push({ id: `label-${n.key}`, level: 'warn', text: 'Rând suplimentar fără descriere', tab: tabOf(secOf(n)), focus: n.key });
+  }
+  const netrec = active.filter((n) => n.status === 'nok' && !n.inPV);
+  if (netrec.length) {
+    out.push({ id: 'pv', level: 'warn', text: `${netrec.length} ${netrec.length === 1 ? 'constatare netrecută' : 'constatări netrecute'} în PV`, tab: tabOf(secOf(netrec[0])), focus: netrec[0].key });
+  }
+  for (const n of active.filter((x) => x.status === 'nok' && x.amenda?.aplicata)) {
+    const lipsa = [];
+    if (!String(n.amenda.serie || '').trim() || !String(n.amenda.numar || '').trim()) lipsa.push('seria / nr.');
+    if (!String(n.amenda.suma || '').trim()) lipsa.push('suma');
+    if (lipsa.length) out.push({ id: `fine-${n.key}`, level: 'warn', text: `Amendă fără ${lipsa.join(' și ')}: ${constatareLabel(n)}`, tab: tabOf(secOf(n)), focus: n.key });
+  }
+  const faraGps = (c.constructii || []).filter((k) => !k.gps);
+  if (faraGps.length) {
+    const nume = faraGps.map((k) => k.denumire || `Construcția ${c.constructii.indexOf(k) + 1}`).join(', ');
+    out.push({ id: 'gps', level: 'warn', text: `Coordonate GPS necompletate: ${nume}`, tab: 'obiectiv', focus: `gps-${faraGps[0].id}` });
+  }
+  if (includeClose && !isISO(c.dataIncheiere)) out.push({ id: 'close', level: 'todo', text: 'Controlul nu este încheiat', tab: 'obiectiv', focus: 'sec-perioada' });
+  return out;
+}
+
+// ───────── Coordonate GPS ─────────
+export const fmtCoord = (g) => (g ? `${g.lat.toFixed(6)}, ${g.lon.toFixed(6)}` : '');
+export const googleMapsUrl = (g) => `https://www.google.com/maps/search/?api=1&query=${g.lat.toFixed(6)},${g.lon.toFixed(6)}`;
+export const appleMapsUrl = (g, label = '') => `https://maps.apple.com/?ll=${g.lat.toFixed(6)},${g.lon.toFixed(6)}&q=${encodeURIComponent(label || fmtCoord(g))}`;
+// Precizia: sub 30 m bună, până la 100 m acceptabilă, peste 100 m slabă (de regulă în interior sau fără GPS)
+export const gpsQuality = (acc) => (acc <= 30 ? 'buna' : acc <= 100 ? 'medie' : 'slaba');

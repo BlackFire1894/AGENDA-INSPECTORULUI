@@ -27,14 +27,18 @@ export const state = {
     collapsed: new Set(),     // construcții închise explicit
     nerFilter: 'ALL',
     showAllNer: false,        // arată și neregulile de instalații nebifate DA la dotări
-    obsHidden: pref('agenda-obs-hidden', false),                 // câmpurile de observații goale sunt ascunse
-    obsOpen: new Set(),                                          // observații deschise manual cât sunt ascunse
+    obsHidden: pref('agenda-obs-hidden', false),                 // setarea generală: observațiile ascunse
+    // Excepții individuale față de setarea generală: „<idControl>|<cale>” → true (ascuns) / false (afișat)
+    obsOverride: new Map(pref('agenda-obs-override', [])),
+    todoOpen: false,
+    gpsBusy: '',              // id-ul construcției pentru care se caută poziția// lista completă „Ce mai ai de făcut” deschisă
     catCollapsed: new Set(pref('agenda-cats-collapsed', [])),    // categorii de nereguli restrânse
   },
   meta: { lastBackup: null },
 };
 
-export const today = () => todayISO(state.now);
+// Data de azi se citește mereu direct din ceasul tabletei (nu dintr-o copie), ca să nu rămână în urmă nicio clipă.
+export const today = () => todayISO(new Date());
 
 export function getControl(id) {
   return state.controls.find((c) => c.id === id);

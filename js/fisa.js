@@ -1,8 +1,9 @@
 // Fișa controlului: rezumat complet, tipăribil (PDF din dialogul de tipărire) sau partajabil ca fișier.
 import { fmtDate, fmtDateLong, todayISO, isISO } from './dates.js';
 import {
-  DOTARI, ACTE, SECTIUNI, CATEGORII, sectiuniActive, secOf, neregulaLabel, neregulaLetter, neregulaCat,
-  constructieOf, amendaSerieNr, fineStatus, asiDeadline, vecheInfo, isIncheiat, controlStats, isLocalitate,
+  DOTARI, ACTE, SECTIUNI, CATEGORII, sectiuniActive, secOf, neregulaLetter, neregulaCat,
+  constructieOf, amendaSerieNr, fineStatus, asiDeadline, vecheInfo, isIncheiat, controlStats, isLocalitate, constatareLabel,
+  sablon, isApplicable, constructiiCuNU, fmtCoord, googleMapsUrl,
 } from './model.js';
 import { esc } from './ui.js';
 
@@ -34,6 +35,7 @@ export function fisaMarkup(c, controls, now = new Date()) {
       ${c.administrator ? `<span><b>Administrator:</b> ${esc(c.administrator)}</span>` : ''}
       ${c.telefon ? `<span><b>Telefon:</b> ${esc(c.telefon)}</span>` : ''}
       ${c.email ? `<span><b>Email:</b> ${esc(c.email)}</span>` : ''}
+      ${c.adresa || c.localitate ? `<span><b>Adresă:</b> ${esc([c.adresa, c.localitate].filter(Boolean).join(', '))}</span>` : ''}
     </div>
     <div class="f-sum">
       <div><b>${st.constatate}</b><span>nereguli / neconformități</span></div>
@@ -64,6 +66,7 @@ export function fisaMarkup(c, controls, now = new Date()) {
         <td><b>Structură</b><br>${esc(k.structura) || '—'}</td>
         <td><b>Pereți</b><br>${esc(k.materialPereti) || '—'}</td>
       </tr></table>
+      <p class="f-dot"><b>Coordonate GPS:</b> ${k.gps ? `<a href="${esc(googleMapsUrl(k.gps))}">${esc(fmtCoord(k.gps))}</a> (± ${Math.round(k.gps.acc)} m)` : 'necompletate'}</p>
       <p class="f-dot"><b>DA:</b> ${esc(by.DA.join(', ')) || '—'}${centrala ? ` · <b>Centrală termică:</b> ${esc(centrala)}` : ''}</p>
       <p class="f-dot"><b>NU:</b> ${esc(by.NU.join(', ')) || '—'} · <b>NEC:</b> ${esc(by.NEC.join(', ')) || '—'}</p>
       ${DOTARI.filter((d) => k.dotari[d.key]?.obs?.trim()).map((d) => `<p class="f-dot f-small"><b>${esc(d.label)}:</b> ${obs(k.dotari[d.key].obs)}</p>`).join('')}
@@ -81,8 +84,10 @@ export function fisaMarkup(c, controls, now = new Date()) {
   // Secțiuni de constatări
   for (const sec of sectiuniActive(c)) {
     const rows = c.nereguli.filter((n) => secOf(n) === sec);
-    const verif = rows.filter((n) => n.status);
-    const neverif = rows.length - verif.length;
+    // nereguli grave (NU la dotări) apar mereu, chiar neverificate, ca să nu se piardă
+    const gravNeverif = (n) => !n.status && sablon(n.key)?.grav && isApplicable(c, n);
+    const verif = rows.filter((n) => n.status || gravNeverif(n));
+    const neverif = rows.filter((n) => !n.status && isApplicable(c, n)).length - rows.filter(gravNeverif).length;
     h.push(`<section><h2>${esc(SECTIUNI[sec].label)}</h2>`);
     if (!verif.length) {
       h.push('<p class="f-small">Nicio rubrică verificată.</p>');
@@ -102,11 +107,11 @@ export function fisaMarkup(c, controls, now = new Date()) {
           if (d) det.push(`<b>ASI 90 zile:</b> ${esc(d.msg)}`);
         }
         const k = constructieOf(c, n);
-        h.push(`<tr class="${n.status === 'nok' ? 'f-nok' : ''}">
+        h.push(`<tr class="${n.status === 'nok' || gravNeverif(n) ? 'f-nok' : ''}">
           <td>${esc(neregulaLetter(c, n))}</td>
-          <td>${esc(neregulaLabel(n))}${n.custom ? '' : `<div class="f-cat">${esc(CATEGORII[neregulaCat(n)] || '')}</div>`}</td>
-          ${sec === 'ner' && multe ? `<td>${k ? esc(k.denumire) : '—'}</td>` : ''}
-          <td>${n.status === 'nok' ? (sec === 'ner' ? 'Constatat' : 'Neconform') : STATUS.ok}</td>
+          <td>${esc(constatareLabel(n))}${n.custom ? '' : `<div class="f-cat">${esc(CATEGORII[neregulaCat(n)] || '')}</div>`}</td>
+          ${sec === 'ner' && multe ? `<td>${sablon(n.key)?.reqNU ? esc(constructiiCuNU(c, sablon(n.key).reqNU).map((x) => x.denumire).join(', ') || '—') : k ? esc(k.denumire) : '—'}</td>` : ''}
+          <td>${n.status === 'nok' ? (sec === 'ner' ? 'Constatat' : 'Neconform') : n.status === 'ok' ? STATUS.ok : '<b>Neverificată — gravă</b>'}</td>
           <td>${n.status === 'nok' ? (n.inPV ? 'Trecut' : '<b>Netrecut</b>') : ''}</td>
           <td>${det.join('<br>')}</td>
         </tr>`);
