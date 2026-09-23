@@ -6,7 +6,7 @@ import {
   normalizeControl, allFines, NEREGULI, SABLON, isApplicable, secStats, sectiuniActive, activeNereguli,
   neregulaLetter, tabOfNeregula, controlStats, constructieOf, amendaSerieNr, ACTE, emptyConstructie,
   vecheInfo, pvText, constatareLabel, todoList, NEREGULI_GRAVE, constructiiCuNU,
-  fmtCoord, googleMapsUrl, gpsQuality, constructiiOf, constructiiNume, matchNeregula, pesteParter, grfVPesteParter, sablon, isGrav,
+  fmtCoord, googleMapsUrl, gpsQuality, constructiiOf, constructiiNume, matchNeregula, pesteParter, grfVPesteParter, sablon, isGrav, syncAutoNU,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -158,7 +158,7 @@ test('nereguli de instalații: apar doar dacă instalația e bifată DA la dotă
   // un rând completat nu dispare, chiar dacă instalația e scoasă
   n('q').status = 'nok';
   assert.ok(isApplicable(c, n('q')));
-  assert.equal(secStats(c, 'ner').total, 5 + 5 + 4 + 2 + 1); // a,b,d,e,f + aa…ae (mereu) + c,i,l,m + g,h + q
+  assert.equal(secStats(c, 'ner').total, 5 + 5 + 2 + 4 + 2 + 1); // a,b,d,e,f + aa…ae + ah,ai (mereu) + c,i,l,m + g,h + q
 });
 
 test('Planuri/SVSU și Protecție civilă: doar la Localitate, cu amenzi în Panou', () => {
@@ -464,4 +464,67 @@ test('v1.9: sigiliu la neregulile grave; rând adăugat marcat „Neregulă grav
   const t = pvText(c, [c]).text;
   assert.match(t, /Lipsă hidranți interiori[^\n]*\(sigiliu aplicat\)/);
   assert.match(t, /Depozitare butelii în subsol \(neregulă gravă; sigiliu aplicat\)/);
+});
+
+test('v1.10: nereguli ah (fără ASI) și ai (lucrări fără aviz), mereu vizibile, în „Documentație”', () => {
+  const c = newControl({ start: '2026-09-01' });
+  for (const k of ['ah', 'ai']) {
+    const n = c.nereguli.find((x) => x.key === k);
+    assert.ok(n && isApplicable(c, n), `${k} vizibilă`);
+    assert.equal(sablon(k).cat, 'docs');
+    assert.equal(neregulaLetter(c, n), k);
+  }
+  assert.ok(matchNeregula(c, c.nereguli.find((x) => x.key === 'ah'), 'fara asi'));
+  assert.ok(matchNeregula(c, c.nereguli.find((x) => x.key === 'ai'), 'aviz extindere'));
+  // date vechi (schema 7): rândurile noi apar, necompletate
+  const old = normalizeControl({ ...c, nereguli: c.nereguli.filter((x) => !['ah', 'ai'].includes(x.key)) });
+  assert.equal(old.nereguli.find((x) => x.key === 'ah').status, '');
+  assert.ok(old.nereguli.some((x) => x.key === 'ai'));
+});
+
+test('v1.10: ah / ai primele în listă; NU la ASI / AVIZ le constată automat, cu observațiile', () => {
+  const c = newControl({ denumire: 'Hotel', start: '2026-09-01' });
+  const ner = c.nereguli.filter((n) => n.sec === 'ner' && !sablon(n.key).grav).map((n) => n.key);
+  assert.deepEqual(ner.slice(0, 3), ['ah', 'ai', 'a']);
+  c.constructii.push(emptyConstructie(2));
+  c.constructii[1].denumire = 'Anexă';
+  const ah = c.nereguli.find((n) => n.key === 'ah');
+  // NU la ASI pe Anexă, cu observații
+  c.constructii[1].dotari.asi.v = 'NU';
+  c.constructii[1].dotari.asi.obs = 'ASI solicitată în 2025, nefinalizată';
+  assert.equal(syncAutoNU(c, 'asi'), 'added');
+  assert.equal(ah.status, 'nok');
+  assert.equal(constructiiNume(c, ah), 'Anexă');
+  assert.equal(ah.obs, 'Anexă: ASI solicitată în 2025, nefinalizată');
+  // observațiile din dotări se actualizează cât timp inspectorul nu le-a editat
+  c.constructii[1].dotari.asi.obs = 'fără ASI';
+  assert.equal(syncAutoNU(c, 'asi', { obsOnly: true }), 'updated');
+  assert.equal(ah.obs, 'Anexă: fără ASI');
+  // a doua construcție cu NU
+  c.constructii[0].dotari.asi.v = 'NU';
+  assert.equal(syncAutoNU(c, 'asi'), 'updated');
+  assert.equal(constructiiNume(c, ah), 'Construcția 1, Anexă');
+  // inspectorul editează observațiile → nu se mai suprascriu
+  ah.obs = 'Funcționează fără ASI din 2024';
+  c.constructii[1].dotari.asi.obs = 'altceva';
+  syncAutoNU(c, 'asi', { obsOnly: true });
+  syncAutoNU(c, 'asi');
+  assert.equal(ah.obs, 'Funcționează fără ASI din 2024');
+  // NU dispare: neregula lucrată rămâne (kept), cea nelucrată e retrasă (removed)
+  c.constructii[0].dotari.asi.v = 'DA'; c.constructii[1].dotari.asi.v = 'DA';
+  assert.equal(syncAutoNU(c, 'asi'), 'kept');
+  assert.equal(ah.status, 'nok');
+  const ai = c.nereguli.find((n) => n.key === 'ai');
+  c.constructii[0].dotari.aviz.v = 'NU';
+  assert.equal(syncAutoNU(c, 'aviz'), 'added');
+  c.constructii[0].dotari.aviz.v = 'NEC';
+  assert.equal(syncAutoNU(c, 'aviz'), 'removed');
+  assert.equal(ai.status, '');
+  assert.equal(syncAutoNU(c, 'aviz'), null);
+  // control nou pe același obiectiv: NU moștenit → ai constatată din start
+  c.constructii[1].dotari.aviz.v = 'NU';
+  const n2 = controlFromPrevious(c, '2027-09-01');
+  const ai2 = n2.nereguli.find((n) => n.key === 'ai');
+  assert.equal(ai2.status, 'nok');
+  assert.deepEqual(ai2.constructieIds, [n2.constructii[1].id]);
 });

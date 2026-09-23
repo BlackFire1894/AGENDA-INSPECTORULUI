@@ -45,6 +45,8 @@ Datele calendaristice sunt șiruri `AAAA-LL-ZZ` în ora locală; `""` înseamnă
 | `constructieIds` | string[] | construcțiile în care s-a constatat (una sau mai multe); `[]` sau doar id-uri inexistente = implicit: la neregulile grave cele cu NU la dotare, altfel prima construcție (`constructiiOf()`) |
 | `grav` | bool | doar la rândurile adăugate (`custom`): marcat de inspector ca neregulă gravă |
 | `sigiliu` | bool | la neregulile grave (din listă sau `grav`): s-a aplicat sigiliu în baza acestei nereguli |
+| `auto` | bool | `ah` / `ai`: constatată automat din NU la ASI / AVIZ (dotări) |
+| `obsAuto` | string | observațiile preluate automat; cât timp `obs === obsAuto`, se actualizează din dotări |
 | `asiTermen`, `asiPrezentat`, `asiDataPrezentare` | | doar pentru `a` |
 | `amenda` | `{ aplicata, serie, numar, data, suma, achitata, dataAchitare }` | `data = ""` → data încheierii; `serie`/`numar` = seria și numărul procesului-verbal de amendă |
 
@@ -53,6 +55,7 @@ Calculul termenelor: `js/model.js` → `fineStatus()`, `asiDeadline()`.
 ## Catalog (js/model.js)
 - `NEREGULI`, `PLANURI`, `PROTECTIE_CIVILA` → `SABLON`: rândurile standard, fiecare cu `cat` (categoria pentru codul de culori) și, la instalații, `req` (dotările de care depinde).
 - O neregulă cu `req` apare doar dacă cel puțin o construcție are DA la una din dotările listate (`centrala` = cel puțin un tip bifat). Un rând deja completat rămâne mereu vizibil.
+- Schema 7 → 8: neregulile noi `ah` (construcția funcționează fără ASI) și `ai` (lucrări de extindere / modificare fără aviz), primele din listă, adăugate de `normalizeControl()`; câmpurile `auto` și `obsAuto` pe nereguli. NU la dotarea ASI / AVIZ constată automat `ah` / `ai` (`syncAutoNU()`), cu observațiile din dotări.
 - Schema 6 → 7: construcțiile primesc `grf` (`""`); neregulile primesc `grav` și `sigiliu` (`false`); `constructieId` (un singur id) devine `constructieIds` (listă): `"x"` → `["x"]`, `""` → `[]` (`normalizeControl()`).
 - Schema 5 → 6: `adresa`, `localitate` (`''`) pe control și `gps` (`null`) pe fiecare construcție. Schema 4 → 5: rândurile noi de nereguli (inclusiv `lipsa-*`, neregulile grave la NU) și dotarea `detectoriAutonomi`.
 - Schema 3 → 4: `vecheManual: false` adăugat de `normalizeControl()`.

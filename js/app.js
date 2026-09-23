@@ -5,7 +5,7 @@ import { fmtDate, fmtDateLong, toISO, parseDateQuery, isISO } from './dates.js';
 import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
   fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat, pvText, sectiuniActive, secOf,
-  todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality, constructiiOf, grfVPesteParter, neregulaLetter, neregulaLabel,
+  todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality, constructiiOf, grfVPesteParter, neregulaLetter, neregulaLabel, AUTO_NU, syncAutoNU,
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
@@ -200,6 +200,8 @@ document.addEventListener('input', (e) => {
     const c = getControl(route.id);
     if (!c) return;
     setPath(c, el.dataset.bind, el.value);
+    const mObs = el.dataset.bind.match(/\.dotari\.(\w+)\.obs$/);
+    if (mObs && AUTO_NU[mObs[1]]) syncAutoNU(c, mObs[1], { obsOnly: true });
     touch(c);
     if (el.tagName === 'TEXTAREA') autosize(el);
     refreshTodoSoon(c);
@@ -365,8 +367,21 @@ document.addEventListener('click', async (e) => {
         const [k] = resolvePath(c, el.dataset.path);   // părintele lui „grf” = construcția
         if (grfVPesteParter(k)) { touch(c, true); rerenderEditor(); gravGrfToast(c, k); return; }
       }
-      // NU la o instalație necesară → avertizare: neregulă gravă, adăugată în tabul Nereguli
       const mDot = el.dataset.path.match(/\.dotari\.(\w+)\.v$/);
+      // NU la ASI / AVIZ → neregula ah / ai se constată automat, cu observațiile din dotări
+      if (mDot && AUTO_NU[mDot[1]]) {
+        const r = syncAutoNU(c, mDot[1]);
+        touch(c, true); rerenderEditor();
+        const key = AUTO_NU[mDot[1]];
+        const lbl = neregulaLabel(c.nereguli.find((x) => x.key === key));
+        const vezi = { label: 'Vezi', fn: () => { location.hash = `#/control/${c.id}/nereguli/${key}`; } };
+        if (r === 'added') toast(`Neregulă trecută automat (${key}): ${lbl}`, 'warn', vezi);
+        else if (r === 'updated') toast(`Neregula ${key} actualizată din fișă: construcțiile cu NU la ${mDot[1].toUpperCase()}`, 'ok', vezi);
+        else if (r === 'removed') toast(`Neregula ${key} a fost retrasă (nu mai e NU la ${mDot[1].toUpperCase()})`);
+        else if (r === 'kept') toast(`Neregula ${key} rămâne constatată: are date completate. Verificați-o.`, 'warn', vezi);
+        return;
+      }
+      // NU la o instalație necesară → avertizare: neregulă gravă, adăugată în tabul Nereguli
       if (mDot && v === 'NU' && LIPSA_DOTARI.includes(mDot[1])) {
         const d = DOTARI.find((x) => x.key === mDot[1]);
         touch(c, true); rerenderEditor();
