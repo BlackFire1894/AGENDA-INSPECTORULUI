@@ -4,7 +4,7 @@ import { fmtDate, fmtDateLong, isISO } from './dates.js';
 import {
   TIP_OBIECTIV, DOTARI, CENTRALA_TIPURI, ACTE, STRUCTURI, MATERIALE_PERETI, SECTIUNI, CATEGORII,
   controlStats, secStats, fineStatus, fineDate, asiDeadline, isIncheiat, neregulaLabel, neregulaLetter,
-  neregulaCat, secOf, isApplicable, isLocalitate,
+  neregulaCat, secOf, isApplicable, isLocalitate, constructieOf, amendaSerieNr,
 } from './model.js';
 import { icon, esc, pill, tipBadge } from './ui.js';
 
@@ -71,6 +71,27 @@ export function tabHTML(c, tab) {
 }
 
 // ───────── helpers pentru câmpuri ─────────
+
+// Observații: câmp pe mai multe rânduri (Enter = rând nou) care crește doar în jos.
+// Cu „Observații ascunse”, câmpurile goale devin un buton mic „+ Observații”; cele completate rămân vizibile.
+function obsField(path, value, cls = 'row-obs') {
+  if (state.ui.obsHidden && !value && !state.ui.obsOpen.has(path)) {
+    return `<button type="button" class="obs-add" data-act="obs-open" data-path="${path}">${icon('plus')} Observații</button>`;
+  }
+  return `<textarea class="obs ${cls}" data-bind="${path}" rows="1" placeholder="Observații" autocomplete="off" enterkeyhint="enter">${esc(value)}</textarea>`;
+}
+
+// Construcția în care s-a făcut constatarea (implicit prima construcție)
+function constrSelect(c, n, path) {
+  const cur = constructieOf(c, n);
+  if (!cur) return '';
+  return `<label class="constr-sel">
+    ${icon('building')}<span class="constr-sel-lbl">Construcția</span>
+    <select data-bind="${path}.constructieId" data-rerender="1" aria-label="Construcția în care s-a făcut constatarea">
+      ${c.constructii.map((k, i) => `<option value="${k.id}" ${k.id === cur.id ? 'selected' : ''}>${i + 1}. ${esc(k.denumire || `Construcția ${i + 1}`)}</option>`).join('')}
+    </select>
+  </label>`;
+}
 
 function field(label, path, value, { type = 'text', ph = '', list = '', mode = '', unit = '', wide = false, live = '' } = {}) {
   return `<label class="field ${wide ? 'wide' : ''}">
@@ -206,7 +227,7 @@ function constructieHTML(c, k, i) {
         ${field('Structura de rezistență', `${p}.structura`, k.structura, { list: 'dl-structura', ph: 'Alege sau scrie' })}
         ${field('Material pereți', `${p}.materialPereti`, k.materialPereti, { list: 'dl-pereti', ph: 'Alege sau scrie' })}
       </div>
-      <h3 class="mini-title">Dotări și instalații <small>NEC = nu este cazul</small></h3>
+      <div class="mini-row"><h3 class="mini-title">Dotări și instalații <small>NEC = nu este cazul</small></h3>${i === 0 || state.ui.obsHidden ? obsToggleBtn() : ''}</div>
       <div class="dotari">${DOTARI.map((d) => dotareRow(p, k, d)).join('')}</div>
       ${c.constructii.length > 1 ? `<div class="constr-foot"><button class="btn btn-ghost danger" data-act="constr-del" data-id="${k.id}">${icon('trash')} Șterge construcția</button></div>` : ''}
     </div>` : ''}
@@ -223,13 +244,13 @@ function dotareRow(p, k, d) {
         ${CENTRALA_TIPURI.map((t) => `<button type="button" class="chip-sel ${v.tipuri.includes(t) ? 'on' : ''}" data-act="centrala" data-path="${path}" data-val="${t}">${t}</button>`).join('')}
         <button type="button" class="chip-sel ${v.nuAre ? 'on off-kind' : ''}" data-act="centrala" data-path="${path}" data-val="NU_ARE">NU ARE</button>
       </div>
-      <input class="dot-obs" data-bind="${path}.obs" value="${esc(v.obs)}" placeholder="Observații" autocomplete="off">
+      ${obsField(`${path}.obs`, v.obs, 'dot-obs')}
     </div>`;
   }
   return `<div class="dot-row">
     <span class="dot-label">${esc(d.label)}</span>
     ${segBtns(`${path}.v`, v.v, d.opts, 'seg-dnn')}
-    <input class="dot-obs" data-bind="${path}.obs" value="${esc(v.obs)}" placeholder="Observații" autocomplete="off">
+    ${obsField(`${path}.obs`, v.obs, 'dot-obs')}
   </div>`;
 }
 
@@ -241,6 +262,7 @@ function tabActe(c) {
   return `<section class="card">
     <div class="sec-title-row">
       <h2 class="sec-title">${icon('doc')} Acte de autoritate și evidențe</h2>
+      ${obsToggleBtn()}
       <div class="progress-txt"><b>${st.acteDone}</b>/${st.acteTotal} verificate · <span class="t-green">${ok} prezentate</span> · <span class="t-red">${st.acteNok} lipsă</span></div>
     </div>
     <div class="progress"><span class="p-ok" style="width:${(ok / st.acteTotal) * 100}%"></span><span class="p-nok" style="width:${(st.acteNok / st.acteTotal) * 100}%"></span></div>
@@ -251,7 +273,7 @@ function tabActe(c) {
         <span class="row-idx">${i + 1}</span>
         <div class="row-main">
           <span class="row-label">${esc(a.label)}</span>
-          <input class="row-obs" data-bind="${path}.obs" value="${esc(v.obs)}" placeholder="Observații" autocomplete="off">
+          ${obsField(`${path}.obs`, v.obs)}
         </div>
         ${okNok(path, v.status, 'Prezentat', 'Lipsă')}
       </div>`;
@@ -302,9 +324,15 @@ function tabSectiune(c, sec) {
     const adapost = sec === 'pc' && g.cat === 'pcdotare' && (f === 'ALL' || (f === 'TODO' && !c.adapostPC.v)) ? adapostRow(c) : '';
     if (!vis.length && !adapost) return '';
     const nok = g.rows.filter((n) => n.status === 'nok').length;
-    return `<div class="cat-group cat-${g.cat}">
-      <h3 class="cat-title"><i class="cat-sw"></i>${esc(CATEGORII[g.cat])}${nok ? `<span class="cat-count">${nok} ${nokWord(sec, nok)}</span>` : ''}</h3>
-      <div class="check-list">${vis.map((n) => neregulaRow(c, n)).join('')}${adapost}</div>
+    const closed = state.ui.catCollapsed.has(g.cat);
+    const nRows = vis.length + (adapost ? 1 : 0);
+    return `<div class="cat-group cat-${g.cat} ${closed ? 'closed' : ''}">
+      <button type="button" class="cat-title" data-act="cat-toggle" data-cat="${g.cat}" aria-expanded="${!closed}">
+        ${icon('chevD', closed ? '' : 'rot')}<span class="cat-name">${esc(CATEGORII[g.cat])}</span>
+        <span class="cat-meta">${nRows} ${nRows === 1 ? 'rând' : 'rânduri'}</span>
+        ${nok ? `<span class="cat-count">${nok} ${nokWord(sec, nok)}</span>` : ''}
+      </button>
+      ${closed ? '' : `<div class="check-list">${vis.map((n) => neregulaRow(c, n)).join('')}${adapost}</div>`}
     </div>`;
   }).join('');
   if (!body) body = '<p class="muted pad">Nimic de afișat pentru acest filtru.</p>';
@@ -324,9 +352,13 @@ function tabSectiune(c, sec) {
     </section>
     ${!isIncheiat(c) && anyFineOrAsi ? `<div class="banner banner-info">${icon('info')}<span>Termenele amenzilor${sec === 'ner' ? ' și ASI' : ''} pornesc după ce completezi <b>data încheierii</b> în tabul Obiectiv.</span></div>` : ''}
     ${hiddenNote}
-    <div class="seg-row">
+    <div class="toolbar">
       <div class="segmented">
         ${[['ALL', 'Toate'], ['NOK', `${ui.nokWord[0].toUpperCase()}${ui.nokWord.slice(1)} (${st.constatate})`], ['TODO', `Neverificate (${st.total - st.checked})`]].map(([k, l]) => `<button class="${f === k ? 'on' : ''}" data-act="ner-filter" data-val="${k}">${l}</button>`).join('')}
+      </div>
+      <div class="tool-btns">
+        ${(() => { const all = groups.length && groups.every((g) => state.ui.catCollapsed.has(g.cat)); return `<button class="btn btn-ghost" data-act="cats-all" data-val="${all ? 'open' : 'close'}">${icon(all ? 'chevD' : 'list')} ${all ? 'Extinde categoriile' : 'Restrânge categoriile'}</button>`; })()}
+        ${obsToggleBtn()}
       </div>
     </div>
     <section class="card">
@@ -343,13 +375,18 @@ function tabSectiune(c, sec) {
 }
 
 // Adăpost de protecție civilă: DA / NU / NEC + observații
+export function obsToggleBtn() {
+  const h = state.ui.obsHidden;
+  return `<button class="btn btn-ghost ${h ? 'is-on' : ''}" data-act="obs-toggle" aria-pressed="${h}">${icon('doc')} ${h ? 'Arată observațiile' : 'Ascunde observațiile'}</button>`;
+}
+
 function adapostRow(c) {
   const v = c.adapostPC;
   return `<div class="check-row adapost-row" id="ner-adapostPC">
     <span class="row-idx letter">2</span>
     <div class="row-main">
       <span class="row-label">Adăpost de protecție civilă <small class="muted">NEC = nu este cazul</small></span>
-      <input class="row-obs" data-bind="adapostPC.obs" value="${esc(v.obs)}" placeholder="Observații" autocomplete="off">
+      ${obsField('adapostPC.obs', v.obs)}
     </div>
     <div class="row-side">${segBtns('adapostPC.v', v.v, ['DA', 'NU', 'NEC'], 'seg-dnn seg-adapost')}</div>
   </div>`;
@@ -373,7 +410,8 @@ function neregulaRow(c, n) {
     <div class="row-main">
       ${labelHTML}
       ${chips.length ? `<span class="chips">${chips.join('')}</span>` : ''}
-      <input class="row-obs" data-bind="${path}.obs" value="${esc(n.obs)}" placeholder="Observații" autocomplete="off">
+      ${n.sec === 'ner' || !n.sec ? constrSelect(c, n, path) : ''}
+      ${obsField(`${path}.obs`, n.obs)}
     </div>
     <div class="row-side">
       ${okNok(path, n.status, sec.ok, sec.nok)}
@@ -408,9 +446,11 @@ function neregulaDetail(c, n, path) {
     fine = `<div class="fine-box fb-${fs.level}">
       <div class="fine-status">
         <span class="fine-dot"></span>
-        <div><b>${esc(fs.label)}</b><span>${esc(fs.msg)}</span></div>
+        <div><b>${esc(fs.label)}${amendaSerieNr(a) ? ` · ${esc(amendaSerieNr(a))}` : ''}</b><span>${esc(fs.msg)}</span></div>
       </div>
       <div class="form-grid g3">
+        ${field('Seria amenzii', `${path}.amenda.serie`, a.serie, { ph: 'ex: AB' })}
+        ${field('Nr. amenzii', `${path}.amenda.numar`, a.numar, { mode: 'numeric', ph: 'ex: 0012345' })}
         <label class="field">
           <span class="lbl">Data aplicării</span>
           <span class="inp-wrap"><input type="date" data-bind="${path}.amenda.data" data-rerender="1" value="${esc(a.data)}"></span>

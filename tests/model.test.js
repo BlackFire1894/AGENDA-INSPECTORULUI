@@ -4,7 +4,7 @@ import { addDays, diffDays, parseDateQuery, zile } from '../js/dates.js';
 import {
   newControl, fineStatus, asiDeadline, matchControl, objectives, controlFromPrevious,
   normalizeControl, allFines, NEREGULI, SABLON, isApplicable, secStats, sectiuniActive, activeNereguli,
-  neregulaLetter, tabOfNeregula, controlStats,
+  neregulaLetter, tabOfNeregula, controlStats, constructieOf, amendaSerieNr, ACTE, emptyConstructie,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -180,4 +180,29 @@ test('Planuri/SVSU și Protecție civilă: doar la Localitate, cu amenzi în Pan
   assert.equal(allFines([l], '2026-09-05').length, 0);
   assert.equal(controlStats(l).constatate, 0);
   assert.equal(l.nereguli.find((n) => n.key === 'pcSireneDefecte').status, 'nok');
+});
+
+test('v1.4: acte exerciții, construcția neregulii, seria și nr. amenzii', () => {
+  assert.ok(['exercitii', 'registreExercitii', 'rapoarteExercitii'].every((k) => ACTE.some((a) => a.key === k)));
+  const c = newControl({ start: '2026-09-01' });
+  c.constructii.push(emptyConstructie(2));
+  const n = c.nereguli.find((x) => x.key === 'd');
+  assert.equal(constructieOf(c, n).id, c.constructii[0].id);      // implicit prima construcție
+  n.constructieId = c.constructii[1].id;
+  assert.equal(constructieOf(c, n).id, c.constructii[1].id);
+  c.constructii.splice(1, 1);                                     // construcția aleasă e ștearsă
+  assert.equal(constructieOf(c, n).id, c.constructii[0].id);
+  assert.equal(amendaSerieNr({ serie: ' AB ', numar: '123' }), 'Seria AB nr. 123');
+  assert.equal(amendaSerieNr({ serie: '', numar: '9' }), 'nr. 9');
+  assert.equal(amendaSerieNr({}), '');
+  // date vechi (schema 2): câmpurile noi apar goale
+  const old = normalizeControl({ id: 'x', objectiveId: 'o', dataInceput: '2026-01-01',
+    acte: { ctpsi: { status: 'ok', obs: '' } },
+    nereguli: [{ key: 'b', status: 'nok', amenda: { aplicata: true, data: '', suma: '100', achitata: false, dataAchitare: '' } }] });
+  const b = old.nereguli.find((x) => x.key === 'b');
+  assert.equal(b.constructieId, '');
+  assert.equal(b.amenda.serie, '');
+  assert.equal(b.amenda.suma, '100');
+  assert.deepEqual(old.acte.exercitii, { status: '', obs: '' });
+  assert.equal(old.acte.ctpsi.status, 'ok');
 });

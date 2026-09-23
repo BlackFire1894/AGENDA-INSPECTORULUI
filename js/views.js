@@ -7,6 +7,7 @@ import {
 import {
   objectives, allFines, allAsi, isIncheiat, byStartDesc, controlStats, matchControl, fold,
   neregulaLabel, neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
+  constructieOf, amendaSerieNr,
 } from './model.js';
 import { icon, esc, pill, tipBadge, empty } from './ui.js';
 import { APP_VERSION } from './version.js';
@@ -160,7 +161,8 @@ export function viewDashboard() {
   const fineItem = ({ c, n, st }) => `<a class="item item-${st.level}" href="#/control/${c.id}/${tabOfNeregula(n)}/${encodeURIComponent(n.key)}">
       <span class="item-main">
         <span class="item-title">${esc(c.denumire || 'Obiectiv fără denumire')}</span>
-        <span class="item-sub">${esc(neregulaLetter(c, n))}. ${esc(neregulaLabel(n))}</span>
+        <span class="item-sub">${esc(neregulaLetter(c, n))}. ${esc(neregulaLabel(n))}${c.constructii.length > 1 && constructieOf(c, n) ? ` · ${esc(constructieOf(c, n).denumire)}` : ''}</span>
+        ${amendaSerieNr(n.amenda) ? `<span class="item-sub">Amenda ${esc(amendaSerieNr(n.amenda))}</span>` : ''}
         <span class="item-msg">${esc(st.msg)}</span>
       </span>
       <span class="item-side">
@@ -430,10 +432,18 @@ export function viewCalendar() {
 
   return `<header class="page-head">
       <div><div class="eyebrow">${icon('calendar')} ${monthCount} ${monthCount === 1 ? 'control' : 'controale'} în această lună</div><h1 class="cap">${MONTHS[m]} ${y}</h1></div>
-      <div class="row-gap">
-        <button class="icon-btn big" data-act="cal-prev" aria-label="Luna anterioară">${icon('chevL')}</button>
+      <div class="row-gap cal-nav">
+        <div class="stepper cal-step" aria-label="Anul">
+          <button class="step-btn" data-act="cal-year-prev" aria-label="Anul anterior">${icon('chevL')}</button>
+          <span class="step-val"><b>${y}</b><small>anul</small></span>
+          <button class="step-btn" data-act="cal-year-next" aria-label="Anul următor">${icon('chevR')}</button>
+        </div>
+        <div class="stepper cal-step" aria-label="Luna">
+          <button class="step-btn" data-act="cal-prev" aria-label="Luna anterioară">${icon('chevL')}</button>
+          <span class="step-val"><b class="cap">${MONTHS_SHORT[m]}</b><small>luna</small></span>
+          <button class="step-btn" data-act="cal-next" aria-label="Luna următoare">${icon('chevR')}</button>
+        </div>
         <button class="btn btn-ghost btn-lg" data-act="cal-today">Azi</button>
-        <button class="icon-btn big" data-act="cal-next" aria-label="Luna următoare">${icon('chevR')}</button>
       </div>
     </header>
     <div class="cal-layout">

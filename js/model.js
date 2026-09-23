@@ -5,7 +5,7 @@ import {
   TERMEN_PLATA, PRAG_ROSU, TERMEN_ANAF, TERMEN_ASI, fmtDate,
 } from './dates.js';
 
-export const SCHEMA_VERSION = 2; // 2: secțiuni Planuri/SVSU și Protecție civilă, adăpost PC
+export const SCHEMA_VERSION = 3; // 2: secțiuni Planuri/SVSU și PC, adăpost PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții
 
 export const TIP_OBIECTIV = [
   { key: 'OPEC', label: 'OPEC / Instituție' },
@@ -50,6 +50,9 @@ export const ACTE = [
   { key: 'fise', label: 'Fișe de instruire completate corect' },
   { key: 'stingatoare', label: 'Verificare lunară a stingătoarelor' },
   { key: 'contract', label: 'Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)' },
+  { key: 'exercitii', label: 'Exerciții efectuate' },
+  { key: 'registreExercitii', label: 'Registrele exercițiilor sunt la zi' },
+  { key: 'rapoarteExercitii', label: 'Rapoarte exerciții' },
 ];
 
 // Categorii (cod de culori în interfață: bandă colorată + titlu de grup)
@@ -159,8 +162,9 @@ export function emptyConstructie(nr = 1) {
 export function emptyNeregula(key, custom = false, sec = 'ner') {
   return {
     key, custom, sec, label: '', status: '', obs: '', inPV: false,
+    constructieId: '',   // construcția în care s-a constatat; '' = prima construcție
     asiTermen: false, asiPrezentat: false, asiDataPrezentare: '',
-    amenda: { aplicata: false, data: '', suma: '', achitata: false, dataAchitare: '' },
+    amenda: { aplicata: false, serie: '', numar: '', data: '', suma: '', achitata: false, dataAchitare: '' },
   };
 }
 
@@ -217,6 +221,21 @@ export function normalizeControl(c) {
 }
 
 export const isIncheiat = (c) => isISO(c.dataIncheiere);
+
+// Construcția în care s-a făcut constatarea: cea aleasă sau, implicit, prima construcție.
+// Dacă construcția aleasă a fost ștearsă, revine la prima.
+export function constructieOf(c, n) {
+  const list = c.constructii || [];
+  return list.find((k) => k.id === n.constructieId) || list[0] || null;
+}
+
+// „Seria AB nr. 123456” (gol dacă nu s-a completat nimic)
+export function amendaSerieNr(a) {
+  const serie = String(a?.serie || '').trim();
+  const numar = String(a?.numar || '').trim();
+  if (!serie && !numar) return '';
+  return [serie && `Seria ${serie}`, numar && `nr. ${numar}`].filter(Boolean).join(' ');
+}
 
 export function neregulaLabel(n) {
   if (n.custom) return n.label || 'Neregulă suplimentară';

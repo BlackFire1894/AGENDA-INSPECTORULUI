@@ -1,10 +1,10 @@
 // Punctul de intrare: rutare, evenimente, fluxuri (control nou, backup, date demo).
 import * as store from './store.js';
-import { state, today, getControl, touch, flush, addControl, removeControl, onSaveState } from './state.js';
+import { state, today, getControl, touch, flush, addControl, removeControl, onSaveState, savePref } from './state.js';
 import { addDays, fmtDate, fmtDateLong, toISO, parseDateQuery, isISO } from './dates.js';
 import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
-  fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat,
+  fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat,
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
@@ -52,6 +52,10 @@ async function render({ keepScroll = false } = {}) {
       const c = getControl(route.id);
       if (!c) { location.hash = '#/panou'; return; }
       if (!tabsFor(c).some((t) => t.key === route.tab)) { location.replace(`#/control/${c.id}/obiectiv`); return; }
+      if (route.focus) {
+        const fn = c.nereguli.find((x) => x.key === route.focus);
+        if (fn && state.ui.catCollapsed.delete(neregulaCat(fn))) savePref('agenda-cats-collapsed', [...state.ui.catCollapsed]);
+      }
       if (prev.name !== 'control' || prev.id !== route.id) state.ui.showAllNer = false;
       if (prev.name !== 'control' || prev.id !== route.id || prev.tab !== route.tab) state.ui.nerFilter = 'ALL';
       html = viewControl(c, route.tab);
@@ -61,6 +65,7 @@ async function render({ keepScroll = false } = {}) {
   }
   main().innerHTML = html;
   main().dataset.view = route.name;
+  autosizeAll();
   updateNav();
   const sameView = prev.name === route.name && prev.id === route.id && prev.tab === route.tab;
   if (keepScroll || sameView) window.scrollTo(0, y);
@@ -96,9 +101,21 @@ function rerenderEditor() {
   document.getElementById('ed-head').innerHTML = edHeadHTML(c);
   document.getElementById('ed-tabs').innerHTML = edTabsHTML(c, route.tab);
   document.getElementById('ed-body').innerHTML = tabHTML(c, route.tab);
+  autosizeAll();
   window.scrollTo(0, y);
   updateNav();
 }
+
+// Observațiile cresc în jos pe măsură ce se scrie (lățimea rămâne fixă)
+function autosize(el) {
+  el.style.height = 'auto';
+  el.style.height = `${el.scrollHeight + 2}px`;
+}
+function autosizeAll() {
+  document.querySelectorAll('textarea.obs').forEach(autosize);
+}
+let resizeTimer;
+window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(autosizeAll, 150); });
 
 // ───────── acces la date prin „căi” ─────────
 // ex: "constructii.#<id>.dotari.asi.v", "nereguli.@a.amenda.suma"
@@ -127,6 +144,7 @@ document.addEventListener('input', (e) => {
     if (!c) return;
     setPath(c, el.dataset.bind, el.value);
     touch(c);
+    if (el.tagName === 'TEXTAREA') autosize(el);
     if (el.dataset.liveSrc === 'denumire') {
       const h = document.querySelector('[data-live="denumire"]');
       if (h) h.textContent = el.value || 'Obiectiv fără denumire';
@@ -168,7 +186,7 @@ document.addEventListener('change', async (e) => {
     if (!c) return;
     setPath(c, el.dataset.bind, el.value);
     if (el.dataset.bind === 'dataInceput' && !isISO(el.value)) { c.dataInceput = today(); }
-    touch(c);
+    touch(c, true);
     rerenderEditor();
     return;
   }
@@ -211,6 +229,10 @@ document.addEventListener('click', async (e) => {
     case 'cal-prev': case 'cal-next': {
       const d = new Date(state.ui.calYear, state.ui.calMonth + (act === 'cal-next' ? 1 : -1), 1);
       state.ui.calYear = d.getFullYear(); state.ui.calMonth = d.getMonth();
+      render({ keepScroll: true }); return;
+    }
+    case 'cal-year-prev': case 'cal-year-next': {
+      state.ui.calYear += act === 'cal-year-next' ? 1 : -1;
       render({ keepScroll: true }); return;
     }
     case 'cal-today': {
@@ -297,6 +319,29 @@ document.addEventListener('click', async (e) => {
       return;
     }
     case 'ner-filter': state.ui.nerFilter = el.dataset.val; rerenderEditor(); return;
+    case 'obs-toggle':
+      state.ui.obsHidden = !state.ui.obsHidden;
+      state.ui.obsOpen.clear();
+      savePref('agenda-obs-hidden', state.ui.obsHidden);
+      rerenderEditor(); return;
+    case 'obs-open': {
+      state.ui.obsOpen.add(el.dataset.path);
+      rerenderEditor();
+      document.querySelector(`textarea[data-bind="${CSS.escape(el.dataset.path)}"]`)?.focus();
+      return;
+    }
+    case 'cat-toggle': {
+      const cat = el.dataset.cat;
+      if (!state.ui.catCollapsed.delete(cat)) state.ui.catCollapsed.add(cat);
+      savePref('agenda-cats-collapsed', [...state.ui.catCollapsed]);
+      rerenderEditor(); return;
+    }
+    case 'cats-all': {
+      const cats = [...document.querySelectorAll('#ed-body [data-act="cat-toggle"]')].map((b) => b.dataset.cat);
+      cats.forEach((k) => (el.dataset.val === 'close' ? state.ui.catCollapsed.add(k) : state.ui.catCollapsed.delete(k)));
+      savePref('agenda-cats-collapsed', [...state.ui.catCollapsed]);
+      rerenderEditor(); return;
+    }
     case 'toggle-all-ner': state.ui.showAllNer = !state.ui.showAllNer; rerenderEditor(); return;
     case 'ner-add': {
       const n = emptyNeregula(`k${uid()}`, true, el.dataset.sec || 'ner');
@@ -332,7 +377,7 @@ document.addEventListener('click', async (e) => {
     }
     default: return;
   }
-  touch(c);
+  touch(c, true);
   rerenderEditor();
 });
 

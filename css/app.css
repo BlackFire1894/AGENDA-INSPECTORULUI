@@ -389,7 +389,7 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .ed-tab.on .tab-num { background: var(--accent); color: #fff; }
 .tab-txt { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
 .tab-txt b { font-size: 1rem; }
-.tab-txt small { color: var(--muted); font-size: 0.8056rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tab-txt small { color: var(--muted); font-size: 0.8056rem; font-weight: 600; line-height: 1.25; }
 .tab-txt small.warn { color: var(--warn); }
 /* 5 taburi (Localitate): mai compact, eticheta poate trece pe două rânduri */
 .ed-tabs[style*="--tabs:5"] .ed-tab { gap: 0.4444rem; padding: 0.5556rem 0.6667rem; }
@@ -443,8 +443,43 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .dot-row:first-child { border-top: 0; }
 .dot-row:nth-child(even) { background: var(--surface-2); }
 .dot-label { font-weight: 750; font-size: 0.9444rem; }
-.dot-obs, .row-obs { height: max(44px, 2.5556rem); border: 1.5px solid var(--line); border-radius: 0.6667rem; background: var(--surface); padding: 0 0.6667rem; font-size: max(16px, 0.9167rem); outline: 0; min-width: 0; width: 100%; }
+/* Observații: textarea care crește doar în jos (înălțimea e setată din JS), lățimea rămâne fixă */
+.dot-obs, .row-obs {
+  display: block; min-height: max(44px, 2.5556rem); border: 1.5px solid var(--line); border-radius: 0.6667rem; background: var(--surface);
+  padding: 0.5rem 0.6667rem; font-size: max(16px, 0.9167rem); line-height: 1.4; outline: 0; min-width: 0; width: 100%;
+  resize: none; overflow: hidden; overflow-wrap: anywhere; white-space: pre-wrap;
+}
+.obs-add {
+  justify-self: start; align-self: start; display: inline-flex; align-items: center; gap: 0.3333rem; min-height: 44px; padding: 0 0.7778rem;
+  border-radius: 0.6667rem; border: 1.5px dashed var(--line-strong); color: var(--muted); font-size: 0.8889rem; font-weight: 650; background: transparent;
+}
+.obs-add .ic { width: 1.1111rem; height: 1.1111rem; }
+.dot-row .obs-add { grid-column: 3; }
+@media (max-width: 999px) { .dot-row .obs-add { grid-column: 1 / -1; } }
+/* Construcția în care s-a constatat neregula */
+.constr-sel { display: flex; align-items: center; gap: 0.5rem; min-height: 44px; }
+.constr-sel .ic { width: 1.2222rem; height: 1.2222rem; color: var(--muted); }
+.constr-sel-lbl { font-size: 0.8889rem; font-weight: 700; color: var(--muted); }
+.constr-sel select {
+  flex: 1; min-width: 0; max-width: 24rem; min-height: 44px; padding: 0 2.2rem 0 0.7778rem; border-radius: 0.6667rem;
+  border: 1.5px solid var(--line-strong); background: var(--surface) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%235b6477' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right 0.6rem center / 1.1rem;
+  font-size: max(16px, 0.9444rem); font-weight: 650; -webkit-appearance: none; appearance: none; color: var(--text);
+}
+/* Bara de unelte din taburile de constatări */
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.6667rem; margin-bottom: 0.8889rem; }
+.toolbar .segmented { background: var(--surface); }
+.toolbar .segmented button.on { background: var(--ink-2); color: #fff; }
+.tool-btns { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.btn.is-on { border-color: var(--accent); color: var(--accent-ink); background: var(--accent-soft); }
+.mini-row { display: flex; align-items: center; justify-content: space-between; gap: 0.6667rem; flex-wrap: wrap; margin: 1.2222rem 0 0.5556rem; }
+.mini-row .mini-title { margin: 0; }
+/* Calendar: pași pentru an și lună */
+.cal-step .step-btn { font-size: 1rem; display: grid; place-items: center; }
+.cal-step .step-val { min-width: 4.4rem; }
+.cal-step .step-val b { font-size: 1.2222rem; }
 .dot-obs:focus, .row-obs:focus { border-color: var(--accent); }
+.dot-row { align-items: start; }
+.dot-row .dot-label, .dot-row .segmented, .dot-row .chips-sel { align-self: center; }
 @media (max-width: 999px) { .dot-row { grid-template-columns: 170px auto; } .dot-row .dot-obs { grid-column: 1 / -1; } }
 .seg-dnn { padding: 3px; }
 .seg-dnn button { min-width: 3.5556rem; min-height: max(44px, 2.4444rem); padding: 0 0.6667rem; font-size: 0.8889rem; }
@@ -484,11 +519,17 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .cat-pcdotare { --cat: var(--cat-pcdotare); } .cat-custom { --cat: var(--cat-custom); }
 .cat-group + .cat-group { margin-top: 1.1111rem; }
 .cat-title {
+  width: 100%; text-align: left; min-height: 44px;
   display: flex; align-items: center; gap: 0.5556rem; margin: 0 0 0.5556rem; padding: 0.4444rem 0.7778rem;
   border-radius: 0.6667rem; border-left: 0.4444rem solid var(--cat);
   background: color-mix(in srgb, var(--cat) 13%, var(--surface)); font-size: 1rem; font-weight: 800;
 }
 .cat-sw { display: none; }
+.cat-title .ic { width: 1.2222rem; height: 1.2222rem; transition: transform .15s; transform: rotate(-90deg); }
+.cat-title .ic.rot { transform: none; }
+.cat-name { flex: 0 1 auto; }
+.cat-meta { font-size: 0.8056rem; font-weight: 650; color: var(--muted); }
+.cat-group.closed .cat-title { margin-bottom: 0; }
 .cat-count { margin-left: auto; font-size: 0.8056rem; font-weight: 750; padding: 0.1111rem 0.5556rem; border-radius: 0.6667rem; background: var(--red); color: #fff; }
 .cat-group .check-row { box-shadow: inset 0.4444rem 0 0 var(--cat); padding-left: 1.2222rem; }
 .cat-group .check-row .row-idx { background: color-mix(in srgb, var(--cat) 16%, var(--surface)); color: color-mix(in srgb, var(--cat) 75%, var(--text)); }
