@@ -1,0 +1,11 @@
+{
+  "name": "agenda-inspectorului",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Agenda inspectorului — aplicație web instalabilă (PWA) pentru iPad",
+  "scripts": {
+    "test": "node --test tests/*.test.js",
+    "start": "npx http-server . -p 8080 -c-1"
+  }
+}
