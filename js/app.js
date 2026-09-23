@@ -337,7 +337,6 @@ document.addEventListener('click', async (e) => {
     }
     case 'start-today': c.dataInceput = today(); break;
     case 'end-today': c.dataIncheiere = today(); break;
-    case 'end-start': c.dataIncheiere = c.dataInceput; break;
     case 'reopen': c.dataIncheiere = ''; break;
     case 'constr-inc': {
       const k = emptyConstructie(c.constructii.length + 1);

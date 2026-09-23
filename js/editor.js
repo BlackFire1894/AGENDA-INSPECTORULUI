@@ -164,7 +164,6 @@ function tabObiectiv(c) {
         <span class="inp-wrap"><input type="date" data-bind="dataIncheiere" data-rerender="1" value="${esc(c.dataIncheiere)}"></span>
         <span class="field-actions">
           <button class="chip-btn" data-act="end-today">Azi</button>
-          <button class="chip-btn" data-act="end-start">= data începerii</button>
           <button class="chip-btn danger" data-act="reopen">Redeschide</button>
         </span>
         ${c.dataIncheiere < c.dataInceput ? `<span class="field-err">${icon('alert')} Data încheierii este înaintea datei de începere.</span>` : ''}
