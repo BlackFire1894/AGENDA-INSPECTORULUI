@@ -541,3 +541,43 @@ export function pvText(c, controls = [], { doarNetrecute = false, cuActe = true 
   if (!nr) lines.push('', doarNetrecute ? 'Toate neregulile constatate sunt deja trecute în PV.' : 'Nu au fost constatate nereguli.');
   return { text: lines.join('\n'), count: nr };
 }
+
+// ───────── „Ce mai am de făcut” ─────────
+// Lista pașilor rămași într-un control, în ordinea firească a lucrului.
+// Fiecare pas: { id, level: 'todo' | 'warn', text, tab, focus } — focus = cheia rândului (sau „act-<cheie>”).
+export function todoList(c, { includeClose = true } = {}) {
+  const out = [];
+  const tabOf = (sec) => SECTIUNI[sec].tab;
+  if (!String(c.denumire || '').trim()) out.push({ id: 'denumire', level: 'todo', text: 'Completează denumirea obiectivului', tab: 'obiectiv', focus: 'sec-date' });
+
+  const acteTodo = ACTE.filter((a) => !c.acte[a.key]?.status);
+  if (acteTodo.length) {
+    out.push({ id: 'acte', level: 'todo', text: `${acteTodo.length} ${acteTodo.length === 1 ? 'act neverificat' : 'acte neverificate'}`, tab: 'acte', focus: `act-${acteTodo[0].key}` });
+  }
+  for (const sec of sectiuniActive(c)) {
+    const rows = c.nereguli.filter((n) => secOf(n) === sec && isApplicable(c, n));
+    const todo = rows.filter((n) => !n.status);
+    const adapost = sec === 'pc' && !c.adapostPC?.v ? 1 : 0;
+    const k = todo.length + adapost;
+    if (k) {
+      const what = sec === 'ner' ? (k === 1 ? 'neregulă neverificată' : 'nereguli neverificate') : (k === 1 ? 'rubrică neverificată' : 'rubrici neverificate');
+      out.push({ id: `todo-${sec}`, level: 'todo', text: `${SECTIUNI[sec].label}: ${k} ${what}`, tab: tabOf(sec), focus: todo[0]?.key || 'adapostPC' });
+    }
+  }
+  const active = activeNereguli(c);
+  for (const n of active.filter((x) => x.custom && x.status && !String(x.label || '').trim())) {
+    out.push({ id: `label-${n.key}`, level: 'warn', text: 'Rând suplimentar fără descriere', tab: tabOf(secOf(n)), focus: n.key });
+  }
+  const netrec = active.filter((n) => n.status === 'nok' && !n.inPV);
+  if (netrec.length) {
+    out.push({ id: 'pv', level: 'warn', text: `${netrec.length} ${netrec.length === 1 ? 'constatare netrecută' : 'constatări netrecute'} în PV`, tab: tabOf(secOf(netrec[0])), focus: netrec[0].key });
+  }
+  for (const n of active.filter((x) => x.status === 'nok' && x.amenda?.aplicata)) {
+    const lipsa = [];
+    if (!String(n.amenda.serie || '').trim() || !String(n.amenda.numar || '').trim()) lipsa.push('seria / nr.');
+    if (!String(n.amenda.suma || '').trim()) lipsa.push('suma');
+    if (lipsa.length) out.push({ id: `fine-${n.key}`, level: 'warn', text: `Amendă fără ${lipsa.join(' și ')}: ${constatareLabel(n)}`, tab: tabOf(secOf(n)), focus: n.key });
+  }
+  if (includeClose && !isISO(c.dataIncheiere)) out.push({ id: 'close', level: 'todo', text: 'Controlul nu este încheiat', tab: 'obiectiv', focus: 'sec-perioada' });
+  return out;
+}

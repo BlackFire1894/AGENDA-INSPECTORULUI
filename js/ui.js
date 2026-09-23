@@ -56,12 +56,21 @@ export function empty(ic, title, text, action = '') {
 }
 
 let toastTimer;
-export function toast(msg, level = 'ok') {
+// `action`: { label, fn } — ex. „Anulează” după o acțiune în bloc; mesajul stă mai mult pe ecran.
+export function toast(msg, level = 'ok', action = null) {
   const el = document.getElementById('toast');
-  el.className = `toast show toast-${level}`;
-  el.innerHTML = `${icon(level === 'ok' ? 'check' : 'alert')}<span>${esc(msg)}</span>`;
+  el.className = `toast show toast-${level} ${action ? 'has-action' : ''}`;
+  el.innerHTML = `${icon(level === 'ok' ? 'check' : 'alert')}<span>${esc(msg)}</span>${action ? `<button class="toast-btn">${esc(action.label)}</button>` : ''}`;
+  if (action) {
+    el.querySelector('.toast-btn').addEventListener('click', () => { el.className = 'toast'; action.fn(); }, { once: true });
+  }
   clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => { el.className = 'toast'; }, 2600);
+  toastTimer = setTimeout(() => { el.className = 'toast'; }, action ? 7000 : 2600);
+}
+
+// Butonul de ajutor contextual „?”
+export function helpBtn(key) {
+  return `<button class="icon-btn big help-btn" data-act="help" data-key="${key}" aria-label="Ajutor pentru acest ecran" title="Ajutor">?</button>`;
 }
 
 // Fereastră modală. Returnează elementul corpului; închiderea prin closeModal().

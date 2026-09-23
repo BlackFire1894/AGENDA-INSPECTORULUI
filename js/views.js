@@ -9,8 +9,16 @@ import {
   neregulaLabel, neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
   constructieOf, amendaSerieNr, vecheInfo, constatareLabel,
 } from './model.js';
-import { icon, esc, pill, tipBadge, empty } from './ui.js';
+import { icon, esc, pill, tipBadge, empty, helpBtn } from './ui.js';
 import { APP_VERSION } from './version.js';
+import { GHID } from './help.js';
+
+export function guideSteps() {
+  return `<div class="guide-steps">${GHID.map((g, i) => `<div class="guide-step">
+      <span class="guide-num">${i + 1}</span>
+      <div><h3>${icon(g.ic)} ${esc(g.title)}</h3>${g.lines.map((l) => `<p>${l}</p>`).join('')}</div>
+    </div>`).join('')}</div>`;
+}
 
 export const FONT_SIZES = [
   { key: 'mic', label: 'Mic', px: 15, hint: 'mai mult conținut pe ecran' },
@@ -101,7 +109,7 @@ export function viewDashboard() {
       <h1 class="dash-date">${esc(ucfirst(fmtDateLong(t)))}</h1>
     </div>
     <div class="dash-right">
-      <div class="big-clock" data-clock>${pad(now.getHours())}:${pad(now.getMinutes())}</div>
+      <div class="dash-clock-row">${helpBtn('panou')}<div class="big-clock" data-clock>${pad(now.getHours())}:${pad(now.getMinutes())}</div></div>
       ${cs.length ? `<button class="btn btn-ghost backup-quick ${backupIsStale() ? 'stale' : ''}" data-act="backup-export">${icon('download')}<span><b>Backup rapid</b><small>${esc(backupAgeText())}</small></span></button>` : ''}
     </div>
   </header>`;
@@ -110,7 +118,8 @@ export function viewDashboard() {
     return `${head}<div class="welcome card">
       <div class="welcome-art">${icon('shield')}</div>
       <h2>Bun venit în Agenda inspectorului</h2>
-      <p>Începe primul control. Toate datele rămân pe această tabletă; fă periodic un backup din Setări.</p>
+      <p>Toate datele rămân pe această tabletă. Cum lucrați, în 4 pași:</p>
+      ${guideSteps()}
       <div class="row-gap">
         <button class="btn btn-primary btn-xl" data-act="new-control">${icon('plus')} Control nou</button>
         <button class="btn btn-ghost btn-xl" data-act="demo-load">Încarcă date demonstrative</button>
@@ -264,7 +273,7 @@ export function viewObjectives() {
   const u = state.ui;
   return `<header class="page-head">
       <div><div class="eyebrow">${icon('building')} Lista obiectivelor controlate</div><h1>Obiective</h1></div>
-      <button class="btn btn-primary btn-lg" data-act="new-control">${icon('plus')} Control nou</button>
+      <div class="row-gap">${helpBtn('obiective')}<button class="btn btn-primary btn-lg" data-act="new-control">${icon('plus')} Control nou</button></div>
     </header>
     ${searchBar('obj', u.objSearch, 'Caută obiectiv după nume sau dată…')}
     <div class="seg-row">
@@ -323,7 +332,7 @@ export function viewObjective(oid) {
         <a class="icon-btn big" href="#/obiective" aria-label="Înapoi">${icon('back')}</a>
         <div><div class="eyebrow">${tipBadge(o.tip)}</div><h1>${esc(o.denumire || 'Obiectiv fără denumire')}</h1></div>
       </div>
-      <button class="btn btn-primary btn-lg" data-act="new-control" data-oid="${o.id}">${icon('plus')} Control nou pe acest obiectiv</button>
+      <div class="row-gap">${helpBtn('obiectiv')}<button class="btn btn-primary btn-lg" data-act="new-control" data-oid="${o.id}">${icon('plus')} Control nou pe acest obiectiv</button></div>
     </header>
     <section class="card info-grid">
       <div><span class="lbl">Administrator</span><span class="val">${esc(o.administrator || '—')}</span></div>
@@ -347,7 +356,7 @@ export function viewHistory() {
   const u = state.ui;
   return `<header class="page-head">
       <div><div class="eyebrow">${icon('history')} Toate controalele, pe toate obiectivele</div><h1>Istoric controale</h1></div>
-      <button class="btn btn-primary btn-lg" data-act="new-control">${icon('plus')} Control nou</button>
+      <div class="row-gap">${helpBtn('istoric')}<button class="btn btn-primary btn-lg" data-act="new-control">${icon('plus')} Control nou</button></div>
     </header>
     ${searchBar('hist', u.histSearch, 'Caută după obiectiv, administrator sau dată…')}
     <div class="seg-row">
@@ -469,6 +478,7 @@ export function viewCalendar() {
           <button class="step-btn" data-act="cal-next" aria-label="Luna următoare">${icon('chevR')}</button>
         </div>
         <button class="btn btn-ghost btn-lg" data-act="cal-today">Azi</button>
+        ${helpBtn('calendar')}
       </div>
     </header>
     <div class="cal-layout">
@@ -491,7 +501,8 @@ export function viewCalendar() {
 export function viewSettings(persisted) {
   const last = state.meta.lastBackup;
   const demo = state.controls.filter((c) => c.demo).length;
-  return `<header class="page-head"><div><div class="eyebrow">${icon('settings')} Date, backup și informații</div><h1>Setări</h1></div></header>
+  return `<header class="page-head"><div><div class="eyebrow">${icon('settings')} Date, backup și informații</div><h1>Setări</h1></div>
+    <div class="row-gap">${helpBtn('setari')}<button class="btn btn-ghost btn-lg" data-act="guide">${icon('info')} Ghid de utilizare</button></div></header>
   <section class="card set-sec">
     <h2 class="sec-title">${icon('settings')} Mărimea textului</h2>
     <p>Se aplică imediat în toată aplicația: text, butoane, spațieri și iconițe se ajustează împreună.</p>

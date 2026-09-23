@@ -542,7 +542,7 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .seg-adapost button { min-width: max(44px, 4rem); }
 .check-row.is-ok { background: var(--green-soft); border-color: color-mix(in srgb, var(--green) 45%, transparent); }
 .check-row.is-nok { background: var(--red-soft); border-color: color-mix(in srgb, var(--red) 55%, transparent); }
-.check-row.flash { animation: flash 1.6s ease; }
+.check-row.flash, .flash { animation: flash 1.6s ease; }
 @keyframes flash { 0%, 60% { box-shadow: 0 0 0 5px var(--accent); } 100% { box-shadow: 0 0 0 0 transparent; } }
 .row-idx { width: max(44px, 2.4444rem); height: max(44px, 2.4444rem); border-radius: 0.7222rem; display: grid; place-items: center; font-weight: 850; background: var(--surface-2); color: var(--muted); font-size: 0.9444rem; }
 .row-idx.letter { font-size: 1.1111rem; }
@@ -783,3 +783,43 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .ed-dates { flex-wrap: wrap; }
 .ed-dates .save-ind { margin-left: 0.4444rem; padding: 0; }
 .ed-actions .danger { margin-left: auto; }
+
+/* ───────── „Ce mai ai de făcut” ───────── */
+.todo { display: flex; flex-direction: column; gap: 0.5556rem; padding: 0.6667rem 0.7778rem; margin-bottom: 0.8889rem; border-radius: 1rem; background: var(--surface); box-shadow: var(--shadow); border-left: 0.3333rem solid var(--accent); }
+.todo-head { display: flex; align-items: center; gap: 0.6667rem; flex-wrap: wrap; }
+.todo-title { display: inline-flex; align-items: center; gap: 0.4444rem; font-weight: 750; color: var(--muted); font-size: 0.9444rem; white-space: nowrap; }
+.todo-title b { display: inline-grid; place-items: center; min-width: 1.5556rem; height: 1.5556rem; padding: 0 0.3333rem; border-radius: 0.7778rem; background: var(--accent); color: #fff; font-size: 0.8333rem; }
+.todo-title .ic { width: 1.2222rem; height: 1.2222rem; color: var(--accent); }
+.todo-head > .todo-item { flex: 1; min-width: 12rem; }
+.todo-more { min-height: 44px; padding: 0 0.7778rem; border-radius: 0.6667rem; color: var(--accent-ink); font-weight: 700; font-size: 0.9444rem; }
+.todo-list { display: flex; flex-direction: column; gap: 0.4444rem; }
+.todo-item {
+  display: flex; align-items: center; gap: 0.5556rem; min-height: 44px; padding: 0.4444rem 0.7778rem; border-radius: 0.6667rem;
+  background: var(--accent-soft); color: var(--accent-ink); font-weight: 700; font-size: 0.9444rem; text-align: left;
+}
+.todo-item .ic { width: 1.1111rem; height: 1.1111rem; flex: none; }
+.todo-item.t-warn { background: var(--warn-soft); color: var(--warn-ink); }
+.todo-done { flex-direction: row; align-items: center; border-left-color: var(--green); color: var(--green-ink); }
+.todo-done .ic { color: var(--green); flex: none; }
+.btn-rest { border-color: color-mix(in srgb, var(--green) 45%, var(--line)); color: var(--green-ink); }
+.btn-rest .ic { color: var(--green); }
+#sec-date.flash, #sec-perioada.flash { animation: flash 1.6s ease; }
+
+/* ───────── Toast cu acțiune (Anulează) ───────── */
+.toast.has-action { pointer-events: auto; padding-right: 0.5556rem; }
+.toast-btn { min-height: 44px; padding: 0 0.8889rem; margin-left: 0.4444rem; border-radius: 0.6667rem; background: rgba(255, 255, 255, .16); color: #fff; font-weight: 800; }
+
+/* ───────── Ajutor „?” și ghid ───────── */
+.help-btn { font-size: 1.3333rem; font-weight: 850; color: var(--accent); }
+.help-q { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--accent); color: #fff; font-size: 1.2222rem; }
+.help-list { margin: 0; padding-left: 1.2222rem; display: flex; flex-direction: column; gap: 0.6667rem; font-size: 1.0556rem; }
+.dash-clock-row { display: flex; align-items: center; gap: 0.6667rem; }
+.guide-steps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7778rem; text-align: left; margin: 1rem 0 1.4444rem; }
+.modal .guide-steps { grid-template-columns: 1fr; margin: 0; }
+.guide-step { display: flex; gap: 0.7778rem; padding: 0.8889rem; border-radius: 1rem; background: var(--surface-2); border: 1.5px solid var(--line); }
+.guide-num { flex: none; width: 2.2222rem; height: 2.2222rem; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #fff; font-weight: 850; }
+.guide-step h3 { display: flex; align-items: center; gap: 0.4444rem; font-size: 1.0556rem; margin-bottom: 0.3333rem; }
+.guide-step h3 .ic { width: 1.2222rem; height: 1.2222rem; color: var(--accent); }
+.guide-step p { margin: 0.2222rem 0 0; font-size: 0.9444rem; color: var(--text); }
+.welcome p { max-width: none; }
+@media (max-width: 700px) { .guide-steps { grid-template-columns: 1fr; } }

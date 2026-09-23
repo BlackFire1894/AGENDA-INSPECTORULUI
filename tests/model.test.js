@@ -5,7 +5,7 @@ import {
   newControl, fineStatus, asiDeadline, matchControl, objectives, controlFromPrevious,
   normalizeControl, allFines, NEREGULI, SABLON, isApplicable, secStats, sectiuniActive, activeNereguli,
   neregulaLetter, tabOfNeregula, controlStats, constructieOf, amendaSerieNr, ACTE, emptyConstructie,
-  vecheInfo, pvText, constatareLabel,
+  vecheInfo, pvText, constatareLabel, todoList,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -287,4 +287,27 @@ test('rubricile Planuri/PC neconforme apar cu formularea negativă (PV, Panou, f
   assert.doesNotMatch(t, /Plan evacuare conform/);
   const d = c.nereguli.find((n) => n.key === 'd'); d.status = 'nok';
   assert.equal(constatareLabel(d), 'Stingătoare expirate');       // neregulile rămân cu textul lor
+});
+
+test('„Ce mai am de făcut”: pașii rămași, în ordine, și lista goală la final', () => {
+  const c = newControl({ start: '2026-09-01' });
+  let t = todoList(c).map((x) => x.id);
+  assert.deepEqual(t, ['denumire', 'acte', 'todo-ner', 'close']);
+  c.denumire = 'Școala 1';
+  for (const a of Object.values(c.acte)) a.status = 'ok';
+  for (const n of c.nereguli) if (isApplicable(c, n)) n.status = 'ok';
+  const d = c.nereguli.find((n) => n.key === 'd');
+  d.status = 'nok'; d.amenda.aplicata = true;
+  t = todoList(c);
+  assert.deepEqual(t.map((x) => x.id), ['pv', 'fine-d', 'close']);
+  assert.equal(t[0].focus, 'd');
+  assert.match(t[1].text, /seria \/ nr\. și suma/);
+  d.inPV = true; Object.assign(d.amenda, { serie: 'AB', numar: '1', suma: '500' });
+  c.dataIncheiere = '2026-09-01';
+  assert.deepEqual(todoList(c), []);
+  // localitate: adăpostul PC contează la Protecție civilă
+  const l = newControl({ tip: 'LOCALITATE', denumire: 'Comuna', start: '2026-09-01' });
+  for (const n of l.nereguli) if (n.sec === 'pc') n.status = 'ok';
+  const pc = todoList(l).find((x) => x.id === 'todo-pc');
+  assert.ok(pc && /1 rubrică neverificată/.test(pc.text) && pc.focus === 'adapostPC');
 });

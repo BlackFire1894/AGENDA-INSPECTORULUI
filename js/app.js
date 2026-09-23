@@ -5,12 +5,14 @@ import { addDays, fmtDate, fmtDateLong, toISO, parseDateQuery, isISO } from './d
 import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
   fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat, pvText, sectiuniActive, secOf,
+  todoList, isApplicable, ACTE,
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
-  viewCalendar, viewSettings, hintText, backupAgeText, backupIsStale,
+  viewCalendar, viewSettings, hintText, backupAgeText, backupIsStale, guideSteps,
 } from './views.js';
-import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey } from './editor.js';
+import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML } from './editor.js';
+import { GHID, AJUTOR } from './help.js';
 import { icon, esc, toast, openModal, closeModal, confirmDialog } from './ui.js';
 import { buildDemo } from './demo.js';
 import { APP_VERSION } from './version.js';
@@ -75,6 +77,7 @@ async function render({ keepScroll = false } = {}) {
       if (!c) { location.hash = '#/panou'; return; }
       if (!tabsFor(c).some((t) => t.key === route.tab)) { location.replace(`#/control/${c.id}/obiectiv`); return; }
       if (route.focus) {
+        state.ui.nerFilter = 'ALL';
         const fn = c.nereguli.find((x) => x.key === route.focus);
         if (fn && state.ui.catCollapsed.delete(neregulaCat(fn))) savePref('agenda-cats-collapsed', [...state.ui.catCollapsed]);
       }
@@ -96,7 +99,7 @@ async function render({ keepScroll = false } = {}) {
 }
 
 function focusNeregula(key) {
-  const el = document.getElementById(`ner-${key}`);
+  const el = document.getElementById(`ner-${key}`) || document.getElementById(key);
   if (!el) return;
   requestAnimationFrame(() => {
     el.scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -123,11 +126,22 @@ function rerenderEditor() {
   if (!c) return;
   const y = window.scrollY;
   document.getElementById('ed-head').innerHTML = edHeadHTML(c);
+  document.getElementById('ed-todo').innerHTML = todoHTML(c);
   document.getElementById('ed-tabs').innerHTML = edTabsHTML(c, route.tab);
   document.getElementById('ed-body').innerHTML = tabHTML(c, route.tab);
   autosizeAll();
   window.scrollTo(0, y);
   updateNav();
+}
+
+// Bara „Ce mai ai de făcut” se actualizează și în timpul tastării (fără a atinge câmpul în care se scrie)
+let todoTimer;
+function refreshTodoSoon(c) {
+  clearTimeout(todoTimer);
+  todoTimer = setTimeout(() => {
+    const el = document.getElementById('ed-todo');
+    if (el && route.name === 'control' && route.id === c.id) el.innerHTML = todoHTML(c);
+  }, 250);
 }
 
 // Observațiile cresc în jos pe măsură ce se scrie (lățimea rămâne fixă)
@@ -169,6 +183,7 @@ document.addEventListener('input', (e) => {
     setPath(c, el.dataset.bind, el.value);
     touch(c);
     if (el.tagName === 'TEXTAREA') autosize(el);
+    refreshTodoSoon(c);
     if (el.dataset.liveSrc === 'denumire') {
       const h = document.querySelector('[data-live="denumire"]');
       if (h) h.textContent = el.value || 'Obiectiv fără denumire';
@@ -273,6 +288,8 @@ document.addEventListener('click', async (e) => {
       return;
     }
     case 'backup-export': exportBackup(); return;
+    case 'help': showHelp(el.dataset.key === 'ctrl' ? `ctrl-${route.tab}` : el.dataset.key); return;
+    case 'guide': showGuide(); return;
     case 'fisa-print': window.print(); return;
     case 'fisa-share': shareFisa(getControl(el.dataset.id)); return;
     case 'demo-load': await loadDemo(); return;
@@ -319,7 +336,6 @@ document.addEventListener('click', async (e) => {
       break;
     }
     case 'start-today': c.dataInceput = today(); break;
-    case 'close-control': c.dataIncheiere = c.dataInceput; toast(`Control încheiat la ${fmtDate(c.dataIncheiere)} — poți modifica data`); break;
     case 'end-today': c.dataIncheiere = today(); break;
     case 'end-start': c.dataIncheiere = c.dataInceput; break;
     case 'reopen': c.dataIncheiere = ''; break;
@@ -346,6 +362,15 @@ document.addEventListener('click', async (e) => {
     }
     case 'ner-filter': state.ui.nerFilter = el.dataset.val; rerenderEditor(); return;
     case 'pv-text': openPvText(c); return;
+    case 'todo-toggle': state.ui.todoOpen = !state.ui.todoOpen; rerenderEditor(); return;
+    case 'todo-go': {
+      closeModal();
+      const target = `#/control/${c.id}/${el.dataset.tab}${el.dataset.focus ? `/${encodeURIComponent(el.dataset.focus)}` : ''}`;
+      if (location.hash === target) { if (el.dataset.focus) focusNeregula(el.dataset.focus); } else location.hash = target;
+      return;
+    }
+    case 'rest-ok': restConform(c, el.dataset.sec); return;
+    case 'close-control': closeControlFlow(c); return;
     case 'obs-toggle':
       // butonul general: setează toate câmpurile și anulează excepțiile individuale
       state.ui.obsHidden = !state.ui.obsHidden;
@@ -489,6 +514,75 @@ function openNewControl({ date, oid } = {}) {
     startControl(newControl({ tip, denumire: name.value.trim(), start: startDate }));
   });
   setTimeout(() => name.focus(), 250);
+}
+
+// ───────── Restul conform (în bloc, cu „Anulează”) ─────────
+
+async function restConform(c, sec) {
+  let rows;
+  if (sec === 'acte') rows = ACTE.map((a) => c.acte[a.key]).filter((v) => !v.status);
+  else rows = c.nereguli.filter((n) => secOf(n) === sec && !n.status && (state.ui.showAllNer || isApplicable(c, n)));
+  if (!rows.length) return;
+  const word = sec === 'acte' ? 'Prezentat' : 'Conform';
+  const what = sec === 'acte' ? (rows.length === 1 ? 'act' : 'acte') : (rows.length === 1 ? 'rând' : 'rânduri');
+  const ok = await confirmDialog({
+    title: `Marchez ${rows.length} ${what} ca „${word}”?`,
+    text: 'Se schimbă doar rândurile încă nemarcate; cele marcate deja rămân cum sunt. Imediat după puteți apăsa „Anulează”.',
+    ok: `Da, ${rows.length} ${what} „${word}”`,
+  });
+  if (!ok) return;
+  rows.forEach((r) => { r.status = 'ok'; });
+  touch(c, true);
+  rerenderEditor();
+  toast(`${rows.length} ${what} marcate „${word}”`, 'ok', {
+    label: 'Anulează',
+    fn: () => { rows.forEach((r) => { r.status = ''; }); touch(c, true); if (route.name === 'control' && route.id === c.id) rerenderEditor(); toast('Anulat'); },
+  });
+}
+
+// ───────── Încheierea controlului: verificare a omisiunilor ─────────
+
+function closeControlFlow(c) {
+  const doClose = () => {
+    c.dataIncheiere = c.dataInceput;
+    touch(c, true);
+    closeModal();
+    rerenderEditor();
+    toast(`Control încheiat la ${fmtDate(c.dataIncheiere)} — poți modifica data`);
+  };
+  const items = todoList(c, { includeClose: false });
+  if (!items.length) { doClose(); return; }
+  const m = openModal(`
+    <div class="modal-head"><h2>${icon('alert')} Înainte de încheiere</h2><button class="icon-btn big" data-act="modal-close" aria-label="Închide">${icon('x')}</button></div>
+    <div class="modal-body">
+      <p class="lead">Au rămas ${items.length === 1 ? 'un lucru necompletat' : `${items.length} lucruri necompletate`}. Atingeți unul ca să mergeți direct la el, sau încheiați oricum.</p>
+      <div class="todo-list">${items.map((x) => `<button class="todo-item t-${x.level}" data-act="todo-go" data-tab="${x.tab}" data-focus="${esc(x.focus || '')}">${icon(x.level === 'warn' ? 'alert' : 'chevR')}<span>${esc(x.text)}</span></button>`).join('')}</div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-lg" data-act="modal-close">Revin să completez</button>
+      <button class="btn btn-success btn-lg" id="close-anyway">${icon('check')} Încheie oricum</button>
+    </div>`, { wide: true });
+  m.querySelector('#close-anyway').addEventListener('click', doClose);
+}
+
+// ───────── Ghid și ajutor contextual ─────────
+
+function showGuide() {
+  openModal(`
+    <div class="modal-head"><h2>${icon('info')} Cum lucrați cu aplicația</h2><button class="icon-btn big" data-act="modal-close" aria-label="Închide">${icon('x')}</button></div>
+    <div class="modal-body">${guideSteps()}</div>
+    <div class="modal-foot"><button class="btn btn-primary btn-lg" data-act="modal-close">Am înțeles</button></div>`, { wide: true });
+}
+
+function showHelp(key) {
+  const h = AJUTOR[key] || AJUTOR.panou;
+  openModal(`
+    <div class="modal-head"><h2><span class="help-q">?</span> ${esc(h.title)}</h2><button class="icon-btn big" data-act="modal-close" aria-label="Închide">${icon('x')}</button></div>
+    <div class="modal-body"><ul class="help-list">${h.lines.map((l) => `<li>${l}</li>`).join('')}</ul></div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-lg" data-act="guide">${icon('info')} Ghidul complet</button>
+      <button class="btn btn-primary btn-lg" data-act="modal-close">Am înțeles</button>
+    </div>`);
 }
 
 // ───────── Text pentru procesul-verbal ─────────

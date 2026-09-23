@@ -4,9 +4,9 @@ import { fmtDate, fmtDateLong, isISO } from './dates.js';
 import {
   TIP_OBIECTIV, DOTARI, CENTRALA_TIPURI, ACTE, STRUCTURI, MATERIALE_PERETI, SECTIUNI, CATEGORII,
   controlStats, secStats, fineStatus, fineDate, asiDeadline, isIncheiat, neregulaLabel, neregulaLetter,
-  neregulaCat, secOf, isApplicable, isLocalitate, constructieOf, amendaSerieNr, vecheInfo, constatareAnterioara,
+  neregulaCat, secOf, isApplicable, isLocalitate, constructieOf, amendaSerieNr, vecheInfo, constatareAnterioara, todoList,
 } from './model.js';
-import { icon, esc, pill, tipBadge } from './ui.js';
+import { icon, esc, pill, tipBadge, helpBtn } from './ui.js';
 
 // Toate taburile posibile; „planuri” și „pc” apar doar la controalele de tip Localitate.
 export const TABS = [
@@ -25,6 +25,7 @@ export function viewControl(c, tab) {
   curControlId = c.id;
   return `<div class="editor">
     <header class="ed-head" id="ed-head">${edHeadHTML(c)}</header>
+    <div id="ed-todo">${todoHTML(c)}</div>
     <nav class="ed-tabs" id="ed-tabs" style="--tabs:${tabsFor(c).length}">${edTabsHTML(c, tab)}</nav>
     <div id="ed-body" class="ed-body">${tabHTML(c, tab)}</div>
   </div>`;
@@ -43,8 +44,28 @@ export function edHeadHTML(c) {
       <a class="btn btn-ghost" href="#/fisa/${c.id}">${icon('download')} Fișa PDF</a>
       <a class="btn btn-ghost" href="#/obiectiv/${c.objectiveId}">${icon('history')} Istoric</a>
       <button class="btn btn-ghost" data-act="backup-export" title="Backup rapid al tuturor controalelor">${icon('upload')} Backup</button>
+      ${helpBtn('ctrl')}
       <button class="icon-btn big danger" data-act="control-delete" aria-label="Șterge controlul">${icon('trash')}</button>
     </div>`;
+}
+
+// „Ce mai ai de făcut”: pasul următor, cu acces direct; lista completă se deschide la cerere.
+export function todoHTML(c) {
+  const items = todoList(c);
+  if (!items.length) {
+    return `<div class="todo todo-done">${icon('check')}<span><b>Totul e completat.</b> Puteți genera Text PV sau Fișa PDF.</span></div>`;
+  }
+  const open = state.ui.todoOpen;
+  const btn = (x) => `<button class="todo-item t-${x.level}" data-act="todo-go" data-tab="${x.tab}" data-focus="${esc(x.focus || '')}">
+      ${icon(x.level === 'warn' ? 'alert' : 'chevR')}<span>${esc(x.text)}</span></button>`;
+  return `<div class="todo ${open ? 'open' : ''}">
+    <div class="todo-head">
+      <span class="todo-title">${icon('list')} Ce mai ai de făcut <b>${items.length}</b></span>
+      ${open ? '' : btn(items[0])}
+      ${items.length > 1 || open ? `<button class="todo-more" data-act="todo-toggle">${open ? 'Ascunde lista' : `Toate (${items.length})`}</button>` : ''}
+    </div>
+    ${open ? `<div class="todo-list">${items.map(btn).join('')}</div>` : ''}
+  </div>`;
 }
 
 export function edTabsHTML(c, tab) {
@@ -158,7 +179,7 @@ function tabObiectiv(c) {
       </div>`;
 
   return `
-  <section class="card form-card">
+  <section class="card form-card" id="sec-date">
     <h2 class="sec-title">${icon('building')} Date obiectiv</h2>
     <div class="field wide">
       <span class="lbl">Tip obiectiv</span>
@@ -180,7 +201,7 @@ function tabObiectiv(c) {
     </div>
   </section>
 
-  <section class="card form-card">
+  <section class="card form-card" id="sec-perioada">
     <h2 class="sec-title">${icon('calendar')} Perioada controlului</h2>
     <div class="form-grid">
       <div class="field">
@@ -280,14 +301,14 @@ function tabActe(c) {
   return `<section class="card">
     <div class="sec-title-row">
       <h2 class="sec-title">${icon('doc')} Acte de autoritate și evidențe</h2>
-      ${obsToggleBtn()}
+      <div class="tool-btns">${obsToggleBtn()}${restBtn(st.acteTotal - st.acteDone, 'acte', 'Restul prezentate')}</div>
       <div class="progress-txt"><b>${st.acteDone}</b>/${st.acteTotal} verificate · <span class="t-green">${ok} prezentate</span> · <span class="t-red">${st.acteNok} lipsă</span></div>
     </div>
     <div class="progress"><span class="p-ok" style="width:${(ok / st.acteTotal) * 100}%"></span><span class="p-nok" style="width:${(st.acteNok / st.acteTotal) * 100}%"></span></div>
     <div class="check-list">${ACTE.map((a, i) => {
       const v = c.acte[a.key];
       const path = `acte.${a.key}`;
-      return `<div class="check-row ${v.status ? `is-${v.status}` : ''}">
+      return `<div class="check-row ${v.status ? `is-${v.status}` : ''}" id="act-${a.key}">
         <span class="row-idx">${i + 1}</span>
         <div class="row-main">
           <span class="row-label">${esc(a.label)}</span>
@@ -377,6 +398,7 @@ function tabSectiune(c, sec) {
       <div class="tool-btns">
         ${(() => { const all = groups.length && groups.every((g) => state.ui.catCollapsed.has(g.cat)); return `<button class="btn btn-ghost" data-act="cats-all" data-val="${all ? 'open' : 'close'}">${icon(all ? 'chevD' : 'list')} ${all ? 'Extinde categoriile' : 'Restrânge categoriile'}</button>`; })()}
         ${obsToggleBtn()}
+        ${restBtn(st.total - st.checked - (sec === 'pc' && !c.adapostPC.v ? 1 : 0), sec, sec === 'ner' ? 'Restul conform' : 'Restul conforme')}
       </div>
     </div>
     <section class="card">
@@ -393,6 +415,12 @@ function tabSectiune(c, sec) {
 }
 
 // Adăpost de protecție civilă: DA / NU / NEC + observații
+// „Restul conform”: bifează în bloc rândurile vizibile încă neverificate (cu confirmare și „Anulează”)
+function restBtn(n, sec, label) {
+  if (n <= 0) return '';
+  return `<button class="btn btn-ghost btn-rest" data-act="rest-ok" data-sec="${sec}">${icon('check')} ${label} (${n})</button>`;
+}
+
 export function obsToggleBtn() {
   const h = state.ui.obsHidden;
   return `<button class="btn btn-ghost ${h ? 'is-on' : ''}" data-act="obs-toggle" aria-pressed="${h}">${icon('doc')} ${h ? 'Arată observațiile' : 'Ascunde observațiile'}</button>`;
