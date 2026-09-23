@@ -84,7 +84,8 @@ export const AJUTOR = {
   'ctrl-obiectiv': {
     title: 'Tabul Obiectiv',
     lines: [
-      'Datele obiectivului, perioada controlului și construcțiile, fiecare cu dotările ei (DA / NU / NEC = nu este cazul).',
+      'Datele obiectivului (inclusiv adresa și localitatea), perioada controlului și construcțiile, fiecare cu dotările ei (DA / NU / NEC = nu este cazul).',
+      '<b>Coordonate GPS</b> pentru fiecare construcție: deschideți construcția, stați lângă ea și apăsați <b>Completează coordonatele</b>. Poziția se citește o singură dată, doar la cerere (nu se urmărește locația). Construcțiile fără coordonate apar în „Ce mai ai de făcut”. Coordonatele au legături spre Google Maps / Hărți Apple, apar în fișă și se preiau la următorul control. Dacă localizarea e oprită, aplicația vă arată pașii de activare. Pentru precizie, ieșiți în aer liber (± sub 30 m = bună).',
       'Dotările bifate <b>DA</b> decid ce nereguli de instalații apar în tabul Nereguli.',
       '<b>NU</b> la o instalație înseamnă că lipsește o instalație necesară: e <b>neregulă gravă</b>, marcată cu roșu, și apare prima în tabul Nereguli (G1, G2…). Pentru „nu e cazul” folosiți <b>NEC</b>.',
       '<b>Încheie controlul</b> vă arată ce ați omis înainte de încheiere și pornește termenele.',

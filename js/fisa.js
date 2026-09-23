@@ -3,7 +3,7 @@ import { fmtDate, fmtDateLong, todayISO, isISO } from './dates.js';
 import {
   DOTARI, ACTE, SECTIUNI, CATEGORII, sectiuniActive, secOf, neregulaLetter, neregulaCat,
   constructieOf, amendaSerieNr, fineStatus, asiDeadline, vecheInfo, isIncheiat, controlStats, isLocalitate, constatareLabel,
-  sablon, isApplicable, constructiiCuNU,
+  sablon, isApplicable, constructiiCuNU, fmtCoord, googleMapsUrl,
 } from './model.js';
 import { esc } from './ui.js';
 
@@ -35,6 +35,7 @@ export function fisaMarkup(c, controls, now = new Date()) {
       ${c.administrator ? `<span><b>Administrator:</b> ${esc(c.administrator)}</span>` : ''}
       ${c.telefon ? `<span><b>Telefon:</b> ${esc(c.telefon)}</span>` : ''}
       ${c.email ? `<span><b>Email:</b> ${esc(c.email)}</span>` : ''}
+      ${c.adresa || c.localitate ? `<span><b>Adresă:</b> ${esc([c.adresa, c.localitate].filter(Boolean).join(', '))}</span>` : ''}
     </div>
     <div class="f-sum">
       <div><b>${st.constatate}</b><span>nereguli / neconformități</span></div>
@@ -65,6 +66,7 @@ export function fisaMarkup(c, controls, now = new Date()) {
         <td><b>Structură</b><br>${esc(k.structura) || '—'}</td>
         <td><b>Pereți</b><br>${esc(k.materialPereti) || '—'}</td>
       </tr></table>
+      <p class="f-dot"><b>Coordonate GPS:</b> ${k.gps ? `<a href="${esc(googleMapsUrl(k.gps))}">${esc(fmtCoord(k.gps))}</a> (± ${Math.round(k.gps.acc)} m)` : 'necompletate'}</p>
       <p class="f-dot"><b>DA:</b> ${esc(by.DA.join(', ')) || '—'}${centrala ? ` · <b>Centrală termică:</b> ${esc(centrala)}` : ''}</p>
       <p class="f-dot"><b>NU:</b> ${esc(by.NU.join(', ')) || '—'} · <b>NEC:</b> ${esc(by.NEC.join(', ')) || '—'}</p>
       ${DOTARI.filter((d) => k.dotari[d.key]?.obs?.trim()).map((d) => `<p class="f-dot f-small"><b>${esc(d.label)}:</b> ${obs(k.dotari[d.key].obs)}</p>`).join('')}

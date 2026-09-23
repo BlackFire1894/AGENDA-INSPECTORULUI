@@ -6,6 +6,7 @@ import {
   normalizeControl, allFines, NEREGULI, SABLON, isApplicable, secStats, sectiuniActive, activeNereguli,
   neregulaLetter, tabOfNeregula, controlStats, constructieOf, amendaSerieNr, ACTE, emptyConstructie,
   vecheInfo, pvText, constatareLabel, todoList, NEREGULI_GRAVE, constructiiCuNU,
+  fmtCoord, googleMapsUrl, gpsQuality,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -292,8 +293,9 @@ test('rubricile Planuri/PC neconforme apar cu formularea negativă (PV, Panou, f
 test('„Ce mai am de făcut”: pașii rămași, în ordine, și lista goală la final', () => {
   const c = newControl({ start: '2026-09-01' });
   let t = todoList(c).map((x) => x.id);
-  assert.deepEqual(t, ['denumire', 'acte', 'todo-ner', 'close']);
+  assert.deepEqual(t, ['denumire', 'acte', 'todo-ner', 'gps', 'close']);
   c.denumire = 'Școala 1';
+  c.constructii[0].gps = { lat: 47.1335, lon: 24.4966, acc: 12, la: '2026-09-01T08:00:00.000Z' };
   for (const a of Object.values(c.acte)) a.status = 'ok';
   for (const n of c.nereguli) if (isApplicable(c, n)) n.status = 'ok';
   const d = c.nereguli.find((n) => n.key === 'd');
@@ -342,4 +344,30 @@ test('v1.7: nereguli noi, detectori autonomi, ignifugare expirată, nereguli gra
   // ASI / AVIZ pe NU nu generează nereguli grave (sunt documente)
   c.constructii[0].dotari.asi.v = 'NU';
   assert.ok(!c.nereguli.some((x) => x.key === 'lipsa-asi'));
+});
+
+test('v1.8: coordonate GPS pe fiecare construcție, preluate la controlul următor', () => {
+  const c = newControl({ denumire: 'Școala 2', start: '2026-09-01' });
+  c.constructii.push(emptyConstructie(2));
+  c.constructii[1].denumire = 'Sala de sport';
+  let g = todoList(c).find((x) => x.id === 'gps');
+  assert.match(g.text, /Construcția 1, Sala de sport/);
+  assert.equal(g.focus, `gps-${c.constructii[0].id}`);
+  c.constructii[0].gps = { lat: 47.1335, lon: 24.4966, acc: 12, la: '2026-09-01T08:00:00.000Z' };
+  g = todoList(c).find((x) => x.id === 'gps');
+  assert.equal(g.text, 'Coordonate GPS necompletate: Sala de sport');
+  assert.equal(g.focus, `gps-${c.constructii[1].id}`);
+  c.constructii[1].gps = { lat: 47.134, lon: 24.497, acc: 250, la: '2026-09-01T08:05:00.000Z' };
+  assert.ok(!todoList(c).some((x) => x.id === 'gps'));
+  const n = controlFromPrevious(c, '2027-09-01');
+  assert.deepEqual(n.constructii.map((k) => k.gps?.lat), [47.1335, 47.134]);
+  assert.notEqual(n.constructii[0].gps, c.constructii[0].gps);        // copie, nu referință
+  assert.equal(fmtCoord(c.constructii[0].gps), '47.133500, 24.496600');
+  assert.equal(googleMapsUrl(c.constructii[0].gps), 'https://www.google.com/maps/search/?api=1&query=47.133500,24.496600');
+  assert.deepEqual([12, 30, 31, 100, 101].map(gpsQuality), ['buna', 'buna', 'medie', 'medie', 'slaba']);
+  // date vechi: construcții fără gps → null; gps pe control (versiune de probă) → mutat la prima construcție
+  const old = normalizeControl({ ...c, gps: { lat: 1, lon: 2, acc: 5 }, constructii: [{ id: 'k1', denumire: 'A' }] });
+  assert.equal(old.constructii[0].gps.lat, 1);
+  assert.ok(!('gps' in old));
+  assert.equal(normalizeControl({ ...c, constructii: [{ id: 'k2' }] }).constructii[0].gps, null);
 });

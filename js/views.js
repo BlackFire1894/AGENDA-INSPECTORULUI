@@ -7,7 +7,7 @@ import {
 import {
   objectives, allFines, allAsi, isIncheiat, byStartDesc, controlStats, matchControl, fold,
   neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
-  constructieOf, amendaSerieNr, vecheInfo, constatareLabel, sablon, isApplicable,
+  constructieOf, amendaSerieNr, vecheInfo, constatareLabel, sablon, isApplicable, fmtCoord, googleMapsUrl, appleMapsUrl,
 } from './model.js';
 import { icon, esc, pill, tipBadge, empty, helpBtn } from './ui.js';
 import { APP_VERSION } from './version.js';
@@ -309,7 +309,7 @@ export function objListHTML() {
       <span class="avatar ${o.tip === 'LOCALITATE' ? 'av-loc' : 'av-opec'}">${esc(init)}</span>
       <span class="obj-main">
         <span class="obj-title">${esc(o.denumire || 'Obiectiv fără denumire')}</span>
-        <span class="obj-sub">${tipBadge(o.tip)}${o.administrator ? `<span>${esc(o.administrator)}</span>` : ''}${o.telefon ? `<span>· ${esc(o.telefon)}</span>` : ''}</span>
+        <span class="obj-sub">${tipBadge(o.tip)}${o.localitate ? `<span>${icon('pin')} ${esc(o.localitate)}</span>` : ''}${o.administrator ? `<span>${esc(o.administrator)}</span>` : ''}${o.telefon ? `<span>· ${esc(o.telefon)}</span>` : ''}</span>
         <span class="chips">
           ${pill('neutral', `${o.controls.length} ${o.controls.length === 1 ? 'control' : 'controale'}`, 'history')}
           ${pill('neutral', `ultimul: ${fmtDate(o.last.dataInceput)}`, 'calendar')}
@@ -340,7 +340,12 @@ export function viewObjective(oid) {
       <div><span class="lbl">Administrator</span><span class="val">${esc(o.administrator || '—')}</span></div>
       <div><span class="lbl">Telefon</span><span class="val">${o.telefon ? `<a href="tel:${esc(o.telefon.replace(/\s/g, ''))}">${icon('phone')} ${esc(o.telefon)}</a>` : '—'}</span></div>
       <div><span class="lbl">Email</span><span class="val">${o.email ? `<a href="mailto:${esc(o.email)}">${icon('mail')} ${esc(o.email)}</a>` : '—'}</span></div>
+      <div><span class="lbl">Adresă</span><span class="val">${esc([o.adresa, o.localitate].filter(Boolean).join(', ') || '—')}</span></div>
       <div><span class="lbl">Construcții</span><span class="val">${o.last.constructii.length}</span></div>
+      <div class="wide"><span class="lbl">Coordonate GPS pe construcții</span><span class="val gps-list">${o.last.constructii.map((k, i) => {
+        const nume = k.denumire || `Construcția ${i + 1}`;
+        return `<span>${esc(nume)}: ${k.gps ? `<a href="${esc(googleMapsUrl(k.gps))}" target="_blank" rel="noopener">${icon('pin')} ${esc(fmtCoord(k.gps))}</a> · <a class="small-link" href="${esc(appleMapsUrl(k.gps, `${o.denumire} – ${nume}`))}" target="_blank" rel="noopener">Hărți Apple</a>` : '<span class="muted">necompletate</span>'}</span>`;
+      }).join('')}</span></div>
     </section>
     <section class="stat-row">
       <div class="stat"><b>${o.controls.length}</b><span>controale</span></div>

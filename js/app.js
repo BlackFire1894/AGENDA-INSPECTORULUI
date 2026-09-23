@@ -5,7 +5,7 @@ import { fmtDate, fmtDateLong, toISO, parseDateQuery, isISO } from './dates.js';
 import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
   fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat, pvText, sectiuniActive, secOf,
-  todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon,
+  todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality,
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
@@ -101,7 +101,14 @@ async function render({ keepScroll = false } = {}) {
 }
 
 function focusNeregula(key) {
-  const el = document.getElementById(`ner-${key}`) || document.getElementById(key);
+  let el = document.getElementById(`ner-${key}`) || document.getElementById(key);
+  // Coordonatele unei construcții restrânse: întâi o deschidem.
+  if (!el && key.startsWith('gps-')) {
+    const id = key.slice(4);
+    state.ui.collapsed.delete(id); state.ui.expanded.add(id);
+    rerenderEditor();
+    el = document.getElementById(key);
+  }
   if (!el) return;
   requestAnimationFrame(() => {
     el.scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -381,6 +388,19 @@ document.addEventListener('click', async (e) => {
       return;
     }
     case 'rest-ok': restConform(c, el.dataset.sec); return;
+    case 'gps-get': { const k = c.constructii.find((x) => x.id === el.dataset.id); if (k) getGps(c, k); return; }
+    case 'gps-copy': {
+      const k = c.constructii.find((x) => x.id === el.dataset.id);
+      if (!k?.gps) return;
+      try { await navigator.clipboard.writeText(fmtCoord(k.gps)); toast('Coordonate copiate'); } catch { toast(fmtCoord(k.gps), 'warn'); }
+      return;
+    }
+    case 'gps-clear': {
+      const ok = await confirmDialog({ title: 'Ștergi coordonatele?', text: 'Le puteți prelua din nou oricând, cu „Completează coordonatele”.', ok: 'Șterge', danger: true });
+      const k = c.constructii.find((x) => x.id === el.dataset.id);
+      if (ok && k) { k.gps = null; touch(c, true); rerenderEditor(); }
+      return;
+    }
     case 'close-control': closeControlFlow(c); return;
     case 'obs-toggle':
       // butonul general: setează toate câmpurile și anulează excepțiile individuale
@@ -525,6 +545,52 @@ function openNewControl({ date, oid } = {}) {
     startControl(newControl({ tip, denumire: name.value.trim(), start: startDate }));
   });
   setTimeout(() => name.focus(), 250);
+}
+
+// ───────── Coordonate GPS ─────────
+// O singură atingere; se caută poziția precisă (GPS), cu limită de timp ca aplicația să nu rămână blocată.
+function getGps(c, k) {
+  if (!('geolocation' in navigator)) { toast('Localizarea nu este disponibilă pe acest dispozitiv', 'warn'); return; }
+  if (state.ui.gpsBusy) return;
+  state.ui.gpsBusy = k.id; rerenderEditor();
+  const done = () => { state.ui.gpsBusy = ''; if (route.name === 'control' && route.id === c.id) rerenderEditor(); };
+  navigator.geolocation.getCurrentPosition((pos) => {
+    const { latitude: lat, longitude: lon, accuracy: acc } = pos.coords;
+    k.gps = { lat, lon, acc, la: new Date().toISOString() };
+    touch(c, true);
+    done();
+    const q = gpsQuality(acc);
+    toast(q === 'slaba' ? `Coordonate preluate, dar precizie slabă (± ${Math.round(acc)} m)` : `Coordonate preluate (± ${Math.round(acc)} m)`, q === 'slaba' ? 'warn' : 'ok');
+  }, (err) => {
+    done();
+    // 1 = permisiune refuzată, 2 = Localizarea iPad-ului oprită / fără poziție: ambele se rezolvă din Setări.
+    if (err.code === 3) {
+      toast('Nu s-a găsit semnal la timp. Ieșiți în aer liber sau lângă o fereastră și încercați din nou.', 'warn');
+      return;
+    }
+    gpsActivatePrompt(c, k);
+  }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+}
+
+// Localizarea e oprită sau refuzată. O aplicație web nu poate deschide Setările iPad-ului și nici nu poate porni
+// Localizarea singură, deci arătăm pașii exacți și un buton „Încearcă din nou”.
+function gpsActivatePrompt(c, k) {
+  const m = openModal(`<div class="modal-head"><h2>${icon('locate')} Activați localizarea</h2></div>
+    <div class="modal-body">
+      <p class="lead">Coordonatele nu pot fi completate: localizarea e oprită sau aplicația nu are permisiune. Pe iPad:</p>
+      <ol class="gps-steps">
+        <li><b>Setări → Confidențialitate și securitate → Localizare</b>: porniți <b>Localizare</b>.</li>
+        <li>În aceeași listă, <b>Site-uri Safari</b>: alegeți <b>Cât timp folosesc aplicația</b> și porniți <b>Localizare precisă</b>.</li>
+        <li><b>Setări → Aplicații → Safari → Localizare</b>: alegeți <b>Întreabă</b> sau <b>Permite</b>.</li>
+        <li>Reveniți aici și apăsați <b>Încearcă din nou</b>; la întrebarea iPad-ului, alegeți <b>Permite</b>.</li>
+      </ol>
+      <p class="hint">Aplicația citește poziția doar când apăsați butonul; nu urmărește locația.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-lg" data-act="modal-close">Renunță</button>
+      <button class="btn btn-primary btn-lg" id="gps-retry">${icon('locate')} Încearcă din nou</button>
+    </div>`);
+  m.querySelector('#gps-retry').addEventListener('click', () => { closeModal(); getGps(c, k); });
 }
 
 // ───────── Restul conform (în bloc, cu „Anulează”) ─────────

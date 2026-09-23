@@ -5,7 +5,7 @@ import {
   TERMEN_PLATA, PRAG_ROSU, TERMEN_ANAF, TERMEN_ASI, fmtDate, zinelucratoare,
 } from './dates.js';
 
-export const SCHEMA_VERSION = 5; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări)
+export const SCHEMA_VERSION = 6; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS
 
 export const TIP_OBIECTIV = [
   { key: 'OPEC', label: 'OPEC / Instituție' },
@@ -181,6 +181,7 @@ export function emptyConstructie(nr = 1) {
   return {
     id: uid(), denumire: `Construcția ${nr}`, suprafata: '', regimInaltime: '', nrAngajati: '',
     structura: '', materialPereti: '', dotari,
+    gps: null,   // { lat, lon, acc (m), la (ISO) } — coordonatele construcției, preluate la cerere cu „Completează coordonatele”
   };
 }
 
@@ -208,6 +209,7 @@ export function newControl({ objectiveId, tip = 'OPEC', denumire = '', start } =
     tip,
     denumire,
     administrator: '', telefon: '', email: '',
+    adresa: '', localitate: '',
     dataInceput: today,
     dataIncheiere: '',
     constructii: [emptyConstructie(1)],
@@ -224,6 +226,8 @@ export function controlFromPrevious(prev, start) {
   c.administrator = prev.administrator;
   c.telefon = prev.telefon;
   c.email = prev.email;
+  c.adresa = prev.adresa || '';
+  c.localitate = prev.localitate || '';
   c.constructii = JSON.parse(JSON.stringify(prev.constructii || [])).map((k) => ({ ...k, id: uid() }));
   if (!c.constructii.length) c.constructii = [emptyConstructie(1)];
   if (prev.adapostPC) c.adapostPC = { ...prev.adapostPC };
@@ -243,6 +247,9 @@ export function normalizeControl(c) {
     const e = emptyConstructie(i + 1);
     return { ...e, ...k, dotari: { ...e.dotari, ...(k.dotari || {}) } };
   });
+  // Coordonatele stăteau pe control, nu pe construcție, într-o versiune de probă: se mută la prima construcție.
+  if (out.gps && !out.constructii[0].gps) out.constructii[0] = { ...out.constructii[0], gps: out.gps };
+  delete out.gps;
   out.adapostPC = { ...base.adapostPC, ...(c.adapostPC || {}) };
   return out;
 }
@@ -456,7 +463,7 @@ export function objectives(controls) {
     out.push({
       id, controls: list, last,
       denumire: last.denumire, tip: last.tip, administrator: last.administrator,
-      telefon: last.telefon, email: last.email,
+      telefon: last.telefon, email: last.email, adresa: last.adresa, localitate: last.localitate,
     });
   }
   return out.sort((a, b) => byStartDesc(a.last, b.last));
@@ -488,7 +495,7 @@ export function matchControl(c, query) {
     const [s, e] = controlRange(c);
     return rangesOverlap(s, e, a, b);
   }
-  const hay = fold([c.denumire, c.administrator, c.telefon, c.email].join(' '));
+  const hay = fold([c.denumire, c.administrator, c.telefon, c.email, c.adresa, c.localitate].join(' '));
   return fold(q).split(/\s+/).every((w) => hay.includes(w));
 }
 
@@ -621,6 +628,18 @@ export function todoList(c, { includeClose = true } = {}) {
     if (!String(n.amenda.suma || '').trim()) lipsa.push('suma');
     if (lipsa.length) out.push({ id: `fine-${n.key}`, level: 'warn', text: `Amendă fără ${lipsa.join(' și ')}: ${constatareLabel(n)}`, tab: tabOf(secOf(n)), focus: n.key });
   }
+  const faraGps = (c.constructii || []).filter((k) => !k.gps);
+  if (faraGps.length) {
+    const nume = faraGps.map((k) => k.denumire || `Construcția ${c.constructii.indexOf(k) + 1}`).join(', ');
+    out.push({ id: 'gps', level: 'warn', text: `Coordonate GPS necompletate: ${nume}`, tab: 'obiectiv', focus: `gps-${faraGps[0].id}` });
+  }
   if (includeClose && !isISO(c.dataIncheiere)) out.push({ id: 'close', level: 'todo', text: 'Controlul nu este încheiat', tab: 'obiectiv', focus: 'sec-perioada' });
   return out;
 }
+
+// ───────── Coordonate GPS ─────────
+export const fmtCoord = (g) => (g ? `${g.lat.toFixed(6)}, ${g.lon.toFixed(6)}` : '');
+export const googleMapsUrl = (g) => `https://www.google.com/maps/search/?api=1&query=${g.lat.toFixed(6)},${g.lon.toFixed(6)}`;
+export const appleMapsUrl = (g, label = '') => `https://maps.apple.com/?ll=${g.lat.toFixed(6)},${g.lon.toFixed(6)}&q=${encodeURIComponent(label || fmtCoord(g))}`;
+// Precizia: sub 30 m bună, până la 100 m acceptabilă, peste 100 m slabă (de regulă în interior sau fără GPS)
+export const gpsQuality = (acc) => (acc <= 30 ? 'buna' : acc <= 100 ? 'medie' : 'slaba');

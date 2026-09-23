@@ -1,4 +1,4 @@
-# Modelul de date (schema 4)
+# Modelul de date (schema 6)
 
 Backupul exportat este un JSON: `{ app, schema, exportedAt, controls: Control[] }`.
 Datele calendaristice sunt șiruri `AAAA-LL-ZZ` în ora locală; `""` înseamnă necompletat.
@@ -20,7 +20,9 @@ Datele calendaristice sunt șiruri `AAAA-LL-ZZ` în ora locală; `""` înseamnă
 | `demo` | bool? | date demonstrative |
 
 ## Constructie
-`id, denumire, suprafata, regimInaltime, nrAngajati, structura, materialPereti, dotari`
+`id, denumire, suprafata, regimInaltime, nrAngajati, structura, materialPereti, dotari, gps`
+
+`gps`: `{ lat, lon, acc, la }` sau `null` — coordonatele construcției (grade zecimale, WGS84), precizia în metri și momentul preluării. Se preiau doar la cerere („Completează coordonatele”) și se copiază la controlul următor pe același obiectiv.
 
 `dotari[cheie] = { v: "" | "DA" | "NU" | "NEC", obs }` (NEC = nu este cazul) pentru
 `asi, aviz, hidInt, hidExt, sprinklere, drencere, instSpeciale, idsai, exit, desfumare, ignifugare, rezervaApa, statiePompe`
@@ -47,6 +49,7 @@ Calculul termenelor: `js/model.js` → `fineStatus()`, `asiDeadline()`.
 ## Catalog (js/model.js)
 - `NEREGULI`, `PLANURI`, `PROTECTIE_CIVILA` → `SABLON`: rândurile standard, fiecare cu `cat` (categoria pentru codul de culori) și, la instalații, `req` (dotările de care depinde).
 - O neregulă cu `req` apare doar dacă cel puțin o construcție are DA la una din dotările listate (`centrala` = cel puțin un tip bifat). Un rând deja completat rămâne mereu vizibil.
+- Schema 5 → 6: `adresa`, `localitate` (`''`) pe control și `gps` (`null`) pe fiecare construcție. Schema 4 → 5: rândurile noi de nereguli (inclusiv `lipsa-*`, neregulile grave la NU) și dotarea `detectoriAutonomi`.
 - Schema 3 → 4: `vecheManual: false` adăugat de `normalizeControl()`.
 - Schema 2 → 3: câmpurile noi (`constructieId`, `amenda.serie`, `amenda.numar`, actele noi) se completează cu valori goale de `normalizeControl()`.
 - Schema 1 → 2: `normalizeControl()` adaugă `sec: "ner"` rândurilor vechi și creează rândurile Planuri/PC și `adapostPC`.

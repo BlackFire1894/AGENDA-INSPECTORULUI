@@ -1,11 +1,11 @@
 // Editorul unui control: 3 taburi — Obiectiv, Acte & evidențe, Nereguli.
 import { state, today } from './state.js';
-import { fmtDate, fmtDateLong } from './dates.js';
+import { fmtDate, fmtDateLong, toISO } from './dates.js';
 import {
   TIP_OBIECTIV, DOTARI, CENTRALA_TIPURI, ACTE, STRUCTURI, MATERIALE_PERETI, SECTIUNI, CATEGORII,
   controlStats, secStats, fineStatus, fineDate, asiDeadline, isIncheiat, neregulaLabel, neregulaLetter,
   neregulaCat, secOf, isApplicable, isLocalitate, constructieOf, amendaSerieNr, vecheInfo, todoList,
-  LIPSA_DOTARI, constructiiCuNU, sablon,
+  LIPSA_DOTARI, constructiiCuNU, sablon, fmtCoord, googleMapsUrl, appleMapsUrl, gpsQuality,
 } from './model.js';
 import { icon, esc, pill, tipBadge, helpBtn } from './ui.js';
 
@@ -205,6 +205,8 @@ function tabObiectiv(c) {
         <span class="inp-wrap"><input type="email" data-bind="email" value="${esc(c.email)}" placeholder="nume@exemplu.ro" inputmode="email" autocomplete="off" autocapitalize="off">
         ${c.email ? `<a class="inp-action" href="mailto:${esc(c.email)}" aria-label="Trimite email">${icon('mail')}</a>` : ''}</span>
       </label>
+      ${field('Adresă', 'adresa', c.adresa, { ph: 'Strada, nr., bloc…' })}
+      ${field('Localitate', 'localitate', c.localitate, { ph: 'ex: Cluj-Napoca' })}
     </div>
   </section>
 
@@ -233,6 +235,42 @@ function tabObiectiv(c) {
   </section>
   <datalist id="dl-structura">${STRUCTURI.map((s) => `<option value="${esc(s)}">`).join('')}</datalist>
   <datalist id="dl-pereti">${MATERIALE_PERETI.map((s) => `<option value="${esc(s)}">`).join('')}</datalist>`;
+}
+
+// Coordonate GPS pe construcție: preluate doar la cerere (o atingere), cu precizia afișată și legături spre hărți
+function gpsBlock(c, k, i) {
+  const g = k.gps;
+  const busy = state.ui.gpsBusy === k.id;
+  const numeHarta = [c.denumire, k.denumire || `Construcția ${i + 1}`].filter(Boolean).join(' – ');
+  if (!g) {
+    return `<div class="gps-field" id="gps-${k.id}">
+      <span class="lbl">Coordonate GPS</span>
+      <div class="gps-empty">
+        <span class="gps-cell is-empty">Necompletat</span>
+        <button class="btn btn-primary btn-lg" data-act="gps-get" data-id="${k.id}" ${busy ? 'disabled' : ''}>${icon('locate')} ${busy ? 'Se caută semnalul…' : 'Completează coordonatele'}</button>
+      </div>
+      <span class="hint">Doar la cerere: poziția se citește o singură dată, când apăsați, lângă această construcție. Nu se urmărește locația.</span>
+    </div>`;
+  }
+  const q = gpsQuality(g.acc);
+  const la = g.la ? new Date(g.la) : null;
+  return `<div class="gps-field" id="gps-${k.id}">
+    <span class="lbl">Coordonate GPS</span>
+    <div class="gps-box">
+      <div class="gps-main">
+        <b class="gps-coord gps-cell">${esc(fmtCoord(g))}</b>
+        <span class="gps-meta"><span class="gps-q q-${q}">± ${Math.round(g.acc)} m · precizie ${q === 'buna' ? 'bună' : q === 'medie' ? 'medie' : 'slabă'}</span>${la ? ` · preluate ${esc(fmtDate(toISO(la)))}, ${String(la.getHours()).padStart(2, '0')}:${String(la.getMinutes()).padStart(2, '0')}` : ''}</span>
+        ${q === 'slaba' ? `<span class="gps-warn">${icon('alert')} Precizie slabă: ieșiți în aer liber sau lângă o fereastră și apăsați „Actualizează”.</span>` : ''}
+      </div>
+      <div class="gps-actions">
+        <a class="btn btn-ghost" href="${esc(googleMapsUrl(g))}" target="_blank" rel="noopener">${icon('pin')} Google Maps</a>
+        <a class="btn btn-ghost" href="${esc(appleMapsUrl(g, numeHarta))}" target="_blank" rel="noopener">${icon('pin')} Hărți Apple</a>
+        <button class="btn btn-ghost" data-act="gps-copy" data-id="${k.id}">${icon('doc')} Copiază</button>
+        <button class="btn btn-ghost" data-act="gps-get" data-id="${k.id}" ${busy ? 'disabled' : ''}>${icon('history')} ${busy ? 'Se caută…' : 'Actualizează'}</button>
+        <button class="icon-btn danger" data-act="gps-clear" data-id="${k.id}" aria-label="Șterge coordonatele">${icon('trash')}</button>
+      </div>
+    </div>
+  </div>`;
 }
 
 function isOpen(c, k, i) {
@@ -264,7 +302,7 @@ function constructieHTML(c, k, i) {
       <span class="constr-num">${i + 1}</span>
       <input class="constr-name" data-bind="${p}.denumire" value="${esc(k.denumire)}" placeholder="Denumirea construcției ${i + 1}" autocomplete="off">
       ${s.lipsa ? `<span class="pill pill-red">${icon('alert')}${s.lipsa} ${s.lipsa === 1 ? 'instalație lipsă' : 'instalații lipsă'}</span>` : ''}
-      <span class="constr-sum">${s.set}/${s.total} dotări${k.suprafata ? ` · ${esc(k.suprafata)} m²` : ''}${k.regimInaltime ? ` · ${esc(k.regimInaltime)}` : ''}</span>
+      <span class="constr-sum">${s.set}/${s.total} dotări${k.suprafata ? ` · ${esc(k.suprafata)} m²` : ''}${k.regimInaltime ? ` · ${esc(k.regimInaltime)}` : ''}${k.gps ? ' · GPS ✓' : ''}</span>
       <button class="icon-btn" data-act="constr-toggle" data-id="${k.id}" aria-label="${open ? 'Restrânge' : 'Extinde'}">${icon('chevD', open ? 'rot' : '')}</button>
     </div>
     ${open ? `<div class="constr-body">
@@ -275,6 +313,7 @@ function constructieHTML(c, k, i) {
         ${field('Structura de rezistență', `${p}.structura`, k.structura, { list: 'dl-structura', ph: 'Alege sau scrie' })}
         ${field('Material pereți', `${p}.materialPereti`, k.materialPereti, { list: 'dl-pereti', ph: 'Alege sau scrie' })}
       </div>
+      ${gpsBlock(c, k, i)}
       <div class="mini-row"><h3 class="mini-title">Dotări și instalații <small>NEC = nu este cazul</small></h3>${i === 0 || state.ui.obsHidden ? obsToggleBtn() : ''}</div>
       <div class="dotari">${DOTARI.map((d) => dotareRow(p, k, d)).join('')}</div>
       ${c.constructii.length > 1 ? `<div class="constr-foot"><button class="btn btn-ghost danger" data-act="constr-del" data-id="${k.id}">${icon('trash')} Șterge construcția</button></div>` : ''}
