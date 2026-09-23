@@ -5,13 +5,13 @@ import { fmtDate, fmtDateLong, toISO, parseDateQuery, isISO } from './dates.js';
 import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
   fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat, pvText, sectiuniActive, secOf,
-  todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality,
+  todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality, constructiiOf, grfVPesteParter, neregulaLetter, neregulaLabel,
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
   viewCalendar, viewSettings, hintText, backupAgeText, backupIsStale, guideSteps,
 } from './views.js';
-import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML } from './editor.js';
+import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML, nerResultsHTML, grfBlock } from './editor.js';
 import { AJUTOR } from './help.js';
 import { icon, esc, toast, openModal, closeModal, confirmDialog } from './ui.js';
 import { buildDemo } from './demo.js';
@@ -80,11 +80,14 @@ async function render({ keepScroll = false } = {}) {
       if (!tabsFor(c).some((t) => t.key === route.tab)) { location.replace(`#/control/${c.id}/obiectiv`); return; }
       if (route.focus) {
         state.ui.nerFilter = 'ALL';
+        state.ui.nerQuery = '';
         const fn = c.nereguli.find((x) => x.key === route.focus);
         if (fn && state.ui.catCollapsed.delete(neregulaCat(fn))) savePref('agenda-cats-collapsed', [...state.ui.catCollapsed]);
       }
       if (prev.name !== 'control' || prev.id !== route.id) state.ui.showAllNer = false;
-      if (prev.name !== 'control' || prev.id !== route.id || prev.tab !== route.tab) state.ui.nerFilter = 'ALL';
+      if (prev.name !== 'control' || prev.id !== route.id || prev.tab !== route.tab) {
+        state.ui.nerFilter = 'ALL'; state.ui.nerQuery = ''; state.ui.constrPick = '';
+      }
       html = viewControl(c, route.tab);
       break;
     }
@@ -186,6 +189,13 @@ function setPath(obj, path, v) { const [p, k] = resolvePath(obj, path); if (p) p
 
 document.addEventListener('input', (e) => {
   const el = e.target;
+  if (el.id === 'ner-search' && route.name === 'control') {
+    const c = getControl(route.id);
+    if (!c) return;
+    state.ui.nerQuery = el.value;
+    refreshNerResults(c, el.dataset.sec);
+    return;
+  }
   if (el.dataset.bind && route.name === 'control') {
     const c = getControl(route.id);
     if (!c) return;
@@ -206,6 +216,16 @@ document.addEventListener('input', (e) => {
     refreshSearch(key);
   }
 });
+
+// Doar lista se redesenează: bara de căutare rămâne activă, cu tastatura deschisă.
+function refreshNerResults(c, sec) {
+  const box = document.getElementById('ner-results');
+  if (!box) return;
+  box.innerHTML = nerResultsHTML(c, sec);
+  autosizeAll();
+  const tb = document.querySelector('.toolbar [data-act="cats-all"]');
+  if (tb) tb.hidden = !!state.ui.nerQuery.trim();
+}
 
 function refreshSearch(key) {
   const v = key === 'obj' ? state.ui.objSearch : state.ui.histSearch;
@@ -229,6 +249,24 @@ function refreshSearch(key) {
 
 document.addEventListener('change', async (e) => {
   const el = e.target;
+  // regimul de înălțime schimbă starea „GRF/NSI V peste parter” → redesenăm doar atunci (nu la fiecare ieșire din câmp)
+  if (el.dataset.grav !== undefined && route.name === 'control') {
+    const c = getControl(route.id);
+    const [k] = c ? resolvePath(c, el.dataset.bind) : [];   // părintele lui „regimInaltime”
+    const now = grfVPesteParter(k);
+    if (k && now !== (el.dataset.grav === '1')) {
+      // actualizare parțială: câmpul atins după acesta își păstrează focusul (și tastatura)
+      touch(c, true);
+      el.dataset.grav = now ? '1' : '0';
+      document.getElementById(`grf-${k.id}`)?.replaceWith(Object.assign(document.createElement('div'), { innerHTML: grfBlock(c, k) }).firstElementChild);
+      const pillEl = document.getElementById(`grf-pill-${k.id}`);
+      if (pillEl) pillEl.hidden = !now;
+      document.getElementById('ed-todo').innerHTML = todoHTML(c);
+      document.getElementById('ed-tabs').innerHTML = edTabsHTML(c, route.tab);
+      if (now) gravGrfToast(c, k);
+    }
+    return;
+  }
   if (el.dataset.bind && el.dataset.rerender && route.name === 'control') {
     const c = getControl(route.id);
     if (!c) return;
@@ -306,6 +344,7 @@ document.addEventListener('click', async (e) => {
     case 'wipe': await wipeAll(); return;
     case 'apply-update': applyUpdate(); return;
     case 'font-size': setFontSize(el.dataset.val); return;
+    case 'theme': setTheme(el.dataset.val); return;
     case 'check-update': {
       const found = await checkForUpdate();
       if (!found) toast(`Ai cea mai nouă versiune (${APP_VERSION})`);
@@ -321,6 +360,11 @@ document.addEventListener('click', async (e) => {
       const noClear = el.closest('.no-clear');
       const v = el.dataset.toggle && cur === el.dataset.val && !noClear ? '' : el.dataset.val;
       setPath(c, el.dataset.path, v);
+      // GRF/NSI V la o construcție cu regim peste parter → avertizare: neregulă gravă
+      if (el.dataset.path.endsWith('.grf') && v === 'V') {
+        const [k] = resolvePath(c, el.dataset.path);   // părintele lui „grf” = construcția
+        if (grfVPesteParter(k)) { touch(c, true); rerenderEditor(); gravGrfToast(c, k); return; }
+      }
       // NU la o instalație necesară → avertizare: neregulă gravă, adăugată în tabul Nereguli
       const mDot = el.dataset.path.match(/\.dotari\.(\w+)\.v$/);
       if (mDot && v === 'NU' && LIPSA_DOTARI.includes(mDot[1])) {
@@ -336,6 +380,8 @@ document.addEventListener('click', async (e) => {
     case 'flag': {
       const v = !getPath(c, el.dataset.path);
       setPath(c, el.dataset.path, v);
+      // rând adăugat care nu mai e grav → nici sigiliul nu mai are temei
+      if (el.dataset.path.endsWith('.grav') && !v) setPath(c, el.dataset.path.replace(/\.grav$/, '.sigiliu'), false);
       if (el.dataset.path.endsWith('.amenda.achitata') && v) {
         const [amenda] = resolvePath(c, el.dataset.path);
         if (!amenda.dataAchitare) amenda.dataAchitare = today();
@@ -379,6 +425,29 @@ document.addEventListener('click', async (e) => {
       return;
     }
     case 'ner-filter': state.ui.nerFilter = el.dataset.val; rerenderEditor(); return;
+    case 'ner-q-clear': {
+      state.ui.nerQuery = '';
+      rerenderEditor();
+      document.getElementById('ner-search')?.focus();
+      return;
+    }
+    case 'constr-pick': state.ui.constrPick = state.ui.constrPick === el.dataset.key ? '' : el.dataset.key; rerenderEditor(); return;
+    case 'constr-opt': case 'constr-opt-all': {
+      const n = c.nereguli.find((x) => x.key === el.dataset.key);
+      if (!n) return;
+      if (act === 'constr-opt-all') n.constructieIds = c.constructii.map((k) => k.id);
+      else {
+        const ids = new Set(constructiiOf(c, n).map((k) => k.id));
+        if (ids.has(el.dataset.id)) {
+          if (ids.size === 1) { toast('Rămâne cel puțin o construcție', 'warn'); return; }
+          ids.delete(el.dataset.id);
+        } else ids.add(el.dataset.id);
+        n.constructieIds = c.constructii.filter((k) => ids.has(k.id)).map((k) => k.id);
+      }
+      touch(c, true);
+      rerenderEditor();
+      return;
+    }
     case 'pv-text': openPvText(c); return;
     case 'todo-toggle': state.ui.todoOpen = !state.ui.todoOpen; rerenderEditor(); return;
     case 'todo-go': {
@@ -547,6 +616,12 @@ function openNewControl({ date, oid } = {}) {
   setTimeout(() => name.focus(), 250);
 }
 
+function gravGrfToast(c, k) {
+  toast(`Neregulă gravă: ${k.denumire || 'construcția'} are GRF/NSI V și regim ${k.regimInaltime} (peste parter)`, 'warn', {
+    label: 'Vezi', fn: () => { location.hash = `#/control/${c.id}/nereguli/grav-grfV`; },
+  });
+}
+
 // ───────── Coordonate GPS ─────────
 // O singură atingere; se caută poziția precisă (GPS), cu limită de timp ca aplicația să nu rămână blocată.
 function getGps(c, k) {
@@ -595,17 +670,42 @@ function gpsActivatePrompt(c, k) {
 
 // ───────── Restul conform (în bloc, cu „Anulează”) ─────────
 
+// Marcare în bloc, cu confirmare manuală: lista exactă a rândurilor + bifa „Am verificat…”, altfel butonul
+// rămâne inactiv (fără bife accidentale). Neregulile grave nu intră niciodată în bloc: se decid individual.
 async function restConform(c, sec) {
-  let rows;
-  if (sec === 'acte') rows = ACTE.map((a) => c.acte[a.key]).filter((v) => !v.status);
-  else rows = c.nereguli.filter((n) => secOf(n) === sec && !n.status && (isApplicable(c, n) || (state.ui.showAllNer && !sablon(n.key)?.grav)));
-  if (!rows.length) return;
+  let rows, items;
+  if (sec === 'acte') {
+    const acte = ACTE.filter((a) => !c.acte[a.key]?.status);
+    rows = acte.map((a) => c.acte[a.key]);
+    items = acte.map((a) => ['', a.label]);
+  } else {
+    rows = c.nereguli.filter((n) => secOf(n) === sec && !n.status && !sablon(n.key)?.grav
+      && (isApplicable(c, n) || state.ui.showAllNer));
+    items = rows.map((n) => [neregulaLetter(c, n), neregulaLabel(n)]);
+  }
+  const grave = sec === 'ner' ? c.nereguli.filter((n) => !n.status && sablon(n.key)?.grav && isApplicable(c, n)).length : 0;
+  if (!rows.length) { if (grave) toast('Neregulile grave rămase se marchează individual', 'warn'); return; }
   const word = sec === 'acte' ? 'Prezentat' : 'Conform';
   const what = sec === 'acte' ? (rows.length === 1 ? 'act' : 'acte') : (rows.length === 1 ? 'rând' : 'rânduri');
-  const ok = await confirmDialog({
-    title: `Marchez ${rows.length} ${what} ca „${word}”?`,
-    text: 'Se schimbă doar rândurile încă nemarcate; cele marcate deja rămân cum sunt. Imediat după puteți apăsa „Anulează”.',
-    ok: `Da, ${rows.length} ${what} „${word}”`,
+  const ok = await new Promise((resolve) => {
+    let done = false;
+    const m = openModal(`<div class="modal-head"><h2>${icon('alert')} Marchez ${rows.length} ${what} ca „${word}”?</h2></div>
+      <div class="modal-body">
+        <p class="lead">Verificați lista. Se schimbă doar rândurile de mai jos, încă nemarcate.</p>
+        <ul class="bulk-list">${items.map(([l, t]) => `<li>${l ? `<b class="bulk-letter">${esc(l)}</b>` : icon('check')}<span>${esc(t)}</span></li>`).join('')}</ul>
+        ${grave ? `<p class="bulk-grav">${icon('alert')} ${grave === 1 ? 'Neregula gravă (G) nu e inclusă' : `Cele ${grave} nereguli grave (G) nu sunt incluse`}: se marchează individual.</p>` : ''}
+        <label class="bulk-confirm"><input type="checkbox" id="bulk-ok"><span>Am verificat la fața locului ${rows.length === 1 ? 'acest rând' : `toate cele ${rows.length} ${what}`} și ${rows.length === 1 ? 'este' : 'sunt'} „${word.toLowerCase()}${rows.length === 1 || sec === 'acte' ? '' : 'e'}”.</span></label>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost btn-lg" data-r="0">Renunță</button>
+        <button class="btn btn-primary btn-lg" data-r="1" disabled>${icon('check')} Marchează ${rows.length} ${what}</button>
+      </div>`, { wide: true, onClose: () => { if (!done) resolve(false); } });
+    const go = m.querySelector('[data-r="1"]');
+    m.querySelector('#bulk-ok').addEventListener('change', (e) => { go.disabled = !e.target.checked; });
+    m.querySelectorAll('[data-r]').forEach((btn) => btn.addEventListener('click', () => {
+      if (btn.disabled) return;
+      done = true; resolve(btn.dataset.r === '1'); closeModal();
+    }));
   });
   if (!ok) return;
   rows.forEach((r) => { r.status = 'ok'; });
@@ -819,6 +919,15 @@ function setFontSize(size) {
   const root = document.documentElement;
   if (size === 'mare') delete root.dataset.font; else root.dataset.font = size;
   try { localStorage.setItem('agenda-font', size); } catch { /* setarea rămâne doar pentru sesiunea curentă */ }
+  render({ keepScroll: true });
+}
+
+// ───────── tema (preferință a acestei tablete) ─────────
+
+function setTheme(t) {
+  const root = document.documentElement;
+  if (t === 'light' || t === 'dark') root.dataset.theme = t; else delete root.dataset.theme;
+  try { localStorage.setItem('agenda-theme', t); } catch { /* setarea rămâne doar pentru sesiunea curentă */ }
   render({ keepScroll: true });
 }
 

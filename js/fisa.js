@@ -2,8 +2,8 @@
 import { fmtDate, fmtDateLong, todayISO, isISO } from './dates.js';
 import {
   DOTARI, ACTE, SECTIUNI, CATEGORII, sectiuniActive, secOf, neregulaLetter, neregulaCat,
-  constructieOf, amendaSerieNr, fineStatus, asiDeadline, vecheInfo, isIncheiat, controlStats, isLocalitate, constatareLabel,
-  sablon, isApplicable, constructiiCuNU, fmtCoord, googleMapsUrl,
+  constructiiNume, amendaSerieNr, fineStatus, asiDeadline, vecheInfo, isIncheiat, controlStats, isLocalitate, constatareLabel,
+  sablon, isGrav, isApplicable, fmtCoord, grfText, grfVPesteParter, googleMapsUrl,
 } from './model.js';
 import { esc } from './ui.js';
 
@@ -62,6 +62,7 @@ export function fisaMarkup(c, controls, now = new Date()) {
       <table class="f-kv"><tr>
         <td><b>Suprafață desf.</b><br>${k.suprafata ? `${esc(k.suprafata)} m²` : '—'}</td>
         <td><b>Regim înălțime</b><br>${esc(k.regimInaltime) || '—'}</td>
+        <td><b>GRF / NSI</b><br>${esc(grfText(k.grf)) || '—'}${grfVPesteParter(k) ? '<br><b>neregulă gravă</b>' : ''}</td>
         <td><b>Nr. angajați</b><br>${esc(k.nrAngajati) || '—'}</td>
         <td><b>Structură</b><br>${esc(k.structura) || '—'}</td>
         <td><b>Pereți</b><br>${esc(k.materialPereti) || '—'}</td>
@@ -97,6 +98,8 @@ export function fisaMarkup(c, controls, now = new Date()) {
         const vi = vecheInfo(controls, c, n);
         const det = [];
         if (obs(n.obs)) det.push(obs(n.obs));
+        if (n.custom && n.grav) det.push('<b>Neregulă gravă</b>');
+        if (n.status === 'nok' && isGrav(n) && n.sigiliu) det.push('<b>Sigiliu aplicat</b>');
         if (vi.veche) det.push(`<b>Neregulă veche</b>${vi.auto ? ` (și la controlul din ${fmtDate(vi.auto.dataInceput)})` : ''}`);
         if (n.status === 'nok' && n.amenda?.aplicata) {
           const fs = fineStatus(c, n, today);
@@ -106,11 +109,10 @@ export function fisaMarkup(c, controls, now = new Date()) {
           const d = asiDeadline(c, today);
           if (d) det.push(`<b>ASI 90 zile:</b> ${esc(d.msg)}`);
         }
-        const k = constructieOf(c, n);
         h.push(`<tr class="${n.status === 'nok' || gravNeverif(n) ? 'f-nok' : ''}">
           <td>${esc(neregulaLetter(c, n))}</td>
           <td>${esc(constatareLabel(n))}${n.custom ? '' : `<div class="f-cat">${esc(CATEGORII[neregulaCat(n)] || '')}</div>`}</td>
-          ${sec === 'ner' && multe ? `<td>${sablon(n.key)?.reqNU ? esc(constructiiCuNU(c, sablon(n.key).reqNU).map((x) => x.denumire).join(', ') || '—') : k ? esc(k.denumire) : '—'}</td>` : ''}
+          ${sec === 'ner' && multe ? `<td>${esc(constructiiNume(c, n) || '—')}</td>` : ''}
           <td>${n.status === 'nok' ? (sec === 'ner' ? 'Constatat' : 'Neconform') : n.status === 'ok' ? STATUS.ok : '<b>Neverificată — gravă</b>'}</td>
           <td>${n.status === 'nok' ? (n.inPV ? 'Trecut' : '<b>Netrecut</b>') : ''}</td>
           <td>${det.join('<br>')}</td>

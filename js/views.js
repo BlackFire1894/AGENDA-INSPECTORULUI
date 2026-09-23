@@ -7,7 +7,7 @@ import {
 import {
   objectives, allFines, allAsi, isIncheiat, byStartDesc, controlStats, matchControl, fold,
   neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
-  constructieOf, amendaSerieNr, vecheInfo, constatareLabel, sablon, isApplicable, fmtCoord, googleMapsUrl, appleMapsUrl,
+  constructiiNume, secOf, amendaSerieNr, vecheInfo, constatareLabel, sablon, isApplicable, fmtCoord, googleMapsUrl, appleMapsUrl,
 } from './model.js';
 import { icon, esc, pill, tipBadge, empty, helpBtn } from './ui.js';
 import { APP_VERSION } from './version.js';
@@ -177,7 +177,7 @@ export function viewDashboard() {
   const fineItem = ({ c, n, st }) => `<a class="item item-${st.level}" href="#/control/${c.id}/${tabOfNeregula(n)}/${encodeURIComponent(n.key)}">
       <span class="item-main">
         <span class="item-title">${esc(c.denumire || 'Obiectiv fără denumire')}</span>
-        <span class="item-sub">${esc(neregulaLetter(c, n))}. ${esc(constatareLabel(n))}${c.constructii.length > 1 && constructieOf(c, n) ? ` · ${esc(constructieOf(c, n).denumire)}` : ''}</span>
+        <span class="item-sub">${esc(neregulaLetter(c, n))}. ${esc(constatareLabel(n))}${c.constructii.length > 1 && secOf(n) === 'ner' ? ` · ${esc(constructiiNume(c, n))}` : ''}</span>
         ${amendaSerieNr(n.amenda) ? `<span class="item-sub">Amenda ${esc(amendaSerieNr(n.amenda))}</span>` : ''}
         <span class="item-msg">${esc(st.msg)}</span>
         ${st.nelucr ? `<span class="item-warn">⚠ ${esc(st.nelucr)}</span>` : ''}
@@ -505,6 +505,13 @@ export function viewCalendar() {
 
 // ───────────────────────── SETĂRI ─────────────────────────
 
+const THEMES = [
+  { key: 'auto', label: 'Automat', hint: 'ca iPad-ul', ic: 'contrast' },
+  { key: 'light', label: 'Luminoasă', hint: 'mereu', ic: 'sun' },
+  { key: 'dark', label: 'Întunecată', hint: 'mereu', ic: 'moon' },
+];
+const currentTheme = () => document.documentElement.dataset.theme || 'auto';
+
 export function viewSettings(persisted) {
   const last = state.meta.lastBackup;
   const demo = state.controls.filter((c) => c.demo).length;
@@ -516,6 +523,15 @@ export function viewSettings(persisted) {
     <div class="font-opts" role="radiogroup" aria-label="Mărimea textului">
       ${FONT_SIZES.map((f) => `<button class="font-opt ${currentFont() === f.key ? 'on' : ''}" data-act="font-size" data-val="${f.key}" role="radio" aria-checked="${currentFont() === f.key}">
         <span class="aa" style="font-size:${f.px + 8}px">Aa</span><span>${f.label}</span><small>${f.hint}</small>
+      </button>`).join('')}
+    </div>
+  </section>
+  <section class="card set-sec">
+    <h2 class="sec-title">${icon('moon')} Tema</h2>
+    <p><b>Automat</b> urmează iPad-ul (Setări → Afișaj și luminozitate): luminoasă ziua, întunecată seara, dacă așa e setat. Sau alegeți una fixă.</p>
+    <div class="font-opts" role="radiogroup" aria-label="Tema">
+      ${THEMES.map((t) => `<button class="font-opt theme-opt ${currentTheme() === t.key ? 'on' : ''}" data-act="theme" data-val="${t.key}" role="radio" aria-checked="${currentTheme() === t.key}">
+        <span class="aa">${icon(t.ic)}</span><span>${t.label}</span><small>${t.hint}</small>
       </button>`).join('')}
     </div>
   </section>

@@ -20,7 +20,9 @@ Datele calendaristice sunt șiruri `AAAA-LL-ZZ` în ora locală; `""` înseamnă
 | `demo` | bool? | date demonstrative |
 
 ## Constructie
-`id, denumire, suprafata, regimInaltime, nrAngajati, structura, materialPereti, dotari, gps`
+`id, denumire, suprafata, regimInaltime, nrAngajati, structura, materialPereti, dotari, grf, gps`
+
+`grf`: `"I"`…`"V"`, `"NN"` (nu e necesar) sau `""` — GRF (P118/1999) / NSI (P118-1/2025). `"V"` cu `regimInaltime` peste parter (`pesteParter()`: P+1, P+2E, S+P+1, P+M…) declanșează neregula gravă `grav-grfV`.
 
 `gps`: `{ lat, lon, acc, la }` sau `null` — coordonatele construcției (grade zecimale, WGS84), precizia în metri și momentul preluării. Se preiau doar la cerere („Completează coordonatele”) și se copiază la controlul următor pe același obiectiv.
 
@@ -40,7 +42,9 @@ Datele calendaristice sunt șiruri `AAAA-LL-ZZ` în ora locală; `""` înseamnă
 | `obs` | string | |
 | `inPV` | bool | trecut / netrecut în procesul-verbal |
 | `vecheManual` | bool | marcată manual „neregulă veche”; se detectează și automat din istoric (`vecheInfo()`): același rând constatat la un control anterior al aceluiași obiectiv |
-| `constructieId` | string | construcția în care s-a constatat; `""` sau un id inexistent = prima construcție (`constructieOf()`) |
+| `constructieIds` | string[] | construcțiile în care s-a constatat (una sau mai multe); `[]` sau doar id-uri inexistente = implicit: la neregulile grave cele cu NU la dotare, altfel prima construcție (`constructiiOf()`) |
+| `grav` | bool | doar la rândurile adăugate (`custom`): marcat de inspector ca neregulă gravă |
+| `sigiliu` | bool | la neregulile grave (din listă sau `grav`): s-a aplicat sigiliu în baza acestei nereguli |
 | `asiTermen`, `asiPrezentat`, `asiDataPrezentare` | | doar pentru `a` |
 | `amenda` | `{ aplicata, serie, numar, data, suma, achitata, dataAchitare }` | `data = ""` → data încheierii; `serie`/`numar` = seria și numărul procesului-verbal de amendă |
 
@@ -49,6 +53,7 @@ Calculul termenelor: `js/model.js` → `fineStatus()`, `asiDeadline()`.
 ## Catalog (js/model.js)
 - `NEREGULI`, `PLANURI`, `PROTECTIE_CIVILA` → `SABLON`: rândurile standard, fiecare cu `cat` (categoria pentru codul de culori) și, la instalații, `req` (dotările de care depinde).
 - O neregulă cu `req` apare doar dacă cel puțin o construcție are DA la una din dotările listate (`centrala` = cel puțin un tip bifat). Un rând deja completat rămâne mereu vizibil.
+- Schema 6 → 7: construcțiile primesc `grf` (`""`); neregulile primesc `grav` și `sigiliu` (`false`); `constructieId` (un singur id) devine `constructieIds` (listă): `"x"` → `["x"]`, `""` → `[]` (`normalizeControl()`).
 - Schema 5 → 6: `adresa`, `localitate` (`''`) pe control și `gps` (`null`) pe fiecare construcție. Schema 4 → 5: rândurile noi de nereguli (inclusiv `lipsa-*`, neregulile grave la NU) și dotarea `detectoriAutonomi`.
 - Schema 3 → 4: `vecheManual: false` adăugat de `normalizeControl()`.
 - Schema 2 → 3: câmpurile noi (`constructieId`, `amenda.serie`, `amenda.numar`, actele noi) se completează cu valori goale de `normalizeControl()`.

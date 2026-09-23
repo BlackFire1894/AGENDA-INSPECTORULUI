@@ -39,7 +39,7 @@ export function buildDemo(today) {
   s2.dataIncheiere = addDays(today, -41);
   okAll(s2, ['fise', 'stingatoare']);
   nok(s2, 'd', { inPV: true, obs: '2 stingătoare expirate, corp A', amenda: { suma: '2500', serie: 'DB', numar: '0012345' } });
-  s2.nereguli.find((x) => x.key === 'j').constructieId = s2.constructii[1].id;
+  s2.nereguli.find((x) => x.key === 'j').constructieIds = [s2.constructii[1].id];
   nok(s2, 'j', { inPV: true, obs: 'Hol etaj 1' });
   out.push(s2);
 
