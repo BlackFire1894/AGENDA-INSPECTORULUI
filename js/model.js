@@ -12,7 +12,7 @@ export const TIP_OBIECTIV = [
   { key: 'LOCALITATE', label: 'Localitate' },
 ];
 
-const DNN = ['DA', 'NU', 'NEC'];
+const DNN = ['DA', 'NU', 'NEC']; // NEC = nu este cazul
 const DN = ['DA', 'NU'];
 
 // Dotări / instalații verificate pentru fiecare construcție

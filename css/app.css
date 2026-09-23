@@ -139,6 +139,7 @@ h1 { font-size: 34px; line-height: 1.15; font-weight: 800; }
 .sec-title .ic { color: var(--accent); width: 26px; height: 26px; }
 .sec-title-row { display: flex; align-items: center; justify-content: space-between; gap: 14px; flex-wrap: wrap; margin-bottom: 14px; }
 .sec-title-row .sec-title { margin: 0; }
+.mini-title small { text-transform: none; letter-spacing: 0; font-weight: 600; margin-left: 8px; }
 .mini-title { font-size: 17px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 22px 0 10px; }
 .list-title { display: flex; align-items: center; gap: 10px; font-size: 24px; margin: 26px 0 14px; }
 .group-title { font-size: 18px; text-transform: capitalize; color: var(--muted); margin: 26px 4px 10px; display: flex; gap: 10px; align-items: center; }
@@ -441,7 +442,7 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .seg-dnn button { min-width: 64px; min-height: 44px; padding: 0 12px; font-size: 16px; }
 .seg-dnn button.on.v-DA { background: var(--green); color: #fff; }
 .seg-dnn button.on.v-NU { background: var(--ink-2); color: #fff; }
-.seg-dnn button.on.v-NEC { background: var(--warn); color: #fff; }
+.seg-dnn button.on.v-NEC { background: var(--muted); color: #fff; }
 .chips-sel { display: flex; gap: 6px; flex-wrap: wrap; }
 .chip-sel { min-height: 44px; padding: 0 14px; border-radius: 12px; border: 1.5px solid var(--line-strong); font-weight: 750; font-size: 15px; background: var(--surface); }
 .chip-sel.on { background: var(--accent); border-color: var(--accent); color: #fff; }

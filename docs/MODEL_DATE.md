@@ -21,7 +21,7 @@ Datele calendaristice sunt șiruri `AAAA-LL-ZZ` în ora locală; `""` înseamnă
 ## Constructie
 `id, denumire, suprafata, regimInaltime, nrAngajati, structura, materialPereti, dotari`
 
-`dotari[cheie] = { v: "" | "DA" | "NU" | "NEC", obs }` pentru
+`dotari[cheie] = { v: "" | "DA" | "NU" | "NEC", obs }` (NEC = nu este cazul) pentru
 `asi, aviz, hidInt, hidExt, sprinklere, drencere, instSpeciale, idsai, exit, desfumare, ignifugare, rezervaApa, statiePompe`
 (DA/NU/NEC) și `fotovoltaice, acumulatori, ilumHint, ipt` (DA/NU).
 

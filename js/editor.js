@@ -70,7 +70,7 @@ function field(label, path, value, { type = 'text', ph = '', list = '', mode = '
 function segBtns(path, value, opts, cls = '') {
   return `<div class="segmented ${cls}">${opts.map((o) => {
     const [k, l] = Array.isArray(o) ? o : [o, o];
-    return `<button type="button" class="${value === k ? 'on' : ''} v-${esc(k)}" data-act="set" data-path="${path}" data-val="${esc(k)}" data-toggle="1">${esc(l)}</button>`;
+    return `<button type="button" class="${value === k ? 'on' : ''} v-${esc(k)}" ${k === 'NEC' ? 'title="Nu este cazul" aria-label="Nu este cazul"' : ''} data-act="set" data-path="${path}" data-val="${esc(k)}" data-toggle="1">${esc(l)}</button>`;
   }).join('')}</div>`;
 }
 
@@ -191,7 +191,7 @@ function constructieHTML(c, k, i) {
         ${field('Structura de rezistență', `${p}.structura`, k.structura, { list: 'dl-structura', ph: 'Alege sau scrie' })}
         ${field('Material pereți', `${p}.materialPereti`, k.materialPereti, { list: 'dl-pereti', ph: 'Alege sau scrie' })}
       </div>
-      <h3 class="mini-title">Dotări și instalații</h3>
+      <h3 class="mini-title">Dotări și instalații <small>NEC = nu este cazul</small></h3>
       <div class="dotari">${DOTARI.map((d) => dotareRow(p, k, d)).join('')}</div>
       ${c.constructii.length > 1 ? `<div class="constr-foot"><button class="btn btn-ghost danger" data-act="constr-del" data-id="${k.id}">${icon('trash')} Șterge construcția</button></div>` : ''}
     </div>` : ''}

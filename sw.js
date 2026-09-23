@@ -1,7 +1,7 @@
 // Service worker: aplicația pornește instant și funcționează offline.
 // Strategie „stale-while-revalidate”: servește din cache, actualizează în fundal
 // (versiunea nouă apare la următoarea deschidere a aplicației).
-const CACHE = 'agenda-v1';
+const CACHE = 'agenda-v2';
 const ASSETS = [
   './', './index.html', './manifest.webmanifest', './css/app.css',
   './js/app.js', './js/state.js', './js/store.js', './js/model.js', './js/dates.js',
