@@ -14,7 +14,7 @@ Funcționează **offline**, iar datele rămân **doar pe tabletă** (IndexedDB),
 | **Istoric** | toate controalele, grupate pe luni, cu căutare și filtre |
 | **Control** | 3 taburi: **Obiectiv** (date, perioadă, construcții și dotări) · **Acte & evidențe** (✓ verde / ✗ roșu) · **Nereguli** (șablon a–z + nereguli suplimentare, trecut/netrecut în PV, amendă, termen ASI) |
 
-Salvare automată la fiecare modificare. Un control nou pe un obiectiv existent preia automat datele de contact și construcțiile din ultimul control.
+Salvare automată la fiecare modificare. Mărimea textului (Mic / Mediu / Mare) se alege din **Setări** și scalează proporțional toată interfața. Un control nou pe un obiectiv existent preia automat datele de contact și construcțiile din ultimul control.
 
 ## Termene
 

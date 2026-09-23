@@ -11,6 +11,17 @@ import {
 import { icon, esc, pill, tipBadge, empty } from './ui.js';
 import { APP_VERSION } from './version.js';
 
+export const FONT_SIZES = [
+  { key: 'mic', label: 'Mic', px: 15, hint: 'mai mult conținut pe ecran' },
+  { key: 'mediu', label: 'Mediu', px: 16.5, hint: 'echilibrat' },
+  { key: 'mare', label: 'Mare', px: 18, hint: 'implicit' },
+];
+
+export function currentFont() {
+  const f = document.documentElement.dataset.font;
+  return f === 'mic' || f === 'mediu' ? f : 'mare';
+}
+
 const LEVEL_LABEL = { blue: 'În curs', yellow: 'Termen expirat', red: 'ANAF', green: 'Achitată' };
 
 export function money(v) {
@@ -446,6 +457,15 @@ export function viewSettings(persisted) {
   const last = state.meta.lastBackup;
   const demo = state.controls.filter((c) => c.demo).length;
   return `<header class="page-head"><div><div class="eyebrow">${icon('settings')} Date, backup și informații</div><h1>Setări</h1></div></header>
+  <section class="card set-sec">
+    <h2 class="sec-title">${icon('settings')} Mărimea textului</h2>
+    <p>Se aplică imediat în toată aplicația: text, butoane, spațieri și iconițe se ajustează împreună.</p>
+    <div class="font-opts" role="radiogroup" aria-label="Mărimea textului">
+      ${FONT_SIZES.map((f) => `<button class="font-opt ${currentFont() === f.key ? 'on' : ''}" data-act="font-size" data-val="${f.key}" role="radio" aria-checked="${currentFont() === f.key}">
+        <span class="aa" style="font-size:${f.px + 8}px">Aa</span><span>${f.label}</span><small>${f.hint}</small>
+      </button>`).join('')}
+    </div>
+  </section>
   <section class="card set-sec">
     <h2 class="sec-title">${icon('download')} Backup</h2>
     <p>Datele sunt salvate <b>doar pe această tabletă</b>. Exportă periodic un fișier de backup și salvează-l în <b>Fișiere → iCloud Drive</b> (sau alt loc sigur).</p>

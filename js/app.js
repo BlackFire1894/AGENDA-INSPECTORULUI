@@ -229,6 +229,7 @@ document.addEventListener('click', async (e) => {
     case 'demo-remove': await removeDemo(); return;
     case 'wipe': await wipeAll(); return;
     case 'apply-update': applyUpdate(); return;
+    case 'font-size': setFontSize(el.dataset.val); return;
     case 'check-update': {
       const found = await checkForUpdate();
       if (!found) toast(`Ai cea mai nouă versiune (${APP_VERSION})`);
@@ -486,6 +487,15 @@ async function importBackup(file) {
     toast(`Import reușit: ${result.length} controale`);
     render();
   }));
+}
+
+// ───────── mărimea textului (preferință a acestei tablete) ─────────
+
+function setFontSize(size) {
+  const root = document.documentElement;
+  if (size === 'mare') delete root.dataset.font; else root.dataset.font = size;
+  try { localStorage.setItem('agenda-font', size); } catch { /* setarea rămâne doar pentru sesiunea curentă */ }
+  render({ keepScroll: true });
 }
 
 // ───────── date demonstrative / ștergere ─────────
