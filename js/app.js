@@ -8,7 +8,7 @@ import {
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
-  viewCalendar, viewSettings, hintText,
+  viewCalendar, viewSettings, hintText, backupAgeText, backupIsStale,
 } from './views.js';
 import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey } from './editor.js';
 import { icon, esc, toast, openModal, closeModal, confirmDialog } from './ui.js';
@@ -113,6 +113,8 @@ function updateNav() {
   const open = state.controls.filter((c) => !isIncheiat(c)).length;
   document.querySelectorAll('[data-badge="panou"]').forEach((b) => { b.textContent = fines || ''; b.hidden = !fines; });
   document.querySelectorAll('[data-badge="istoric"]').forEach((b) => { b.textContent = open || ''; b.hidden = !open; });
+  document.querySelectorAll('[data-backup-age]').forEach((el) => { el.textContent = backupAgeText(); });
+  document.querySelectorAll('[data-backup-btn]').forEach((el) => el.classList.toggle('stale', backupIsStale()));
 }
 
 // Re-randare parțială a editorului (păstrează poziția de scroll)
@@ -571,7 +573,8 @@ async function exportBackup() {
   await flush();
   const payload = { app: 'agenda-inspectorului', schema: SCHEMA_VERSION, exportedAt: new Date().toISOString(), controls: state.controls };
   const json = JSON.stringify(payload, null, 1);
-  const name = `agenda-inspectorului-backup-${today()}.json`;
+  const d = new Date();
+  const name = `agenda-inspectorului-backup-${today()}_${String(d.getHours()).padStart(2, '0')}-${String(d.getMinutes()).padStart(2, '0')}.json`;
   const file = new File([json], name, { type: 'application/json' });
   try {
     if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -592,7 +595,7 @@ async function exportBackup() {
   state.meta.lastBackup = nowStamp();
   await store.setMeta('lastBackup', state.meta.lastBackup);
   toast(`Backup exportat: ${state.controls.length} controale`);
-  render({ keepScroll: true });
+  if (route.name === 'control') rerenderEditor(); else render({ keepScroll: true });
 }
 
 async function importBackup(file) {

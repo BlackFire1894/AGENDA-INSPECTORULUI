@@ -100,7 +100,10 @@ export function viewDashboard() {
       <div class="eyebrow">${icon('clock')} Data și ora tabletei</div>
       <h1 class="dash-date">${esc(ucfirst(fmtDateLong(t)))}</h1>
     </div>
-    <div class="big-clock" data-clock>${pad(now.getHours())}:${pad(now.getMinutes())}</div>
+    <div class="dash-right">
+      <div class="big-clock" data-clock>${pad(now.getHours())}:${pad(now.getMinutes())}</div>
+      ${cs.length ? `<button class="btn btn-ghost backup-quick ${backupIsStale() ? 'stale' : ''}" data-act="backup-export">${icon('download')}<span><b>Backup rapid</b><small>${esc(backupAgeText())}</small></span></button>` : ''}
+    </div>
   </header>`;
 
   if (!cs.length) {
@@ -229,12 +232,28 @@ export function viewDashboard() {
   return `${head}${backupWarn}${kpis}<div class="dash-grid">${secFines}${secAsi}${secOpen}${secPv}</div>`;
 }
 
-function backupReminder() {
-  if (!state.controls.length) return '';
+// Vechimea ultimului backup (aceeași funcție de backup e disponibilă din Panou, control, bara laterală și Setări)
+export function backupAgeDays() {
   const last = state.meta.lastBackup;
-  const days = last ? diffDays(last.slice(0, 10), today()) : null;
-  if (days !== null && days < 7) return '';
-  return `<a class="banner" href="#/setari">${icon('alert')}<span><b>${last ? `Ultimul backup acum ${zile(days)}.` : 'Nu ai făcut încă niciun backup.'}</b> Datele sunt doar pe această tabletă — exportă un backup în Fișiere / iCloud Drive.</span>${icon('chevR')}</a>`;
+  return last ? diffDays(last.slice(0, 10), today()) : null;
+}
+export function backupIsStale() {
+  const d = backupAgeDays();
+  return state.controls.length > 0 && (d === null || d >= 7);
+}
+export function backupAgeText() {
+  const d = backupAgeDays();
+  if (d === null) return 'niciun backup încă';
+  if (d === 0) return `ultimul: azi, ${state.meta.lastBackup.slice(11, 16)}`;
+  if (d === 1) return 'ultimul: ieri';
+  return `ultimul: acum ${zile(d)}`;
+}
+
+function backupReminder() {
+  if (!backupIsStale()) return '';
+  const d = backupAgeDays();
+  return `<div class="banner">${icon('alert')}<span><b>${d !== null ? `Ultimul backup acum ${zile(d)}.` : 'Nu ai făcut încă niciun backup.'}</b> Datele sunt doar pe această tabletă — salvează un backup în Fișiere / iCloud Drive.</span>
+    <button class="btn btn-primary" data-act="backup-export">${icon('download')} Backup acum</button></div>`;
 }
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -484,7 +503,7 @@ export function viewSettings(persisted) {
   </section>
   <section class="card set-sec">
     <h2 class="sec-title">${icon('download')} Backup</h2>
-    <p>Datele sunt salvate <b>doar pe această tabletă</b>. Exportă periodic un fișier de backup și salvează-l în <b>Fișiere → iCloud Drive</b> (sau alt loc sigur).</p>
+    <p>Butonul <b>Backup rapid</b> din Panou, din bara laterală și din fiecare control face exact același export ca butonul de aici. Datele sunt salvate <b>doar pe această tabletă</b>. Exportă periodic un fișier de backup și salvează-l în <b>Fișiere → iCloud Drive</b> (sau alt loc sigur).</p>
     <div class="set-status"><span class="lbl">Ultimul backup</span><b>${last ? `${fmtDateLong(last.slice(0, 10))}, ${last.slice(11, 16)}` : 'niciodată'}</b></div>
     <div class="row-gap">
       <button class="btn btn-primary btn-lg" data-act="backup-export">${icon('download')} Exportă backup</button>

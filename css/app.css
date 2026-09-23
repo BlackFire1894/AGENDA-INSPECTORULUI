@@ -755,3 +755,19 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .obs-hide .ic.up { transform: rotate(180deg); }
 .dot-row .obs-wrap { grid-column: 3; }
 @media (max-width: 999px) { .dot-row .obs-wrap { grid-column: 1 / -1; } }
+
+/* ───────── Backup rapid ───────── */
+.dash-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.5556rem; }
+.backup-quick { gap: 0.6667rem; text-align: left; padding: 0.4444rem 0.8889rem; min-height: max(44px, 3.1111rem); }
+.backup-quick span, .side-backup span { display: flex; flex-direction: column; line-height: 1.2; }
+.backup-quick small { font-size: 0.7778rem; color: var(--muted); font-weight: 600; }
+.backup-quick.stale { border-color: var(--warn); background: var(--warn-soft); color: var(--warn-ink); }
+.backup-quick.stale small { color: var(--warn-ink); }
+.side-backup {
+  display: flex; align-items: center; gap: 0.7778rem; min-height: max(44px, 3.2222rem); padding: 0.4444rem 0.8889rem; border-radius: 0.8889rem;
+  margin-top: auto; text-align: left; color: rgba(255, 255, 255, .85); background: rgba(255, 255, 255, .07);
+}
+.side-backup small { font-size: 0.7778rem; opacity: .75; font-weight: 600; }
+.side-backup.stale { background: color-mix(in srgb, var(--warn) 30%, transparent); color: #fff; }
+.side-backup + .side-settings { margin-top: 0; }
+.banner .btn { flex: none; }
