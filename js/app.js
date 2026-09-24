@@ -1,17 +1,17 @@
 // Punctul de intrare: rutare, evenimente, fluxuri (control nou, backup, date demo).
 import * as store from './store.js';
-import { state, today, getControl, touch, flush, addControl, removeControl, onSaveState, savePref } from './state.js';
+import { state, today, getControl, touch, flush, addControl, removeControl, onSaveState, savePref, historyStart, historyMove, checkpoint, onHistory } from './state.js';
 import { fmtDate, fmtDateLong, toISO, parseDateQuery, isISO } from './dates.js';
 import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
   fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat, pvText, sectiuniActive, secOf,
-  todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality, constructiiOf, grfVPesteParter, neregulaLetter, neregulaLabel, AUTO_NU, syncAutoNU,
+  todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality, constructiiOf, grfVPesteParter, constructiiEligibile, verifExpirate, ascunsaDeDotari, neregulaLetter, neregulaLabel, AUTO_NU, syncAutoNU,
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
   viewCalendar, viewSettings, hintText, backupAgeText, backupIsStale, guideSteps,
 } from './views.js';
-import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML, nerResultsHTML, grfBlock } from './editor.js';
+import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML, nerResultsHTML, grfBlock, undoRedoHTML } from './editor.js';
 import { AJUTOR } from './help.js';
 import { icon, esc, toast, openModal, closeModal, confirmDialog } from './ui.js';
 import { buildDemo } from './demo.js';
@@ -88,6 +88,7 @@ async function render({ keepScroll = false } = {}) {
       if (prev.name !== 'control' || prev.id !== route.id || prev.tab !== route.tab) {
         state.ui.nerFilter = 'ALL'; state.ui.nerQuery = ''; state.ui.constrPick = '';
       }
+      historyStart(c);
       html = viewControl(c, route.tab);
       break;
     }
@@ -251,6 +252,18 @@ function refreshSearch(key) {
 
 document.addEventListener('change', async (e) => {
   const el = e.target;
+  // data ultimei verificări pentru o construcție (rândurile de verificare)
+  if (el.dataset.verif && route.name === 'control') {
+    const c = getControl(route.id);
+    if (!c) return;
+    checkpoint(c);
+    const [key, kid, field] = el.dataset.verif.split('|');
+    const n = c.nereguli.find((x) => x.key === key);
+    if (!n) return;
+    n.verificari[kid] = { ...(n.verificari[kid] || {}), [field]: el.value };
+    touch(c, true); rerenderEditor();
+    return;
+  }
   // regimul de înălțime schimbă starea „GRF/NSI V peste parter” → redesenăm doar atunci (nu la fiecare ieșire din câmp)
   if (el.dataset.grav !== undefined && route.name === 'control') {
     const c = getControl(route.id);
@@ -272,6 +285,7 @@ document.addEventListener('change', async (e) => {
   if (el.dataset.bind && el.dataset.rerender && route.name === 'control') {
     const c = getControl(route.id);
     if (!c) return;
+    checkpoint(c);
     setPath(c, el.dataset.bind, el.value);
     if (el.dataset.bind === 'dataInceput' && !isISO(el.value)) { c.dataInceput = today(); }
     touch(c, true);
@@ -356,7 +370,34 @@ document.addEventListener('click', async (e) => {
 
   if (!c) return;
   // ─── acțiuni în editor ───
+  if (act !== 'undo' && act !== 'redo') checkpoint(c);   // textul tastat până acum = un pas separat de atingerea asta
   switch (act) {
+    case 'undo': case 'redo': {
+      if (historyMove(c, act)) {
+        rerenderEditor();
+        toast(act === 'undo' ? 'Modificare anulată' : 'Modificare refăcută', 'ok');
+      }
+      return;
+    }
+    case 'verif-luni': {
+      const n = c.nereguli.find((x) => x.key === el.dataset.key);
+      if (!n) return;
+      n.verificari[el.dataset.id] = { ...(n.verificari[el.dataset.id] || {}), luni: Number(el.dataset.val) };
+      break;
+    }
+    case 'verif-nok': {
+      // „tu decizi”: constată neregula pentru construcțiile cu verificarea expirată
+      const n = c.nereguli.find((x) => x.key === el.dataset.key);
+      if (!n) return;
+      const exp = verifExpirate(c, n);
+      n.status = 'nok';
+      n.constructieIds = exp.map((k) => k.id);
+      touch(c, true); rerenderEditor();
+      toast(`${n.key}: constatat pentru ${exp.map((k) => k.denumire).join(', ')}`, 'ok', {
+        label: 'Anulează', fn: () => { if (historyMove(c, 'undo')) rerenderEditor(); },
+      });
+      return;
+    }
     case 'set': {
       const cur = getPath(c, el.dataset.path);
       const noClear = el.closest('.no-clear');
@@ -374,10 +415,11 @@ document.addEventListener('click', async (e) => {
         touch(c, true); rerenderEditor();
         const key = AUTO_NU[mDot[1]];
         const lbl = neregulaLabel(c.nereguli.find((x) => x.key === key));
+        const dot = DOTARI.find((d) => d.key === mDot[1])?.label || mDot[1];
         const vezi = { label: 'Vezi', fn: () => { location.hash = `#/control/${c.id}/nereguli/${key}`; } };
         if (r === 'added') toast(`Neregulă trecută automat (${key}): ${lbl}`, 'warn', vezi);
-        else if (r === 'updated') toast(`Neregula ${key} actualizată din fișă: construcțiile cu NU la ${mDot[1].toUpperCase()}`, 'ok', vezi);
-        else if (r === 'removed') toast(`Neregula ${key} a fost retrasă (nu mai e NU la ${mDot[1].toUpperCase()})`);
+        else if (r === 'updated') toast(`Neregula ${key} actualizată din fișă: construcțiile cu NU la ${dot}`, 'ok', vezi);
+        else if (r === 'removed') toast(`Neregula ${key} a fost retrasă (nu mai e NU la ${dot})`);
         else if (r === 'kept') toast(`Neregula ${key} rămâne constatată: are date completate. Verificați-o.`, 'warn', vezi);
         return;
       }
@@ -450,7 +492,7 @@ document.addEventListener('click', async (e) => {
     case 'constr-opt': case 'constr-opt-all': {
       const n = c.nereguli.find((x) => x.key === el.dataset.key);
       if (!n) return;
-      if (act === 'constr-opt-all') n.constructieIds = c.constructii.map((k) => k.id);
+      if (act === 'constr-opt-all') n.constructieIds = constructiiEligibile(c, n).map((k) => k.id);
       else {
         const ids = new Set(constructiiOf(c, n).map((k) => k.id));
         if (ids.has(el.dataset.id)) {
@@ -695,7 +737,7 @@ async function restConform(c, sec) {
     items = acte.map((a) => ['', a.label]);
   } else {
     rows = c.nereguli.filter((n) => secOf(n) === sec && !n.status && !sablon(n.key)?.grav
-      && (isApplicable(c, n) || state.ui.showAllNer));
+      && (isApplicable(c, n) || (state.ui.showAllNer && ascunsaDeDotari(c, n))));
     items = rows.map((n) => [neregulaLetter(c, n), neregulaLabel(n)]);
   }
   const grave = sec === 'ner' ? c.nereguli.filter((n) => !n.status && sablon(n.key)?.grav && isApplicable(c, n)).length : 0;
@@ -1003,6 +1045,12 @@ document.addEventListener('visibilitychange', () => {
 window.addEventListener('pagehide', () => flush());
 window.addEventListener('hashchange', () => { closeModal(); render(); });
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+// butoanele Anulează / Refă urmează istoricul (inclusiv în timpul tastării, fără redesenare)
+onHistory((c) => {
+  const box = document.getElementById('undo-redo');
+  if (box && route.name === 'control' && route.id === c.id) box.outerHTML = undoRedoHTML(c);
+});
 
 onSaveState((s) => {
   const el = document.getElementById('save-ind');

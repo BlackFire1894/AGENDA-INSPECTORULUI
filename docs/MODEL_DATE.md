@@ -20,7 +20,7 @@ Datele calendaristice sunt șiruri `AAAA-LL-ZZ` în ora locală; `""` înseamnă
 | `demo` | bool? | date demonstrative |
 
 ## Constructie
-`id, denumire, suprafata, regimInaltime, nrAngajati, structura, materialPereti, dotari, grf, gps`
+`id, denumire, suprafata, regimInaltime, nrAngajati, anConstruire, structura, materialPereti, dotari, grf, gps`
 
 `grf`: `"I"`…`"V"`, `"NN"` (nu e necesar) sau `""` — GRF (P118/1999) / NSI (P118-1/2025). `"V"` cu `regimInaltime` peste parter (`pesteParter()`: P+1, P+2E, S+P+1, P+M…) declanșează neregula gravă `grav-grfV`.
 
@@ -38,7 +38,7 @@ Datele calendaristice sunt șiruri `AAAA-LL-ZZ` în ora locală; `""` înseamnă
 | `key` | string | literă (`a`…`z`, `ș`, `ț`) la Nereguli, cheie text la Planuri/PC (ex. `paar`, `svsuSef`, `pcSireneDefecte`), `k…` la rândurile custom |
 | `sec` | `"ner"` \| `"plan"` \| `"pc"` | tabul: Nereguli / Planuri și SVSU / Protecție civilă. `plan` și `pc` contează doar la LOCALITATE |
 | `custom` | bool | `label` e folosit doar la cele custom |
-| `status` | `""` \| `"ok"` (conform) \| `"nok"` (constatat) | |
+| `status` | `""` \| `"ok"` (conform) \| `"nok"` (constatat) \| `"nec"` (nu este cazul; nu apare în PV) | |
 | `obs` | string | |
 | `inPV` | bool | trecut / netrecut în procesul-verbal |
 | `vecheManual` | bool | marcată manual „neregulă veche”; se detectează și automat din istoric (`vecheInfo()`): același rând constatat la un control anterior al aceluiași obiectiv |
@@ -47,6 +47,7 @@ Datele calendaristice sunt șiruri `AAAA-LL-ZZ` în ora locală; `""` înseamnă
 | `sigiliu` | bool | la neregulile grave (din listă sau `grav`): s-a aplicat sigiliu în baza acestei nereguli |
 | `auto` | bool | `ah` / `ai`: constatată automat din NU la ASI / AVIZ (dotări) |
 | `obsAuto` | string | observațiile preluate automat; cât timp `obs === obsAuto`, se actualizează din dotări |
+| `verificari` | object | rândurile de verificare (b1–b3, c1–c7): `idConstrucție → { data: "AAAA-LL-ZZ", luni }` — data ultimei verificări; `luni` doar la b2 (12 / 24). Expirare = data + luni < data începerii controlului (`verifStare()`). Se preiau la controlul următor. |
 | `asiTermen`, `asiPrezentat`, `asiDataPrezentare` | | doar pentru `a` |
 | `amenda` | `{ aplicata, serie, numar, data, suma, achitata, dataAchitare }` | `data = ""` → data încheierii; `serie`/`numar` = seria și numărul procesului-verbal de amendă |
 
@@ -55,6 +56,7 @@ Calculul termenelor: `js/model.js` → `fineStatus()`, `asiDeadline()`.
 ## Catalog (js/model.js)
 - `NEREGULI`, `PLANURI`, `PROTECTIE_CIVILA` → `SABLON`: rândurile standard, fiecare cu `cat` (categoria pentru codul de culori) și, la instalații, `req` (dotările de care depinde).
 - O neregulă cu `req` apare doar dacă cel puțin o construcție are DA la una din dotările listate (`centrala` = cel puțin un tip bifat). Un rând deja completat rămâne mereu vizibil.
+- Schema 8 → 9: `status` poate fi și `"nec"` (nu este cazul); verificările `b` și `c` sunt defalcate în `b1`–`b3`, `c1`–`c7` (cele vechi rămân doar unde au fost completate); nereguli noi `aj` (EXIT incomplet), `ak` (iluminat Hint incomplet), `al` (stingătoare insuficiente / lipsă), `am` (lipsă iluminat Hint — constatată automat la NU pentru Iluminat Hint, vizibilă doar atunci); `verificari` pe nereguli; construcțiile primesc `anConstruire`; dotările ASI / AVIZ primesc `nr` (numărul autorizației / avizului, la DA).
 - Schema 7 → 8: neregulile noi `ah` (construcția funcționează fără ASI) și `ai` (lucrări de extindere / modificare fără aviz), primele din listă, adăugate de `normalizeControl()`; câmpurile `auto` și `obsAuto` pe nereguli. NU la dotarea ASI / AVIZ constată automat `ah` / `ai` (`syncAutoNU()`), cu observațiile din dotări.
 - Schema 6 → 7: construcțiile primesc `grf` (`""`); neregulile primesc `grav` și `sigiliu` (`false`); `constructieId` (un singur id) devine `constructieIds` (listă): `"x"` → `["x"]`, `""` → `[]` (`normalizeControl()`).
 - Schema 5 → 6: `adresa`, `localitate` (`''`) pe control și `gps` (`null`) pe fiecare construcție. Schema 4 → 5: rândurile noi de nereguli (inclusiv `lipsa-*`, neregulile grave la NU) și dotarea `detectoriAutonomi`.

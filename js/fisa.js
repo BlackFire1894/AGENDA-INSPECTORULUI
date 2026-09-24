@@ -3,11 +3,11 @@ import { fmtDate, fmtDateLong, todayISO, isISO } from './dates.js';
 import {
   DOTARI, ACTE, SECTIUNI, CATEGORII, sectiuniActive, secOf, neregulaLetter, neregulaCat,
   constructiiNume, amendaSerieNr, fineStatus, asiDeadline, vecheInfo, isIncheiat, controlStats, isLocalitate, constatareLabel,
-  sablon, isGrav, isApplicable, fmtCoord, grfText, grfVPesteParter, googleMapsUrl,
+  sablon, isGrav, isApplicable, fmtCoord, isVerificare, verifStare, constructiiEligibile, grfText, grfVPesteParter, googleMapsUrl,
 } from './model.js';
 import { esc } from './ui.js';
 
-const STATUS = { ok: 'Conform', nok: 'Neconform' };
+const STATUS = { ok: 'Conform', nok: 'Neconform', nec: 'NEC (nu este cazul)' };
 
 function money(v) {
   const n = Number(String(v).replace(',', '.'));
@@ -64,10 +64,12 @@ export function fisaMarkup(c, controls, now = new Date()) {
         <td><b>Regim înălțime</b><br>${esc(k.regimInaltime) || '—'}</td>
         <td><b>GRF / NSI</b><br>${esc(grfText(k.grf)) || '—'}${grfVPesteParter(k) ? '<br><b>neregulă gravă</b>' : ''}</td>
         <td><b>Nr. angajați</b><br>${esc(k.nrAngajati) || '—'}</td>
+        <td><b>Anul construirii</b><br>${esc(k.anConstruire) || '—'}</td>
         <td><b>Structură</b><br>${esc(k.structura) || '—'}</td>
         <td><b>Pereți</b><br>${esc(k.materialPereti) || '—'}</td>
       </tr></table>
       <p class="f-dot"><b>Coordonate GPS:</b> ${k.gps ? `<a href="${esc(googleMapsUrl(k.gps))}">${esc(fmtCoord(k.gps))}</a> (± ${Math.round(k.gps.acc)} m)` : 'necompletate'}</p>
+      ${['asi', 'aviz'].filter((d) => k.dotari[d]?.v === 'DA' && k.dotari[d].nr?.trim()).map((d) => `<p class="f-dot"><b>${d === 'asi' ? 'Nr. autorizație (ASI)' : 'Nr. aviz'}:</b> ${esc(k.dotari[d].nr)}</p>`).join('')}
       <p class="f-dot"><b>DA:</b> ${esc(by.DA.join(', ')) || '—'}${centrala ? ` · <b>Centrală termică:</b> ${esc(centrala)}` : ''}</p>
       <p class="f-dot"><b>NU:</b> ${esc(by.NU.join(', ')) || '—'} · <b>NEC:</b> ${esc(by.NEC.join(', ')) || '—'}</p>
       ${DOTARI.filter((d) => k.dotari[d.key]?.obs?.trim()).map((d) => `<p class="f-dot f-small"><b>${esc(d.label)}:</b> ${obs(k.dotari[d.key].obs)}</p>`).join('')}
@@ -98,6 +100,13 @@ export function fisaMarkup(c, controls, now = new Date()) {
         const vi = vecheInfo(controls, c, n);
         const det = [];
         if (obs(n.obs)) det.push(obs(n.obs));
+        if (isVerificare(n) && n.status !== 'nec') {
+          const vs = constructiiEligibile(c, n).map((k) => {
+            const s = verifStare(c, n, k);
+            return `${multe ? `${esc(k.denumire)}: ` : ''}${s.stare === 'lipsa' ? 'fără dată' : `${fmtDate(s.data)} (${s.luni} luni)${s.stare === 'expirata' ? ` — <b>expirată din ${fmtDate(s.expira)}</b>` : ''}`}`;
+          });
+          if (vs.length) det.push(`<b>Ultima verificare:</b> ${vs.join('; ')}`);
+        }
         if (n.custom && n.grav) det.push('<b>Neregulă gravă</b>');
         if (n.status === 'nok' && isGrav(n) && n.sigiliu) det.push('<b>Sigiliu aplicat</b>');
         if (vi.veche) det.push(`<b>Neregulă veche</b>${vi.auto ? ` (și la controlul din ${fmtDate(vi.auto.dataInceput)})` : ''}`);
@@ -113,7 +122,7 @@ export function fisaMarkup(c, controls, now = new Date()) {
           <td>${esc(neregulaLetter(c, n))}</td>
           <td>${esc(constatareLabel(n))}${n.custom ? '' : `<div class="f-cat">${esc(CATEGORII[neregulaCat(n)] || '')}</div>`}</td>
           ${sec === 'ner' && multe ? `<td>${esc(constructiiNume(c, n) || '—')}</td>` : ''}
-          <td>${n.status === 'nok' ? (sec === 'ner' ? 'Constatat' : 'Neconform') : n.status === 'ok' ? STATUS.ok : '<b>Neverificată — gravă</b>'}</td>
+          <td>${n.status === 'nok' ? (sec === 'ner' ? 'Constatat' : 'Neconform') : STATUS[n.status] || '<b>Neverificată — gravă</b>'}</td>
           <td>${n.status === 'nok' ? (n.inPV ? 'Trecut' : '<b>Netrecut</b>') : ''}</td>
           <td>${det.join('<br>')}</td>
         </tr>`);

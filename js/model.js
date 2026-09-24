@@ -2,10 +2,10 @@
 // Structura este documentată în docs/MODEL_DATE.md (pregătită pentru portare nativă).
 import {
   addDays, diffDays, isISO, todayISO, parseDateQuery, queryRange, rangesOverlap, zile,
-  TERMEN_PLATA, PRAG_ROSU, TERMEN_ANAF, TERMEN_ASI, fmtDate, zinelucratoare,
+  TERMEN_PLATA, PRAG_ROSU, TERMEN_ANAF, TERMEN_ASI, fmtDate, zinelucratoare, addMonths,
 } from './dates.js';
 
-export const SCHEMA_VERSION = 8; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS · 7: mai multe construcții pe neregulă, GRF/NSI pe construcție · 8: nereguli ah, ai
+export const SCHEMA_VERSION = 9; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS · 7: mai multe construcții pe neregulă, GRF/NSI pe construcție · 8: nereguli ah, ai · 9: verificări defalcate cu date pe construcție, NEC, aj/ak, an construire, nr. ASI/aviz
 
 export const TIP_OBIECTIV = [
   { key: 'OPEC', label: 'OPEC / Instituție' },
@@ -17,8 +17,8 @@ const DN = ['DA', 'NU'];
 
 // Dotări / instalații verificate pentru fiecare construcție
 export const DOTARI = [
-  { key: 'asi', label: 'ASI', opts: DNN },
-  { key: 'aviz', label: 'AVIZ', opts: DNN },
+  { key: 'asi', label: 'ASI', opts: DNN, nr: 'Nr. autorizație' },   // `nr`: la DA se completează numărul
+  { key: 'aviz', label: 'AVIZ', opts: DNN, nr: 'Nr. aviz' },
   { key: 'hidInt', label: 'Hidranți interiori', opts: DNN },
   { key: 'hidExt', label: 'Hidranți exteriori', opts: DNN },
   { key: 'sprinklere', label: 'Sprinklere', opts: DNN },
@@ -94,16 +94,34 @@ export const NEREGULI = [
   { key: 'ah', cat: 'docs', label: 'Construcția funcționează fără ASI (autorizație de securitate la incendiu)', autoNU: 'asi' },
   { key: 'ai', cat: 'docs', label: 'Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz', autoNU: 'aviz' },
   { key: 'a', cat: 'docs', label: 'Nu a prezentat documentație ASI', asi: true },
-  { key: 'b', cat: 'docs', label: 'Nu a prezentat / nu are verificare instalații electrice / IPT / CT' },
-  { key: 'c', cat: 'docs', label: 'Nu a prezentat / nu are verificare IDSAI / Hint / Hext / Desfumare / Sprinklere / Drencere / Instalații speciale', req: INST_C },
+  // Verificări, defalcate pe instalație; data ultimei verificări se completează pe fiecare construcție.
+  // `verif`: perioada de valabilitate în luni (b2: la alegere 12 / 24, pe construcție). b1–b3: toate construcțiile.
+  { key: 'b1', cat: 'docs', label: 'Nu a prezentat / nu are verificare instalații electrice', verif: 12 },
+  { key: 'b2', cat: 'docs', label: 'Nu a prezentat / nu are verificare împământare (IPT)', verif: 12, verifAlegeri: [12, 24] },
+  { key: 'b3', cat: 'docs', label: 'Nu a prezentat / nu are verificare CT (centrală termică)', verif: 24 },
+  { key: 'c1', cat: 'docs', label: 'Nu a prezentat / nu are verificare IDSAI', req: ['idsai'], verif: 12 },
+  { key: 'c2', cat: 'docs', label: 'Nu a prezentat / nu are verificare hidranți interiori', req: ['hidInt'], verif: 6 },
+  { key: 'c3', cat: 'docs', label: 'Nu a prezentat / nu are verificare hidranți exteriori', req: ['hidExt'], verif: 6 },
+  { key: 'c4', cat: 'docs', label: 'Nu a prezentat / nu are verificare desfumare', req: ['desfumare'], verif: 12 },
+  { key: 'c5', cat: 'docs', label: 'Nu a prezentat / nu are verificare sprinklere', req: ['sprinklere'], verif: 12 },
+  { key: 'c6', cat: 'docs', label: 'Nu a prezentat / nu are verificare drencere', req: ['drencere'], verif: 12 },
+  { key: 'c7', cat: 'docs', label: 'Nu a prezentat / nu are verificare instalații speciale', req: ['instSpeciale'], verif: 12 },
+  // până la v1.10: verificările grupate; rămân doar în controalele în care au fost completate (retras)
+  { key: 'b', cat: 'docs', label: 'Nu a prezentat / nu are verificare instalații electrice / IPT / CT', retras: true },
+  { key: 'c', cat: 'docs', label: 'Nu a prezentat / nu are verificare IDSAI / Hint / Hext / Desfumare / Sprinklere / Drencere / Instalații speciale', req: INST_C, retras: true },
   { key: 'd', cat: 'stingatoare', label: 'Stingătoare expirate' },
   { key: 'e', cat: 'stingatoare', label: 'Stingătoare neconforme' },
+  { key: 'al', cat: 'stingatoare', label: 'Stingătoare insuficiente / lipsă' },
   { key: 'f', cat: 'electric', label: 'Instalații electrice exploatate incorect' },
   { key: 'g', cat: 'electric', label: 'Perete / planșeu / perete + planșeu cameră CT – 90 minute', req: ['centrala'] },
   { key: 'h', cat: 'electric', label: 'Ușă RF 15 minute cameră CT', req: ['centrala'] },
   { key: 'i', cat: 'electric', label: 'Ușă RF 60 minute cameră IDSAI', req: ['idsai'] },
   { key: 'j', cat: 'semnalizare', label: 'EXIT defect', req: ['exit'] },
+  { key: 'aj', cat: 'semnalizare', label: 'EXIT incomplet', req: ['exit'] },
   { key: 'k', cat: 'semnalizare', label: 'Iluminat Hint defect', req: ['ilumHint'] },
+  { key: 'ak', cat: 'semnalizare', label: 'Iluminat Hint incomplet', req: ['ilumHint'] },
+  // NU la Iluminat Hint → constatată automat (ca ah / ai), vizibilă doar cât timp o construcție are NU
+  { key: 'am', cat: 'semnalizare', label: 'Lipsă iluminat Hint', autoNU: 'ilumHint', doarLaNU: true },
   { key: 'l', cat: 'idsai', label: 'Erori IDSAI', req: ['idsai'] },
   { key: 'm', cat: 'idsai', label: 'IDSAI nefuncțional', req: ['idsai'] },
   { key: 'n', cat: 'hidranti', label: 'Probleme Hint', req: ['hidInt'] },
@@ -195,10 +213,10 @@ export function uid() {
 export function emptyConstructie(nr = 1) {
   const dotari = {};
   for (const d of DOTARI) {
-    dotari[d.key] = d.centrala ? { tipuri: [], nuAre: false, obs: '' } : { v: '', obs: '' };
+    dotari[d.key] = d.centrala ? { tipuri: [], nuAre: false, obs: '' } : { v: '', obs: '', ...(d.nr ? { nr: '' } : {}) };
   }
   return {
-    id: uid(), denumire: `Construcția ${nr}`, suprafata: '', regimInaltime: '', nrAngajati: '',
+    id: uid(), denumire: `Construcția ${nr}`, suprafata: '', regimInaltime: '', nrAngajati: '', anConstruire: '',
     structura: '', materialPereti: '', dotari,
     grf: '',     // GRF/NSI: 'I'…'V' sau 'NN' (nu e necesar); '' = necompletat
     gps: null,   // { lat, lon, acc (m), la (ISO) } — coordonatele construcției, preluate la cerere cu „Completează coordonatele”
@@ -214,6 +232,7 @@ export function emptyNeregula(key, custom = false, sec = 'ner') {
     grav: false,         // doar la rândurile adăugate: marcată de inspector ca neregulă gravă
     sigiliu: false,      // la neregulile grave: s-a aplicat sigiliu în baza acestei nereguli
     auto: false,         // ah / ai: constatată automat din NU la ASI / AVIZ (dotări)
+    verificari: {},      // rândurile de verificare: idConstrucție → { data: 'AAAA-LL-ZZ', luni } (data ultimei verificări)
     obsAuto: '',         // ultimele observații preluate automat din dotări (dacă obs === obsAuto, nu au fost editate)
     asiTermen: false, asiPrezentat: false, asiDataPrezentare: '',
     amenda: { aplicata: false, serie: '', numar: '', data: '', suma: '', achitata: false, dataAchitare: '' },
@@ -252,15 +271,22 @@ export function controlFromPrevious(prev, start) {
   c.email = prev.email;
   c.adresa = prev.adresa || '';
   c.localitate = prev.localitate || '';
-  c.constructii = JSON.parse(JSON.stringify(prev.constructii || [])).map((k) => ({ ...k, id: uid() }));
+  const idNou = new Map();
+  c.constructii = JSON.parse(JSON.stringify(prev.constructii || [])).map((k) => { const id = uid(); idNou.set(k.id, id); return { ...k, id }; });
   if (!c.constructii.length) c.constructii = [emptyConstructie(1)];
+  // datele ultimelor verificări rămân valabile de la un control la altul (se actualizează la nevoie)
+  for (const n of c.nereguli) {
+    const p = isVerificare(n) && (prev.nereguli || []).find((x) => x.key === n.key);
+    if (!p?.verificari) continue;
+    for (const [kid, v] of Object.entries(p.verificari)) if (idNou.has(kid)) n.verificari[idNou.get(kid)] = { ...v };
+  }
   if (prev.adapostPC) c.adapostPC = { ...prev.adapostPC };
   for (const dot of Object.keys(AUTO_NU)) syncAutoNU(c, dot);   // NU la ASI / AVIZ moștenit → neregula apare din start
   return c;
 }
 
 // ───────── NU la ASI / AVIZ (dotări) → neregulile ah / ai, completate automat ─────────
-export const AUTO_NU = { asi: 'ah', aviz: 'ai' };
+export const AUTO_NU = { asi: 'ah', aviz: 'ai', ilumHint: 'am' };
 
 function obsDinDotari(c, list, dot) {
   const multe = (c.constructii || []).length > 1;
@@ -317,7 +343,9 @@ export function normalizeControl(c) {
   });
   out.constructii = (c.constructii && c.constructii.length ? c.constructii : base.constructii).map((k, i) => {
     const e = emptyConstructie(i + 1);
-    return { ...e, ...k, dotari: { ...e.dotari, ...(k.dotari || {}) } };
+    const dotari = { ...e.dotari };
+    for (const [key, v] of Object.entries(k.dotari || {})) dotari[key] = { ...(e.dotari[key] || {}), ...v };
+    return { ...e, ...k, dotari };
   });
   // Coordonatele stăteau pe control, nu pe construcție, într-o versiune de probă: se mută la prima construcție.
   if (out.gps && !out.constructii[0].gps) out.constructii[0] = { ...out.constructii[0], gps: out.gps };
@@ -338,7 +366,8 @@ export function constructiiOf(c, n) {
   const t = n && !n.custom ? SABLON_BY_KEY.get(n.key) : null;
   const decl = (t && constructiiDeclansate(c, t)) || [];
   if (decl.length) return decl;
-  return list.length ? [list[0]] : [];
+  const elig = constructiiEligibile(c, n);   // implicit: prima construcție care are instalația
+  return elig.length ? [elig[0]] : [];
 }
 export const constructieOf = (c, n) => constructiiOf(c, n)[0] || null;
 export const constructiiNume = (c, n) => constructiiOf(c, n).map((k) => k.denumire || `Construcția ${c.constructii.indexOf(k) + 1}`).join(', ');
@@ -422,9 +451,19 @@ export function hasDotare(c, key) {
 export function isApplicable(c, n) {
   if (n.custom || n.status) return true;
   const t = sablon(n.key);
+  if (t?.retras) return false;
+  if (t?.doarLaNU) return constructiiCuNU(c, t.autoNU).length > 0;
   const decl = constructiiDeclansate(c, t);
   if (decl) return decl.length > 0;
   return !t?.req || t.req.some((k) => hasDotare(c, k));
+}
+
+// Rânduri ascunse doar pentru că instalația nu e bifată DA: „Arată toate” le poate afișa.
+// Nu intră aici: neregulile grave, cele vechi retrase (b, c) și „Lipsă iluminat Hint” (există doar la NU).
+export function ascunsaDeDotari(c, n) {
+  if (n.custom || isApplicable(c, n)) return false;
+  const t = sablon(n.key);
+  return !!t && !t.grav && !t.retras && !t.doarLaNU;
 }
 
 // Statistici pentru o secțiune (tab)
@@ -438,7 +477,7 @@ export function secStats(c, sec, today = todayISO()) {
   return {
     total, checked,
     // rândurile „Lipsă …” (nereguli grave) nu sunt „ascunse”: există doar când o instalație e pe NU
-    hidden: rows.filter((n) => !isApplicable(c, n) && !sablon(n.key)?.grav).length,
+    hidden: rows.filter((n) => ascunsaDeDotari(c, n)).length,
     constatate: nok.length,
     netrecute: nok.filter((n) => !n.inPV).length,
     fines: nok.filter((n) => n.amenda?.aplicata).map((n) => ({ n, st: fineStatus(c, n, today) })),
@@ -665,6 +704,8 @@ export function pvText(c, controls = [], { doarNetrecute = false, cuActe = true 
       let t = `${++nr}. ${constatareLabel(n)}`;
       const ks = constructiiOf(c, n);
       if (sec === 'ner' && multe && ks.length) t += ` – ${ks.length > 1 ? 'construcțiile' : 'construcția'}: ${constructiiNume(c, n)}`;
+      const vt = verifText(c, n);
+      if (vt) t += `. ${vt[0].toUpperCase()}${vt.slice(1)}`;
       if (n.obs && n.obs.trim()) t += `. ${n.obs.trim().replace(/\s*\n\s*/g, '; ')}`;
       const extra = [];
       if (n.custom && n.grav) extra.push('neregulă gravă');
@@ -734,6 +775,11 @@ export function todoList(c, { includeClose = true } = {}) {
     const nume = faraGps.map((k) => k.denumire || `Construcția ${c.constructii.indexOf(k) + 1}`).join(', ');
     out.push({ id: 'gps', level: 'warn', text: `Coordonate GPS necompletate: ${nume}`, tab: 'obiectiv', focus: `gps-${faraGps[0].id}` });
   }
+  // verificări expirate care nu sunt (încă) constatate — inspectorul decide
+  for (const n of c.nereguli.filter((x) => isVerificare(x) && isApplicable(c, x) && x.status !== 'nok' && x.status !== 'nec')) {
+    const exp = verifExpirate(c, n);
+    if (exp.length) out.push({ id: `verif-${n.key}`, level: 'warn', text: `Verificare expirată (${n.key}, ${neregulaLabel(n).replace(/^Nu a prezentat \/ nu are verificare /, '')}): ${exp.map((k) => k.denumire).join(', ')}`, tab: 'nereguli', focus: n.key });
+  }
   if (includeClose && !isISO(c.dataIncheiere)) out.push({ id: 'close', level: 'todo', text: 'Controlul nu este încheiat', tab: 'obiectiv', focus: 'sec-perioada' });
   return out;
 }
@@ -744,3 +790,41 @@ export const googleMapsUrl = (g) => `https://www.google.com/maps/search/?api=1&q
 export const appleMapsUrl = (g, label = '') => `https://maps.apple.com/?ll=${g.lat.toFixed(6)},${g.lon.toFixed(6)}&q=${encodeURIComponent(label || fmtCoord(g))}`;
 // Precizia: sub 30 m bună, până la 100 m acceptabilă, peste 100 m slabă (de regulă în interior sau fără GPS)
 export const gpsQuality = (acc) => (acc <= 30 ? 'buna' : acc <= 100 ? 'medie' : 'slaba');
+
+// ───────── Verificări pe instalații: data ultimei verificări, pe construcție ─────────
+// Construcțiile relevante pentru un rând: cele cu DA la instalația cerută (dacă rândul ține de o instalație),
+// altfel toate. Dacă niciuna nu are DA (rând afișat cu „Arată toate”), toate.
+export function constructiiEligibile(c, n) {
+  const list = c.constructii || [];
+  const t = n && !n.custom ? sablon(n.key) : null;
+  if (!t?.req || t.grav) return list;
+  const cu = list.filter((k) => t.req.some((r) => (r === 'centrala' ? (k.dotari?.centrala?.tipuri || []).length > 0 : k.dotari?.[r]?.v === 'DA')));
+  return cu.length ? cu : list;
+}
+
+export const isVerificare = (n) => !n.custom && !!sablon(n.key)?.verif;
+
+// Starea verificării unei construcții, față de data controlului (data începerii).
+export function verifStare(c, n, k) {
+  const t = sablon(n.key);
+  const v = n.verificari?.[k.id] || {};
+  const luni = t.verifAlegeri?.includes(Number(v.luni)) ? Number(v.luni) : t.verif;
+  if (!isISO(v.data)) return { data: '', luni, stare: 'lipsa' };
+  const expira = addMonths(v.data, luni);
+  const ref = isISO(c.dataInceput) ? c.dataInceput : todayISO();
+  return { data: v.data, luni, expira, stare: expira < ref ? 'expirata' : 'valabila' };
+}
+
+export const verifExpirate = (c, n) => (isVerificare(n) ? constructiiEligibile(c, n).filter((k) => verifStare(c, n, k).stare === 'expirata') : []);
+
+// Textul pentru PV / fișă: datele ultimei verificări la construcțiile alese
+export function verifText(c, n) {
+  if (!isVerificare(n)) return '';
+  const multe = (c.constructii || []).length > 1;
+  return constructiiOf(c, n).map((k) => {
+    const s = verifStare(c, n, k);
+    const cum = s.stare === 'lipsa' ? 'fără verificare prezentată'
+      : `ultima verificare ${fmtDate(s.data)}${s.stare === 'expirata' ? `, expirată din ${fmtDate(s.expira)}` : ''}`;
+    return multe ? `${k.denumire || 'construcție'}: ${cum}` : cum;
+  }).join('; ');
+}
