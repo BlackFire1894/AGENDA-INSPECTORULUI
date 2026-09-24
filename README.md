@@ -14,7 +14,7 @@ Funcționează **offline**, iar datele rămân **doar pe tabletă** (IndexedDB),
 | **Istoric** | toate controalele, grupate pe luni, cu căutare și filtre |
 | **Control** | **Obiectiv** (date, perioadă, construcții și dotări) · **Acte & evidențe** (✓ verde / ✗ roșu) · la localități: **Planuri și SVSU** și **Protecție civilă** · **Nereguli** (grupate pe categorii colorate; cele de instalații apar doar dacă instalația e bifată DA la dotări). Peste tot: trecut/netrecut în PV, amendă, rânduri suplimentare |
 
-Salvare automată la fiecare modificare. În control, bara **„Ce mai ai de făcut”** arată pasul următor; **Restul conform** bifează în bloc (cu Anulează); **Încheie controlul** arată omisiunile. Fiecare ecran are un buton **?** cu ajutor scurt, iar ecranul de bun venit / Setări conțin ghidul în 4 pași. Din control: **Text PV** (lista neregulilor, gata de copiat în procesul-verbal) și **Fișa (PDF)** (rezumat complet, tipărit sau partajat). Neregulile constatate și la controale anterioare sunt marcate **Neregulă veche** (automat din istoric sau manual). Mărimea textului (Mic / Mediu / Mare) se alege din **Setări** și scalează proporțional toată interfața. Un control nou pe un obiectiv existent preia automat datele de contact și construcțiile din ultimul control.
+Salvare automată la fiecare modificare. În control, bara **„Ce mai aveți de făcut”** arată pasul următor; **Restul conform** bifează în bloc (cu Anulează); **Încheie controlul** arată omisiunile. **Ghidul aplicației** (bara laterală / Panou) este manualul complet, cu căutare. Din control: **Text PV** (lista neregulilor, gata de copiat în procesul-verbal) și **Fișa (PDF)** (rezumat complet, tipărit sau partajat). Neregulile constatate și la controale anterioare sunt marcate **Neregulă veche** (automat din istoric sau manual). Mărimea textului (Mic / Mediu / Mare) se alege din **Setări** și scalează proporțional toată interfața. Un control nou pe un obiectiv existent preia automat datele de contact și construcțiile din ultimul control.
 
 ## Termene
 
@@ -23,10 +23,10 @@ Toate termenele curg de la data de referință **+ 1 zi**, după data și ora ta
 - **Amendă** (data aplicării, implicit data încheierii controlului):
   - 🔵 zilele 1–15: în curs
   - 🟡 zilele 16–39: termenul de 15 zile a expirat
-  - 🔴 din ziua 40: *„Mai ai 5 zile până să o trimiți la ANAF, consultă calculatorul de termene”* (termen ANAF: ziua 45 = 15 + 30 de zile, conform art. 39 alin. (1) din OG 2/2001)
+  - 🔴 din ziua 40: *„Mai aveți 5 zile până să o trimiteți la ANAF; consultați calculatorul de termene”* (termen ANAF: ziua 45 = 15 + 30 de zile, conform art. 39 alin. (1) din OG 2/2001)
   - 🟢 achitată, cu dovada primită
 - **ASI**: 90 de zile de la data încheierii controlului.
-- Termenele care cad într-o zi nelucrătoare (weekend sau sărbătoare legală, art. 139 Codul muncii) **nu se mută automat**; aplicația afișează avertizarea „cade sâmbătă — verifică prelungirea”.
+- Termenele care cad într-o zi nelucrătoare (weekend sau sărbătoare legală, art. 139 Codul muncii) **nu se mută automat**; aplicația afișează avertizarea „cade sâmbătă — verificați prelungirea”.
 
 Logica este acoperită de teste: `npm test`.
 

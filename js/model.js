@@ -542,7 +542,7 @@ export function fineStatus(control, n, today = todayISO()) {
     const left = TERMEN_PLATA - Math.max(elapsed, 0);
     return {
       level: 'blue', label: 'În curs', elapsed, plataPana, anafPana, plataNelucr, anafNelucr, daysLeft: left,
-      nelucr: plataNelucr ? `Termenul de plată (${fmtDate(plataPana)}) cade ${plataNelucr} — verifică prelungirea` : '',
+      nelucr: plataNelucr ? `Termenul de plată (${fmtDate(plataPana)}) cade ${plataNelucr} — verificați prelungirea` : '',
       msg: left === 0 ? 'Astăzi este ultima zi de plată' : `${maiSunt(left)} din termenul de plată (${fmtDate(plataPana)})`,
     };
   }
@@ -550,17 +550,17 @@ export function fineStatus(control, n, today = todayISO()) {
     const over = elapsed - TERMEN_PLATA;
     return {
       level: 'yellow', label: 'Termen 15 zile expirat', elapsed, plataPana, anafPana, plataNelucr, anafNelucr, daysLeft: leftAnaf,
-      nelucr: anafNelucr ? `Termenul ANAF (${fmtDate(anafPana)}) cade ${anafNelucr} — verifică prelungirea` : '',
+      nelucr: anafNelucr ? `Termenul ANAF (${fmtDate(anafPana)}) cade ${anafNelucr} — verificați prelungirea` : '',
       msg: `Termenul de plată a expirat de ${zile(over)} (${fmtDate(plataPana)})`,
     };
   }
   let msg;
-  if (leftAnaf > 0) msg = `Mai ai ${zile(leftAnaf)} până să o trimiți la ANAF, consultă calculatorul de termene`;
-  else if (leftAnaf === 0) msg = 'Astăzi este ultima zi pentru trimiterea la ANAF, consultă calculatorul de termene';
+  if (leftAnaf > 0) msg = `Mai aveți ${zile(leftAnaf)} până să o trimiteți la ANAF; consultați calculatorul de termene`;
+  else if (leftAnaf === 0) msg = 'Astăzi este ultima zi pentru trimiterea la ANAF; consultați calculatorul de termene';
   else msg = `Termenul de trimitere la ANAF (${fmtDate(anafPana)}) a fost depășit cu ${zile(-leftAnaf)}`;
   return {
     level: 'red', label: 'Trimite la ANAF', elapsed, plataPana, anafPana, plataNelucr, anafNelucr, daysLeft: leftAnaf, msg,
-    nelucr: anafNelucr && leftAnaf >= 0 ? `Termenul ANAF (${fmtDate(anafPana)}) cade ${anafNelucr} — verifică prelungirea` : '',
+    nelucr: anafNelucr && leftAnaf >= 0 ? `Termenul ANAF (${fmtDate(anafPana)}) cade ${anafNelucr} — verificați prelungirea` : '',
   };
 }
 
@@ -581,7 +581,7 @@ export function asiDeadline(control, today = todayISO()) {
   else if (left === 0) msg = `Termenul expiră astăzi (${fmtDate(deadline)})`;
   else msg = `Termen depășit cu ${zile(-left)} (${fmtDate(deadline)})`;
   const nl = zinelucratoare(deadline);
-  return { deadline, daysLeft: left, msg, nelucr: nl && left >= 0 ? `Termenul (${fmtDate(deadline)}) cade ${nl} — verifică prelungirea` : '' };
+  return { deadline, daysLeft: left, msg, nelucr: nl && left >= 0 ? `Termenul (${fmtDate(deadline)}) cade ${nl} — verificați prelungirea` : '' };
 }
 
 // Statistici pentru un control
@@ -800,7 +800,7 @@ export function pvText(c, controls = [], { doarNetrecute = false, cuActe = true 
 export function todoList(c, { includeClose = true } = {}) {
   const out = [];
   const tabOf = (sec) => SECTIUNI[sec].tab;
-  if (!String(c.denumire || '').trim()) out.push({ id: 'denumire', level: 'todo', text: 'Completează denumirea obiectivului', tab: 'obiectiv', focus: 'sec-date' });
+  if (!String(c.denumire || '').trim()) out.push({ id: 'denumire', level: 'todo', text: 'Completați denumirea obiectivului', tab: 'obiectiv', focus: 'sec-date' });
 
   const acteTodo = ACTE.filter((a) => !c.acte[a.key]?.status);
   if (acteTodo.length) {

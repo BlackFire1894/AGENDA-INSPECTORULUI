@@ -9,4 +9,5 @@
 - Logica de termene (`fineStatus`, `asiDeadline`) e acoperită de `npm test`; rulează testele înainte de push.
 - Dimensiuni în CSS doar în `rem` (baza = 18px la „Mare”, 16.5px „Mediu”, 15px „Mic”), ca setarea de mărime a textului să scaleze tot. Excepții: bordurile subțiri, umbrele și media queries rămân în px. Înălțimile țintelor de atingere folosesc `max(44px, …rem)`, iar fontul câmpurilor de text `max(16px, …rem)`, altfel iOS mărește pagina la focus.
 - **Ghidul aplicației** (`js/help.js`, ecranul `#/ghid`) e manualul complet: butoanele (cu pictograme), funcțiile, corelările, fluxul. Se actualizează odată cu funcțiile pe care le descrie — orice buton sau comportament nou intră în capitolul lui.
+- Tonul textelor din aplicație e formal („dumneavoastră”: „Completați…”, „Ștergeți…?”); etichetele butoanelor rămân nume de acțiuni („Anulează”, „Șterge”).
 - UI: text mare, ținte de atingere ≥ 44px, temă luminoasă și întunecată, portret (bara de jos) și peisaj (bara laterală, ≥ 1000px).

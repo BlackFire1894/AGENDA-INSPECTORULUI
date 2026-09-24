@@ -82,7 +82,7 @@ async function render({ keepScroll = false } = {}) {
       if (route.focus) reveal(c, route.focus);
       if (prev.name !== 'control' || prev.id !== route.id) state.ui.showAllNer = false;
       if (prev.name !== 'control' || prev.id !== route.id || prev.tab !== route.tab) {
-        state.ui.nerFilter = 'ALL'; state.ui.nerQuery = ''; state.ui.constrPick = '';
+        state.ui.nerFilter = 'ALL'; state.ui.nerQuery = ''; state.ui.constrPick = ''; state.ui.toolsOpen = false;
       }
       historyStart(c);
       html = viewControl(c, route.tab);
@@ -187,7 +187,7 @@ function rerenderEditor() {
   updateEditTools();
 }
 
-// Bara „Ce mai ai de făcut” se actualizează și în timpul tastării (fără a atinge câmpul în care se scrie)
+// Bara „Ce mai aveți de făcut” se actualizează și în timpul tastării (fără a atinge câmpul în care se scrie)
 let todoTimer;
 function refreshTodoSoon(c) {
   clearTimeout(todoTimer);
@@ -303,6 +303,12 @@ function refreshSearch(key) {
   }
 }
 
+// Observații deschise și lăsate goale: la ieșirea din câmp redevin „+ Obs.” (la următoarea redesenare)
+document.addEventListener('focusout', (e) => {
+  const el = e.target;
+  if (el.dataset?.obs && !el.value.trim()) state.ui.obsOpen.delete(obsKey(el.dataset.bind));
+});
+
 document.addEventListener('change', async (e) => {
   const el = e.target;
   // data ultimei verificări pentru o construcție (rândurile de verificare)
@@ -417,7 +423,7 @@ document.addEventListener('click', async (e) => {
     case 'theme': setTheme(el.dataset.val); return;
     case 'check-update': {
       const found = await checkForUpdate();
-      if (!found) toast(`Ai cea mai nouă versiune (${APP_VERSION})`);
+      if (!found) toast(`Aveți cea mai nouă versiune (${APP_VERSION})`);
       return;
     }
   }
@@ -549,7 +555,7 @@ document.addEventListener('click', async (e) => {
     case 'constr-dec': case 'constr-del': {
       if (c.constructii.length <= 1) { toast('Obiectivul trebuie să aibă cel puțin o construcție', 'warn'); return; }
       const k = act === 'constr-del' ? c.constructii.find((x) => x.id === el.dataset.id) : c.constructii[c.constructii.length - 1];
-      const ok = await confirmDialog({ title: 'Ștergi construcția?', text: `„${k.denumire || 'Construcție'}” și toate datele ei vor fi șterse din acest control.`, ok: 'Șterge', danger: true });
+      const ok = await confirmDialog({ title: 'Ștergeți construcția?', text: `„${k.denumire || 'Construcție'}” și toate datele ei vor fi șterse din acest control.`, ok: 'Șterge', danger: true });
       if (!ok) return;
       c.constructii = c.constructii.filter((x) => x !== k);
       break;
@@ -602,27 +608,17 @@ document.addEventListener('click', async (e) => {
       return;
     }
     case 'gps-clear': {
-      const ok = await confirmDialog({ title: 'Ștergi coordonatele?', text: 'Le puteți prelua din nou oricând, cu „Completează coordonatele”.', ok: 'Șterge', danger: true });
+      const ok = await confirmDialog({ title: 'Ștergeți coordonatele?', text: 'Le puteți prelua din nou oricând, cu „Completează coordonatele”.', ok: 'Șterge', danger: true });
       const k = c.constructii.find((x) => x.id === el.dataset.id);
       if (ok && k) { k.gps = null; touch(c, true); rerenderEditor(); }
       return;
     }
     case 'close-control': closeControlFlow(c); return;
-    case 'obs-toggle':
-      // butonul general: setează toate câmpurile și anulează excepțiile individuale
-      state.ui.obsHidden = !state.ui.obsHidden;
-      state.ui.obsOverride.clear();
-      savePref('agenda-obs-hidden', state.ui.obsHidden);
-      savePref('agenda-obs-override', []);
-      rerenderEditor(); return;
-    case 'obs-show': case 'obs-hide': {
-      const show = act === 'obs-show';
-      const key = obsKey(el.dataset.path);
-      if (show === !state.ui.obsHidden) state.ui.obsOverride.delete(key); else state.ui.obsOverride.set(key, !show);
-      const entries = [...state.ui.obsOverride].slice(-1000);   // limită de siguranță pentru memoria locală
-      savePref('agenda-obs-override', entries);
+    case 'tools-more': state.ui.toolsOpen = !state.ui.toolsOpen; rerenderEditor(); return;
+    case 'obs-open': {
+      state.ui.obsOpen.add(obsKey(el.dataset.path));
       rerenderEditor();
-      if (show) document.querySelector(`textarea[data-bind="${CSS.escape(el.dataset.path)}"]`)?.focus();
+      document.querySelector(`textarea[data-bind="${CSS.escape(el.dataset.path)}"]`)?.focus();
       return;
     }
     case 'cat-toggle': {
@@ -652,7 +648,7 @@ document.addEventListener('click', async (e) => {
     }
     case 'ner-del': {
       const n = c.nereguli.find((x) => x.key === el.dataset.key);
-      const ok = await confirmDialog({ title: 'Ștergi rândul?', text: `„${n.label || 'Neregulă suplimentară'}” va fi eliminată din acest control.`, ok: 'Șterge', danger: true });
+      const ok = await confirmDialog({ title: 'Ștergeți rândul?', text: `„${n.label || 'Neregulă suplimentară'}” va fi eliminată din acest control.`, ok: 'Șterge', danger: true });
       if (!ok) return;
       c.nereguli = c.nereguli.filter((x) => x !== n);
       break;
@@ -663,7 +659,7 @@ document.addEventListener('click', async (e) => {
       break;
     }
     case 'control-delete': {
-      const ok = await confirmDialog({ title: 'Ștergi controlul?', text: `Controlul de la „${c.denumire || 'obiectiv fără denumire'}” din ${fmtDate(c.dataInceput)} va fi șters definitiv.`, ok: 'Șterge definitiv', danger: true });
+      const ok = await confirmDialog({ title: 'Ștergeți controlul?', text: `Controlul de la „${c.denumire || 'obiectiv fără denumire'}” din ${fmtDate(c.dataInceput)} va fi șters definitiv.`, ok: 'Șterge definitiv', danger: true });
       if (!ok) return;
       await removeControl(c.id);
       toast('Control șters');
@@ -705,7 +701,7 @@ function openNewControl({ date, oid } = {}) {
       </label>
       <label class="field">
         <span class="lbl">Denumire obiectiv</span>
-        <span class="inp-wrap big-inp">${icon('search')}<input id="nc-name" placeholder="Scrie denumirea — caut și în obiectivele existente" autocomplete="off" enterkeyhint="done"></span>
+        <span class="inp-wrap big-inp">${icon('search')}<input id="nc-name" placeholder="Scrieți denumirea — caut și în obiectivele existente" autocomplete="off" enterkeyhint="done"></span>
       </label>
       <div id="nc-existing"></div>
       <div class="nc-new">
@@ -868,7 +864,7 @@ function closeControlFlow(c) {
     touch(c, true);
     closeModal();
     rerenderEditor();
-    toast(`Control încheiat la ${fmtDate(c.dataIncheiere)} — poți modifica data`);
+    toast(`Control încheiat la ${fmtDate(c.dataIncheiere)} — puteți modifica data`);
   };
   const items = todoList(c, { includeClose: false });
   if (!items.length) { doClose(); return; }
@@ -1066,7 +1062,7 @@ async function loadDemo() {
 }
 
 async function removeDemo() {
-  const ok = await confirmDialog({ title: 'Ștergi datele demonstrative?', text: 'Doar controalele demonstrative vor fi șterse. Datele tale rămân.', ok: 'Șterge', danger: true });
+  const ok = await confirmDialog({ title: 'Ștergeți datele demonstrative?', text: 'Doar controalele demonstrative vor fi șterse. Datele dumneavoastră rămân.', ok: 'Șterge', danger: true });
   if (!ok) return;
   for (const c of state.controls.filter((x) => x.demo)) await removeControl(c.id);
   toast('Date demonstrative șterse');
@@ -1074,7 +1070,7 @@ async function removeDemo() {
 }
 
 async function wipeAll() {
-  const ok = await confirmDialog({ title: 'Ștergi TOATE datele?', text: `${state.controls.length} controale vor fi șterse definitiv de pe această tabletă. Operația nu poate fi anulată.`, ok: 'Șterge tot', danger: true });
+  const ok = await confirmDialog({ title: 'Ștergeți TOATE datele?', text: `${state.controls.length} controale vor fi șterse definitiv de pe această tabletă. Operația nu poate fi anulată.`, ok: 'Șterge tot', danger: true });
   if (!ok) return;
   await store.replaceAll([]);
   state.controls = [];

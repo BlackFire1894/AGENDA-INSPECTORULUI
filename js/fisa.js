@@ -39,10 +39,10 @@ export function fisaMarkup(c, controls, now = new Date()) {
     </div>
     <div class="f-sum">
       <div><b>${st.constatate}</b><span>nereguli / neconformități</span></div>
-      <div><b>${st.netrecute}</b><span>netrecute în PV</span></div>
-      <div><b>${st.fines.length}</b><span>amenzi</span></div>
-      <div><b>${vechi}</b><span>nereguli vechi</span></div>
-      <div><b>${st.acteNok}</b><span>acte lipsă</span></div>
+      <div><b>${st.netrecute}</b><span>${st.netrecute === 1 ? 'netrecută' : 'netrecute'} în PV</span></div>
+      <div><b>${st.fines.length}</b><span>${st.fines.length === 1 ? 'amendă' : 'amenzi'}</span></div>
+      <div><b>${vechi}</b><span>${vechi === 1 ? 'neregulă veche' : 'nereguli vechi'}</span></div>
+      <div><b>${st.acteNok}</b><span>${st.acteNok === 1 ? 'act lipsă' : 'acte lipsă'}</span></div>
     </div>
   </header>`);
 
