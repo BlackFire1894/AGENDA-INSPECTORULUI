@@ -21,7 +21,7 @@ export const GHID = [
       'Mergeți prin taburi, de la stânga la dreapta. La fiecare rând: <b>✓</b> e în regulă, <b>✗</b> e neregulă. La ✗ apar PV-ul și amenda. Căutarea din tab vă duce direct la o neregulă.',
       'Bara <b>„Ce mai ai de făcut”</b> vă arată mereu pasul următor; atingeți-o și vă duce acolo.',
       '<b>Restul conform</b> marchează rândurile rămase, după ce vedeți lista și confirmați cu bifa „Am verificat…”.',
-      'Totul se salvează <b>automat</b>, pe loc. Butoanele <b>↶ Anulează</b> și <b>↷ Refă</b> din antet vă duc un pas înapoi sau înainte.',
+      'Totul se salvează <b>automat</b>, pe loc. <b>↶ Anulează</b>, <b>↑ Sus</b> și <b>↷ Refă</b> stau mereu la îndemână: în banda de deasupra barei de jos (vertical) sau în bara laterală (orizontal). După Anulează / Refă, ecranul merge la locul schimbat și îl evidențiază.',
     ],
   },
   {
@@ -99,7 +99,8 @@ export const AJUTOR = {
   'ctrl-acte': {
     title: 'Acte și evidențe',
     lines: [
-      '<b>✓ Prezentat</b> sau <b>✗ Lipsă</b> pentru fiecare act. Observațiile acceptă mai multe rânduri (Enter).',
+      '<b>✓ Prezentat</b>, <b>✗ Lipsă</b> sau <b>NEC</b> pentru fiecare act. Observațiile acceptă mai multe rânduri (Enter).',
+      'Ca la nereguli: căutare (număr sau text; LFD = lucru cu foc deschis, CTPSI = cadru tehnic PSI, RESP = responsabil PSI), filtru, bara listei cu actele necompletate și lipsă, fiecare act se strânge din bara lui (singur la ✓ / NEC).',
       '<b>Restul prezentate</b> arată lista actelor nemarcate și cere bifa „Am verificat…” înainte de marcare; imediat după, aveți <b>Anulează</b>.',
     ],
   },
@@ -107,14 +108,16 @@ export const AJUTOR = {
     title: 'Nereguli',
     lines: [
       'Primele rânduri: <b>ah</b> (funcționează fără ASI) și <b>ai</b> (lucrări fără aviz). La NU pentru ASI / AVIZ în tabul Obiectiv se constată singure, cu observațiile de acolo.',
-      '<b>Căutare:</b> scrieți litera (d, ag, G1) sau un cuvânt (hidranți, gaz) și lista se restrânge pe loc; ✕ o golește.',
+      '<b>Căutare:</b> scrieți litera (d, ag, G1) sau un cuvânt (hidranți, gaz) și lista se restrânge pe loc; ✕ o golește. Abrevierile se găsesc și după denumirea completă (Hint = hidranți interiori, IDSAI = detectare, semnalizare și alarmare, EXIT = iluminare de securitate pentru evacuare…).',
       '<b>✓ Conform</b>, <b>✗ Constatat</b> sau <b>NEC</b> (nu este cazul). La constatat: construcțiile (una sau mai multe — atingeți meniul și bifați), trecut în PV, amendă (serie, nr., sumă), neregulă veche.',
       'Sus, cu roșu: <b>nereguli grave</b> (G1, G2…) — instalații marcate NU la dotări și construcții cu <b>GRF/NSI V</b> și regim peste parter (P+1, P+2E, P+M…). Apar și dispar singure, după datele din tabul Obiectiv. La constatat, bifa <b>Sigiliu</b> arată în baza cărei nereguli ați aplicat sigiliul.',
       'Rândurile adăugate au bifa <b>Neregulă gravă</b>; bifată, apare și <b>Sigiliu</b>. Secțiunea lor se restrânge din titlu.',
       '<b>Verificările</b> sunt pe instalații (b1 electrice, b2 împământare, b3 CT — la toate construcțiile; c1–c7 IDSAI, hidranți, desfumare, sprinklere, drencere, instalații speciale — doar unde e DA). Completați data ultimei verificări la fiecare construcție; expirarea se calculează față de data controlului (electrice 12 luni, împământare 12 / 24 la alegere, CT 24, hidranți 6, restul 12). La expirare, aplicația vă propune „Constatat”; decideți dumneavoastră.',
       'Meniul de construcții al unei nereguli de instalație arată doar construcțiile care au instalația bifată DA în fișă.',
       'Apar doar neregulile pentru instalațiile bifate DA la dotări; <b>Arată toate</b> le afișează și pe celelalte.',
-      'Categoriile se strâng din titlul lor; bara arată mereu <b>✓ Completat</b> sau câte rânduri sunt <b>necompletate</b>, și când categoria e strânsă. Observațiile se ascund individual (săgeata) sau toate deodată.',
+      'Categoriile și <b>fiecare neregulă</b> se strâng din bara lor (săgeata). Bara categoriei arată <b>✓ Completat</b> sau <b>care</b> rânduri sunt necompletate, câte sunt constatate și <b>care</b> sunt amendate. Bara neregulii strânse arată starea, PV, amenda și avertizările.',
+      'La <b>✓ Conform</b> sau <b>NEC</b> rândul se strânge singur; <b>Restrânge completate</b> le strânge pe toate. Bara categoriei și a neregulii curente rămân sus la derulare, sub taburi.',
+      'Observațiile se ascund individual (săgeata de lângă ele) sau toate deodată.',
       '<b>Restul conform</b> vă arată lista exactă a rândurilor nemarcate și cere bifa „Am verificat…” înainte de marcare; neregulile grave nu intră niciodată în bloc. <b>Adaugă rând</b> pentru nereguli din afara listei.',
     ],
   },

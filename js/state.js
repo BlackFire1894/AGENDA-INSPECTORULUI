@@ -1,6 +1,7 @@
 // Starea aplicației în memorie + salvare automată.
 import * as store from './store.js';
 import { todayISO } from './dates.js';
+import { fixeazaCatalog } from './model.js';
 
 // Preferințe de afișare ale acestei tablete (nu fac parte din date / backup)
 function pref(key, fallback) {
@@ -35,6 +36,7 @@ export const state = {
     todoOpen: false,
     gpsBusy: '',              // id-ul construcției pentru care se caută poziția// lista completă „Ce mai ai de făcut” deschisă
     catCollapsed: new Set(pref('agenda-cats-collapsed', [])),    // categorii de nereguli restrânse
+    rowCollapsed: new Set(pref('agenda-rows-collapsed', [])),    // rânduri de nereguli restrânse: „<idControl>|<cheie>”
   },
   meta: { lastBackup: null },
 };
@@ -57,6 +59,7 @@ function emit(s) { listeners.forEach((fn) => fn(s)); }
 // `now`: salvează imediat (atingeri, selecții, date); textul tastat se salvează după o scurtă pauză.
 export function touch(c, now = false) {
   c.updatedAt = new Date().toISOString();
+  fixeazaCatalog(c);   // încheierea fixează lista de nereguli, redeschiderea o eliberează
   pending.set(c.id, c);
   emit('saving');
   clearTimeout(timer);

@@ -5,7 +5,7 @@ import {
   TERMEN_PLATA, PRAG_ROSU, TERMEN_ANAF, TERMEN_ASI, fmtDate, zinelucratoare, addMonths,
 } from './dates.js';
 
-export const SCHEMA_VERSION = 9; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS · 7: mai multe construcții pe neregulă, GRF/NSI pe construcție · 8: nereguli ah, ai · 9: verificări defalcate cu date pe construcție, NEC, aj/ak, an construire, nr. ASI/aviz
+export const SCHEMA_VERSION = 10; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS · 7: mai multe construcții pe neregulă, GRF/NSI pe construcție · 8: nereguli ah, ai · 9: verificări defalcate cu date pe construcție, NEC, aj/ak, an construire, nr. ASI/aviz · 10: lista înghețată la încheiere (catalog), seria și nr. amenzii într-un câmp
 
 export const TIP_OBIECTIV = [
   { key: 'OPEC', label: 'OPEC / Instituție' },
@@ -91,37 +91,37 @@ export const SECTIUNI = {
 const INST_C = ['idsai', 'hidInt', 'hidExt', 'desfumare', 'sprinklere', 'drencere', 'instSpeciale'];
 export const NEREGULI = [
   // primele din listă (foarte importante); se completează automat la NU pentru ASI / AVIZ la dotări
-  { key: 'ah', cat: 'docs', label: 'Construcția funcționează fără ASI (autorizație de securitate la incendiu)', autoNU: 'asi' },
-  { key: 'ai', cat: 'docs', label: 'Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz', autoNU: 'aviz' },
+  { key: 'ah', din: 8, cat: 'docs', label: 'Construcția funcționează fără ASI (autorizație de securitate la incendiu)', autoNU: 'asi' },
+  { key: 'ai', din: 8, cat: 'docs', label: 'Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz', autoNU: 'aviz' },
   { key: 'a', cat: 'docs', label: 'Nu a prezentat documentație ASI', asi: true },
   // Verificări, defalcate pe instalație; data ultimei verificări se completează pe fiecare construcție.
   // `verif`: perioada de valabilitate în luni (b2: la alegere 12 / 24, pe construcție). b1–b3: toate construcțiile.
-  { key: 'b1', cat: 'docs', label: 'Nu a prezentat / nu are verificare instalații electrice', verif: 12 },
-  { key: 'b2', cat: 'docs', label: 'Nu a prezentat / nu are verificare împământare (IPT)', verif: 12, verifAlegeri: [12, 24] },
-  { key: 'b3', cat: 'docs', label: 'Nu a prezentat / nu are verificare CT (centrală termică)', verif: 24 },
-  { key: 'c1', cat: 'docs', label: 'Nu a prezentat / nu are verificare IDSAI', req: ['idsai'], verif: 12 },
-  { key: 'c2', cat: 'docs', label: 'Nu a prezentat / nu are verificare hidranți interiori', req: ['hidInt'], verif: 6 },
-  { key: 'c3', cat: 'docs', label: 'Nu a prezentat / nu are verificare hidranți exteriori', req: ['hidExt'], verif: 6 },
-  { key: 'c4', cat: 'docs', label: 'Nu a prezentat / nu are verificare desfumare', req: ['desfumare'], verif: 12 },
-  { key: 'c5', cat: 'docs', label: 'Nu a prezentat / nu are verificare sprinklere', req: ['sprinklere'], verif: 12 },
-  { key: 'c6', cat: 'docs', label: 'Nu a prezentat / nu are verificare drencere', req: ['drencere'], verif: 12 },
-  { key: 'c7', cat: 'docs', label: 'Nu a prezentat / nu are verificare instalații speciale', req: ['instSpeciale'], verif: 12 },
+  { key: 'b1', din: 9, cat: 'docs', label: 'Nu a prezentat / nu are verificare instalații electrice', verif: 12 },
+  { key: 'b2', din: 9, cat: 'docs', label: 'Nu a prezentat / nu are verificare împământare (IPT)', verif: 12, verifAlegeri: [12, 24] },
+  { key: 'b3', din: 9, cat: 'docs', label: 'Nu a prezentat / nu are verificare CT (centrală termică)', verif: 24 },
+  { key: 'c1', din: 9, cat: 'docs', label: 'Nu a prezentat / nu are verificare IDSAI', req: ['idsai'], verif: 12 },
+  { key: 'c2', din: 9, cat: 'docs', label: 'Nu a prezentat / nu are verificare hidranți interiori', req: ['hidInt'], verif: 6 },
+  { key: 'c3', din: 9, cat: 'docs', label: 'Nu a prezentat / nu are verificare hidranți exteriori', req: ['hidExt'], verif: 6 },
+  { key: 'c4', din: 9, cat: 'docs', label: 'Nu a prezentat / nu are verificare desfumare', req: ['desfumare'], verif: 12 },
+  { key: 'c5', din: 9, cat: 'docs', label: 'Nu a prezentat / nu are verificare sprinklere', req: ['sprinklere'], verif: 12 },
+  { key: 'c6', din: 9, cat: 'docs', label: 'Nu a prezentat / nu are verificare drencere', req: ['drencere'], verif: 12 },
+  { key: 'c7', din: 9, cat: 'docs', label: 'Nu a prezentat / nu are verificare instalații speciale', req: ['instSpeciale'], verif: 12 },
   // până la v1.10: verificările grupate; rămân doar în controalele în care au fost completate (retras)
-  { key: 'b', cat: 'docs', label: 'Nu a prezentat / nu are verificare instalații electrice / IPT / CT', retras: true },
-  { key: 'c', cat: 'docs', label: 'Nu a prezentat / nu are verificare IDSAI / Hint / Hext / Desfumare / Sprinklere / Drencere / Instalații speciale', req: INST_C, retras: true },
+  { key: 'b', cat: 'docs', label: 'Nu a prezentat / nu are verificare instalații electrice / IPT / CT', retrasDin: 9 },
+  { key: 'c', cat: 'docs', label: 'Nu a prezentat / nu are verificare IDSAI / Hint / Hext / Desfumare / Sprinklere / Drencere / Instalații speciale', req: INST_C, retrasDin: 9 },
   { key: 'd', cat: 'stingatoare', label: 'Stingătoare expirate' },
   { key: 'e', cat: 'stingatoare', label: 'Stingătoare neconforme' },
-  { key: 'al', cat: 'stingatoare', label: 'Stingătoare insuficiente / lipsă' },
+  { key: 'al', din: 9, cat: 'stingatoare', label: 'Stingătoare insuficiente / lipsă' },
   { key: 'f', cat: 'electric', label: 'Instalații electrice exploatate incorect' },
   { key: 'g', cat: 'electric', label: 'Perete / planșeu / perete + planșeu cameră CT – 90 minute', req: ['centrala'] },
   { key: 'h', cat: 'electric', label: 'Ușă RF 15 minute cameră CT', req: ['centrala'] },
   { key: 'i', cat: 'electric', label: 'Ușă RF 60 minute cameră IDSAI', req: ['idsai'] },
   { key: 'j', cat: 'semnalizare', label: 'EXIT defect', req: ['exit'] },
-  { key: 'aj', cat: 'semnalizare', label: 'EXIT incomplet', req: ['exit'] },
+  { key: 'aj', din: 9, cat: 'semnalizare', label: 'EXIT incomplet', req: ['exit'] },
   { key: 'k', cat: 'semnalizare', label: 'Iluminat Hint defect', req: ['ilumHint'] },
-  { key: 'ak', cat: 'semnalizare', label: 'Iluminat Hint incomplet', req: ['ilumHint'] },
+  { key: 'ak', din: 9, cat: 'semnalizare', label: 'Iluminat Hint incomplet', req: ['ilumHint'] },
   // NU la Iluminat Hint → constatată automat (ca ah / ai), vizibilă doar cât timp o construcție are NU
-  { key: 'am', cat: 'semnalizare', label: 'Lipsă iluminat Hint', autoNU: 'ilumHint', doarLaNU: true },
+  { key: 'am', din: 9, cat: 'semnalizare', label: 'Lipsă iluminat Hint', autoNU: 'ilumHint', doarLaNU: true },
   { key: 'l', cat: 'idsai', label: 'Erori IDSAI', req: ['idsai'] },
   { key: 'm', cat: 'idsai', label: 'IDSAI nefuncțional', req: ['idsai'] },
   { key: 'n', cat: 'hidranti', label: 'Probleme Hint', req: ['hidInt'] },
@@ -138,13 +138,13 @@ export const NEREGULI = [
   { key: 'x', cat: 'stingere', label: 'Instalații speciale nefuncționale', req: ['instSpeciale'] },
   { key: 'y', cat: 'pompe', label: 'Probleme stație de pompe / generator', req: ['statiePompe'] },
   { key: 'z', cat: 'pompe', label: 'Stație de pompe / generator nefuncțional', req: ['statiePompe'] },
-  { key: 'aa', cat: 'evacuare', label: 'Planuri de evacuare neafișate corespunzător' },
-  { key: 'ab', cat: 'evacuare', label: 'Căi de evacuare blocate / obturate' },
-  { key: 'ac', cat: 'evacuare', label: 'Lipsă instrucțiuni de utilizare a echipamentelor de gătit' },
-  { key: 'ad', cat: 'evacuare', label: 'Lipsă instrucțiuni de comportare (turism)' },
-  { key: 'ae', cat: 'detectoare', label: 'Detector de gaz defect / inexistent' },
-  { key: 'af', cat: 'detectoare', label: 'Detectori autonomi nefuncționali', req: ['detectoriAutonomi'] },
-  { key: 'ag', cat: 'detectoare', label: 'Ignifugare expirată', req: ['ignifugare'] },
+  { key: 'aa', din: 5, cat: 'evacuare', label: 'Planuri de evacuare neafișate corespunzător' },
+  { key: 'ab', din: 5, cat: 'evacuare', label: 'Căi de evacuare blocate / obturate' },
+  { key: 'ac', din: 5, cat: 'evacuare', label: 'Lipsă instrucțiuni de utilizare a echipamentelor de gătit' },
+  { key: 'ad', din: 5, cat: 'evacuare', label: 'Lipsă instrucțiuni de comportare (turism)' },
+  { key: 'ae', din: 5, cat: 'detectoare', label: 'Detector de gaz defect / inexistent' },
+  { key: 'af', din: 5, cat: 'detectoare', label: 'Detectori autonomi nefuncționali', req: ['detectoriAutonomi'] },
+  { key: 'ag', din: 5, cat: 'detectoare', label: 'Ignifugare expirată', req: ['ignifugare'] },
 ].map((n) => ({ ...n, sec: 'ner' }));
 
 // NU la o instalație (unde NEC = „nu este cazul” e altă opțiune) = instalație necesară care lipsește → neregulă gravă.
@@ -160,10 +160,10 @@ const LIPSA_LABEL = {
 };
 export const NEREGULI_GRAVE = [
   ...LIPSA_DOTARI.map((k, i) => ({
-    key: `lipsa-${k}`, cat: 'lipsa', sec: 'ner', grav: true, reqNU: k, letter: `G${i + 1}`, label: LIPSA_LABEL[k],
+    key: `lipsa-${k}`, din: 5, cat: 'lipsa', sec: 'ner', grav: true, reqNU: k, letter: `G${i + 1}`, label: LIPSA_LABEL[k],
   })),
   // GRF/NSI V cu regim de înălțime peste parter (P+1, P+2E, P+M…) — regula stabilită de utilizator
-  { key: 'grav-grfV', cat: 'grf', sec: 'ner', grav: true, reqGrfV: true, letter: `G${LIPSA_DOTARI.length + 1}`,
+  { key: 'grav-grfV', din: 7, cat: 'grf', sec: 'ner', grav: true, reqGrfV: true, letter: `G${LIPSA_DOTARI.length + 1}`,
     label: 'Construcție cu GRF/NSI V și regim de înălțime peste parter' },
 ];
 
@@ -235,7 +235,7 @@ export function emptyNeregula(key, custom = false, sec = 'ner') {
     verificari: {},      // rândurile de verificare: idConstrucție → { data: 'AAAA-LL-ZZ', luni } (data ultimei verificări)
     obsAuto: '',         // ultimele observații preluate automat din dotări (dacă obs === obsAuto, nu au fost editate)
     asiTermen: false, asiPrezentat: false, asiDataPrezentare: '',
-    amenda: { aplicata: false, serie: '', numar: '', data: '', suma: '', achitata: false, dataAchitare: '' },
+    amenda: { aplicata: false, serieNr: '', data: '', suma: '', achitata: false, dataAchitare: '' },   // serieNr: „DB 0012345”
   };
 }
 
@@ -339,7 +339,10 @@ export function normalizeControl(c) {
     const { constructieId, ...rest } = n;
     // (șablonul gol aduce constructieIds: [], deci lista goală nu trebuie să ascundă alegerea veche)
     const ids = n.constructieIds?.length ? [...n.constructieIds] : constructieId ? [constructieId] : [];
-    return { ...rest, constructieIds: ids, amenda: { ...emptyNeregula('').amenda, ...(n.amenda || {}) } };
+    // până la v1.11: seria și numărul în câmpuri separate → un singur câmp
+    const { serie, numar, ...am } = n.amenda || {};
+    if (!am.serieNr && (serie || numar)) am.serieNr = [serie, numar].map((x) => String(x || '').trim()).filter(Boolean).join(' ');
+    return { ...rest, constructieIds: ids, amenda: { ...emptyNeregula('').amenda, ...am } };
   });
   out.constructii = (c.constructii && c.constructii.length ? c.constructii : base.constructii).map((k, i) => {
     const e = emptyConstructie(i + 1);
@@ -351,10 +354,27 @@ export function normalizeControl(c) {
   if (out.gps && !out.constructii[0].gps) out.constructii[0] = { ...out.constructii[0], gps: out.gps };
   delete out.gps;
   out.adapostPC = { ...base.adapostPC, ...(c.adapostPC || {}) };
+  out.schema = c.schema || 1;
+  if (isIncheiat(out) && !out.catalog) out.catalog = out.schema;
   return out;
 }
 
 export const isIncheiat = (c) => isISO(c.dataIncheiere);
+
+// ───────── Lista de nereguli a unui control ─────────
+// Un control încheiat păstrează lista versiunii în care a fost încheiat (`catalog`): rândurile apărute după nu
+// i se adaugă, cele retrase între timp îi rămân. Un control deschis folosește lista curentă. Datele completate
+// se văd mereu (un rând cu status nu se ascunde niciodată).
+export const catalogOf = (c) => (isIncheiat(c) ? (c.catalog || c.schema || 1) : SCHEMA_VERSION);
+export function inCatalog(c, t) {
+  const v = catalogOf(c);
+  return (t.din || 1) <= v && !(t.retrasDin && v >= t.retrasDin);
+}
+// Se apelează la fiecare salvare: încheierea fixează lista, redeschiderea o eliberează.
+export function fixeazaCatalog(c) {
+  if (isIncheiat(c) && !c.catalog) c.catalog = SCHEMA_VERSION;
+  else if (!isIncheiat(c) && c.catalog) delete c.catalog;
+}
 
 // Construcțiile în care s-a făcut constatarea, în ordinea din tabul Obiectiv. Neales nimic (sau alese
 // doar construcții șterse între timp): la neregulile grave, cele cu NU la dotare; altfel, prima construcție.
@@ -386,10 +406,14 @@ export function constructiiCuNU(c, key) {
 
 // „Seria AB nr. 123456” (gol dacă nu s-a completat nimic)
 export function amendaSerieNr(a) {
-  const serie = String(a?.serie || '').trim();
-  const numar = String(a?.numar || '').trim();
-  if (!serie && !numar) return '';
-  return [serie && `Seria ${serie}`, numar && `nr. ${numar}`].filter(Boolean).join(' ');
+  // un singur câmp („DB 0012345”, „Seria DB nr. 0012345”); datele vechi pot avea încă serie + numar
+  const t = (String(a?.serieNr || '').trim() || [a?.serie, a?.numar].map((x) => String(x || '').trim()).filter(Boolean).join(' '))
+    .replace(/\s+/g, ' ');
+  if (!t) return '';
+  const m = t.match(/^(?:seria\s*)?([a-zăâîșț]{1,5})[\s.,/-]*(?:nr\.?\s*)?(\d[\d ]*)$/i);
+  if (m) return `Seria ${m[1].toUpperCase()} nr. ${m[2].replace(/ /g, '')}`;
+  if (/^\d[\d ]*$/.test(t)) return `nr. ${t.replace(/ /g, '')}`;
+  return t;
 }
 
 export function neregulaLabel(n) {
@@ -451,7 +475,7 @@ export function hasDotare(c, key) {
 export function isApplicable(c, n) {
   if (n.custom || n.status) return true;
   const t = sablon(n.key);
-  if (t?.retras) return false;
+  if (t && !inCatalog(c, t)) return false;
   if (t?.doarLaNU) return constructiiCuNU(c, t.autoNU).length > 0;
   const decl = constructiiDeclansate(c, t);
   if (decl) return decl.length > 0;
@@ -459,11 +483,12 @@ export function isApplicable(c, n) {
 }
 
 // Rânduri ascunse doar pentru că instalația nu e bifată DA: „Arată toate” le poate afișa.
-// Nu intră aici: neregulile grave, cele vechi retrase (b, c) și „Lipsă iluminat Hint” (există doar la NU).
+// Nu intră aici: neregulile grave, rândurile din afara listei controlului (retrase / apărute după încheiere)
+// și „Lipsă iluminat Hint” (există doar la NU).
 export function ascunsaDeDotari(c, n) {
   if (n.custom || isApplicable(c, n)) return false;
   const t = sablon(n.key);
-  return !!t && !t.grav && !t.retras && !t.doarLaNU;
+  return !!t && !t.grav && inCatalog(c, t) && !t.doarLaNU;
 }
 
 // Statistici pentru o secțiune (tab)
@@ -629,15 +654,54 @@ export function matchControl(c, query) {
 
 // Căutarea în nereguli: o literă (d, ag, G1, +2) găsește rândul exact; de la 3 caractere, textul
 // (denumire, categorie, observații, construcții), fără diacritice, toate cuvintele.
+// Glosar pentru căutare: abreviere, denumirea completă și expresii care o indică (fără diacritice).
+// Un text care conține oricare dintre ele primește toate formele, deci „hidranti interiori” găsește „Hint” și invers.
+const GLOSAR = [
+  ['iluminat hint', 'instalatie de iluminare de securitate pentru marcarea hidrantilor interiori', 'marcarea hidrantilor'],
+  ['idsai', 'instalatie de detectare semnalizare si alarmare la incendiu', 'detectare semnalizare'],
+  ['hint', 'instalatie de stingere a incendiilor cu hidranti interiori', 'hidranti interiori'],
+  ['hext', 'instalatie de stingere a incendiilor cu hidranti exteriori', 'hidranti exteriori'],
+  ['exit', 'instalatie de iluminare de securitate pentru evacuare', 'iluminare de securitate pentru evacuare'],
+  ['asi', 'autorizatie de securitate la incendiu', 'autorizatie de securitate'],
+  ['aviz', 'aviz de securitate la incendiu', 'aviz de securitate'],
+  ['ctpsi', 'cadru tehnic psi', 'cadru tehnic'],
+  ['resp', 'responsabil psi', 'responsabil'],
+  ['lfd', 'lucru cu foc deschis', 'foc deschis'],
+];
+export function cuGlosar(text) {
+  const baza = fold(text);
+  let rest = ` ${baza} `;
+  const add = [];
+  for (const forme of GLOSAR) {
+    const re = forme.map((f) => new RegExp(`\\b${f}\\b`, 'g'));
+    if (re.some((r) => r.test(rest))) {
+      add.push(...forme);
+      for (const r of re) rest = rest.replace(r, ' ');   // „iluminat hint” nu mai declanșează și „hint”
+    }
+  }
+  return add.length ? `${baza} ${add.join(' ')}` : baza;
+}
+const potriviri = (hay, q) => q.split(/\s+/).every((w) => hay.includes(w));
+
+// Căutarea în acte: numărul actului sau text (denumire, observații), cu glosar
+export function matchAct(c, key, query) {
+  const q = fold(query).trim();
+  if (!q) return true;
+  const i = ACTE.findIndex((a) => a.key === key);
+  if (q === String(i + 1)) return true;
+  if (q.length < 3 && !/\s/.test(q)) return false;
+  return potriviri(cuGlosar([ACTE[i]?.label, c.acte[key]?.obs].join(' ')), q);
+}
+
 export function matchNeregula(c, n, query) {
   const q = fold(query).trim();
   if (!q) return true;
   const letter = fold(neregulaLetter(c, n));
   if (q === letter) return true;
   if (q.length < 3 && !/\s/.test(q)) return false;
-  const hay = fold([neregulaLabel(n), constatareLabel(n), n.custom ? '' : CATEGORII[neregulaCat(n)], n.obs,
+  const hay = cuGlosar([neregulaLabel(n), constatareLabel(n), n.custom ? '' : CATEGORII[neregulaCat(n)], n.obs,
     secOf(n) === 'ner' ? constructiiNume(c, n) : ''].join(' '));
-  return q.split(/\s+/).every((w) => hay.includes(w));
+  return potriviri(hay, q);
 }
 
 // Toate amenzile, cu stadiu, sortate după urgență
@@ -766,7 +830,7 @@ export function todoList(c, { includeClose = true } = {}) {
   }
   for (const n of active.filter((x) => x.status === 'nok' && x.amenda?.aplicata)) {
     const lipsa = [];
-    if (!String(n.amenda.serie || '').trim() || !String(n.amenda.numar || '').trim()) lipsa.push('seria / nr.');
+    if (!amendaSerieNr(n.amenda)) lipsa.push('seria / nr.');
     if (!String(n.amenda.suma || '').trim()) lipsa.push('suma');
     if (lipsa.length) out.push({ id: `fine-${n.key}`, level: 'warn', text: `Amendă fără ${lipsa.join(' și ')}: ${constatareLabel(n)}`, tab: tabOf(secOf(n)), focus: n.key });
   }
@@ -827,4 +891,33 @@ export function verifText(c, n) {
       : `ultima verificare ${fmtDate(s.data)}${s.stare === 'expirata' ? `, expirată din ${fmtDate(s.expira)}` : ''}`;
     return multe ? `${k.denumire || 'construcție'}: ${cum}` : cum;
   }).join('; ');
+}
+
+// ───────── Ce s-a schimbat între două stări ale controlului (Anulează / Refă) ─────────
+// Returnează primul loc schimbat: tabul, elementul de adus în vizor și o descriere scurtă.
+export function schimbare(a, b) {
+  const eq = (x, y) => JSON.stringify(x) === JSON.stringify(y);
+  const na = new Map((a.nereguli || []).map((n) => [n.key, n]));
+  const nb = new Map((b.nereguli || []).map((n) => [n.key, n]));
+  for (const key of new Set([...na.keys(), ...nb.keys()])) {
+    if (eq(na.get(key), nb.get(key))) continue;
+    const y = nb.get(key);
+    const n = y || na.get(key);
+    const sec = secOf(n);
+    if (!y) return { tab: SECTIUNI[sec].tab, focus: `add-${sec}`, text: 'rândul adăugat' };
+    return { tab: SECTIUNI[sec].tab, focus: key, text: `${neregulaLetter(b, y)}. ${constatareLabel(y)}` };
+  }
+  for (const act of ACTE) {
+    if (!eq(a.acte?.[act.key], b.acte?.[act.key])) return { tab: 'acte', focus: `act-${act.key}`, text: act.label };
+  }
+  const ka = new Map((a.constructii || []).map((k) => [k.id, k]));
+  const kb = new Map((b.constructii || []).map((k) => [k.id, k]));
+  for (const id of new Set([...ka.keys(), ...kb.keys()])) {
+    if (eq(ka.get(id), kb.get(id))) continue;
+    const k = kb.get(id);
+    return k ? { tab: 'obiectiv', focus: `constr-${id}`, text: k.denumire || 'construcția' } : { tab: 'obiectiv', focus: 'sec-constructii', text: 'construcțiile' };
+  }
+  if (!eq(a.adapostPC, b.adapostPC)) return { tab: 'pc', focus: 'adapostPC', text: 'Adăpost de protecție civilă' };
+  if (a.dataInceput !== b.dataInceput || a.dataIncheiere !== b.dataIncheiere) return { tab: 'obiectiv', focus: 'sec-perioada', text: 'perioada controlului' };
+  return { tab: 'obiectiv', focus: 'sec-date', text: 'datele obiectivului' };
 }

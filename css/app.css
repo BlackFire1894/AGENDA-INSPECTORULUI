@@ -994,3 +994,67 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 @media (max-width: 999px) { .dot-nr { grid-template-columns: minmax(0, 1fr); gap: 0.3333rem; } }
 .custom-toggle > .ic { transition: transform .15s; transform: rotate(-90deg); }
 .custom-toggle > .ic.rot, .custom-toggle:disabled > .ic { transform: none; }
+
+/* ───────── v1.12 ───────── */
+/* Anulează / Sus / Refă — zonă separată de conținut: bandă deasupra barei de jos (vertical), bara laterală (orizontal) */
+.edit-tools[hidden] { display: none !important; }
+.edit-strip { display: none; }
+.et-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4444rem; min-height: max(44px, 2.6667rem); padding: 0 1.1111rem;
+  border-radius: 0.8889rem; font-weight: 750; font-size: 0.9444rem; background: var(--surface); border: 1.5px solid var(--line-strong); color: var(--text);
+}
+.et-btn .ic { width: 1.3333rem; height: 1.3333rem; flex: none; }
+.et-btn:disabled { opacity: .4; }
+.et-btn.et-top { color: var(--accent-ink); }
+@media (max-width: 999px) {
+  .edit-strip:not([hidden]) {
+    position: fixed; left: 0; right: 0; bottom: var(--tabbar-h, 4.4444rem); z-index: 29;
+    display: flex; justify-content: center; gap: 2.2222rem; padding: 0.4444rem 1rem;
+    background: var(--surface-2); border-top: 1px solid var(--line);
+  }
+  body.in-control .main { padding-bottom: calc(env(safe-area-inset-bottom) + 10.6667rem); }
+}
+.side-edit:not([hidden]) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.3333rem; padding: 0.3333rem; border-radius: var(--radius-sm); background: rgba(255, 255, 255, .07); }
+.side-edit .et-btn {
+  flex-direction: column; gap: 0.1111rem; padding: 0.3333rem 0.1111rem; min-height: max(44px, 3.5556rem); font-size: 0.75rem;
+  background: rgba(255, 255, 255, .1); border-color: rgba(255, 255, 255, .14); color: #fff;
+}
+.side-edit .et-btn.et-top { color: #fff; }
+/* Evidențierea locului schimbat de Anulează / Refă */
+.flash-undo { animation: flashUndo 2.6s ease; }
+@keyframes flashUndo {
+  0%, 70% { box-shadow: 0 0 0 4px var(--accent), 0 0 0 10px color-mix(in srgb, var(--accent) 30%, transparent); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+/* Barele fixe: categoria curentă sub taburi, neregula curentă sub categorie */
+.cat-group > .cat-title { position: sticky; top: var(--st-cat, 0px); z-index: 6; }
+/* Rândul de neregulă: bară (fixă la derulare, restrângibilă) + corp */
+.check-row.ner-row { grid-template-columns: minmax(0, 1fr) auto; row-gap: 0.6667rem; }
+.ner-row > .ner-bar {
+  grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.7778rem; align-items: start;
+  position: sticky; top: calc(var(--st-cat, 0px) + var(--cat-h, 0px)); z-index: 4; background: inherit; border-radius: 0.7778rem;
+}
+.ner-row .bar-main { display: flex; flex-direction: column; gap: 0.4444rem; min-width: 0; padding-top: 0.4444rem; cursor: pointer; }
+.ner-row .bar-main:has(input) { cursor: auto; }
+.ner-row .ner-bar .pill { white-space: normal; }
+.ner-row .row-tgl .ic { transition: transform .15s; transform: rotate(-90deg); }
+.ner-row .row-tgl .ic.rot { transform: none; }
+.ner-row > .row-main { grid-column: 1; padding: 0 0 0 3.2222rem; }
+.ner-row > .row-side { grid-column: 2; }
+.ner-row.is-collapsed { padding-top: 0.4444rem; padding-bottom: 0.4444rem; }
+.pill-todo { background: transparent; color: var(--warn-ink); border: 1.5px dashed var(--warn); }
+@media (max-width: 999px) {
+  .check-row.ner-row { grid-template-columns: minmax(0, 1fr); }
+  .ner-row > .row-side { grid-column: 1; padding-left: 3.2222rem; }
+}
+/* Bara categoriei: necompletate (care), constatate, amendate (care) */
+.cat-info { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.3333rem; margin-left: auto; }
+.cat-info .cat-stare, .cat-info .cat-count { margin-left: 0; white-space: normal; }
+.cat-amenzi { display: inline-flex; align-items: center; gap: 0.2778rem; padding: 0.1111rem 0.5556rem; border-radius: 999px; font-size: 0.8333rem; font-weight: 800; background: var(--blue-soft); color: var(--blue-ink); }
+.cat-title .cat-amenzi .ic { width: 1rem; height: 1rem; transform: none; }
+.custom-toggle .cat-info { margin-left: 0.3333rem; justify-content: flex-start; }
+/* Actele: același comportament ca neregulile */
+.cat-acte { --cat: var(--accent); }
+.act-row .row-idx { font-size: 1rem; }
+/* Mesajele nu acoperă banda Anulează / Sus / Refă */
+@media (max-width: 999px) { body.in-control .toast { bottom: calc(var(--tabbar-h, 4.4444rem) + 4.4444rem); } }

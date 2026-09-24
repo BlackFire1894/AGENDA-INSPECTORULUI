@@ -38,7 +38,7 @@ export function buildDemo(today) {
   const s2 = controlFromPrevious(s1, addDays(today, -42));
   s2.dataIncheiere = addDays(today, -41);
   okAll(s2, ['fise', 'stingatoare']);
-  nok(s2, 'd', { inPV: true, obs: '2 stingătoare expirate, corp A', amenda: { suma: '2500', serie: 'DB', numar: '0012345' } });
+  nok(s2, 'd', { inPV: true, obs: '2 stingătoare expirate, corp A', amenda: { suma: '2500', serieNr: 'DB 0012345' } });
   s2.nereguli.find((x) => x.key === 'j').constructieIds = [s2.constructii[1].id];
   nok(s2, 'j', { inPV: true, obs: 'Hol etaj 1' });
   out.push(s2);
@@ -53,7 +53,7 @@ export function buildDemo(today) {
   okAll(h, ['sezon']);
   nok(h, 'a', { inPV: true, asiTermen: true, obs: 'Pavilion central' });
   nok(h, 'l', { inPV: true, obs: 'Erori zona 3 centrală' });
-  nok(h, 'q', { inPV: false, obs: 'Hidrant exterior H2 fără presiune', amenda: { suma: '5000', serie: 'DB', numar: '0012377' } });
+  nok(h, 'q', { inPV: false, obs: 'Hidrant exterior H2 fără presiune', amenda: { suma: '5000', serieNr: 'DB 0012377' } });
   out.push(h);
 
   // 3. Primărie (Localitate) — amendă albastră, o neregulă netrecută în PV

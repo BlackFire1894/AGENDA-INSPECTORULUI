@@ -81,7 +81,7 @@ export function fisaMarkup(c, controls, now = new Date()) {
   h.push(`<section><h2>Acte de autoritate și evidențe</h2><table class="f-table">
     <thead><tr><th>#</th><th>Act / evidență</th><th>Situație</th><th>Observații</th></tr></thead><tbody>
     ${ACTE.map((a, i) => { const v = c.acte[a.key] || {}; return `<tr class="${v.status === 'nok' ? 'f-nok' : ''}">
-      <td>${i + 1}</td><td>${esc(a.label)}</td><td>${v.status === 'ok' ? 'Prezentat' : v.status === 'nok' ? 'Lipsă' : '—'}</td><td>${obs(v.obs)}</td></tr>`; }).join('')}
+      <td>${i + 1}</td><td>${esc(a.label)}</td><td>${v.status === 'ok' ? 'Prezentat' : v.status === 'nok' ? 'Lipsă' : v.status === 'nec' ? 'NEC (nu este cazul)' : '—'}</td><td>${obs(v.obs)}</td></tr>`; }).join('')}
   </tbody></table></section>`);
 
   // Secțiuni de constatări
