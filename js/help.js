@@ -144,7 +144,7 @@ export const MANUAL = [
       { p: '<b>Bara categoriei</b> (se strânge / deschide la atingere) arată mereu, și când e strânsă:' },
       { ul: [
         `${P(`${icon('check')} Completat`, 'green')} sau ${P('3 necompletate: b2, c1, e', 'warn')} — <b>care</b> rânduri mai sunt de completat;`,
-        `${P('1 constatată', 'red')} — câte sunt constatate; ${P(`${icon('fine')} 1 amendată: d`, 'blue')} — <b>care</b> sunt amendate.`,
+        `${P('1 constatată', 'red')} — câte sunt constatate; ${P(`${icon('pv')} 1 netrecută în PV: d`, 'warn')} — <b>care</b> constatări nu sunt încă trecute în procesul-verbal (sau ${P(`${icon('pv')} toate în PV`, 'green')}); ${P(`${icon('fine')} 1 amendată: d`, 'blue')} — <b>care</b> sunt amendate.`,
       ] },
       { p: '<b>Bara fiecărei nereguli</b>: litera, denumirea și săgeata. Atingeți titlul sau săgeata ca să o strângeți / deschideți. Strânsă, bara arată tot ce contează:' },
       { ul: [

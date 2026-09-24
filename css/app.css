@@ -1091,3 +1091,8 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 @media (max-width: 999px) { body.in-control .toast { bottom: calc(var(--tabbar-h, 4.4444rem) + 4.4444rem); } }
 /* Pe orizontal ghidul e în bara laterală: nu-l mai repetăm în antetul Panoului */
 @media (min-width: 1000px) { .dash-clock-row .guide-btn { display: none; } }
+/* Bara categoriei: constatările netrecute în PV */
+.cat-pv { display: inline-flex; align-items: center; gap: 0.2778rem; padding: 0.1111rem 0.5556rem; border-radius: 999px; font-size: 0.8333rem; font-weight: 800; white-space: normal; }
+.cat-title .cat-pv .ic { width: 1rem; height: 1rem; transform: none; }
+.cat-pv.pv-rest { background: var(--warn); color: #fff; }
+.cat-pv.pv-gata { background: var(--green-soft); color: var(--green-ink); }

@@ -560,12 +560,16 @@ function catInfo(c, rows, sec, { adapostGol = false } = {}) {
   const gol = rows.filter((n) => !n.status);
   const rest = gol.length + (adapostGol ? 1 : 0);
   const nok = rows.filter((n) => n.status === 'nok');
+  const netrec = nok.filter((n) => !n.inPV);
   const amend = nok.filter((n) => n.amenda?.aplicata);
   const lit = [litere(c, gol), adapostGol ? 'adăpost' : ''].filter(Boolean).join(', ');
   return `${rest
     ? `<span class="cat-stare st-rest">${rest} ${rest === 1 ? 'necompletată' : 'necompletate'}: ${esc(lit)}</span>`
     : `<span class="cat-stare st-gata">${icon('check')} Completat</span>`}
     ${nok.length ? `<span class="cat-count">${nok.length} ${nokWord(sec, nok.length)}</span>` : ''}
+    ${nok.length ? (netrec.length
+    ? `<span class="cat-pv pv-rest">${icon('pv')} ${netrec.length} ${netrec.length === 1 ? 'netrecută' : 'netrecute'} în PV: ${esc(litere(c, netrec))}</span>`
+    : `<span class="cat-pv pv-gata">${icon('pv')} toate în PV</span>`) : ''}
     ${amend.length ? `<span class="cat-amenzi">${icon('fine')} ${amend.length} ${amend.length === 1 ? 'amendată' : 'amendate'}: ${esc(litere(c, amend))}</span>` : ''}`;
 }
 
