@@ -8,7 +8,7 @@ import {
   LIPSA_DOTARI, isGrav, constructiiDeclansate, GRF_NIVELURI, grfVPesteParter, sablon, fmtCoord, googleMapsUrl, appleMapsUrl, gpsQuality,
   constructiiEligibile, isVerificare, verifStare, verifExpirate, ascunsaDeDotari, matchAct,
 } from './model.js';
-import { icon, esc, pill, tipBadge } from './ui.js';
+import { icon, esc, pill, finePill, tipBadge } from './ui.js';
 
 // Toate taburile posibile; „planuri” și „pc” apar doar la controalele de tip Localitate.
 export const TABS = [
@@ -81,31 +81,32 @@ export function todoHTML(c) {
 export function edTabsHTML(c, tab) {
   const st = controlStats(c, today());
   const tabs = tabsFor(c);
+  // starea tabului, în cuvinte (portocaliu: acte lipsă / constatări netrecute în PV)
   const badge = (t) => {
-    if (t.key === 'obiectiv') return [`${c.constructii.length} ${tabs.length >= 5 ? 'constr.' : c.constructii.length === 1 ? 'construcție' : 'construcții'}`, false];
-    if (t.key === 'acte') return [tabs.length < 5 || !st.acteNok ? `${st.acteDone}/${st.acteTotal}${st.acteNok ? ` · ${st.acteNok} lipsă` : ''}` : `${st.acteNok} lipsă`, st.acteNok > 0];
+    if (t.key === 'obiectiv') return [`${c.constructii.length} ${c.constructii.length === 1 ? 'construcție' : 'construcții'}`, false];
+    if (t.key === 'acte') return [`${st.acteNok} lipsă`, st.acteNok > 0];
     const s2 = secStats(c, t.sec, today());
-    // Cu 5 taburi, textul e scurt ca să încapă; culoarea portocalie semnalează nereguli netrecute în PV.
-    if (s2.constatate) return [`${s2.constatate} ${nokWord(t.sec, s2.constatate)}${s2.netrecute && tabs.length < 5 ? ` · ${s2.netrecute} ${s2.netrecute === 1 ? 'netrecută' : 'netrecute'}` : ''}`, s2.netrecute > 0];
-    return [`${s2.checked}/${s2.total} verificate`, false];
+    if (!s2.constatate) return [`0 ${nokWord(t.sec, 0)}`, false];
+    return [`${s2.constatate} ${nokWord(t.sec, s2.constatate)}${s2.netrecute ? ` · ${s2.netrecute} ${s2.netrecute === 1 ? 'netrecută' : 'netrecute'} în PV` : ''}`, s2.netrecute > 0];
   };
-  // cât din tab e completat: dotările (Obiectiv), actele, rândurile verificate (secțiunile)
+  // cât din tab e completat, scris lângă bară: dotările (Obiectiv), actele, rândurile verificate (secțiunile)
   const progres = (t) => {
     if (t.key === 'obiectiv') {
       const s = c.constructii.map(dotariSummary).reduce((a, x) => ({ set: a.set + x.set, total: a.total + x.total }), { set: 0, total: 0 });
-      return s.total ? s.set / s.total : 0;
+      return ['Dotări', s.set, s.total];
     }
-    if (t.key === 'acte') return st.acteTotal ? st.acteDone / st.acteTotal : 0;
+    if (t.key === 'acte') return ['Verificate', st.acteDone, st.acteTotal];
     const s2 = secStats(c, t.sec, today());
-    return s2.total ? s2.checked / s2.total : 0;
+    return ['Verificate', s2.checked, s2.total];
   };
   return tabs.map((t, i) => {
     const [txt, warn] = badge(t);
-    const pr = Math.round(progres(t) * 100);
+    const [ce, gata, total] = progres(t);
+    const pr = total ? Math.round((gata / total) * 100) : 0;
     return `<a class="ed-tab ${t.key === tab ? 'on' : ''}" href="#/control/${c.id}/${t.key}" ${t.key === tab ? 'aria-current="page"' : ''}>
       <span class="tab-num">${i + 1}</span>
-      <span class="tab-txt"><b>${t.label}</b><small class="${warn ? 'warn' : ''}">${esc(txt)}</small></span>
-      <span class="tab-prog ${pr === 100 ? 'done' : ''}" aria-hidden="true"><i style="width:${pr}%"></i></span>
+      <span class="tab-txt"><b>${t.label}</b><small class="${warn ? 'warn' : ''}">${esc(txt)}</small><small class="tab-prog-txt ${gata === total && total ? 'done' : ''}">${ce} <b>${gata}/${total}</b></small></span>
+      <span class="tab-prog ${gata === total && total ? 'done' : ''}" aria-hidden="true"><i style="width:${pr}%"></i></span>
     </a>`;
   }).join('');
 }
@@ -121,13 +122,12 @@ export function tabHTML(c, tab) {
 // ───────── helpers pentru câmpuri ─────────
 
 // Observații: câmp pe mai multe rânduri (Enter = rând nou) care crește doar în jos.
-// Fiecare câmp se poate ascunde / afișa individual; butonul general „Ascunde / Arată observațiile” le setează pe toate.
-// Ascuns: cele completate au indicatorul „Observații scrise”, cele goale „+ Observații”.
 let curControlId = '';
 export const obsKey = (path) => `${curControlId}|${path}`;
-// Observațiile completate se văd mereu; cele goale sunt un buton mic „+ Obs.” (se deschid la atingere)
-function obsField(path, value, cls = 'row-obs') {
-  if (!String(value || '').trim() && !state.ui.obsOpen.has(obsKey(path))) {
+// Observațiile completate se văd mereu; cele goale sunt un buton mic „+ Obs.” (se deschid la atingere).
+// La un rând constatat (✗), câmpul e deschis din start — fără focus, deci fără tastatură.
+function obsField(path, value, cls = 'row-obs', deschis = false) {
+  if (!deschis && !String(value || '').trim() && !state.ui.obsOpen.has(obsKey(path))) {
     return `<button type="button" class="obs-add" data-act="obs-open" data-path="${path}" aria-label="Adaugă observații">${icon('plus')} Obs.</button>`;
   }
   return `<div class="obs-wrap">
@@ -166,7 +166,7 @@ function verifBlock(c, n) {
   const rows = list.map((k) => {
     const s = verifStare(c, n, k);
     const stare = s.stare === 'lipsa' ? '<span class="vf-st vf-lipsa">fără dată</span>'
-      : s.stare === 'expirata' ? `<span class="vf-st vf-exp">${icon('alert')} expirată din ${esc(fmtDate(s.expira))}</span>`
+      : s.stare === 'expirata' ? `<span class="vf-st vf-exp">${icon('alert')} expirată — era valabilă până la ${esc(fmtDate(s.expira))}</span>`
         : `<span class="vf-st vf-ok">${icon('check')} valabilă până la ${esc(fmtDate(s.expira))}</span>`;
     return `<div class="vf-row ${s.stare === 'expirata' ? 'is-exp' : ''}">
       <span class="vf-name">${icon('building')} ${esc(k.denumire || 'Construcție')}</span>
@@ -437,7 +437,7 @@ function actRow(c, a, i) {
   const pill0 = collapsed ? (v.status === 'ok' ? pill('green', ACT_SEC.ok, 'check') : v.status === 'nok' ? pill('red', ACT_SEC.nok, 'x')
     : v.status === 'nec' ? pill('neutral', 'NEC') : '<span class="pill pill-todo">Necompletat</span>') : '';
   const obsPill = collapsed && v.obs?.trim() ? pill('neutral', 'Are observații', 'doc') : '';
-  const obsGol = !String(v.obs || '').trim() && !state.ui.obsOpen.has(obsKey(`${path}.obs`));
+  const obsGol = !String(v.obs || '').trim() && !state.ui.obsOpen.has(obsKey(`${path}.obs`)) && v.status !== 'nok';
   const tgl = `data-act="row-toggle" data-key="act:${a.key}"`;
   return `<div class="check-row ner-row act-row ${v.status ? `is-${v.status}` : ''} ${collapsed ? 'is-collapsed' : ''}" id="act-${a.key}">
     <div class="ner-bar">
@@ -449,7 +449,7 @@ function actRow(c, a, i) {
       ${collapsed ? '' : okNok(path, v.status, ACT_SEC.ok, ACT_SEC.nok, { nec: true })}
       <button type="button" class="icon-btn row-tgl" ${tgl} aria-expanded="${!collapsed}" aria-label="${collapsed ? 'Deschide' : 'Restrânge'} actul ${i + 1}">${icon('chevD', collapsed ? '' : 'rot')}</button>
     </div>
-    ${collapsed || obsGol ? '' : `<div class="row-main">${obsField(`${path}.obs`, v.obs)}</div>`}
+    ${collapsed || obsGol ? '' : `<div class="row-main">${obsField(`${path}.obs`, v.obs, 'row-obs', v.status === 'nok')}</div>`}
   </div>`;
 }
 
@@ -523,9 +523,9 @@ function okNok(path, status, okLabel, nokLabel, { nec = false } = {}) {
 const nokWord = (sec, n) => (sec === 'ner' ? (n === 1 ? 'constatată' : 'constatate') : (n === 1 ? 'neconformă' : 'neconforme'));
 
 const SEC_UI = {
-  ner: { ic: 'alert', title: 'Nereguli constatate', addTitle: 'Nereguli suplimentare', nokWord: 'constatate', empty: 'Adaugă nereguli care nu se află în lista standard.' },
-  plan: { ic: 'list', title: 'Planuri și SVSU', addTitle: 'Rubrici suplimentare', nokWord: 'neconforme', empty: 'Adaugă rubrici care nu se află în lista standard.' },
-  pc: { ic: 'shield', title: 'Protecție civilă', addTitle: 'Rubrici suplimentare', nokWord: 'neconforme', empty: 'Adaugă rubrici care nu se află în lista standard.' },
+  ner: { ic: 'alert', title: 'Nereguli constatate', addTitle: 'Nereguli suplimentare', nokWord: 'constatate', empty: 'Adăugați nereguli care nu se află în lista standard.' },
+  plan: { ic: 'list', title: 'Planuri și SVSU', addTitle: 'Rubrici suplimentare', nokWord: 'neconforme', empty: 'Adăugați rubrici care nu se află în lista standard.' },
+  pc: { ic: 'shield', title: 'Protecție civilă', addTitle: 'Rubrici suplimentare', nokWord: 'neconforme', empty: 'Adăugați rubrici care nu se află în lista standard.' },
 };
 
 // Rândurile unei secțiuni, grupate pe categorii, cu filtrul și căutarea aplicate
@@ -567,12 +567,12 @@ function catInfo(c, rows, sec, { adapostGol = false, scurt = false } = {}) {
   const tNok = `${nok.length} ${nokWord(sec, nok.length)}`;
   const tPv = `${netrec.length} ${netrec.length === 1 ? 'netrecută' : 'netrecute'} în PV`;
   const tAm = `${amend.length} ${amend.length === 1 ? 'amendată' : 'amendate'}`;
-  // categorie deschisă: pe un rând, prescurtat; restrânsă: complet, cu literele
+  // categorie deschisă: cuvinte întregi, fără litere (rândurile se văd dedesubt); restrânsă: și literele rândurilor
   if (scurt) {
-    return `${rest ? `<span class="cat-stare st-rest" title="${esc(`${tNec}: ${lit}`)}">${rest} necompl.</span>` : `<span class="cat-stare st-gata">${icon('check')} Completat</span>`}
-      ${nok.length ? `<span class="cat-count" title="${esc(tNok)}">${icon('x')} ${nok.length}</span>` : ''}
-      ${nok.length ? (netrec.length ? `<span class="cat-pv pv-rest" title="${esc(`${tPv}: ${litere(c, netrec)}`)}">${icon('pv')} ${netrec.length}</span>` : `<span class="cat-pv pv-gata" title="toate în PV">${icon('pv')} ✓</span>`) : ''}
-      ${amend.length ? `<span class="cat-amenzi" title="${esc(`${tAm}: ${litere(c, amend)}`)}">${icon('fine')} ${amend.length}</span>` : ''}`;
+    return `${rest ? `<span class="cat-stare st-rest">${tNec}</span>` : `<span class="cat-stare st-gata">${icon('check')} Completat</span>`}
+      ${nok.length ? `<span class="cat-count">${tNok}</span>` : ''}
+      ${nok.length ? (netrec.length ? `<span class="cat-pv pv-rest">${icon('pv')} ${tPv}</span>` : `<span class="cat-pv pv-gata">${icon('pv')} toate în PV</span>`) : ''}
+      ${amend.length ? `<span class="cat-amenzi">${icon('fine')} ${tAm}</span>` : ''}`;
   }
   return `${rest
     ? `<span class="cat-stare st-rest">${tNec}: ${esc(lit)}</span>`
@@ -670,7 +670,9 @@ function tabSectiune(c, sec) {
       <span class="${st.constatate ? 't-red' : ''}"><b>${st.constatate}</b> ${ui.nokWord}</span>
       ${st.constatate ? `<span class="${st.netrecute ? 't-warn' : 't-green'}"><b>${inPV}</b>/${st.constatate} în PV</span>` : ''}
       ${st.fines.length ? `<span><b>${st.fines.length}</b> ${st.fines.length === 1 ? 'amendă' : 'amenzi'}</span>` : ''}
-      ${sec === 'ner' && st.hidden > 0 ? `<button class="chip-link" data-act="toggle-all-ner" title="Rânduri pentru instalații nebifate DA la dotări">${showAll ? `Ascunde rândurile instalațiilor nebifate (${st.hidden})` : `+${st.hidden} ${st.hidden === 1 ? 'ascuns' : 'ascunse'} · Arată`}</button>` : ''}
+      ${sec === 'ner' && st.hidden > 0 ? `<button class="chip-link" data-act="toggle-all-ner">${showAll
+        ? `Ascunde ${st.hidden === 1 ? 'rândul' : `cele ${st.hidden} rânduri`} (instalații fără DA)`
+        : `+${st.hidden} ${st.hidden === 1 ? 'rând ascuns (instalație fără DA)' : 'rânduri ascunse (instalații fără DA)'} · Arată`}</button>` : ''}
     </div>`;
   return `${sumar}
     ${!isIncheiat(c) && anyFineOrAsi ? `<p class="sec-note">${icon('info')} Termenele amenzilor${sec === 'ner' ? ' și ASI' : ''} pornesc după ce completați <b>data încheierii</b> (tabul Obiectiv).</p>` : ''}
@@ -733,7 +735,7 @@ function rowPills(c, n, collapsed) {
   if (n.status === 'nok' && n.auto) pills.push(pill('neutral', `Din fișa obiectivului: NU la ${DOTARI.find((d) => d.key === sablon(n.key)?.autoNU)?.label || ''}`, 'building'));
   if (n.status === 'nok') {
     pills.push(n.inPV ? pill('green', 'Trecut în PV', 'pv') : pill('warn', 'Netrecut în PV', 'pv'));
-    if (n.amenda.aplicata) { const fs = fineStatus(c, n, today()); pills.push(pill(fs.level, `Amendă · ${fs.label}`, 'fine')); }
+    if (n.amenda.aplicata) { const fs = fineStatus(c, n, today()); pills.push(finePill(fs.level, `Amendă · ${fs.label}`)); }
     if (collapsed && (c.constructii || []).length > 1 && secOf(n) === 'ner') pills.push(pill('neutral', constructiiNume(c, n), 'building'));
   }
   const exp = n.status !== 'nok' && n.status !== 'nec' ? verifExpirate(c, n) : [];
@@ -759,7 +761,7 @@ function neregulaRow(c, n) {
   const tgl = `data-act="row-toggle" data-key="${esc(n.key)}"`;
   const verif = isVerificare(n) && n.status !== 'nec' ? verifBlock(c, n) : '';
   const constr = sablon(n.key)?.grav ? constrNU(c, n) : ((n.sec === 'ner' || !n.sec) && n.status !== 'nec' ? constrSelect(c, n) : '');
-  const obsGol = !String(n.obs || '').trim() && !state.ui.obsOpen.has(obsKey(`${path}.obs`));
+  const obsGol = !String(n.obs || '').trim() && !state.ui.obsOpen.has(obsKey(`${path}.obs`)) && n.status !== 'nok';
   const faraCorp = !verif && !constr && obsGol && !n.custom && n.status !== 'nok';   // corpul ar avea doar „+ Obs.”
   if (faraCorp && !collapsed) pills.push(obsField(`${path}.obs`, ''));
   return `<div class="check-row ner-row ${n.status ? `is-${n.status}` : ''} ${vi.veche && n.status !== 'nec' ? 'is-veche' : ''} ${n.custom && n.grav ? 'is-grav-custom' : ''} ${collapsed ? 'is-collapsed' : ''}" id="ner-${esc(n.key)}">
@@ -775,7 +777,7 @@ function neregulaRow(c, n) {
     ${collapsed || faraCorp ? '' : `<div class="row-main">
       ${verif}
       ${constr}
-      <div class="row-foot">${obsField(`${path}.obs`, n.obs)}${n.custom ? `<button class="icon-btn danger" data-act="ner-del" data-key="${esc(n.key)}" aria-label="Șterge rândul">${icon('trash')}</button>` : ''}</div>
+      <div class="row-foot">${obsField(`${path}.obs`, n.obs, 'row-obs', n.status === 'nok')}${n.custom ? `<button class="icon-btn danger" data-act="ner-del" data-key="${esc(n.key)}" aria-label="Șterge rândul">${icon('trash')}</button>` : ''}</div>
     </div>
     ${n.status === 'nok' ? neregulaDetail(c, n, path) : ''}`}
   </div>`;

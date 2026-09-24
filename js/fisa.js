@@ -103,7 +103,7 @@ export function fisaMarkup(c, controls, now = new Date()) {
         if (isVerificare(n) && n.status !== 'nec') {
           const vs = constructiiEligibile(c, n).map((k) => {
             const s = verifStare(c, n, k);
-            return `${multe ? `${esc(k.denumire)}: ` : ''}${s.stare === 'lipsa' ? 'fără dată' : `${fmtDate(s.data)} (${s.luni} luni)${s.stare === 'expirata' ? ` — <b>expirată din ${fmtDate(s.expira)}</b>` : ''}`}`;
+            return `${multe ? `${esc(k.denumire)}: ` : ''}${s.stare === 'lipsa' ? 'fără dată' : `${fmtDate(s.data)} (${s.luni} luni)${s.stare === 'expirata' ? ` — <b>expirată (era valabilă până la ${fmtDate(s.expira)})</b>` : ''}`}`;
           });
           if (vs.length) det.push(`<b>Ultima verificare:</b> ${vs.join('; ')}`);
         }

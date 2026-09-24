@@ -136,12 +136,19 @@ function focusNeregula(key, { strong = false } = {}) {
 }
 
 // Barele fixe (taburi → categorie → neregulă): fiecare se oprește sub cea de deasupra
+// Bara unei categorii își poate schimba înălțimea (textul trece pe două rânduri, se strânge, se schimbă starea):
+// bara neregulii curente, lipită dedesubt, o urmează fără goluri sau suprapuneri.
+const catRO = typeof window.ResizeObserver === 'function'
+  ? new window.ResizeObserver((entries) => entries.forEach((e) => e.target.parentElement?.style.setProperty('--cat-h', `${e.target.offsetHeight}px`)))
+  : null;
 function measureSticky() {
   const tabs = document.querySelector('.ed-tabs');
   document.documentElement.style.setProperty('--st-cat', `${tabs ? tabs.offsetHeight : 0}px`);
+  catRO?.disconnect();
   document.querySelectorAll('.cat-group').forEach((g) => {
     const t = g.querySelector(':scope > .cat-title');
     g.style.setProperty('--cat-h', `${t ? t.offsetHeight : 0}px`);
+    if (t) catRO?.observe(t);
   });
   const bar = document.querySelector('.tabbar');
   document.documentElement.style.setProperty('--tabbar-h', `${bar && window.getComputedStyle(bar).display !== 'none' ? bar.offsetHeight : 0}px`);
@@ -168,6 +175,9 @@ function updateNav() {
   const open = state.controls.filter((c) => !isIncheiat(c)).length;
   document.querySelectorAll('[data-badge="panou"]').forEach((b) => { b.textContent = fines || ''; b.hidden = !fines; });
   document.querySelectorAll('[data-badge="istoric"]').forEach((b) => { b.textContent = open || ''; b.hidden = !open; });
+  // bara laterală: același număr, în cuvinte (bara de jos, îngustă, păstrează bulina)
+  document.querySelectorAll('[data-badge-text="panou"]').forEach((b) => { b.textContent = fines ? `${fines} ${fines === 1 ? 'amendă urgentă' : 'amenzi urgente'}` : ''; b.hidden = !fines; });
+  document.querySelectorAll('[data-badge-text="istoric"]').forEach((b) => { b.textContent = open ? `${open} ${open === 1 ? 'neîncheiat' : 'neîncheiate'}` : ''; b.hidden = !open; });
   document.querySelectorAll('[data-backup-age]').forEach((el) => { el.textContent = backupAgeText(); });
   document.querySelectorAll('[data-backup-btn]').forEach((el) => el.classList.toggle('stale', backupIsStale()));
 }
@@ -268,8 +278,6 @@ function refreshNerResults(c, sec) {
   box.innerHTML = listaHTML(c, sec);
   autosizeAll();
   measureSticky();
-  const tb = document.querySelector('.toolbar [data-act="cats-all"]');
-  if (tb) tb.hidden = !!state.ui.nerQuery.trim();
 }
 
 // Ghidul: se schimbă doar cuprinsul și capitolele, bara de căutare rămâne activă

@@ -575,7 +575,7 @@ test('v1.11: verificări defalcate, date pe construcție, expirare față de dat
   assert.deepEqual(t, ['verif-b1', 'verif-c2']);                   // b2 e pe 24 luni: valabilă
   // PV: datele la construcțiile alese
   Object.assign(n('b1'), { status: 'nok', constructieIds: [k1.id] });
-  assert.match(pvText(c, [c]).text, /Nu a prezentat \/ nu are verificare instalații electrice – construcția: Construcția 1\. Construcția 1: ultima verificare 23\.09\.2025, expirată din 23\.09\.2026/);
+  assert.match(pvText(c, [c]).text, /Nu a prezentat \/ nu are verificare instalații electrice – construcția: Construcția 1\. Construcția 1: ultima verificare 23\.09\.2025, expirată \(era valabilă până la 23\.09\.2026\)/);
   assert.ok(!todoList(c).some((x) => x.id === 'verif-b1'));
   // NEC: verificat, fără PV, fără semnalare
   n('b2').status = 'nec';
@@ -587,7 +587,7 @@ test('v1.11: verificări defalcate, date pe construcție, expirare față de dat
   assert.equal(b1.status, '');
   assert.deepEqual(Object.values(b1.verificari).map((v) => v.data).sort(), ['2025-09-23', '2025-09-24']);
   assert.equal(b1.verificari[urm.constructii[0].id].data, '2025-09-23');
-  assert.equal(verifText(urm, { ...b1, status: 'nok' }), 'Construcția 1: ultima verificare 23.09.2025, expirată din 23.09.2026');
+  assert.equal(verifText(urm, { ...b1, status: 'nok' }), 'Construcția 1: ultima verificare 23.09.2025, expirată (era valabilă până la 23.09.2026)');
 });
 
 test('v1.11: NEC, aj/ak, rânduri vechi b/c, an construire, nr. ASI — compatibilitate', () => {

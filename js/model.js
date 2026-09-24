@@ -539,11 +539,15 @@ export function fineStatus(control, n, today = todayISO()) {
   const anafNelucr = zinelucratoare(anafPana);
   const leftAnaf = TERMEN_ANAF - elapsed;
   if (elapsed <= TERMEN_PLATA) {
-    const left = TERMEN_PLATA - Math.max(elapsed, 0);
+    const left = TERMEN_PLATA - elapsed;   // zile până la termenul de plată (dacă data aplicării e în viitor, > 15)
+    let msg;
+    if (elapsed < 0) msg = `Data aplicării amenzii e în viitor (${fmtDate(d)}); plata până la ${fmtDate(plataPana)}`;
+    else if (left === 0) msg = 'Astăzi este ultima zi de plată';
+    else msg = `${maiSunt(left)} din termenul de plată (${fmtDate(plataPana)})`;
     return {
       level: 'blue', label: 'În curs', elapsed, plataPana, anafPana, plataNelucr, anafNelucr, daysLeft: left,
       nelucr: plataNelucr ? `Termenul de plată (${fmtDate(plataPana)}) cade ${plataNelucr} — verificați prelungirea` : '',
-      msg: left === 0 ? 'Astăzi este ultima zi de plată' : `${maiSunt(left)} din termenul de plată (${fmtDate(plataPana)})`,
+      msg,
     };
   }
   if (elapsed < PRAG_ROSU) {
@@ -594,7 +598,7 @@ export function controlStats(c, today = todayISO()) {
   const fines = nok.filter((n) => n.amenda?.aplicata).map((n) => ({ n, st: fineStatus(c, n, today) }));
   return {
     acteDone, acteTotal: ACTE.length, acteNok,
-    nereguliChecked, nereguliTotal: rows.length,
+    nereguliChecked, nereguliTotal: rows.filter((n) => isApplicable(c, n)).length,
     constatate: nok.length,
     netrecute: nok.filter((n) => !n.inPV).length,
     fines,
@@ -811,7 +815,8 @@ export function todoList(c, { includeClose = true } = {}) {
     out.unshift({ id: 'grave', level: 'grav', text: `${grave.length === 1 ? 'O neregulă gravă' : `${grave.length} nereguli grave`}: ${grave.map((n) => { const l = neregulaLabel(n); return l[0].toLowerCase() + l.slice(1); }).join(', ')}`, tab: 'nereguli', focus: grave[0].key });
   }
   for (const sec of sectiuniActive(c)) {
-    const rows = c.nereguli.filter((n) => secOf(n) === sec && isApplicable(c, n) && !(sec === 'ner' && sablon(n.key)?.grav));
+    // aceeași cifră ca filtrul „Neverificate” (neregulile grave sunt incluse și, în plus, semnalate primele)
+    const rows = c.nereguli.filter((n) => secOf(n) === sec && isApplicable(c, n));
     const todo = rows.filter((n) => !n.status);
     const adapost = sec === 'pc' && !c.adapostPC?.v ? 1 : 0;
     const k = todo.length + adapost;
@@ -888,7 +893,7 @@ export function verifText(c, n) {
   return constructiiOf(c, n).map((k) => {
     const s = verifStare(c, n, k);
     const cum = s.stare === 'lipsa' ? 'fără verificare prezentată'
-      : `ultima verificare ${fmtDate(s.data)}${s.stare === 'expirata' ? `, expirată din ${fmtDate(s.expira)}` : ''}`;
+      : `ultima verificare ${fmtDate(s.data)}${s.stare === 'expirata' ? `, expirată (era valabilă până la ${fmtDate(s.expira)})` : ''}`;
     return multe ? `${k.denumire || 'construcție'}: ${cum}` : cum;
   }).join('; ');
 }
