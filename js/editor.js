@@ -89,11 +89,23 @@ export function edTabsHTML(c, tab) {
     if (s2.constatate) return [`${s2.constatate} ${nokWord(t.sec, s2.constatate)}${s2.netrecute && tabs.length < 5 ? ` · ${s2.netrecute} netrecute` : ''}`, s2.netrecute > 0];
     return [`${s2.checked}/${s2.total} verificate`, false];
   };
+  // cât din tab e completat: dotările (Obiectiv), actele, rândurile verificate (secțiunile)
+  const progres = (t) => {
+    if (t.key === 'obiectiv') {
+      const s = c.constructii.map(dotariSummary).reduce((a, x) => ({ set: a.set + x.set, total: a.total + x.total }), { set: 0, total: 0 });
+      return s.total ? s.set / s.total : 0;
+    }
+    if (t.key === 'acte') return st.acteTotal ? st.acteDone / st.acteTotal : 0;
+    const s2 = secStats(c, t.sec, today());
+    return s2.total ? s2.checked / s2.total : 0;
+  };
   return tabs.map((t, i) => {
     const [txt, warn] = badge(t);
-    return `<a class="ed-tab ${t.key === tab ? 'on' : ''}" href="#/control/${c.id}/${t.key}">
+    const pr = Math.round(progres(t) * 100);
+    return `<a class="ed-tab ${t.key === tab ? 'on' : ''}" href="#/control/${c.id}/${t.key}" ${t.key === tab ? 'aria-current="page"' : ''}>
       <span class="tab-num">${i + 1}</span>
       <span class="tab-txt"><b>${t.label}</b><small class="${warn ? 'warn' : ''}">${esc(txt)}</small></span>
+      <span class="tab-prog ${pr === 100 ? 'done' : ''}" aria-hidden="true"><i style="width:${pr}%"></i></span>
     </a>`;
   }).join('');
 }

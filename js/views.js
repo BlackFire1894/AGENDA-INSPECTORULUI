@@ -183,7 +183,7 @@ export function viewDashboard() {
       </span>
     </a>`;
 
-  const secFines = `<section class="card dash-sec" id="sec-fines">
+  const secFines = `<section class="card dash-sec k-fines" id="sec-fines">
     <h2 class="sec-title">${icon('fine')} Amenzi</h2>
     <div class="legend">
       <span><i class="dot dot-blue"></i>în curs (≤ 15 zile)</span>
@@ -195,7 +195,7 @@ export function viewDashboard() {
     ${paid.length ? `<details class="paid"><summary>Achitate (${paid.length})</summary><div class="items">${paid.map(fineItem).join('')}</div></details>` : ''}
   </section>`;
 
-  const secAsi = `<section class="card dash-sec" id="sec-asi">
+  const secAsi = `<section class="card dash-sec k-asi" id="sec-asi">
     <h2 class="sec-title">${icon('hourglass')} Termene ASI – 90 de zile</h2>
     ${asi.length ? `<div class="items">${asi.map(({ c, a }) => `<a class="item item-red" href="#/control/${c.id}/nereguli/a">
         <span class="item-main">
@@ -207,7 +207,7 @@ export function viewDashboard() {
       </a>`).join('')}</div>` : '<p class="muted pad">Niciun termen ASI activ.</p>'}
   </section>`;
 
-  const secOpen = `<section class="card dash-sec" id="sec-open">
+  const secOpen = `<section class="card dash-sec k-open" id="sec-open">
     <h2 class="sec-title">${icon('clock')} Controale neîncheiate</h2>
     ${open.length ? `<div class="items">${open.map((c) => {
       const days = diffDays(c.dataInceput, t);
@@ -222,7 +222,7 @@ export function viewDashboard() {
     }).join('')}</div>` : '<p class="muted pad">Toate controalele sunt încheiate.</p>'}
   </section>`;
 
-  const secPv = `<section class="card dash-sec" id="sec-pv">
+  const secPv = `<section class="card dash-sec k-pv" id="sec-pv">
     <h2 class="sec-title">${icon('pv')} Nereguli netrecute în procesul-verbal</h2>
     ${netrecute.length ? `<div class="items">${netrecute.map(({ c, n }) => `<a class="item item-warn" href="#/control/${c.id}/${tabOfNeregula(n)}/${encodeURIComponent(n.key)}">
         <span class="item-main">

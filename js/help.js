@@ -46,11 +46,12 @@ export const MANUAL = [
     id: 'panou', ic: 'home', title: 'Panoul',
     blocks: [
       { p: 'Sus: data și ora tabletei și <b>Backup rapid</b> (devine portocaliu dacă n-ați făcut niciun backup sau dacă ultimul are 7 zile sau mai mult). Apoi patru casete — atingeți una ca să ajungeți la secțiunea ei:' },
+      { p: 'Fiecare statistică are culoarea ei — aceeași pe casetă și pe secțiunea ei de mai jos, ca s-o găsiți dintr-o privire:' },
       { ul: [
-        '<b>Amenzi active</b>, pe culori (vedeți capitolul „Amenzi și termene”).',
-        '<b>Controale neîncheiate</b> — controale începute, fără dată de încheiere.',
-        '<b>Termene ASI 90 zile</b> — neregula „a” cu termen de prezentare.',
-        '<b>Netrecute în PV</b> — constatări încă netrecute în procesul-verbal.',
+        '<span class="m-k k-fines"></span><b>Amenzi active</b> — <b>verde-albastru (teal)</b>; în interior, fiecare amendă are culoarea stadiului ei (vedeți „Amenzi și termene”).',
+        '<span class="m-k k-open"></span><b>Controale neîncheiate</b> — <b>violet</b>, ca eticheta „În desfășurare”.',
+        '<span class="m-k k-asi"></span><b>Termene ASI 90 zile</b> — <b>albastru</b>; neregula „a” cu termen de prezentare.',
+        '<span class="m-k k-pv"></span><b>Netrecute în PV</b> — <b>portocaliu</b>, ca pastilele „Netrecut în PV”.',
       ] },
       { p: 'Atingeți orice rând din Panou și controlul se deschide <b>exact la neregula respectivă</b>. <b>⚠</b> apare când un termen cade într-o zi nelucrătoare.' },
     ],
@@ -80,7 +81,7 @@ export const MANUAL = [
         [B('trash', '', 'm-icon m-danger'), 'Șterge controlul (cere confirmare).'],
       ] },
       { p: '<b>„Ce mai ai de făcut”</b>: pasul următor (ex. „14 acte neverificate”, „1 constatare netrecută în PV”, „Verificare expirată”, „Amendă fără seria / nr.”). Atingeți-l și ajungeți acolo; <b>Toate (N)</b> deschide lista completă.' },
-      { p: '<b>Taburile</b> (Obiectiv, Acte, Nereguli…) arată pe scurt progresul fiecăruia și rămân sus la derulare.' },
+      { p: '<b>Taburile</b> (Obiectiv, Acte, Nereguli, Planuri și SVSU, Protecție civilă) stau într-o bară întunecată, separată de conținut; tabul în care lucrați e plin, violet. Fiecare arată pe scurt situația (ex. „2 lipsă”, „4 constatate” — portocaliu dacă sunt netrecute în PV) și o bară de progres jos: cât e completat (dotările, actele, rândurile verificate); devine verde la 100%. Bara taburilor rămâne sus la derulare.' },
       { p: '<b>Anulează / Sus / Refă</b> — pe vertical în banda de deasupra barei de jos, pe orizontal în bara laterală:' },
       { btns: [
         [B('undo', 'Anulează'), 'Un pas înapoi: o atingere, sau un text tastat până la pauză. Ecranul merge la locul schimbat (chiar dacă e în alt tab), îl deschide și îl evidențiază.'],
