@@ -857,20 +857,51 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .toast.has-action { pointer-events: auto; padding-right: 0.5556rem; }
 .toast-btn { min-height: 44px; padding: 0 0.8889rem; margin-left: 0.4444rem; border-radius: 0.6667rem; background: rgba(255, 255, 255, .16); color: #fff; font-weight: 800; }
 
-/* ───────── Ajutor „?” și ghid ───────── */
-.help-btn { font-size: 1.3333rem; font-weight: 850; color: var(--accent); }
-.help-q { display: inline-grid; place-items: center; width: 2rem; height: 2rem; border-radius: 50%; background: var(--accent); color: #fff; font-size: 1.2222rem; }
-.help-list { margin: 0; padding-left: 1.2222rem; display: flex; flex-direction: column; gap: 0.6667rem; font-size: 1.0556rem; }
-.dash-clock-row { display: flex; align-items: center; gap: 0.6667rem; }
-.guide-steps { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.7778rem; text-align: left; margin: 1rem 0 1.4444rem; }
-.modal .guide-steps { grid-template-columns: 1fr; margin: 0; }
-.guide-step { display: flex; gap: 0.7778rem; padding: 0.8889rem; border-radius: 1rem; background: var(--surface-2); border: 1.5px solid var(--line); }
-.guide-num { flex: none; width: 2.2222rem; height: 2.2222rem; border-radius: 50%; display: grid; place-items: center; background: var(--accent); color: #fff; font-weight: 850; }
-.guide-step h3 { display: flex; align-items: center; gap: 0.4444rem; font-size: 1.0556rem; margin-bottom: 0.3333rem; }
-.guide-step h3 .ic { width: 1.2222rem; height: 1.2222rem; color: var(--accent); }
-.guide-step p { margin: 0.2222rem 0 0; font-size: 0.9444rem; color: var(--text); }
+/* ───────── Ghidul aplicației (manualul) ───────── */
+.dash-clock-row { display: flex; align-items: center; gap: 0.6667rem; flex-wrap: wrap; justify-content: flex-end; }
 .welcome p { max-width: none; }
-@media (max-width: 700px) { .guide-steps { grid-template-columns: 1fr; } }
+.side-guide {
+  display: flex; align-items: center; gap: 0.7778rem; min-height: max(44px, 3.2222rem); padding: 0 0.8889rem; border-radius: 0.8889rem;
+  font-size: 1.0556rem; font-weight: 600; color: rgba(255, 255, 255, .78);
+}
+.side-guide.on { background: rgba(255, 255, 255, .12); color: #fff; }
+.side-guide span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.side-guide + .side-settings { margin-top: 0; }
+.m-toc { display: grid; grid-template-columns: repeat(auto-fill, minmax(15rem, 1fr)); gap: 0.4444rem; margin: 0.8889rem 0; }
+.m-toc-item {
+  display: flex; align-items: center; gap: 0.5556rem; min-height: max(44px, 2.6667rem); padding: 0.3333rem 0.7778rem; border-radius: 0.7778rem;
+  background: var(--surface-2); color: var(--text); font-weight: 700; font-size: 0.9444rem;
+}
+.m-toc-item .ic { width: 1.2222rem; height: 1.2222rem; color: var(--accent); flex: none; }
+.m-toc-item.is-off { opacity: .35; }
+.m-cap { scroll-margin-top: 1rem; }
+.m-cap p { margin: 0 0 0.7778rem; line-height: 1.55; }
+.m-cap ul { margin: 0 0 0.7778rem; padding-left: 1.3333rem; display: flex; flex-direction: column; gap: 0.5556rem; line-height: 1.55; }
+.m-btns { margin: 0 0 0.8889rem; display: flex; flex-direction: column; gap: 0.4444rem; }
+.m-btns > div { display: grid; grid-template-columns: 14rem minmax(0, 1fr); gap: 0.8889rem; align-items: center; padding: 0.4444rem 0; border-bottom: 1px solid var(--line); }
+.m-btns > div:last-child { border-bottom: 0; }
+.m-btns dt { margin: 0; } .m-btns dd { margin: 0; line-height: 1.5; }
+@media (max-width: 700px) { .m-btns > div { grid-template-columns: minmax(0, 1fr); gap: 0.3333rem; } }
+.m-note { display: flex; gap: 0.5556rem; align-items: flex-start; padding: 0.6667rem 0.8889rem; border-radius: 0.8889rem; background: var(--blue-soft); color: var(--blue-ink); font-weight: 600; }
+.m-note .ic { width: 1.2222rem; height: 1.2222rem; flex: none; margin-top: 0.1111rem; }
+/* replici ale butoanelor din aplicație */
+.m-btn {
+  display: inline-flex; align-items: center; gap: 0.3889rem; min-height: 2.2222rem; padding: 0 0.7778rem; border-radius: 0.7778rem; vertical-align: middle;
+  background: var(--surface); border: 1.5px solid var(--line-strong); color: var(--text); font-weight: 700; font-size: 0.8889rem; white-space: nowrap;
+}
+.m-btn .ic { width: 1.1111rem; height: 1.1111rem; flex: none; }
+.m-btn.m-prim { background: var(--accent); border-color: var(--accent); color: #fff; }
+.m-btn.m-round { border-radius: 50%; width: 2.2222rem; padding: 0; justify-content: center; }
+.m-btn.m-icon { padding: 0; width: 2.2222rem; justify-content: center; }
+.m-btn.m-danger { color: var(--red); }
+.m-btn.m-ok { background: var(--green); border-color: var(--green); color: #fff; }
+.m-btn.m-nok { background: var(--red); border-color: var(--red); color: #fff; }
+.m-btn.m-nec { background: var(--ink-2); border-color: var(--ink-2); color: #fff; }
+.m-btn.m-flat { background: transparent; border-color: transparent; }
+.m-btn.m-green { color: var(--green-ink); }
+.m-btn.m-accent { color: var(--accent-ink); }
+.m-btn.m-green-out { color: var(--green-ink); border-color: var(--green); }
+.m-cap .pill { vertical-align: middle; }
 
 /* ───────── Nereguli grave (NU la dotări) ───────── */
 :root { --cat-lipsa: var(--red); --cat-evacuare: #16a34a; --cat-detectoare: #c026d3; }
@@ -994,3 +1025,69 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 @media (max-width: 999px) { .dot-nr { grid-template-columns: minmax(0, 1fr); gap: 0.3333rem; } }
 .custom-toggle > .ic { transition: transform .15s; transform: rotate(-90deg); }
 .custom-toggle > .ic.rot, .custom-toggle:disabled > .ic { transform: none; }
+
+/* ───────── v1.12 ───────── */
+/* Anulează / Sus / Refă — zonă separată de conținut: bandă deasupra barei de jos (vertical), bara laterală (orizontal) */
+.edit-tools[hidden] { display: none !important; }
+.edit-strip { display: none; }
+.et-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 0.4444rem; min-height: max(44px, 2.6667rem); padding: 0 1.1111rem;
+  border-radius: 0.8889rem; font-weight: 750; font-size: 0.9444rem; background: var(--surface); border: 1.5px solid var(--line-strong); color: var(--text);
+}
+.et-btn .ic { width: 1.3333rem; height: 1.3333rem; flex: none; }
+.et-btn:disabled { opacity: .4; }
+.et-btn.et-top { color: var(--accent-ink); }
+@media (max-width: 999px) {
+  .edit-strip:not([hidden]) {
+    position: fixed; left: 0; right: 0; bottom: var(--tabbar-h, 4.4444rem); z-index: 29;
+    display: flex; justify-content: center; gap: 2.2222rem; padding: 0.4444rem 1rem;
+    background: var(--surface-2); border-top: 1px solid var(--line);
+  }
+  body.in-control .main { padding-bottom: calc(env(safe-area-inset-bottom) + 10.6667rem); }
+}
+.side-edit:not([hidden]) { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.3333rem; padding: 0.3333rem; border-radius: var(--radius-sm); background: rgba(255, 255, 255, .07); }
+.side-edit .et-btn {
+  flex-direction: column; gap: 0.1111rem; padding: 0.3333rem 0.1111rem; min-height: max(44px, 3.5556rem); font-size: 0.75rem;
+  background: rgba(255, 255, 255, .1); border-color: rgba(255, 255, 255, .14); color: #fff;
+}
+.side-edit .et-btn.et-top { color: #fff; }
+/* Evidențierea locului schimbat de Anulează / Refă */
+.flash-undo { animation: flashUndo 2.6s ease; }
+@keyframes flashUndo {
+  0%, 70% { box-shadow: 0 0 0 4px var(--accent), 0 0 0 10px color-mix(in srgb, var(--accent) 30%, transparent); }
+  100% { box-shadow: 0 0 0 0 transparent; }
+}
+/* Barele fixe: categoria curentă sub taburi, neregula curentă sub categorie */
+.cat-group > .cat-title { position: sticky; top: var(--st-cat, 0px); z-index: 6; }
+/* Rândul de neregulă: bară (fixă la derulare, restrângibilă) + corp */
+.check-row.ner-row { grid-template-columns: minmax(0, 1fr) auto; row-gap: 0.6667rem; }
+.ner-row > .ner-bar {
+  grid-column: 1 / -1; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.7778rem; align-items: start;
+  position: sticky; top: calc(var(--st-cat, 0px) + var(--cat-h, 0px)); z-index: 4; background: inherit; border-radius: 0.7778rem;
+}
+.ner-row .bar-main { display: flex; flex-direction: column; gap: 0.4444rem; min-width: 0; padding-top: 0.4444rem; cursor: pointer; }
+.ner-row .bar-main:has(input) { cursor: auto; }
+.ner-row .ner-bar .pill { white-space: normal; }
+.ner-row .row-tgl .ic { transition: transform .15s; transform: rotate(-90deg); }
+.ner-row .row-tgl .ic.rot { transform: none; }
+.ner-row > .row-main { grid-column: 1; padding: 0 0 0 3.2222rem; }
+.ner-row > .row-side { grid-column: 2; }
+.ner-row.is-collapsed { padding-top: 0.4444rem; padding-bottom: 0.4444rem; }
+.pill-todo { background: transparent; color: var(--warn-ink); border: 1.5px dashed var(--warn); }
+@media (max-width: 999px) {
+  .check-row.ner-row { grid-template-columns: minmax(0, 1fr); }
+  .ner-row > .row-side { grid-column: 1; padding-left: 3.2222rem; }
+}
+/* Bara categoriei: necompletate (care), constatate, amendate (care) */
+.cat-info { display: inline-flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.3333rem; margin-left: auto; }
+.cat-info .cat-stare, .cat-info .cat-count { margin-left: 0; white-space: normal; }
+.cat-amenzi { display: inline-flex; align-items: center; gap: 0.2778rem; padding: 0.1111rem 0.5556rem; border-radius: 999px; font-size: 0.8333rem; font-weight: 800; background: var(--blue-soft); color: var(--blue-ink); }
+.cat-title .cat-amenzi .ic { width: 1rem; height: 1rem; transform: none; }
+.custom-toggle .cat-info { margin-left: 0.3333rem; justify-content: flex-start; }
+/* Actele: același comportament ca neregulile */
+.cat-acte { --cat: var(--accent); }
+.act-row .row-idx { font-size: 1rem; }
+/* Mesajele nu acoperă banda Anulează / Sus / Refă */
+@media (max-width: 999px) { body.in-control .toast { bottom: calc(var(--tabbar-h, 4.4444rem) + 4.4444rem); } }
+/* Pe orizontal ghidul e în bara laterală: nu-l mai repetăm în antetul Panoului */
+@media (min-width: 1000px) { .dash-clock-row .guide-btn { display: none; } }

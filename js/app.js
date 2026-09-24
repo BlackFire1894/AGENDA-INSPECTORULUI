@@ -5,14 +5,13 @@ import { fmtDate, fmtDateLong, toISO, parseDateQuery, isISO } from './dates.js';
 import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
   fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat, pvText, sectiuniActive, secOf,
-  todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality, constructiiOf, grfVPesteParter, constructiiEligibile, verifExpirate, ascunsaDeDotari, neregulaLetter, neregulaLabel, AUTO_NU, syncAutoNU,
+  todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality, constructiiOf, schimbare, grfVPesteParter, constructiiEligibile, verifExpirate, ascunsaDeDotari, neregulaLetter, neregulaLabel, AUTO_NU, syncAutoNU,
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
-  viewCalendar, viewSettings, hintText, backupAgeText, backupIsStale, guideSteps,
+  viewCalendar, viewSettings, hintText, backupAgeText, backupIsStale, viewGhid,
 } from './views.js';
-import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML, nerResultsHTML, grfBlock, undoRedoHTML } from './editor.js';
-import { AJUTOR } from './help.js';
+import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML, listaHTML, grfBlock, editToolsHTML, rowKey } from './editor.js';
 import { icon, esc, toast, openModal, closeModal, confirmDialog } from './ui.js';
 import { buildDemo } from './demo.js';
 import { APP_VERSION } from './version.js';
@@ -34,6 +33,7 @@ function parseRoute() {
     case 'calendar': return { name };
     case 'istoric': return { name };
     case 'setari': return { name };
+    case 'ghid': return { name, id: a };
     case 'fisa': return { name, id: a };
     case 'control': return { name, id: a, tab: TABS.some((t) => t.key === b) ? b : 'obiectiv', focus: c };
     default: return { name: 'panou' };
@@ -54,6 +54,7 @@ async function render({ keepScroll = false } = {}) {
     case 'calendar': html = viewCalendar(); break;
     case 'istoric': html = viewHistory(); break;
     case 'setari': html = viewSettings(persisted); break;
+    case 'ghid': html = viewGhid(); break;
     case 'fisa': {
       const c = getControl(route.id);
       if (!c) { location.hash = '#/panou'; return; }
@@ -78,12 +79,7 @@ async function render({ keepScroll = false } = {}) {
       const c = getControl(route.id);
       if (!c) { location.hash = '#/panou'; return; }
       if (!tabsFor(c).some((t) => t.key === route.tab)) { location.replace(`#/control/${c.id}/obiectiv`); return; }
-      if (route.focus) {
-        state.ui.nerFilter = 'ALL';
-        state.ui.nerQuery = '';
-        const fn = c.nereguli.find((x) => x.key === route.focus);
-        if (fn && state.ui.catCollapsed.delete(neregulaCat(fn))) savePref('agenda-cats-collapsed', [...state.ui.catCollapsed]);
-      }
+      if (route.focus) reveal(c, route.focus);
       if (prev.name !== 'control' || prev.id !== route.id) state.ui.showAllNer = false;
       if (prev.name !== 'control' || prev.id !== route.id || prev.tab !== route.tab) {
         state.ui.nerFilter = 'ALL'; state.ui.nerQuery = ''; state.ui.constrPick = '';
@@ -101,24 +97,67 @@ async function render({ keepScroll = false } = {}) {
   const sameView = prev.name === route.name && prev.id === route.id && prev.tab === route.tab;
   if (keepScroll || sameView) window.scrollTo(0, y);
   else window.scrollTo(0, 0);
-  if (route.name === 'control' && route.focus) focusNeregula(route.focus);
+  updateEditTools();
+  if (route.name === 'ghid' && route.id) document.getElementById(`ghid-${route.id}`)?.scrollIntoView({ block: 'start' });
+  if (route.name === 'control' && route.focus) focusNeregula(route.focus, { strong: state.ui.focusStrong });
+  state.ui.focusStrong = false;
 }
 
-function focusNeregula(key) {
-  let el = document.getElementById(`ner-${key}`) || document.getElementById(key);
-  // Coordonatele unei construcții restrânse: întâi o deschidem.
-  if (!el && key.startsWith('gps-')) {
-    const id = key.slice(4);
-    state.ui.collapsed.delete(id); state.ui.expanded.add(id);
-    rerenderEditor();
-    el = document.getElementById(key);
+const saveRows = () => savePref('agenda-rows-collapsed', [...state.ui.rowCollapsed].slice(-3000));
+
+// Ce trebuie deschis ca un element să fie vizibil: filtrul și căutarea, categoria, rândul, construcția.
+function reveal(c, focus) {
+  state.ui.nerFilter = 'ALL';
+  state.ui.nerQuery = '';
+  const fn = c.nereguli.find((x) => x.key === focus);
+  if (fn) {
+    if (state.ui.catCollapsed.delete(neregulaCat(fn))) savePref('agenda-cats-collapsed', [...state.ui.catCollapsed]);
+    if (fn.custom && state.ui.catCollapsed.delete(`custom-${secOf(fn)}`)) savePref('agenda-cats-collapsed', [...state.ui.catCollapsed]);
+    if (state.ui.rowCollapsed.delete(rowKey(c, fn))) savePref('agenda-rows-collapsed', [...state.ui.rowCollapsed]);
   }
+  const ma = focus.match(/^act-(\w+)$/);
+  if (ma) {
+    if (state.ui.catCollapsed.delete('acte')) savePref('agenda-cats-collapsed', [...state.ui.catCollapsed]);
+    if (state.ui.rowCollapsed.delete(`${c.id}|act:${ma[1]}`)) saveRows();
+  }
+  const m = focus.match(/^(?:gps|constr)-(.+)$/);
+  if (m) { state.ui.collapsed.delete(m[1]); state.ui.expanded.add(m[1]); }
+}
+
+function focusNeregula(key, { strong = false } = {}) {
+  const el = document.getElementById(`ner-${key}`) || document.getElementById(key);
   if (!el) return;
+  const cls = strong ? 'flash-undo' : 'flash';
   requestAnimationFrame(() => {
     el.scrollIntoView({ block: 'center', behavior: 'smooth' });
-    el.classList.add('flash');
-    setTimeout(() => el.classList.remove('flash'), 1800);
+    el.classList.remove(cls); void el.offsetWidth; el.classList.add(cls);
+    setTimeout(() => el.classList.remove(cls), strong ? 2600 : 1800);
   });
+}
+
+// Barele fixe (taburi → categorie → neregulă): fiecare se oprește sub cea de deasupra
+function measureSticky() {
+  const tabs = document.querySelector('.ed-tabs');
+  document.documentElement.style.setProperty('--st-cat', `${tabs ? tabs.offsetHeight : 0}px`);
+  document.querySelectorAll('.cat-group').forEach((g) => {
+    const t = g.querySelector(':scope > .cat-title');
+    g.style.setProperty('--cat-h', `${t ? t.offsetHeight : 0}px`);
+  });
+  const bar = document.querySelector('.tabbar');
+  document.documentElement.style.setProperty('--tabbar-h', `${bar && window.getComputedStyle(bar).display !== 'none' ? bar.offsetHeight : 0}px`);
+}
+
+// Anulează / Sus / Refă: banda de jos (vertical) și bara laterală (orizontal), doar în control
+function updateEditTools() {
+  const c = route.name === 'control' ? getControl(route.id) : null;
+  document.body.classList.toggle('in-control', !!c);
+  for (const id of ['edit-strip', 'side-edit']) {
+    const box = document.getElementById(id);
+    if (!box) continue;
+    box.hidden = !c;
+    box.innerHTML = c ? editToolsHTML(c) : '';
+  }
+  measureSticky();
 }
 
 function updateNav() {
@@ -145,6 +184,7 @@ function rerenderEditor() {
   autosizeAll();
   window.scrollTo(0, y);
   updateNav();
+  updateEditTools();
 }
 
 // Bara „Ce mai ai de făcut” se actualizează și în timpul tastării (fără a atinge câmpul în care se scrie)
@@ -166,7 +206,7 @@ function autosizeAll() {
   document.querySelectorAll('textarea.obs').forEach(autosize);
 }
 let resizeTimer;
-window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(autosizeAll, 150); });
+window.addEventListener('resize', () => { clearTimeout(resizeTimer); resizeTimer = setTimeout(() => { autosizeAll(); measureSticky(); }, 150); });
 
 // ───────── acces la date prin „căi” ─────────
 // ex: "constructii.#<id>.dotari.asi.v", "nereguli.@a.amenda.suma"
@@ -212,6 +252,7 @@ document.addEventListener('input', (e) => {
     }
     return;
   }
+  if (el.dataset.search === 'ghid') { state.ui.ghidQuery = el.value; refreshGhid(); return; }
   if (el.dataset.search) {
     const key = el.dataset.search;
     if (key === 'obj') state.ui.objSearch = el.value;
@@ -224,10 +265,22 @@ document.addEventListener('input', (e) => {
 function refreshNerResults(c, sec) {
   const box = document.getElementById('ner-results');
   if (!box) return;
-  box.innerHTML = nerResultsHTML(c, sec);
+  box.innerHTML = listaHTML(c, sec);
   autosizeAll();
+  measureSticky();
   const tb = document.querySelector('.toolbar [data-act="cats-all"]');
   if (tb) tb.hidden = !!state.ui.nerQuery.trim();
+}
+
+// Ghidul: se schimbă doar cuprinsul și capitolele, bara de căutare rămâne activă
+function refreshGhid() {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = viewGhid();
+  for (const sel of ['#ghid-list', '.m-toc']) { const cur = document.querySelector(sel); const nou = tmp.querySelector(sel); if (cur && nou) cur.replaceWith(nou); }
+  const bar = document.querySelector('[data-search="ghid"]')?.closest('.searchbar');
+  const clr = bar?.querySelector('[data-act="search-clear"]');
+  if (state.ui.ghidQuery && bar && !clr) bar.querySelector('input').insertAdjacentHTML('afterend', `<button class="icon-btn" data-act="search-clear" data-key="ghid" aria-label="Șterge căutarea">${icon('x')}</button>`);
+  else if (!state.ui.ghidQuery && clr) clr.remove();
 }
 
 function refreshSearch(key) {
@@ -316,10 +369,12 @@ document.addEventListener('click', async (e) => {
 
   switch (act) {
     case 'modal-close': closeModal(); return;
+    case 'scroll-top': window.scrollTo({ top: 0, behavior: 'smooth' }); return;
     case 'new-control': openNewControl({ date: el.dataset.date, oid: el.dataset.oid }); return;
     case 'scroll': document.getElementById(el.dataset.target)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return;
     case 'search-clear': {
       const key = el.dataset.key;
+      if (key === 'ghid') { state.ui.ghidQuery = ''; const i = document.querySelector('[data-search="ghid"]'); if (i) { i.value = ''; i.focus(); } refreshGhid(); return; }
       if (key === 'obj') state.ui.objSearch = ''; else state.ui.histSearch = '';
       const input = document.querySelector(`[data-search="${key}"]`);
       if (input) { input.value = ''; input.focus(); }
@@ -351,8 +406,7 @@ document.addEventListener('click', async (e) => {
       return;
     }
     case 'backup-export': exportBackup(); return;
-    case 'help': showHelp(el.dataset.key === 'ctrl' ? `ctrl-${route.tab}` : el.dataset.key); return;
-    case 'guide': showGuide(); return;
+    case 'ghid-back': if (history.length > 1) history.back(); else location.hash = '#/panou'; return;
     case 'fisa-print': window.print(); return;
     case 'fisa-share': shareFisa(getControl(el.dataset.id)); return;
     case 'demo-load': await loadDemo(); return;
@@ -373,11 +427,34 @@ document.addEventListener('click', async (e) => {
   if (act !== 'undo' && act !== 'redo') checkpoint(c);   // textul tastat până acum = un pas separat de atingerea asta
   switch (act) {
     case 'undo': case 'redo': {
-      if (historyMove(c, act)) {
-        rerenderEditor();
-        toast(act === 'undo' ? 'Modificare anulată' : 'Modificare refăcută', 'ok');
-      }
+      // după mutare: ecranul merge la locul schimbat, îl deschide și îl evidențiază
+      const inainte = JSON.parse(JSON.stringify(c));
+      if (!historyMove(c, act)) return;
+      const t = schimbare(inainte, c);
+      toast(`${act === 'undo' ? 'Anulat' : 'Refăcut'}: ${t.text}`, 'ok');
+      reveal(c, t.focus);
+      const target = `#/control/${c.id}/${t.tab}/${encodeURIComponent(t.focus)}`;
+      if (location.hash === target) { rerenderEditor(); focusNeregula(t.focus, { strong: true }); } else { state.ui.focusStrong = true; location.hash = target; }
       return;
+    }
+    case 'row-toggle': {
+      const k = `${c.id}|${el.dataset.key}`;
+      if (!state.ui.rowCollapsed.delete(k)) state.ui.rowCollapsed.add(k);
+      saveRows(); rerenderEditor(); return;
+    }
+    case 'rows-collapse': case 'rows-expand': {
+      if (el.dataset.sec === 'acte') {
+        for (const a of ACTE) {
+          const k = `${c.id}|act:${a.key}`;
+          if (act === 'rows-expand') state.ui.rowCollapsed.delete(k); else if (c.acte[a.key].status) state.ui.rowCollapsed.add(k);
+        }
+        saveRows(); rerenderEditor(); return;
+      }
+      for (const n of c.nereguli.filter((x) => secOf(x) === el.dataset.sec && isApplicable(c, x))) {
+        if (act === 'rows-expand') state.ui.rowCollapsed.delete(rowKey(c, n));
+        else if (n.status) state.ui.rowCollapsed.add(rowKey(c, n));
+      }
+      saveRows(); rerenderEditor(); return;
     }
     case 'verif-luni': {
       const n = c.nereguli.find((x) => x.key === el.dataset.key);
@@ -403,6 +480,9 @@ document.addEventListener('click', async (e) => {
       const noClear = el.closest('.no-clear');
       const v = el.dataset.toggle && cur === el.dataset.val && !noClear ? '' : el.dataset.val;
       setPath(c, el.dataset.path, v);
+      // ✓ Conform / NEC → rândul se restrânge singur (la Constatat rămâne deschis, pentru PV și amendă)
+      const mSt = el.dataset.path.match(/^nereguli\.@(.+)\.status$/) || el.dataset.path.match(/^acte\.(\w+)\.status$/);
+      if (mSt && (v === 'ok' || v === 'nec')) { state.ui.rowCollapsed.add(`${c.id}|${el.dataset.path.startsWith('acte.') ? 'act:' : ''}${mSt[1]}`); saveRows(); }
       // GRF/NSI V la o construcție cu regim peste parter → avertizare: neregulă gravă
       if (el.dataset.path.endsWith('.grf') && v === 'V') {
         const [k] = resolvePath(c, el.dataset.path);   // părintele lui „grf” = construcția
@@ -766,11 +846,17 @@ async function restConform(c, sec) {
   });
   if (!ok) return;
   rows.forEach((r) => { r.status = 'ok'; });
+  const cheiRand = sec === 'acte' ? ACTE.filter((a) => rows.includes(c.acte[a.key])).map((a) => `${c.id}|act:${a.key}`) : rows.map((n) => rowKey(c, n));
+  cheiRand.forEach((k) => state.ui.rowCollapsed.add(k)); saveRows();
   touch(c, true);
   rerenderEditor();
   toast(`${rows.length} ${what} marcate „${word}”`, 'ok', {
     label: 'Anulează',
-    fn: () => { rows.forEach((r) => { r.status = ''; }); touch(c, true); if (route.name === 'control' && route.id === c.id) rerenderEditor(); toast('Anulat'); },
+    fn: () => {
+      rows.forEach((r) => { r.status = ''; });
+      cheiRand.forEach((k) => state.ui.rowCollapsed.delete(k)); saveRows();
+      touch(c, true); if (route.name === 'control' && route.id === c.id) rerenderEditor(); toast('Anulat');
+    },
   });
 }
 
@@ -800,24 +886,6 @@ function closeControlFlow(c) {
 }
 
 // ───────── Ghid și ajutor contextual ─────────
-
-function showGuide() {
-  openModal(`
-    <div class="modal-head"><h2>${icon('info')} Cum lucrați cu aplicația</h2><button class="icon-btn big" data-act="modal-close" aria-label="Închide">${icon('x')}</button></div>
-    <div class="modal-body">${guideSteps()}</div>
-    <div class="modal-foot"><button class="btn btn-primary btn-lg" data-act="modal-close">Am înțeles</button></div>`, { wide: true });
-}
-
-function showHelp(key) {
-  const h = AJUTOR[key] || AJUTOR.panou;
-  openModal(`
-    <div class="modal-head"><h2><span class="help-q">?</span> ${esc(h.title)}</h2><button class="icon-btn big" data-act="modal-close" aria-label="Închide">${icon('x')}</button></div>
-    <div class="modal-body"><ul class="help-list">${h.lines.map((l) => `<li>${l}</li>`).join('')}</ul></div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost btn-lg" data-act="guide">${icon('info')} Ghidul complet</button>
-      <button class="btn btn-primary btn-lg" data-act="modal-close">Am înțeles</button>
-    </div>`);
-}
 
 // ───────── Text pentru procesul-verbal ─────────
 
@@ -1048,8 +1116,9 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal
 
 // butoanele Anulează / Refă urmează istoricul (inclusiv în timpul tastării, fără redesenare)
 onHistory((c) => {
-  const box = document.getElementById('undo-redo');
-  if (box && route.name === 'control' && route.id === c.id) box.outerHTML = undoRedoHTML(c);
+  if (route.name === 'control' && route.id === c.id) {
+    for (const id of ['edit-strip', 'side-edit']) { const b = document.getElementById(id); if (b) b.innerHTML = editToolsHTML(c); }
+  }
 });
 
 onSaveState((s) => {

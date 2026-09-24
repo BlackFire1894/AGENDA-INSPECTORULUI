@@ -12,8 +12,9 @@ Datele calendaristice sunt șiruri `AAAA-LL-ZZ` în ora locală; `""` înseamnă
 | `denumire`, `administrator`, `telefon`, `email` | string | datele obiectivului se iau din cel mai recent control |
 | `dataInceput` | date | implicit data curentă |
 | `dataIncheiere` | date \| `""` | `""` = control neîncheiat |
+| `catalog` | number? | doar la controalele încheiate: versiunea (schema) listei de nereguli cu care au fost încheiate; lista lor nu se mai schimbă la actualizări |
 | `constructii` | Constructie[] | |
-| `acte` | `{ [cheie]: { status: "" \| "ok" \| "nok", obs } }` | chei: `ctpsi, lfd, instruire, organizare, comisie, sezon, controale, analiza, fise, stingatoare, contract, exercitii, registreExercitii, rapoarteExercitii` |
+| `acte` | `{ [cheie]: { status: "" \| "ok" \| "nok" \| "nec", obs } }` | chei: `ctpsi, lfd, instruire, organizare, comisie, sezon, controale, analiza, fise, stingatoare, contract, exercitii, registreExercitii, rapoarteExercitii` |
 | `nereguli` | Neregula[] | toate rândurile de constatări, din toate secțiunile (vezi `sec`): șablon + rânduri `custom` |
 | `adapostPC` | `{ v: "" \| "DA" \| "NU" \| "NEC", obs }` | adăpost de protecție civilă (doar LOCALITATE) |
 | `createdAt`, `updatedAt` | ISO datetime | `updatedAt` decide la importul „Combină” |
@@ -49,13 +50,14 @@ Datele calendaristice sunt șiruri `AAAA-LL-ZZ` în ora locală; `""` înseamnă
 | `obsAuto` | string | observațiile preluate automat; cât timp `obs === obsAuto`, se actualizează din dotări |
 | `verificari` | object | rândurile de verificare (b1–b3, c1–c7): `idConstrucție → { data: "AAAA-LL-ZZ", luni }` — data ultimei verificări; `luni` doar la b2 (12 / 24). Expirare = data + luni < data începerii controlului (`verifStare()`). Se preiau la controlul următor. |
 | `asiTermen`, `asiPrezentat`, `asiDataPrezentare` | | doar pentru `a` |
-| `amenda` | `{ aplicata, serie, numar, data, suma, achitata, dataAchitare }` | `data = ""` → data încheierii; `serie`/`numar` = seria și numărul procesului-verbal de amendă |
+| `amenda` | `{ aplicata, serieNr, data, suma, achitata, dataAchitare }` | `data = ""` → data încheierii; `serieNr` = seria și numărul procesului-verbal de amendă, într-un singur câmp (ex. „DB 0012345”; afișat „Seria DB nr. 0012345”) |
 
 Calculul termenelor: `js/model.js` → `fineStatus()`, `asiDeadline()`.
 
 ## Catalog (js/model.js)
 - `NEREGULI`, `PLANURI`, `PROTECTIE_CIVILA` → `SABLON`: rândurile standard, fiecare cu `cat` (categoria pentru codul de culori) și, la instalații, `req` (dotările de care depinde).
 - O neregulă cu `req` apare doar dacă cel puțin o construcție are DA la una din dotările listate (`centrala` = cel puțin un tip bifat). Un rând deja completat rămâne mereu vizibil.
+- Schema 9 → 10: `catalog` (număr) pe controalele încheiate — lista de nereguli a versiunii în care au fost încheiate (`catalogOf()`, `inCatalog()`; rândurile au `din` / `retrasDin`); cele încheiate înainte primesc `schema` (versiunea în care au fost create). Se fixează la încheiere și se eliberează la redeschidere (`fixeazaCatalog()`, la fiecare salvare). Amenda: `serie` + `numar` → `serieNr` (un singur câmp). Actele pot avea și `status: "nec"`.
 - Schema 8 → 9: `status` poate fi și `"nec"` (nu este cazul); verificările `b` și `c` sunt defalcate în `b1`–`b3`, `c1`–`c7` (cele vechi rămân doar unde au fost completate); nereguli noi `aj` (EXIT incomplet), `ak` (iluminat Hint incomplet), `al` (stingătoare insuficiente / lipsă), `am` (lipsă iluminat Hint — constatată automat la NU pentru Iluminat Hint, vizibilă doar atunci); `verificari` pe nereguli; construcțiile primesc `anConstruire`; dotările ASI / AVIZ primesc `nr` (numărul autorizației / avizului, la DA).
 - Schema 7 → 8: neregulile noi `ah` (construcția funcționează fără ASI) și `ai` (lucrări de extindere / modificare fără aviz), primele din listă, adăugate de `normalizeControl()`; câmpurile `auto` și `obsAuto` pe nereguli. NU la dotarea ASI / AVIZ constată automat `ah` / `ai` (`syncAutoNU()`), cu observațiile din dotări.
 - Schema 6 → 7: construcțiile primesc `grf` (`""`); neregulile primesc `grav` și `sigiliu` (`false`); `constructieId` (un singur id) devine `constructieIds` (listă): `"x"` → `["x"]`, `""` → `[]` (`normalizeControl()`).

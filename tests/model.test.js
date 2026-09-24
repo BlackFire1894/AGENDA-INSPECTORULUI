@@ -7,7 +7,7 @@ import {
   neregulaLetter, tabOfNeregula, controlStats, constructieOf, amendaSerieNr, ACTE, emptyConstructie,
   vecheInfo, pvText, constatareLabel, todoList, NEREGULI_GRAVE, constructiiCuNU,
   fmtCoord, googleMapsUrl, gpsQuality, constructiiOf, constructiiNume, matchNeregula, pesteParter, grfVPesteParter, sablon, isGrav, syncAutoNU,
-  constructiiEligibile, verifStare, verifExpirate, verifText,
+  constructiiEligibile, verifStare, verifExpirate, verifText, catalogOf, fixeazaCatalog, schimbare, SCHEMA_VERSION, matchAct,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -205,7 +205,7 @@ test('v1.4: acte exerciții, construcția neregulii, seria și nr. amenzii', () 
   const b = old.nereguli.find((x) => x.key === 'b');
   assert.deepEqual(b.constructieIds, []);
   assert.ok(!('constructieId' in b));
-  assert.equal(b.amenda.serie, '');
+  assert.equal(b.amenda.serieNr, '');
   assert.equal(b.amenda.suma, '100');
   assert.deepEqual(old.acte.exercitii, { status: '', obs: '' });
   assert.equal(old.acte.ctpsi.status, 'ok');
@@ -626,4 +626,86 @@ test('v1.11: al (stingătoare insuficiente) mereu; NU la Iluminat Hint → am, c
   c.constructii[0].dotari.ilumHint.v = 'DA';
   assert.equal(syncAutoNU(c, 'ilumHint'), 'removed');
   assert.ok(!isApplicable(c, n('am')));
+});
+
+test('v1.12: lista de nereguli înghețată la încheiere; controalele vechi rămân cum au fost', () => {
+  // control creat și încheiat în v1.10 (schema 8), salvat înainte de v1.12 (fără `catalog`)
+  const vechi = normalizeControl({ id: 'x', objectiveId: 'o', schema: 8, dataInceput: '2026-09-23', dataIncheiere: '2026-09-23',
+    constructii: [{ id: 'k1', denumire: 'Corp', dotari: { hidInt: { v: 'DA', obs: '' }, ilumHint: { v: 'DA', obs: '' } } }],
+    nereguli: [{ key: 'b', status: 'ok' }, { key: 'd', status: 'nok' }] });
+  const n = (c, k) => c.nereguli.find((x) => x.key === k);
+  assert.equal(catalogOf(vechi), 8);
+  assert.ok(isApplicable(vechi, n(vechi, 'b')) && isApplicable(vechi, n(vechi, 'c')), 'b și c, ca în v1.10');
+  for (const k of ['b1', 'b2', 'b3', 'c2', 'aj', 'ak', 'al']) assert.ok(!isApplicable(vechi, n(vechi, k)), `${k} nu apare`);
+  assert.ok(isApplicable(vechi, n(vechi, 'ah')) && isApplicable(vechi, n(vechi, 'ai')), 'ah, ai existau în v1.10');
+  const goale = vechi.nereguli.filter((x) => x.sec === 'ner' && !x.status && isApplicable(vechi, x)).map((x) => x.key);
+  assert.deepEqual(goale, ['ah', 'ai', 'a', 'c', 'e', 'f', 'k', 'n', 'o', 'aa', 'ab', 'ac', 'ad', 'ae']);   // exact lista din v1.10
+  assert.ok(!todoList(vechi).some((x) => x.id.startsWith('verif-')));
+  // un rând completat nu se ascunde niciodată
+  n(vechi, 'b1').status = 'ok';
+  assert.ok(isApplicable(vechi, n(vechi, 'b1')));
+  // control deschis: lista curentă; la încheiere se fixează, la redeschidere se eliberează
+  const c = newControl({ start: '2026-09-25' });
+  assert.equal(catalogOf(c), SCHEMA_VERSION);
+  assert.ok(isApplicable(c, n(c, 'b1')) && !isApplicable(c, n(c, 'b')));
+  c.dataIncheiere = '2026-09-25';
+  fixeazaCatalog(c);
+  assert.equal(c.catalog, SCHEMA_VERSION);
+  c.dataIncheiere = '';
+  fixeazaCatalog(c);
+  assert.ok(!('catalog' in c));
+});
+
+test('v1.12: seria și nr. amenzii într-un singur câmp', () => {
+  assert.equal(amendaSerieNr({ serieNr: 'DB 0012345' }), 'Seria DB nr. 0012345');
+  assert.equal(amendaSerieNr({ serieNr: 'db0012345' }), 'Seria DB nr. 0012345');
+  assert.equal(amendaSerieNr({ serieNr: 'seria CJ nr. 45 678' }), 'Seria CJ nr. 45678');
+  assert.equal(amendaSerieNr({ serieNr: '0099' }), 'nr. 0099');
+  assert.equal(amendaSerieNr({ serieNr: 'PV 12/2026' }), 'PV 12/2026');   // formă liberă: rămâne cum e scrisă
+  assert.equal(amendaSerieNr({ serieNr: '  ' }), '');
+  // date vechi: seria + numărul → un câmp, același text în PV
+  const c = normalizeControl({ id: 'x', objectiveId: 'o', dataInceput: '2026-09-01',
+    nereguli: [{ key: 'd', status: 'nok', amenda: { aplicata: true, serie: 'DB', numar: '0012345', suma: '2500' } }] });
+  const d = c.nereguli.find((x) => x.key === 'd');
+  assert.equal(d.amenda.serieNr, 'DB 0012345');
+  assert.ok(!('serie' in d.amenda) && !('numar' in d.amenda));
+  assert.match(pvText(c, [c]).text, /sancționat cu amendă Seria DB nr\. 0012345/);
+  // „Ce mai ai de făcut”: lipsa seriei / nr.
+  d.amenda.serieNr = '';
+  assert.ok(todoList(c).some((x) => x.id === 'fine-d' && /seria \/ nr\./.test(x.text)));
+});
+
+test('v1.12: Anulează / Refă — locul schimbat', () => {
+  const a = newControl({ denumire: 'X', start: '2026-09-25' });
+  a.constructii.push(emptyConstructie(2));
+  const clone = () => JSON.parse(JSON.stringify(a));
+  let b = clone(); b.nereguli.find((x) => x.key === 'd').status = 'nok';
+  assert.deepEqual(schimbare(a, b), { tab: 'nereguli', focus: 'd', text: 'd. Stingătoare expirate' });
+  b = clone(); b.acte.lfd.status = 'ok';
+  assert.equal(schimbare(a, b).focus, 'act-lfd');
+  b = clone(); b.constructii[1].dotari.hidInt.v = 'DA';
+  assert.deepEqual(schimbare(a, b), { tab: 'obiectiv', focus: `constr-${a.constructii[1].id}`, text: 'Construcția 2' });
+  b = clone(); b.dataIncheiere = '2026-09-25';
+  assert.equal(schimbare(a, b).focus, 'sec-perioada');
+  b = clone(); b.administrator = 'Ion';
+  assert.equal(schimbare(a, b).focus, 'sec-date');
+  // rând adăugat, apoi anulat: se arată secțiunea de rânduri adăugate
+  const cu = clone(); cu.nereguli.push({ key: 'x1', custom: true, sec: 'ner', label: 'test', status: 'nok' });
+  assert.deepEqual(schimbare(cu, a), { tab: 'nereguli', focus: 'add-ner', text: 'rândul adăugat' });
+});
+
+test('v1.12: glosar în căutare (Hint ↔ hidranți interiori, IDSAI, LFD, CTPSI…) și căutarea în acte', () => {
+  const c = newControl({ start: '2026-09-25' });
+  const hits = (q) => c.nereguli.filter((n) => n.sec === 'ner' && !n.custom && matchNeregula(c, n, q)).map((n) => n.key);
+  assert.ok(hits('hidranti interiori').includes('n') && hits('hidranti interiori').includes('o'), 'Hint ← hidranți interiori');
+  assert.ok(hits('hint').includes('c2'), 'verificare hidranți interiori ← hint');
+  assert.ok(hits('hidranti exteriori').includes('q') && hits('hext').includes('c3'));
+  assert.ok(hits('detectare').includes('m') && hits('alarmare').includes('l'), 'IDSAI');
+  assert.ok(hits('evacuare').includes('j'), 'EXIT = iluminare de securitate pentru evacuare');
+  assert.ok(hits('marcarea hidrantilor').includes('k') && !hits('marcarea hidrantilor').includes('n'), 'Iluminat Hint, fără Hint');
+  assert.ok(hits('autorizatie').includes('ah'));
+  assert.ok(!hits('asigurare').length, '„asi” nu se potrivește în mijlocul cuvintelor');
+  assert.ok(matchAct(c, 'lfd', 'foc deschis') && matchAct(c, 'ctpsi', 'cadru tehnic') && matchAct(c, 'ctpsi', 'responsabil'));
+  assert.ok(matchAct(c, 'lfd', '2') && !matchAct(c, 'lfd', '3'), 'numărul actului');
+  assert.ok(!matchAct(c, 'instruire', 'foc deschis'));
 });
