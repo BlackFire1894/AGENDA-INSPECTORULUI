@@ -1,11 +1,12 @@
 // Editorul unui control: 3 taburi — Obiectiv, Acte & evidențe, Nereguli.
-import { state, today } from './state.js';
+import { state, today, historyState } from './state.js';
 import { fmtDate, fmtDateLong, toISO } from './dates.js';
 import {
   TIP_OBIECTIV, DOTARI, CENTRALA_TIPURI, ACTE, STRUCTURI, MATERIALE_PERETI, SECTIUNI, CATEGORII,
   controlStats, secStats, fineStatus, fineDate, asiDeadline, isIncheiat, neregulaLabel, neregulaLetter,
   neregulaCat, secOf, isApplicable, isLocalitate, constructiiOf, constructiiNume, matchNeregula, fold, amendaSerieNr, vecheInfo, todoList,
   LIPSA_DOTARI, isGrav, constructiiDeclansate, GRF_NIVELURI, grfVPesteParter, sablon, fmtCoord, googleMapsUrl, appleMapsUrl, gpsQuality,
+  constructiiEligibile, isVerificare, verifStare, verifExpirate, ascunsaDeDotari,
 } from './model.js';
 import { icon, esc, pill, tipBadge, helpBtn } from './ui.js';
 
@@ -41,6 +42,7 @@ export function edHeadHTML(c) {
         <span class="save-ind" id="save-ind">${icon('check')}<span>Salvat</span></span></div>
     </div>
     <div class="ed-actions">
+      ${undoRedoHTML(c)}
       <button class="btn btn-ghost" data-act="pv-text">${icon('pv')} Text PV</button>
       <a class="btn btn-ghost" href="#/fisa/${c.id}">${icon('download')} Fișa PDF</a>
       <a class="btn btn-ghost" href="#/obiectiv/${c.objectiveId}">${icon('history')} Istoric</a>
@@ -48,6 +50,15 @@ export function edHeadHTML(c) {
       ${helpBtn('ctrl')}
       <button class="icon-btn big danger" data-act="control-delete" aria-label="Șterge controlul">${icon('trash')}</button>
     </div>`;
+}
+
+// Anulează / Refă: activate doar când există pași; se actualizează singure după fiecare modificare
+export function undoRedoHTML(c) {
+  const h = historyState(c.id);
+  return `<span class="undo-redo" id="undo-redo">
+    <button class="icon-btn big" data-act="undo" ${h.undo ? '' : 'disabled'} aria-label="Anulează ultima modificare" title="Anulează">${icon('undo')}</button>
+    <button class="icon-btn big" data-act="redo" ${h.redo ? '' : 'disabled'} aria-label="Refă" title="Refă">${icon('redo')}</button>
+  </span>`;
 }
 
 // „Ce mai ai de făcut”: pasul următor, cu acces direct; lista completă se deschide la cerere.
@@ -144,14 +155,48 @@ export function grfBlock(c, k, p = `constructii.#${k.id}`) {
   </div>`;
 }
 
+// Data ultimei verificări, pe fiecare construcție relevantă; expirarea se calculează față de data controlului
+function verifBlock(c, n) {
+  const t = sablon(n.key);
+  const list = constructiiEligibile(c, n);
+  const exp = verifExpirate(c, n);
+  const rows = list.map((k) => {
+    const s = verifStare(c, n, k);
+    const stare = s.stare === 'lipsa' ? '<span class="vf-st vf-lipsa">fără dată</span>'
+      : s.stare === 'expirata' ? `<span class="vf-st vf-exp">${icon('alert')} expirată din ${esc(fmtDate(s.expira))}</span>`
+        : `<span class="vf-st vf-ok">${icon('check')} valabilă până la ${esc(fmtDate(s.expira))}</span>`;
+    return `<div class="vf-row ${s.stare === 'expirata' ? 'is-exp' : ''}">
+      <span class="vf-name">${icon('building')} ${esc(k.denumire || 'Construcție')}</span>
+      <span class="inp-wrap vf-date"><input type="date" data-verif="${esc(n.key)}|${k.id}|data" value="${esc(s.data)}" aria-label="Data ultimei verificări – ${esc(k.denumire)}"></span>
+      ${t.verifAlegeri ? `<div class="segmented vf-luni" role="radiogroup" aria-label="Periodicitate">${t.verifAlegeri.map((l) => `<button type="button" class="${s.luni === l ? 'on' : ''}" data-act="verif-luni" data-key="${esc(n.key)}" data-id="${k.id}" data-val="${l}" role="radio" aria-checked="${s.luni === l}">${l} luni</button>`).join('')}</div>` : ''}
+      ${stare}
+    </div>`;
+  }).join('');
+  return `<div class="verif-block">
+    <span class="lbl">Data ultimei verificări${t.verifAlegeri ? '' : ` · valabilă ${t.verif} luni`}</span>
+    ${rows}
+    ${exp.length && n.status !== 'nok' ? `<div class="vf-propune">${icon('alert')}<span>Verificare expirată: <b>${esc(exp.map((k) => k.denumire).join(', '))}</b>. Constatați neregula?</span>
+      <button class="btn btn-ghost" data-act="verif-nok" data-key="${esc(n.key)}">${icon('x')} Constatat pentru ${exp.length === 1 ? 'aceasta' : `cele ${exp.length}`}</button></div>` : ''}
+  </div>`;
+}
+
+// „hidranți interiori”, „centrală termică” … — instalația de care ține un rând
+function instalatiaText(n) {
+  const req = sablon(n.key)?.req || [];
+  return req.map((r) => (DOTARI.find((d) => d.key === r)?.label || r).toLowerCase()).join(' / ');
+}
+
 // Construcțiile în care s-a făcut constatarea: meniu cu selecție multiplă (implicit prima construcție)
 function constrSelect(c, n) {
   const sel = constructiiOf(c, n);
   if (!sel.length) return '';
-  const multe = c.constructii.length > 1;
+  const multe = constructiiEligibile(c, n).length > 1 || sel.length > 1;
   const open = multe && state.ui.constrPick === n.key;
   const ids = new Set(sel.map((k) => k.id));
-  const all = sel.length === c.constructii.length;
+  // în meniu: doar construcțiile care au instalația rândului (plus cele deja alese, ca să poată fi debifate)
+  const elig = new Set(constructiiEligibile(c, n).map((k) => k.id));
+  const opts = c.constructii.filter((k) => elig.has(k.id) || ids.has(k.id));
+  const all = opts.every((k) => ids.has(k.id));
   return `<div class="constr-sel ${open ? 'open' : ''}">
     <button type="button" class="constr-sel-btn" data-act="constr-pick" data-key="${esc(n.key)}" aria-expanded="${open}" ${multe ? '' : 'disabled'} aria-label="Construcțiile în care s-a făcut constatarea">
       ${icon('building')}<span class="constr-sel-lbl">${sel.length > 1 ? `Construcțiile (${sel.length})` : 'Construcția'}</span>
@@ -159,8 +204,9 @@ function constrSelect(c, n) {
       ${multe ? icon('chevD', open ? 'rot' : '') : ''}
     </button>
     ${open ? `<div class="constr-pick" role="group" aria-label="Alegeți una sau mai multe construcții">
-      ${c.constructii.map((k, i) => `<button type="button" class="constr-opt ${ids.has(k.id) ? 'on' : ''}" data-act="constr-opt" data-key="${esc(n.key)}" data-id="${k.id}" aria-pressed="${ids.has(k.id)}">
-        <span class="cbox">${ids.has(k.id) ? icon('check') : ''}</span><span>${i + 1}. ${esc(k.denumire || `Construcția ${i + 1}`)}</span></button>`).join('')}
+      ${opts.map((k) => { const i = c.constructii.indexOf(k); return `<button type="button" class="constr-opt ${ids.has(k.id) ? 'on' : ''}" data-act="constr-opt" data-key="${esc(n.key)}" data-id="${k.id}" aria-pressed="${ids.has(k.id)}">
+        <span class="cbox">${ids.has(k.id) ? icon('check') : ''}</span><span>${i + 1}. ${esc(k.denumire || `Construcția ${i + 1}`)}</span></button>`; }).join('')}
+      ${opts.length < c.constructii.length ? `<p class="constr-pick-note">${icon('info')} Doar construcțiile cu ${esc(instalatiaText(n))} bifat DA în fișă.</p>` : ''}
       <div class="constr-pick-foot">
         <button type="button" class="btn btn-ghost" data-act="constr-opt-all" data-key="${esc(n.key)}" ${all ? 'disabled' : ''}>${icon('check')} Toate construcțiile</button>
         <button type="button" class="btn btn-primary" data-act="constr-pick" data-key="${esc(n.key)}">Gata</button>
@@ -340,6 +386,7 @@ function constructieHTML(c, k, i) {
         ${field('Suprafață desfășurată', `${p}.suprafata`, k.suprafata, { mode: 'decimal', unit: 'm²', ph: '0' })}
         ${field('Regim de înălțime', `${p}.regimInaltime`, k.regimInaltime, { ph: 'ex: S+P+2E', grav: grfVPesteParter(k) })}
         ${field('Nr. angajați', `${p}.nrAngajati`, k.nrAngajati, { mode: 'numeric', ph: '0' })}
+        ${field('Anul construirii', `${p}.anConstruire`, k.anConstruire, { mode: 'numeric', ph: 'ex: 1978' })}
         ${field('Structura de rezistență', `${p}.structura`, k.structura, { list: 'dl-structura', ph: 'Alege sau scrie' })}
         ${field('Material pereți', `${p}.materialPereti`, k.materialPereti, { list: 'dl-pereti', ph: 'Alege sau scrie' })}
       </div>
@@ -370,6 +417,7 @@ function dotareRow(p, k, d) {
     <span class="dot-label">${esc(d.label)}${grav ? `<small class="grav-note">${icon('alert')} Neregulă gravă</small>` : ''}</span>
     ${segBtns(`${path}.v`, v.v, d.opts, 'seg-dnn')}
     ${obsField(`${path}.obs`, v.obs, 'dot-obs')}
+    ${d.nr && v.v === 'DA' ? `<label class="dot-nr"><span class="lbl">${esc(d.nr)}</span><span class="inp-wrap"><input data-bind="${path}.nr" value="${esc(v.nr || '')}" placeholder="ex: 1234 din 12.05.2019" autocomplete="off"></span></label>` : ''}
   </div>`;
 }
 
@@ -400,10 +448,11 @@ function tabActe(c) {
   </section>`;
 }
 
-function okNok(path, status, okLabel, nokLabel) {
-  return `<div class="oknok">
+function okNok(path, status, okLabel, nokLabel, { nec = false } = {}) {
+  return `<div class="oknok ${nec ? 'has-nec' : ''}">
     <button type="button" class="ok-btn ${status === 'ok' ? 'on' : ''}" data-act="set" data-path="${path}.status" data-val="ok" data-toggle="1" aria-pressed="${status === 'ok'}">${icon('check')}<span>${okLabel}</span></button>
     <button type="button" class="nok-btn ${status === 'nok' ? 'on' : ''}" data-act="set" data-path="${path}.status" data-val="nok" data-toggle="1" aria-pressed="${status === 'nok'}">${icon('x')}<span>${nokLabel}</span></button>
+    ${nec ? `<button type="button" class="nec-btn ${status === 'nec' ? 'on' : ''}" data-act="set" data-path="${path}.status" data-val="nec" data-toggle="1" aria-pressed="${status === 'nec'}" aria-label="NEC – nu este cazul"><b>NEC</b><span>nu e cazul</span></button>` : ''}
   </div>`;
 }
 
@@ -424,7 +473,7 @@ function sectionRows(c, sec) {
   const q = state.ui.nerQuery.trim();
   const showAll = state.ui.showAllNer;
   const rows = c.nereguli.filter((n) => secOf(n) === sec);
-  const tmpl = rows.filter((n) => !n.custom && (isApplicable(c, n) || (showAll && !sablon(n.key)?.grav)));
+  const tmpl = rows.filter((n) => !n.custom && (isApplicable(c, n) || (showAll && ascunsaDeDotari(c, n))));
   const custom = rows.filter((n) => n.custom);
   const show = (n) => (f === 'ALL' || (f === 'NOK' ? n.status === 'nok' : !n.status)) && matchNeregula(c, n, q);
   const groups = [];
@@ -435,8 +484,15 @@ function sectionRows(c, sec) {
     g.rows.push(n);
   }
   // rânduri care s-ar potrivi, dar sunt ascunse (instalații nebifate DA la dotări)
-  const ascunse = q && !showAll ? rows.filter((n) => !n.custom && !isApplicable(c, n) && !sablon(n.key)?.grav && matchNeregula(c, n, q)).length : 0;
+  const ascunse = q && !showAll ? rows.filter((n) => ascunsaDeDotari(c, n) && matchNeregula(c, n, q)).length : 0;
   return { f, q, groups, custom, show, ascunse };
+}
+
+// „✓ Completat” sau „N necompletate” în bara unei categorii
+function stareCat(rest) {
+  return rest
+    ? `<span class="cat-stare st-rest">${rest} ${rest === 1 ? 'necompletată' : 'necompletate'}</span>`
+    : `<span class="cat-stare st-gata">${icon('check')} Completat</span>`;
 }
 
 // Lista de rânduri (se redesenează singură la căutare, ca bara de căutare să rămână activă)
@@ -453,10 +509,13 @@ export function nerResultsHTML(c, sec) {
     const nok = g.rows.filter((n) => n.status === 'nok').length;
     const closed = !q && state.ui.catCollapsed.has(g.cat);
     const nRows = vis.length + (adapost ? 1 : 0);
+    // completat / necompletat: toată categoria, indiferent de filtru sau căutare
+    const rest = g.rows.filter((n) => !n.status).length + (sec === 'pc' && g.cat === 'pcdotare' && !c.adapostPC.v ? 1 : 0);
     return `<div class="cat-group cat-${g.cat} ${closed ? 'closed' : ''}">
       <button type="button" class="cat-title" data-act="cat-toggle" data-cat="${g.cat}" aria-expanded="${!closed}" ${q ? 'disabled' : ''}>
         ${icon('chevD', closed ? '' : 'rot')}<span class="cat-name">${esc(CATEGORII[g.cat])}</span>
         <span class="cat-meta">${nRows} ${nRows === 1 ? 'rând' : 'rânduri'}</span>
+        ${stareCat(rest)}
         ${nok ? `<span class="cat-count">${nok} ${nokWord(sec, nok)}</span>` : ''}
       </button>
       ${closed ? '' : `<div class="check-list">${vis.map((n) => neregulaRow(c, n)).join('')}${adapost}</div>`}
@@ -482,11 +541,19 @@ export function nerResultsHTML(c, sec) {
       ${body}
     </section>
     <section class="card">
-      <div class="sec-title-row">
-        <h2 class="sec-title">${icon('plus')} ${ui.addTitle}</h2>
+      ${(() => {
+        const ck = `custom-${sec}`;
+        const closed = !q && custom.length > 0 && state.ui.catCollapsed.has(ck);
+        const nokC = custom.filter((n) => n.status === 'nok').length;
+        return `<div class="sec-title-row">
+        <button type="button" class="sec-title custom-toggle" data-act="cat-toggle" data-cat="${ck}" aria-expanded="${!closed}" ${custom.length && !q ? '' : 'disabled'}>
+          ${custom.length ? icon('chevD', closed ? '' : 'rot') : icon('plus')} ${ui.addTitle}
+          ${custom.length ? `<span class="cat-meta">${custom.length} ${custom.length === 1 ? 'rând' : 'rânduri'}${closed && nokC ? ` · ${nokC} ${nokWord(sec, nokC)}` : ''}</span>${stareCat(custom.filter((n) => !n.status).length)}` : ''}
+        </button>
         <button class="btn btn-primary" data-act="ner-add" data-sec="${sec}">${icon('plus')} Adaugă rând</button>
       </div>
-      <div class="cat-group cat-custom"><div class="check-list">${customVis.map((n) => neregulaRow(c, n)).join('') || `<p class="muted pad">${q && custom.length ? 'Niciun rând adăugat nu se potrivește căutării.' : ui.empty}</p>`}</div></div>
+      ${closed ? '' : `<div class="cat-group cat-custom"><div class="check-list">${customVis.map((n) => neregulaRow(c, n)).join('') || `<p class="muted pad">${q && custom.length ? 'Niciun rând adăugat nu se potrivește căutării.' : ui.empty}</p>`}</div></div>`}`;
+      })()}
     </section>`;
 }
 
@@ -525,7 +592,7 @@ function tabSectiune(c, sec) {
       <div class="tool-btns">
         ${(() => { const all = groups.length && groups.every((g) => state.ui.catCollapsed.has(g.cat)); return `<button class="btn btn-ghost" data-act="cats-all" data-val="${all ? 'open' : 'close'}" ${q ? 'hidden' : ''}>${icon(all ? 'chevD' : 'list')} ${all ? 'Extinde categoriile' : 'Restrânge categoriile'}</button>`; })()}
         ${obsToggleBtn()}
-        ${restBtn(c.nereguli.filter((n) => secOf(n) === sec && !n.status && !sablon(n.key)?.grav && (isApplicable(c, n) || showAll)).length, sec, sec === 'ner' ? 'Restul conform' : 'Restul conforme')}
+        ${restBtn(c.nereguli.filter((n) => secOf(n) === sec && !n.status && !sablon(n.key)?.grav && (isApplicable(c, n) || (showAll && ascunsaDeDotari(c, n)))).length, sec, sec === 'ner' ? 'Restul conform' : 'Restul conforme')}
       </div>
     </div>
     <div id="ner-results">${nerResultsHTML(c, sec)}</div>`;
@@ -567,7 +634,7 @@ function neregulaRow(c, n) {
     chips.push(n.inPV ? pill('green', 'Trecut în PV', 'pv') : pill('warn', 'Netrecut în PV', 'pv'));
     if (n.amenda.aplicata) { const fs = fineStatus(c, n, today()); chips.push(pill(fs.level, `Amendă · ${fs.label}`, 'fine')); }
   }
-  if (n.status === 'nok' && n.auto) chips.unshift(pill('neutral', `Din fișa obiectivului: NU la ${sablon(n.key)?.autoNU === 'asi' ? 'ASI' : 'AVIZ'}`, 'building'));
+  if (n.status === 'nok' && n.auto) chips.unshift(pill('neutral', `Din fișa obiectivului: NU la ${DOTARI.find((d) => d.key === sablon(n.key)?.autoNU)?.label || ''}`, 'building'));
   if (n.status === 'nok' && n.custom && n.grav) chips.unshift(pill('red', 'Neregulă gravă', 'alert'));
   if (n.status === 'nok' && isGrav(n) && n.sigiliu) chips.unshift(pill('red', 'Sigiliu', 'lock'));
   const vi = vecheInfo(state.controls, c, n);
@@ -577,16 +644,17 @@ function neregulaRow(c, n) {
     const t = sablon(n.key);
     chips.push(pill('neutral', t?.reqNU ? 'Nu mai e marcată NU la dotări' : t?.reqGrfV ? 'Nu mai e GRF/NSI V peste parter' : 'Instalație nebifată DA la dotări', 'info'));
   }
-  return `<div class="check-row ner-row ${n.status ? `is-${n.status}` : ''} ${vi.veche ? 'is-veche' : ''} ${n.custom && n.grav ? 'is-grav-custom' : ''}" id="ner-${esc(n.key)}">
+  return `<div class="check-row ner-row ${n.status ? `is-${n.status}` : ''} ${vi.veche && n.status !== 'nec' ? 'is-veche' : ''} ${n.custom && n.grav ? 'is-grav-custom' : ''}" id="ner-${esc(n.key)}">
     <span class="row-idx letter">${esc(letter)}</span>
     <div class="row-main">
       ${labelHTML}
       ${chips.length ? `<span class="chips">${chips.join('')}</span>` : ''}
-      ${sablon(n.key)?.grav ? constrNU(c, n) : (n.sec === 'ner' || !n.sec ? constrSelect(c, n) : '')}
+      ${isVerificare(n) && n.status !== 'nec' ? verifBlock(c, n) : ''}
+      ${sablon(n.key)?.grav ? constrNU(c, n) : ((n.sec === 'ner' || !n.sec) && n.status !== 'nec' ? constrSelect(c, n) : '')}
       ${obsField(`${path}.obs`, n.obs)}
     </div>
     <div class="row-side">
-      ${okNok(path, n.status, sec.ok, sec.nok)}
+      ${okNok(path, n.status, sec.ok, sec.nok, { nec: !sablon(n.key)?.grav || n.custom })}
       ${n.custom ? `<button class="icon-btn danger" data-act="ner-del" data-key="${esc(n.key)}" aria-label="Șterge rândul">${icon('trash')}</button>` : ''}
     </div>
     ${n.status === 'nok' ? neregulaDetail(c, n, path) : ''}

@@ -1,12 +1,13 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { addDays, diffDays, parseDateQuery, zile, pasteOrtodox, zinelucratoare } from '../js/dates.js';
+import { addDays, addMonths, diffDays, parseDateQuery, zile, pasteOrtodox, zinelucratoare } from '../js/dates.js';
 import {
   newControl, fineStatus, asiDeadline, matchControl, objectives, controlFromPrevious,
   normalizeControl, allFines, NEREGULI, SABLON, isApplicable, secStats, sectiuniActive, activeNereguli,
   neregulaLetter, tabOfNeregula, controlStats, constructieOf, amendaSerieNr, ACTE, emptyConstructie,
   vecheInfo, pvText, constatareLabel, todoList, NEREGULI_GRAVE, constructiiCuNU,
   fmtCoord, googleMapsUrl, gpsQuality, constructiiOf, constructiiNume, matchNeregula, pesteParter, grfVPesteParter, sablon, isGrav, syncAutoNU,
+  constructiiEligibile, verifStare, verifExpirate, verifText,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -147,18 +148,18 @@ test('nereguli de instalații: apar doar dacă instalația e bifată DA la dotă
   const n = (k) => c.nereguli.find((x) => x.key === k);
   assert.ok(isApplicable(c, n('a')));          // documentație: mereu
   assert.ok(!isApplicable(c, n('m')));         // IDSAI nefuncțional: fără IDSAI
-  assert.ok(!isApplicable(c, n('c')));
+  assert.ok(!isApplicable(c, n('c1')));
   assert.ok(!isApplicable(c, n('g')));         // cameră CT: fără centrală
   c.constructii[0].dotari.idsai.v = 'NEC';
   assert.ok(!isApplicable(c, n('m')));
   c.constructii[0].dotari.idsai.v = 'DA';
-  assert.ok(isApplicable(c, n('m')) && isApplicable(c, n('i')) && isApplicable(c, n('c')));
+  assert.ok(isApplicable(c, n('m')) && isApplicable(c, n('i')) && isApplicable(c, n('c1')));
   c.constructii[0].dotari.centrala.tipuri = ['GAZOS'];
   assert.ok(isApplicable(c, n('g')) && isApplicable(c, n('h')));
   // un rând completat nu dispare, chiar dacă instalația e scoasă
   n('q').status = 'nok';
   assert.ok(isApplicable(c, n('q')));
-  assert.equal(secStats(c, 'ner').total, 5 + 5 + 2 + 4 + 2 + 1); // a,b,d,e,f + aa…ae + ah,ai (mereu) + c,i,l,m + g,h + q
+  assert.equal(secStats(c, 'ner').total, 8 + 5 + 2 + 4 + 2 + 1); // a,b1,b2,b3,d,e,f,al + aa…ae + ah,ai (mereu) + c1,i,l,m + g,h + q
 });
 
 test('Planuri/SVSU și Protecție civilă: doar la Localitate, cu amenzi în Panou', () => {
@@ -527,4 +528,102 @@ test('v1.10: ah / ai primele în listă; NU la ASI / AVIZ le constată automat, 
   const ai2 = n2.nereguli.find((n) => n.key === 'ai');
   assert.equal(ai2.status, 'nok');
   assert.deepEqual(ai2.constructieIds, [n2.constructii[1].id]);
+});
+
+test('v1.11: addMonths — capăt de lună și an bisect', () => {
+  assert.equal(addMonths('2025-03-12', 12), '2026-03-12');
+  assert.equal(addMonths('2025-01-31', 1), '2025-02-28');
+  assert.equal(addMonths('2024-01-31', 1), '2024-02-29');
+  assert.equal(addMonths('2025-08-31', 6), '2026-02-28');
+  assert.equal(addMonths('2025-11-15', 24), '2027-11-15');
+});
+
+test('v1.11: verificări defalcate, date pe construcție, expirare față de data controlului', () => {
+  const c = newControl({ denumire: 'Hotel', start: '2026-09-24' });
+  c.constructii.push(emptyConstructie(2));
+  c.constructii[1].denumire = 'Anexă';
+  const [k1, k2] = c.constructii;
+  const n = (k) => c.nereguli.find((x) => x.key === k);
+  // b1–b3 la toate construcțiile, mereu; c* doar cu DA; b și c vechi retrase
+  for (const k of ['b1', 'b2', 'b3']) { assert.ok(isApplicable(c, n(k))); assert.equal(constructiiEligibile(c, n(k)).length, 2); }
+  assert.ok(!isApplicable(c, n('c2')) && !isApplicable(c, n('b')) && !isApplicable(c, n('c')));
+  k2.dotari.hidInt.v = 'DA';
+  assert.ok(isApplicable(c, n('c2')));
+  assert.deepEqual(constructiiEligibile(c, n('c2')).map((k) => k.denumire), ['Anexă']);
+  assert.equal(constructiiNume(c, n('c2')), 'Anexă');                 // implicit: prima cu instalația
+  assert.equal(constructiiNume(c, n('o')), 'Anexă');                  // la fel la neregulile de instalații
+  // electrice 12 luni: 23.09.2025 → expiră 23.09.2026 < 24.09.2026
+  n('b1').verificari[k1.id] = { data: '2025-09-23' };
+  n('b1').verificari[k2.id] = { data: '2025-09-24' };
+  assert.equal(verifStare(c, n('b1'), k1).stare, 'expirata');
+  assert.equal(verifStare(c, n('b1'), k2).stare, 'valabila');            // expiră exact azi: încă valabilă
+  assert.deepEqual(verifExpirate(c, n('b1')).map((k) => k.denumire), ['Construcția 1']);
+  // împământare: 12 implicit, 24 la alegere
+  n('b2').verificari[k1.id] = { data: '2025-03-01' };
+  assert.equal(verifStare(c, n('b2'), k1).stare, 'expirata');
+  n('b2').verificari[k1.id].luni = 24;
+  assert.equal(verifStare(c, n('b2'), k1).stare, 'valabila');
+  n('b1').verificari[k1.id].luni = 24;                                  // alegerea nu contează unde nu e permisă
+  assert.equal(verifStare(c, n('b1'), k1).luni, 12);
+  // CT 24, hidranți 6
+  n('b3').verificari[k1.id] = { data: '2024-09-25' };
+  assert.equal(verifStare(c, n('b3'), k1).stare, 'valabila');
+  n('c2').verificari[k2.id] = { data: '2026-03-23' };
+  assert.equal(verifStare(c, n('c2'), k2).stare, 'expirata');
+  // „Ce mai ai de făcut” semnalează verificările expirate neconstatate
+  const t = todoList(c).filter((x) => x.id.startsWith('verif-')).map((x) => x.id);
+  assert.deepEqual(t, ['verif-b1', 'verif-c2']);                   // b2 e pe 24 luni: valabilă
+  // PV: datele la construcțiile alese
+  Object.assign(n('b1'), { status: 'nok', constructieIds: [k1.id] });
+  assert.match(pvText(c, [c]).text, /Nu a prezentat \/ nu are verificare instalații electrice – construcția: Construcția 1\. Construcția 1: ultima verificare 23\.09\.2025, expirată din 23\.09\.2026/);
+  assert.ok(!todoList(c).some((x) => x.id === 'verif-b1'));
+  // NEC: verificat, fără PV, fără semnalare
+  n('b2').status = 'nec';
+  assert.ok(!todoList(c).some((x) => x.id === 'verif-b2'));
+  assert.doesNotMatch(pvText(c, [c]).text, /împământare/);
+  // control nou: datele verificărilor se preiau, pe construcțiile noi
+  const urm = controlFromPrevious(c, '2027-10-01');
+  const b1 = urm.nereguli.find((x) => x.key === 'b1');
+  assert.equal(b1.status, '');
+  assert.deepEqual(Object.values(b1.verificari).map((v) => v.data).sort(), ['2025-09-23', '2025-09-24']);
+  assert.equal(b1.verificari[urm.constructii[0].id].data, '2025-09-23');
+  assert.equal(verifText(urm, { ...b1, status: 'nok' }), 'Construcția 1: ultima verificare 23.09.2025, expirată din 23.09.2026');
+});
+
+test('v1.11: NEC, aj/ak, rânduri vechi b/c, an construire, nr. ASI — compatibilitate', () => {
+  const c = newControl({ start: '2026-09-01' });
+  const n = (k) => c.nereguli.find((x) => x.key === k);
+  c.constructii[0].dotari.exit.v = 'DA';
+  c.constructii[0].dotari.ilumHint.v = 'DA';
+  assert.ok(isApplicable(c, n('aj')) && isApplicable(c, n('ak')));
+  assert.equal(sablon('aj').label, 'EXIT incomplet');
+  assert.equal(sablon('ak').label, 'Iluminat Hint incomplet');
+  // NEC contează ca verificat
+  const st0 = secStats(c, 'ner');
+  n('d').status = 'nec';
+  assert.equal(secStats(c, 'ner').checked, st0.checked + 1);
+  assert.equal(secStats(c, 'ner').constatate, 0);
+  // date vechi: b constatat rămâne vizibil; construcția primește anConstruire; ASI primește nr
+  const old = normalizeControl({ ...c, nereguli: [{ key: 'b', status: 'nok', obs: 'PRAM lipsă' }],
+    constructii: [{ id: 'k', denumire: 'Corp', dotari: { asi: { v: 'DA', obs: '' } } }] });
+  const b = old.nereguli.find((x) => x.key === 'b');
+  assert.ok(isApplicable(old, b) && b.obs === 'PRAM lipsă');
+  assert.deepEqual(b.verificari, {});
+  assert.equal(old.constructii[0].anConstruire, '');
+  assert.equal(old.constructii[0].dotari.asi.nr, '');
+  assert.equal(old.constructii[0].dotari.asi.v, 'DA');
+});
+
+test('v1.11: al (stingătoare insuficiente) mereu; NU la Iluminat Hint → am, constatată automat', () => {
+  const c = newControl({ denumire: 'Școala', start: '2026-09-01' });
+  const n = (k) => c.nereguli.find((x) => x.key === k);
+  assert.ok(isApplicable(c, n('al')) && sablon('al').cat === 'stingatoare');
+  assert.ok(!isApplicable(c, n('am')));                            // ascunsă cât nu e NU
+  c.constructii[0].dotari.ilumHint.v = 'NU';
+  c.constructii[0].dotari.ilumHint.obs = 'hol etaj 1';
+  assert.equal(syncAutoNU(c, 'ilumHint'), 'added');
+  assert.ok(isApplicable(c, n('am')) && n('am').status === 'nok' && n('am').obs === 'hol etaj 1');
+  c.constructii[0].dotari.ilumHint.v = 'DA';
+  assert.equal(syncAutoNU(c, 'ilumHint'), 'removed');
+  assert.ok(!isApplicable(c, n('am')));
 });

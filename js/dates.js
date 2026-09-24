@@ -43,6 +43,14 @@ export function addDays(iso, n) {
   return `${dt.getUTCFullYear()}-${pad(dt.getUTCMonth() + 1)}-${pad(dt.getUTCDate())}`;
 }
 
+// + n luni; ziua se limitează la ultima zi a lunii (31.01 + 1 lună = 28/29.02)
+export function addMonths(iso, n) {
+  const [y, m, d] = iso.split('-').map(Number);
+  const t = new Date(Date.UTC(y, m - 1 + n, 1));
+  const last = new Date(Date.UTC(t.getUTCFullYear(), t.getUTCMonth() + 1, 0)).getUTCDate();
+  return `${t.getUTCFullYear()}-${pad(t.getUTCMonth() + 1)}-${pad(Math.min(d, last))}`;
+}
+
 export function fmtDate(iso) {
   if (!isISO(iso)) return '—';
   const [y, m, d] = iso.split('-');

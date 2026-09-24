@@ -60,8 +60,71 @@ export function touch(c, now = false) {
   pending.set(c.id, c);
   emit('saving');
   clearTimeout(timer);
-  if (now) flush();
-  else timer = setTimeout(flush, 350);
+  if (now) { flush(); checkpoint(c); } else { timer = setTimeout(flush, 350); scheduleCheckpoint(c); }
+}
+
+// ───────── Anulează / Refă (pe control, în sesiunea curentă) ─────────
+// Se păstrează instantanee ale controlului. Un pas = o atingere, sau un text tastat până la o pauză / până
+// la următoarea atingere. Nu se salvează între sesiuni.
+const LIMITA_PASI = 80;
+const hist = new Map();   // idControl → { base, undo: [], redo: [] }
+const histListeners = new Set();
+let histTimer = null;
+const snap = (c) => JSON.stringify(c, (k, v) => (k === 'updatedAt' ? undefined : v));
+
+export function onHistory(fn) { histListeners.add(fn); }
+const emitHist = (c) => histListeners.forEach((fn) => fn(c));
+
+// Punctul de plecare: controlul așa cum e la deschidere (înainte de prima modificare)
+export function historyStart(c) {
+  if (!hist.has(c.id)) hist.set(c.id, { base: snap(c), undo: [], redo: [] });
+}
+
+// Închide pasul curent: dacă s-a schimbat ceva de la ultimul pas, starea anterioară intră în „Anulează”.
+export function checkpoint(c) {
+  clearTimeout(histTimer);
+  const h = hist.get(c.id);
+  if (!h) return;
+  const cur = snap(c);
+  if (cur === h.base) return;
+  h.undo.push(h.base);
+  if (h.undo.length > LIMITA_PASI) h.undo.shift();
+  h.redo = [];
+  h.base = cur;
+  emitHist(c);
+}
+function scheduleCheckpoint(c) {
+  clearTimeout(histTimer);
+  histTimer = setTimeout(() => checkpoint(c), 1000);
+}
+
+export function historyState(id) {
+  const h = hist.get(id);
+  return { undo: h ? h.undo.length : 0, redo: h ? h.redo.length : 0 };
+}
+
+function restore(c, json) {
+  const data = JSON.parse(json);
+  for (const k of Object.keys(c)) if (!(k in data)) delete c[k];
+  Object.assign(c, data);
+}
+
+// Revine un pas înapoi (undo) sau înainte (redo). Returnează true dacă s-a schimbat ceva.
+export function historyMove(c, dir) {
+  checkpoint(c);   // textul tastat până acum devine un pas separat
+  const h = hist.get(c.id);
+  if (!h) return false;
+  const from = dir === 'undo' ? h.undo : h.redo;
+  const to = dir === 'undo' ? h.redo : h.undo;
+  if (!from.length) return false;
+  to.push(h.base);
+  h.base = from.pop();
+  restore(c, h.base);
+  c.updatedAt = new Date().toISOString();
+  pending.set(c.id, c);
+  flush();
+  emitHist(c);
+  return true;
 }
 
 export async function flush() {
