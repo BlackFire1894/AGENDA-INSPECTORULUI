@@ -34,6 +34,7 @@ export const state = {
     // Excepții individuale față de setarea generală: „<idControl>|<cale>” → true (ascuns) / false (afișat)
     obsOverride: new Map(pref('agenda-obs-override', [])),
     todoOpen: false,
+    ghidQuery: '',            // căutarea din Ghidul aplicației
     gpsBusy: '',              // id-ul construcției pentru care se caută poziția// lista completă „Ce mai ai de făcut” deschisă
     catCollapsed: new Set(pref('agenda-cats-collapsed', [])),    // categorii de nereguli restrânse
     rowCollapsed: new Set(pref('agenda-rows-collapsed', [])),    // rânduri de nereguli restrânse: „<idControl>|<cheie>”

@@ -8,7 +8,7 @@ import {
   LIPSA_DOTARI, isGrav, constructiiDeclansate, GRF_NIVELURI, grfVPesteParter, sablon, fmtCoord, googleMapsUrl, appleMapsUrl, gpsQuality,
   constructiiEligibile, isVerificare, verifStare, verifExpirate, ascunsaDeDotari, matchAct,
 } from './model.js';
-import { icon, esc, pill, tipBadge, helpBtn } from './ui.js';
+import { icon, esc, pill, tipBadge } from './ui.js';
 
 // Toate taburile posibile; „planuri” și „pc” apar doar la controalele de tip Localitate.
 export const TABS = [
@@ -46,7 +46,6 @@ export function edHeadHTML(c) {
       <a class="btn btn-ghost" href="#/fisa/${c.id}">${icon('download')} Fișa PDF</a>
       <a class="btn btn-ghost" href="#/obiectiv/${c.objectiveId}">${icon('history')} Istoric</a>
       <button class="btn btn-ghost" data-act="backup-export" title="Backup rapid al tuturor controalelor">${icon('upload')} Backup</button>
-      ${helpBtn('ctrl')}
       <button class="icon-btn big danger" data-act="control-delete" aria-label="Șterge controlul">${icon('trash')}</button>
     </div>`;
 }

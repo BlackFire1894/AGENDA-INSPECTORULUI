@@ -9,10 +9,9 @@ import {
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
-  viewCalendar, viewSettings, hintText, backupAgeText, backupIsStale, guideSteps,
+  viewCalendar, viewSettings, hintText, backupAgeText, backupIsStale, viewGhid,
 } from './views.js';
 import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML, listaHTML, grfBlock, editToolsHTML, rowKey } from './editor.js';
-import { AJUTOR } from './help.js';
 import { icon, esc, toast, openModal, closeModal, confirmDialog } from './ui.js';
 import { buildDemo } from './demo.js';
 import { APP_VERSION } from './version.js';
@@ -34,6 +33,7 @@ function parseRoute() {
     case 'calendar': return { name };
     case 'istoric': return { name };
     case 'setari': return { name };
+    case 'ghid': return { name, id: a };
     case 'fisa': return { name, id: a };
     case 'control': return { name, id: a, tab: TABS.some((t) => t.key === b) ? b : 'obiectiv', focus: c };
     default: return { name: 'panou' };
@@ -54,6 +54,7 @@ async function render({ keepScroll = false } = {}) {
     case 'calendar': html = viewCalendar(); break;
     case 'istoric': html = viewHistory(); break;
     case 'setari': html = viewSettings(persisted); break;
+    case 'ghid': html = viewGhid(); break;
     case 'fisa': {
       const c = getControl(route.id);
       if (!c) { location.hash = '#/panou'; return; }
@@ -97,6 +98,7 @@ async function render({ keepScroll = false } = {}) {
   if (keepScroll || sameView) window.scrollTo(0, y);
   else window.scrollTo(0, 0);
   updateEditTools();
+  if (route.name === 'ghid' && route.id) document.getElementById(`ghid-${route.id}`)?.scrollIntoView({ block: 'start' });
   if (route.name === 'control' && route.focus) focusNeregula(route.focus, { strong: state.ui.focusStrong });
   state.ui.focusStrong = false;
 }
@@ -250,6 +252,7 @@ document.addEventListener('input', (e) => {
     }
     return;
   }
+  if (el.dataset.search === 'ghid') { state.ui.ghidQuery = el.value; refreshGhid(); return; }
   if (el.dataset.search) {
     const key = el.dataset.search;
     if (key === 'obj') state.ui.objSearch = el.value;
@@ -267,6 +270,17 @@ function refreshNerResults(c, sec) {
   measureSticky();
   const tb = document.querySelector('.toolbar [data-act="cats-all"]');
   if (tb) tb.hidden = !!state.ui.nerQuery.trim();
+}
+
+// Ghidul: se schimbă doar cuprinsul și capitolele, bara de căutare rămâne activă
+function refreshGhid() {
+  const tmp = document.createElement('div');
+  tmp.innerHTML = viewGhid();
+  for (const sel of ['#ghid-list', '.m-toc']) { const cur = document.querySelector(sel); const nou = tmp.querySelector(sel); if (cur && nou) cur.replaceWith(nou); }
+  const bar = document.querySelector('[data-search="ghid"]')?.closest('.searchbar');
+  const clr = bar?.querySelector('[data-act="search-clear"]');
+  if (state.ui.ghidQuery && bar && !clr) bar.querySelector('input').insertAdjacentHTML('afterend', `<button class="icon-btn" data-act="search-clear" data-key="ghid" aria-label="Șterge căutarea">${icon('x')}</button>`);
+  else if (!state.ui.ghidQuery && clr) clr.remove();
 }
 
 function refreshSearch(key) {
@@ -360,6 +374,7 @@ document.addEventListener('click', async (e) => {
     case 'scroll': document.getElementById(el.dataset.target)?.scrollIntoView({ behavior: 'smooth', block: 'start' }); return;
     case 'search-clear': {
       const key = el.dataset.key;
+      if (key === 'ghid') { state.ui.ghidQuery = ''; const i = document.querySelector('[data-search="ghid"]'); if (i) { i.value = ''; i.focus(); } refreshGhid(); return; }
       if (key === 'obj') state.ui.objSearch = ''; else state.ui.histSearch = '';
       const input = document.querySelector(`[data-search="${key}"]`);
       if (input) { input.value = ''; input.focus(); }
@@ -391,8 +406,7 @@ document.addEventListener('click', async (e) => {
       return;
     }
     case 'backup-export': exportBackup(); return;
-    case 'help': showHelp(el.dataset.key === 'ctrl' ? `ctrl-${route.tab}` : el.dataset.key); return;
-    case 'guide': showGuide(); return;
+    case 'ghid-back': if (history.length > 1) history.back(); else location.hash = '#/panou'; return;
     case 'fisa-print': window.print(); return;
     case 'fisa-share': shareFisa(getControl(el.dataset.id)); return;
     case 'demo-load': await loadDemo(); return;
@@ -872,24 +886,6 @@ function closeControlFlow(c) {
 }
 
 // ───────── Ghid și ajutor contextual ─────────
-
-function showGuide() {
-  openModal(`
-    <div class="modal-head"><h2>${icon('info')} Cum lucrați cu aplicația</h2><button class="icon-btn big" data-act="modal-close" aria-label="Închide">${icon('x')}</button></div>
-    <div class="modal-body">${guideSteps()}</div>
-    <div class="modal-foot"><button class="btn btn-primary btn-lg" data-act="modal-close">Am înțeles</button></div>`, { wide: true });
-}
-
-function showHelp(key) {
-  const h = AJUTOR[key] || AJUTOR.panou;
-  openModal(`
-    <div class="modal-head"><h2><span class="help-q">?</span> ${esc(h.title)}</h2><button class="icon-btn big" data-act="modal-close" aria-label="Închide">${icon('x')}</button></div>
-    <div class="modal-body"><ul class="help-list">${h.lines.map((l) => `<li>${l}</li>`).join('')}</ul></div>
-    <div class="modal-foot">
-      <button class="btn btn-ghost btn-lg" data-act="guide">${icon('info')} Ghidul complet</button>
-      <button class="btn btn-primary btn-lg" data-act="modal-close">Am înțeles</button>
-    </div>`);
-}
 
 // ───────── Text pentru procesul-verbal ─────────
 
