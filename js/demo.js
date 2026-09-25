@@ -95,6 +95,11 @@ export function buildDemo(today) {
 
   for (const c of out) {
     c.demo = true;
+    // încărcarea după încheiere: cele vechi sunt încărcate; cel mai recent are încă documentul de încărcat
+    if (c.dataIncheiere) {
+      const vechi = c.dataIncheiere < addDays(today, -10);
+      c.incarcare = { aplicatie: true, aplicatieData: addDays(c.dataIncheiere, 1), document: vechi, documentData: vechi ? addDays(c.dataIncheiere, 2) : '' };
+    }
     // NU la ASI / AVIZ → ah / ai, ca în aplicație; la controalele încheiate, deja trecute în PV
     for (const dot of Object.keys(AUTO_NU)) {
       if (syncAutoNU(c, dot) === 'added' && c.dataIncheiere) c.nereguli.find((n) => n.key === AUTO_NU[dot]).inPV = true;

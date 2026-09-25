@@ -3,7 +3,7 @@ import { state, today, historyState } from './state.js';
 import { fmtDate, fmtDateLong, toISO } from './dates.js';
 import {
   TIP_OBIECTIV, DOTARI, CENTRALA_TIPURI, ACTE, STRUCTURI, MATERIALE_PERETI, SECTIUNI, CATEGORII,
-  controlStats, secStats, fineStatus, fineDate, asiDeadline, isIncheiat, neregulaLabel, neregulaLetter,
+  controlStats, secStats, fineStatus, fineDate, asiDeadline, incarcareStatus, isIncheiat, neregulaLabel, neregulaLetter,
   neregulaCat, secOf, isApplicable, isLocalitate, constructiiOf, constructiiNume, matchNeregula, fold, amendaSerieNr, vecheInfo, todoList,
   LIPSA_DOTARI, isGrav, constructiiDeclansate, GRF_NIVELURI, grfVPesteParter, sablon, fmtCoord, googleMapsUrl, appleMapsUrl, gpsQuality,
   constructiiEligibile, isVerificare, verifStare, verifExpirate, ascunsaDeDotari, matchAct,
@@ -241,6 +241,34 @@ function toggle(path, on, label, { level = 'accent', ic = 'check', offLabel = ''
   </button>`;
 }
 
+// Numărătoarea unui termen: zilele rămase sau depășite, scrise în clar
+function cdBox(days, { lucr = false } = {}) {
+  const n = Math.abs(days);
+  const u = `${n === 1 ? 'zi' : 'zile'}${lucr && days > 0 ? ' lucrătoare' : ''}`;
+  return `<span class="countdown big ${days <= 0 ? 'over' : ''}"><b>${n}</b><small>${days < 0 ? `${u} peste termen` : days === 0 ? 'ultima zi: azi' : `${u} rămase`}</small></span>`;
+}
+
+// După încheiere: controlul încărcat în aplicația ISU și documentul (PV scanat) — 3 zile lucrătoare
+function incarcareHTML(c) {
+  const s = incarcareStatus(c, today());
+  if (!s) return '';
+  const inc = c.incarcare;
+  const cand = (d) => (d ? `<span class="hint">bifat pe ${esc(fmtDate(d))}</span>` : '');
+  return `<section class="card form-card" id="sec-incarcare">
+    <h2 class="sec-title">${icon('upload')} Încărcare după încheiere</h2>
+    <div class="detail-toggles inc-toggles">
+      <div>${toggle('incarcare.aplicatie', inc.aplicatie, 'Încărcat în aplicație', { level: 'green', offLabel: 'Neîncărcat în aplicație' })}${inc.aplicatie ? cand(inc.aplicatieData) : ''}</div>
+      <div>${toggle('incarcare.document', inc.document, 'Document încărcat', { level: 'green', offLabel: 'Document neîncărcat' })}${inc.document ? cand(inc.documentData) : ''}</div>
+    </div>
+    ${s.gata
+    ? `<div class="deadline dl-green">${icon('check')}<div><b>Încărcat în aplicație și document încărcat</b></div></div>`
+    : `<div class="deadline ${s.level === 'red' ? 'dl-red' : 'dl-warn'}">${icon('hourglass')}
+        <div><b>Termen de încărcare: ${esc(fmtDateLong(s.termen))}</b><span>${esc(s.msg)}</span></div>
+        ${cdBox(s.daysLeft, { lucr: true })}
+      </div>`}
+  </section>`;
+}
+
 // ───────── TAB 1: OBIECTIV ─────────
 
 function tabObiectiv(c) {
@@ -299,6 +327,7 @@ function tabObiectiv(c) {
       ${endBlock}
     </div>
   </section>
+  ${incarcareHTML(c)}
 
   <section class="card form-card">
     <div class="sec-title-row">
@@ -792,12 +821,14 @@ function neregulaDetail(c, n, path) {
       <div class="detail-toggles">
         ${toggle(`${path}.asiTermen`, n.asiTermen, 'Termen de prezentare 90 de zile', { level: 'red', ic: 'hourglass' })}
         ${n.asiTermen ? toggle(`${path}.asiPrezentat`, n.asiPrezentat, 'Documentație prezentată', { level: 'green' }) : ''}
+        ${n.asiTermen && !n.asiPrezentat && (d?.faza === 'pierdere' || n.asiPierdere) ? toggle(`${path}.asiPierdere`, n.asiPierdere, 'Pierderea valabilității constatată', { level: 'green' }) : ''}
       </div>
       ${n.asiTermen && d ? `<div class="deadline ${d.resolved ? 'dl-green' : 'dl-red'}">
         ${icon(d.resolved ? 'check' : 'hourglass')}
-        <div><b>${d.resolved ? 'Rezolvat' : d.pending ? 'Termen neînceput' : `Termen: ${esc(fmtDateLong(d.deadline))}`}</b><span>${esc(d.msg)}</span>${d.nelucr ? `<span class="nelucr-inline">⚠ ${esc(d.nelucr)}</span>` : ''}</div>
-        ${!d.pending && !d.resolved ? `<span class="countdown big ${d.daysLeft < 0 ? 'over' : ''}"><b>${Math.abs(d.daysLeft)}</b><small>${d.daysLeft < 0 ? 'zile depășit' : d.daysLeft === 1 ? 'zi' : 'zile'}</small></span>` : ''}
+        <div><b>${d.resolved ? 'Rezolvat' : d.pending ? 'Termen neînceput' : d.faza === 'pierdere' ? `Constatarea pierderii valabilității: până la ${esc(fmtDateLong(d.termenPierdere))}` : `Termen: ${esc(fmtDateLong(d.deadline))}`}</b><span>${esc(d.msg)}</span>${d.nelucr ? `<span class="nelucr-inline">⚠ ${esc(d.nelucr)}</span>` : ''}</div>
+        ${!d.pending && !d.resolved ? cdBox(d.daysLeft) : ''}
       </div>` : ''}
+      ${n.asiTermen && n.asiPierdere && !n.asiPrezentat ? `<div class="form-grid g3"><label class="field"><span class="lbl">Data constatării pierderii valabilității</span><span class="inp-wrap"><input type="date" data-bind="${path}.asiDataPierdere" data-rerender="1" value="${esc(n.asiDataPierdere)}"></span></label></div>` : ''}
       ${n.asiTermen && n.asiPrezentat ? `<div class="form-grid g3"><label class="field"><span class="lbl">Data prezentării</span><span class="inp-wrap"><input type="date" data-bind="${path}.asiDataPrezentare" data-rerender="1" value="${esc(n.asiDataPrezentare)}"></span></label></div>` : ''}
     </div>`;
   }

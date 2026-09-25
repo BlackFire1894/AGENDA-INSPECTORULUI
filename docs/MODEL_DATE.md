@@ -17,6 +17,7 @@ Datele calendaristice sunt șiruri `AAAA-LL-ZZ` în ora locală; `""` înseamnă
 | `acte` | `{ [cheie]: { status: "" \| "ok" \| "nok" \| "nec", obs } }` | chei: `ctpsi, lfd, instruire, organizare, comisie, sezon, controale, analiza, fise, stingatoare, contract, exercitii, registreExercitii, rapoarteExercitii` |
 | `nereguli` | Neregula[] | toate rândurile de constatări, din toate secțiunile (vezi `sec`): șablon + rânduri `custom` |
 | `adapostPC` | `{ v: "" \| "DA" \| "NU" \| "NEC", obs }` | adăpost de protecție civilă (doar LOCALITATE) |
+| `incarcare` | `{ aplicatie, aplicatieData, document, documentData }` | după încheiere: controlul încărcat în aplicația ISU / documentul (PV scanat) încărcat — bifa (`true/false`) și data bifării; termen: 3 zile lucrătoare de la `dataIncheiere` |
 | `createdAt`, `updatedAt` | ISO datetime | `updatedAt` decide la importul „Combină” |
 | `demo` | bool? | date demonstrative |
 
@@ -50,6 +51,7 @@ Datele calendaristice sunt șiruri `AAAA-LL-ZZ` în ora locală; `""` înseamnă
 | `obsAuto` | string | observațiile preluate automat; cât timp `obs === obsAuto`, se actualizează din dotări |
 | `verificari` | object | rândurile de verificare (b1–b3, c1–c7): `idConstrucție → { data: "AAAA-LL-ZZ", luni }` — data ultimei verificări; `luni` doar la b2 (12 / 24). Expirare = data + luni < data începerii controlului (`verifStare()`). Se preiau la controlul următor. |
 | `asiTermen`, `asiPrezentat`, `asiDataPrezentare` | | doar pentru `a` |
+| `asiPierdere`, `asiDataPierdere` | | doar pentru `a`: după cele 90 de zile, pierderea valabilității constatată (5 zile calendaristice) |
 | `amenda` | `{ aplicata, serieNr, data, suma, achitata, dataAchitare }` | `data = ""` → data încheierii; `serieNr` = seria și numărul procesului-verbal de amendă, într-un singur câmp (ex. „DB 0012345”; afișat „Seria DB nr. 0012345”) |
 
 Calculul termenelor: `js/model.js` → `fineStatus()`, `asiDeadline()`.
@@ -65,3 +67,4 @@ Calculul termenelor: `js/model.js` → `fineStatus()`, `asiDeadline()`.
 - Schema 3 → 4: `vecheManual: false` adăugat de `normalizeControl()`.
 - Schema 2 → 3: câmpurile noi (`constructieId`, `amenda.serie`, `amenda.numar`, actele noi) se completează cu valori goale de `normalizeControl()`.
 - Schema 1 → 2: `normalizeControl()` adaugă `sec: "ner"` rândurilor vechi și creează rândurile Planuri/PC și `adapostPC`.
+- v1.16: `normalizeControl()` adaugă `incarcare` (bife goale) controalelor vechi; rândurile primesc `asiPierdere: false`, `asiDataPierdere: ""` din șablonul gol. Fără schimbare de `SCHEMA_VERSION` (lista de nereguli nu se schimbă).

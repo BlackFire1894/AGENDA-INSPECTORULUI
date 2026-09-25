@@ -541,6 +541,13 @@ document.addEventListener('click', async (e) => {
         const [n] = resolvePath(c, el.dataset.path);
         if (!n.asiDataPrezentare) n.asiDataPrezentare = today();
       }
+      if (el.dataset.path.endsWith('.asiPierdere') && v) {
+        const [n] = resolvePath(c, el.dataset.path);
+        if (!n.asiDataPierdere) n.asiDataPierdere = today();
+      }
+      // încărcarea: data bifării se reține (și se șterge la debifare)
+      const mInc = el.dataset.path.match(/^incarcare\.(aplicatie|document)$/);
+      if (mInc) c.incarcare[`${mInc[1]}Data`] = v ? today() : '';
       break;
     }
     case 'centrala': {

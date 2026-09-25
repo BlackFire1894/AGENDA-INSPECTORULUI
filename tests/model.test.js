@@ -8,6 +8,7 @@ import {
   vecheInfo, pvText, constatareLabel, todoList, NEREGULI_GRAVE, constructiiCuNU,
   fmtCoord, googleMapsUrl, gpsQuality, constructiiOf, constructiiNume, matchNeregula, pesteParter, grfVPesteParter, sablon, isGrav, syncAutoNU,
   constructiiEligibile, verifStare, verifExpirate, verifText, catalogOf, fixeazaCatalog, schimbare, SCHEMA_VERSION, matchAct,
+  incarcareStatus,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -308,6 +309,9 @@ test('„Ce mai am de făcut”: pașii rămași, în ordine, și lista goală l
   assert.match(t[1].text, /seria \/ nr\. și suma/);
   d.inPV = true; Object.assign(d.amenda, { serie: 'AB', numar: '1', suma: '500' });
   c.dataIncheiere = '2026-09-01';
+  // după încheiere rămâne încărcarea (aplicația ISU + documentul)
+  assert.deepEqual(todoList(c).map((x) => x.id), ['incarcare']);
+  c.incarcare.aplicatie = true; c.incarcare.document = true;
   assert.deepEqual(todoList(c), []);
   // localitate: adăpostul PC contează la Protecție civilă
   const l = newControl({ tip: 'LOCALITATE', denumire: 'Comuna', start: '2026-09-01' });
@@ -708,4 +712,48 @@ test('v1.12: glosar în căutare (Hint ↔ hidranți interiori, IDSAI, LFD, CTPS
   assert.ok(matchAct(c, 'lfd', 'foc deschis') && matchAct(c, 'ctpsi', 'cadru tehnic') && matchAct(c, 'ctpsi', 'responsabil'));
   assert.ok(matchAct(c, 'lfd', '2') && !matchAct(c, 'lfd', '3'), 'numărul actului');
   assert.ok(!matchAct(c, 'instruire', 'foc deschis'));
+});
+
+test('încărcarea: 3 zile lucrătoare de la încheiere; ultima zi și depășirea sunt roșii', () => {
+  const c = newControl({ start: '2026-09-23' });
+  assert.equal(incarcareStatus(c, '2026-09-24'), null);            // neîncheiat: nu se cere încă
+  c.dataIncheiere = '2026-09-24';                                    // joi → vin, lun, mar = 29.09
+  let s = incarcareStatus(c, '2026-09-24');
+  assert.equal(s.termen, '2026-09-29'); assert.equal(s.daysLeft, 3); assert.equal(s.level, 'warn');
+  assert.deepEqual(s.lipsa, ['aplicatie', 'document']);
+  assert.match(s.msg, /Mai sunt 3 zile lucrătoare pentru încărcare \(până la 29\.09\.2026\)/);
+  s = incarcareStatus(c, '2026-09-26');                              // sâmbătă: rămân luni și marți
+  assert.equal(s.daysLeft, 2);
+  s = incarcareStatus(c, '2026-09-28'); assert.equal(s.daysLeft, 1); assert.match(s.msg, /Mai este 1 zi lucrătoare/);
+  s = incarcareStatus(c, '2026-09-29'); assert.equal(s.daysLeft, 0); assert.equal(s.level, 'red'); assert.match(s.msg, /Astăzi este ultima zi/);
+  s = incarcareStatus(c, '2026-10-01'); assert.equal(s.level, 'red'); assert.match(s.msg, /depășit cu 2 zile/);
+  c.incarcare.aplicatie = true;
+  assert.deepEqual(incarcareStatus(c, '2026-10-01').lipsa, ['document']);
+  c.incarcare.document = true;
+  assert.ok(incarcareStatus(c, '2026-10-01').gata);
+  // peste Crăciun: 23.12 → 24, 28, 29
+  const x = newControl({ start: '2026-12-23' }); x.dataIncheiere = '2026-12-23';
+  assert.equal(incarcareStatus(x, '2026-12-23').termen, '2026-12-29');
+});
+
+test('ASI: după cele 90 de zile, 5 zile pentru constatarea pierderii valabilității', () => {
+  const c = newControl({ start: '2026-01-01' }); c.dataIncheiere = '2026-01-02';   // 90 de zile → 02.04.2026
+  const a = c.nereguli.find((n) => n.key === 'a'); a.status = 'nok'; a.asiTermen = true;
+  assert.equal(asiDeadline(c, '2026-04-02').daysLeft, 0);
+  assert.equal(asiDeadline(c, '2026-04-02').faza, undefined);
+  let d = asiDeadline(c, '2026-04-03');
+  assert.equal(d.faza, 'pierdere'); assert.equal(d.termenPierdere, '2026-04-07'); assert.equal(d.daysLeft, 4);
+  assert.match(d.msg, /Termenul de 90 de zile a expirat \(02\.04\.2026\)\. Mai sunt 4 zile pentru constatarea pierderii valabilității \(până la 07\.04\.2026\)/);
+  d = asiDeadline(c, '2026-04-07'); assert.equal(d.daysLeft, 0); assert.match(d.msg, /Astăzi este ultima zi pentru constatarea pierderii valabilității/);
+  d = asiDeadline(c, '2026-04-08'); assert.equal(d.daysLeft, -1); assert.match(d.msg, /a fost depășit cu 1 zi/);
+  a.asiPierdere = true; a.asiDataPierdere = '2026-04-06';
+  d = asiDeadline(c, '2026-04-08'); assert.ok(d.resolved); assert.match(d.msg, /Pierderea valabilității constatată · 06\.04\.2026/);
+  a.asiPierdere = false; a.asiPrezentat = true;
+  assert.ok(asiDeadline(c, '2026-04-08').resolved);
+});
+
+test('date vechi: controlul fără „incarcare” primește câmpurile goale', () => {
+  const c = newControl({ start: '2026-01-01' }); delete c.incarcare;
+  const n = normalizeControl(c);
+  assert.deepEqual(n.incarcare, { aplicatie: false, aplicatieData: '', document: false, documentData: '' });
 });

@@ -8,6 +8,7 @@ import {
   objectives, allFines, allAsi, isIncheiat, byStartDesc, controlStats, matchControl, fold,
   neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
   constructiiNume, secOf, amendaSerieNr, vecheInfo, constatareLabel, sablon, isApplicable, fmtCoord, googleMapsUrl, appleMapsUrl,
+  incarcareStatus, LIPSA_INCARCARE,
 } from './model.js';
 import { icon, esc, pill, finePill, tipBadge, empty } from './ui.js';
 import { APP_VERSION } from './version.js';
@@ -61,7 +62,15 @@ export function controlRow(c, { showName = true } = {}) {
   }
   if (st.asi && !st.asi.resolved) {
     const z = st.asi.daysLeft;
-    chips.push(pill('red', st.asi.pending ? 'ASI 90 de zile: neînceput' : z > 0 ? `ASI: ${z === 1 ? 'mai este 1 zi' : `mai sunt ${zile(z)}`}` : z === 0 ? 'ASI: expiră azi' : `ASI: depășit cu ${zile(-z)}`, 'hourglass'));
+    const cand = z > 0 ? (z === 1 ? 'mai este 1 zi' : `mai sunt ${zile(z)}`) : z === 0 ? (st.asi.faza ? 'ultima zi azi' : 'expiră azi') : `depășit cu ${zile(-z)}`;
+    chips.push(pill('red', st.asi.pending ? 'ASI 90 de zile: neînceput' : st.asi.faza === 'pierdere' ? `ASI, constatarea pierderii valabilității: ${cand}` : `ASI: ${cand}`, 'hourglass'));
+  }
+  // după încheiere: încărcat în aplicație / document încărcat
+  const inc = st.incarcare;
+  if (inc?.gata) chips.push(pill('green', 'Încărcat în aplicație · document încărcat', 'upload'));
+  else if (inc) {
+    inc.lipsa.forEach((k) => chips.push(pill(inc.level, ucfirst(LIPSA_INCARCARE[k]), 'upload')));
+    chips.push(pill(inc.level, inc.daysLeft < 0 ? `Încărcare: termen depășit cu ${zile(-inc.daysLeft)}` : inc.daysLeft === 0 ? 'Încărcare: ultima zi azi' : `Încărcare: ${inc.daysLeft === 1 ? '1 zi lucrătoare' : `${inc.daysLeft} zile lucrătoare`}`, 'hourglass'));
   }
   return `<a class="ctl-row" href="#/control/${c.id}/obiectiv">
     <span class="date-block ${isIncheiat(c) ? '' : 'is-open'}"><b>${+d}</b><span>${MONTHS_SHORT[+m - 1]}</span><small>${y}</small></span>
@@ -138,6 +147,9 @@ export function viewDashboard() {
   const netrecute = [];
   cs.forEach((c) => activeNereguli(c).forEach((n) => { if (n.status === 'nok' && !n.inPV) netrecute.push({ c, n }); }));
   const nearestAsi = asiActive[0]?.a.daysLeft;
+  // de încărcat (după încheiere): cele cu termenul depășit sau azi, primele
+  const deInc = cs.map((c) => ({ c, s: incarcareStatus(c, t) })).filter((x) => x.s && !x.s.gata).sort((x, y) => x.s.daysLeft - y.s.daysLeft);
+  const incRosii = deInc.filter((x) => x.s.level === 'red').length;
 
 
   const kpis = `<section class="kpis">
@@ -161,6 +173,11 @@ export function viewDashboard() {
       <span class="kpi-top"><span class="kpi-ic">${icon('hourglass')}</span><span class="kpi-num">${asiActive.length}</span></span>
       <span class="kpi-label">Termene ASI 90 zile</span>
       <span class="kpi-foot">${nearestAsi !== undefined ? (nearestAsi >= 0 ? `cel mai apropiat: ${nearestAsi === 0 ? 'expiră azi' : zile(nearestAsi)}` : `unul depășit cu ${zile(-nearestAsi)}`) : 'niciun termen activ'}${asiPending ? `<br>+ ${asiPending} ${asiPending === 1 ? 'neînceput' : 'neîncepute'} (control neîncheiat)` : ''}</span>
+    </button>
+    <button class="kpi kpi-inc" data-act="scroll" data-target="sec-inc">
+      <span class="kpi-top"><span class="kpi-ic">${icon('upload')}</span><span class="kpi-num">${deInc.length}</span></span>
+      <span class="kpi-label">De încărcat</span>
+      <span class="kpi-foot">${deInc.length ? (incRosii ? `${incRosii} cu ultima zi azi sau termen depășit` : 'în aplicație și document, în 3 zile lucrătoare') : 'toate controalele încheiate sunt încărcate'}</span>
     </button>
     <button class="kpi kpi-pv" data-act="scroll" data-target="sec-pv">
       <span class="kpi-top"><span class="kpi-ic">${icon('pv')}</span><span class="kpi-num">${netrecute.length}</span></span>
@@ -201,11 +218,25 @@ export function viewDashboard() {
     ${asi.length ? `<div class="items">${asi.map(({ c, a }) => `<a class="item item-red" href="#/control/${c.id}/nereguli/a">
         <span class="item-main">
           <span class="item-title">${esc(c.denumire || 'Obiectiv fără denumire')}</span>
+          ${a.faza === 'pierdere' ? `<span class="item-sub"><b>Constatarea pierderii valabilității</b> (5 zile după cele 90)</span>` : ''}
           <span class="item-msg">${esc(a.msg)}</span>
           ${a.nelucr ? `<span class="item-warn">⚠ ${esc(a.nelucr)}</span>` : ''}
         </span>
-        <span class="item-side">${a.pending ? pill('neutral', 'neînceput') : `<span class="countdown ${a.daysLeft < 0 ? 'over' : ''}"><b>${Math.abs(a.daysLeft)}</b><small>${Math.abs(a.daysLeft) === 1 ? 'zi' : 'zile'}${a.daysLeft < 0 ? ' peste termen' : a.daysLeft === 0 ? ' — expiră azi' : ' rămase'}</small></span>`}</span>
+        <span class="item-side">${a.pending ? pill('neutral', 'neînceput') : countdown(a.daysLeft)}</span>
       </a>`).join('')}</div>` : '<p class="muted pad">Niciun termen ASI activ.</p>'}
+  </section>`;
+
+  const secInc = `<section class="card dash-sec k-inc" id="sec-inc">
+    <h2 class="sec-title">${icon('upload')} De încărcat în aplicație</h2>
+    ${deInc.length ? `<div class="items">${deInc.map(({ c, s: x }) => `<a class="item item-${x.level === 'red' ? 'red' : 'warn'}" href="#/control/${c.id}/obiectiv/sec-incarcare">
+        <span class="item-main">
+          <span class="item-title">${esc(c.denumire || 'Obiectiv fără denumire')}</span>
+          <span class="item-sub">încheiat ${esc(fmtDateLong(c.dataIncheiere))}</span>
+          <span class="chips">${x.lipsa.map((k) => pill(x.level, ucfirst(LIPSA_INCARCARE[k]), 'upload')).join('')}</span>
+          <span class="item-msg">${esc(x.msg)}</span>
+        </span>
+        <span class="item-side">${countdown(x.daysLeft, { lucr: true })}</span>
+      </a>`).join('')}</div>` : '<p class="muted pad">Toate controalele încheiate sunt încărcate în aplicație, cu documentul.</p>'}
   </section>`;
 
   const secOpen = `<section class="card dash-sec k-open" id="sec-open">
@@ -235,7 +266,7 @@ export function viewDashboard() {
       </a>`).join('')}</div>` : '<p class="muted pad">Toate neregulile constatate sunt trecute în PV.</p>'}
   </section>`;
 
-  return `${head}${kpis}<div class="dash-grid">${secFines}${secAsi}${secOpen}${secPv}</div>`;
+  return `${head}${kpis}<div class="dash-grid">${secFines}${secAsi}${secInc}${secOpen}${secPv}</div>`;
 }
 
 // Vechimea ultimului backup (aceeași funcție de backup e disponibilă din Panou, control, bara laterală și Setări)
@@ -256,6 +287,13 @@ export function backupAgeText() {
 }
 
 const pad = (n) => String(n).padStart(2, '0');
+
+// Numărătoarea unui termen, scrisă în clar (zile rămase / ultima zi / peste termen)
+function countdown(days, { lucr = false } = {}) {
+  const n = Math.abs(days);
+  const u = `${n === 1 ? 'zi' : 'zile'}${lucr && days > 0 ? ' lucrătoare' : ''}`;
+  return `<span class="countdown ${days <= 0 ? 'over' : ''}"><b>${n}</b><small>${days < 0 ? `${u} peste termen` : days === 0 ? 'ultima zi: azi' : `${u} rămase`}</small></span>`;
+}
 
 // ───────────────────────── OBIECTIVE ─────────────────────────
 
@@ -291,6 +329,7 @@ export function objListHTML() {
     const fines = allFines(o.controls, t).filter((f) => f.st.level !== 'green');
     const worst = fines[0]?.st.level;
     const open = o.controls.filter((c) => !isIncheiat(c)).length;
+    const deInc = o.controls.filter((c) => { const x = incarcareStatus(c, t); return x && !x.gata; }).length;
     const dateHit = parseDateQuery(q) && hits[0];
     const init = (o.denumire || '?').trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
     return `<a class="obj-card" href="#/obiectiv/${o.id}">
@@ -303,6 +342,7 @@ export function objListHTML() {
           ${pill('neutral', `ultimul: ${fmtDate(o.last.dataInceput)}`, 'calendar')}
           ${dateHit ? pill('accent', `găsit: ${rangeText(dateHit)}`, 'search') : ''}
           ${open ? pill('open', `${open} în desfășurare`, 'clock') : ''}
+          ${deInc ? pill('warn', `${deInc} ${deInc === 1 ? 'control neîncărcat' : 'controale neîncărcate'}`, 'upload') : ''}
           ${fines.length ? pill(worst, `${fines.length} ${fines.length === 1 ? 'amendă activă' : 'amenzi active'}`, 'fine') : ''}
         </span>
       </span>
@@ -413,6 +453,13 @@ function calendarData(from, to) {
     if (a && a.deadline && !a.resolved && a.deadline >= from && a.deadline <= to) {
       get(a.deadline).deadlines.push({ kind: 'asi', level: 'red', c, text: 'Termen ASI – 90 de zile' });
     }
+    if (a?.termenPierdere && a.termenPierdere >= from && a.termenPierdere <= to) {
+      get(a.termenPierdere).deadlines.push({ kind: 'asi2', level: 'red', c, text: 'Termen ASI – constatarea pierderii valabilității' });
+    }
+    const inc = incarcareStatus(c, t);
+    if (inc && !inc.gata && inc.termen >= from && inc.termen <= to) {
+      get(inc.termen).deadlines.push({ kind: 'inc', level: 'warn', c, text: 'Termen încărcare în aplicație și document', to: 'obiectiv/sec-incarcare' });
+    }
   }
   return map;
 }
@@ -455,7 +502,7 @@ export function viewCalendar() {
       <div><div class="eyebrow">${sel === t ? 'Astăzi' : 'Ziua selectată'}</div><h2>${esc(ucfirst(fmtDateLong(sel)))}</h2></div>
     </div>
     ${selData.controls.length ? `<div class="ctl-list">${selData.controls.map((c) => controlRow(c)).join('')}</div>` : '<p class="muted pad">Niciun control în această zi.</p>'}
-    ${selData.deadlines.length ? `<h3 class="mini-title">Termene</h3><div class="items">${selData.deadlines.map((x) => `<a class="item item-${x.level}" href="#/control/${x.c.id}/${x.n ? tabOfNeregula(x.n) : 'nereguli'}/${encodeURIComponent(x.n ? x.n.key : 'a')}">
+    ${selData.deadlines.length ? `<h3 class="mini-title">Termene</h3><div class="items">${selData.deadlines.map((x) => `<a class="item item-${x.level}" href="#/control/${x.c.id}/${x.to || `${x.n ? tabOfNeregula(x.n) : 'nereguli'}/${encodeURIComponent(x.n ? x.n.key : 'a')}`}">
         <span class="item-main"><span class="item-title">${esc(x.text)}</span><span class="item-sub">${esc(x.c.denumire)}${x.n ? ` · ${esc(neregulaLetter(x.c, x.n))}. ${esc(constatareLabel(x.n))}` : ''}</span></span>
       </a>`).join('')}</div>` : ''}
     <button class="btn btn-primary btn-lg btn-block" data-act="new-control" data-date="${sel}">${icon('plus')} Control nou în această zi</button>

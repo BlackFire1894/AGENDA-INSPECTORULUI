@@ -2,7 +2,8 @@
 // Structura este documentată în docs/MODEL_DATE.md (pregătită pentru portare nativă).
 import {
   addDays, diffDays, isISO, todayISO, parseDateQuery, queryRange, rangesOverlap, zile,
-  TERMEN_PLATA, PRAG_ROSU, TERMEN_ANAF, TERMEN_ASI, fmtDate, zinelucratoare, addMonths,
+  TERMEN_PLATA, PRAG_ROSU, TERMEN_ANAF, TERMEN_ASI, TERMEN_PIERDERE_ASI, TERMEN_INCARCARE, fmtDate, zinelucratoare, addMonths,
+  addWorkingDays, workingDaysBetween,
 } from './dates.js';
 
 export const SCHEMA_VERSION = 10; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS · 7: mai multe construcții pe neregulă, GRF/NSI pe construcție · 8: nereguli ah, ai · 9: verificări defalcate cu date pe construcție, NEC, aj/ak, an construire, nr. ASI/aviz · 10: lista înghețată la încheiere (catalog), seria și nr. amenzii într-un câmp
@@ -235,6 +236,7 @@ export function emptyNeregula(key, custom = false, sec = 'ner') {
     verificari: {},      // rândurile de verificare: idConstrucție → { data: 'AAAA-LL-ZZ', luni } (data ultimei verificări)
     obsAuto: '',         // ultimele observații preluate automat din dotări (dacă obs === obsAuto, nu au fost editate)
     asiTermen: false, asiPrezentat: false, asiDataPrezentare: '',
+    asiPierdere: false, asiDataPierdere: '',   // după cele 90 de zile: pierderea valabilității, constatată (și data)
     amenda: { aplicata: false, serieNr: '', data: '', suma: '', achitata: false, dataAchitare: '' },   // serieNr: „DB 0012345”
   };
 }
@@ -259,6 +261,8 @@ export function newControl({ objectiveId, tip = 'OPEC', denumire = '', start } =
     acte,
     nereguli: SABLON.map((n) => emptyNeregula(n.key, false, n.sec)),
     adapostPC: { v: '', obs: '' },   // Adăpost de protecție civilă: DA / NU / NEC (doar LOCALITATE)
+    // După încheiere: controlul încărcat în aplicația ISU și documentul (PV scanat) încărcat — bifa și data bifării
+    incarcare: { aplicatie: false, aplicatieData: '', document: false, documentData: '' },
   };
 }
 
@@ -354,6 +358,7 @@ export function normalizeControl(c) {
   if (out.gps && !out.constructii[0].gps) out.constructii[0] = { ...out.constructii[0], gps: out.gps };
   delete out.gps;
   out.adapostPC = { ...base.adapostPC, ...(c.adapostPC || {}) };
+  out.incarcare = { ...base.incarcare, ...(c.incarcare || {}) };
   out.schema = c.schema || 1;
   if (isIncheiat(out) && !out.catalog) out.catalog = out.schema;
   return out;
@@ -580,13 +585,49 @@ export function asiDeadline(control, today = todayISO()) {
   }
   const deadline = addDays(control.dataIncheiere, TERMEN_ASI);
   const left = diffDays(today, deadline);
+  if (left >= 0) {
+    const msg = left > 0 ? `${maiSunt(left)} până la ${fmtDate(deadline)}` : `Termenul expiră astăzi (${fmtDate(deadline)})`;
+    const nl = zinelucratoare(deadline);
+    return { deadline, daysLeft: left, msg, nelucr: nl ? `Termenul (${fmtDate(deadline)}) cade ${nl} — verificați prelungirea` : '' };
+  }
+  // Etapa a doua: după cele 90 de zile, 5 zile calendaristice pentru constatarea pierderii valabilității
+  if (n.asiPierdere) {
+    return { resolved: true, pierdere: true, msg: `Pierderea valabilității constatată${isISO(n.asiDataPierdere) ? ' · ' + fmtDate(n.asiDataPierdere) : ''}` };
+  }
+  const termenPierdere = addDays(deadline, TERMEN_PIERDERE_ASI);
+  const left2 = diffDays(today, termenPierdere);
   let msg;
-  if (left > 0) msg = `${maiSunt(left)} până la ${fmtDate(deadline)}`;
-  else if (left === 0) msg = `Termenul expiră astăzi (${fmtDate(deadline)})`;
-  else msg = `Termen depășit cu ${zile(-left)} (${fmtDate(deadline)})`;
-  const nl = zinelucratoare(deadline);
-  return { deadline, daysLeft: left, msg, nelucr: nl && left >= 0 ? `Termenul (${fmtDate(deadline)}) cade ${nl} — verificați prelungirea` : '' };
+  if (left2 > 0) msg = `Termenul de 90 de zile a expirat (${fmtDate(deadline)}). ${maiSunt(left2)} pentru constatarea pierderii valabilității (până la ${fmtDate(termenPierdere)})`;
+  else if (left2 === 0) msg = `Astăzi este ultima zi pentru constatarea pierderii valabilității (${fmtDate(termenPierdere)})`;
+  else msg = `Termenul pentru constatarea pierderii valabilității (${fmtDate(termenPierdere)}) a fost depășit cu ${zile(-left2)}`;
+  const nl = zinelucratoare(termenPierdere);
+  return {
+    deadline, faza: 'pierdere', termenPierdere, daysLeft: left2, msg,
+    nelucr: nl && left2 >= 0 ? `Termenul (${fmtDate(termenPierdere)}) cade ${nl} — verificați prelungirea` : '',
+  };
 }
+
+// Încărcarea după încheiere: controlul în aplicația ISU și documentul (PV scanat).
+// Termen: 3 zile lucrătoare de la data încheierii (ziua încheierii nu se numără); ultima zi și depășirea = roșu.
+export function incarcareStatus(c, today = todayISO()) {
+  if (!isIncheiat(c)) return null;
+  const inc = c.incarcare || {};
+  const lipsa = [!inc.aplicatie && 'aplicatie', !inc.document && 'document'].filter(Boolean);
+  if (!lipsa.length) return { gata: true, lipsa };
+  const termen = addWorkingDays(c.dataIncheiere, TERMEN_INCARCARE);
+  let msg, level, daysLeft;
+  if (today > termen) {
+    daysLeft = -diffDays(termen, today);
+    level = 'red'; msg = `Termenul de încărcare (${fmtDate(termen)}) a fost depășit cu ${zile(-daysLeft)}`;
+  } else {
+    daysLeft = workingDaysBetween(today, termen);
+    level = daysLeft === 0 ? 'red' : 'warn';
+    msg = daysLeft === 0 ? `Astăzi este ultima zi pentru încărcare (${fmtDate(termen)})`
+      : `${daysLeft === 1 ? 'Mai este 1 zi lucrătoare' : `Mai sunt ${daysLeft} zile lucrătoare`} pentru încărcare (până la ${fmtDate(termen)})`;
+  }
+  return { gata: false, lipsa, termen, daysLeft, level, msg };
+}
+export const LIPSA_INCARCARE = { aplicatie: 'neîncărcat în aplicație', document: 'document neîncărcat' };
 
 // Statistici pentru un control
 export function controlStats(c, today = todayISO()) {
@@ -603,6 +644,7 @@ export function controlStats(c, today = todayISO()) {
     netrecute: nok.filter((n) => !n.inPV).length,
     fines,
     asi: asiDeadline(c, today),
+    incarcare: incarcareStatus(c, today),
   };
 }
 
@@ -850,6 +892,15 @@ export function todoList(c, { includeClose = true } = {}) {
     if (exp.length) out.push({ id: `verif-${n.key}`, level: 'warn', text: `Verificare expirată (${n.key}, ${neregulaLabel(n).replace(/^Nu a prezentat \/ nu are verificare /, '')}): ${exp.map((k) => k.denumire).join(', ')}`, tab: 'nereguli', focus: n.key });
   }
   if (includeClose && !isISO(c.dataIncheiere)) out.push({ id: 'close', level: 'todo', text: 'Controlul nu este încheiat', tab: 'obiectiv', focus: 'sec-perioada' });
+  // după încheiere: încărcarea în aplicația ISU și a documentului
+  const inc = incarcareStatus(c);
+  if (inc && !inc.gata) {
+    const ce = inc.lipsa.map((k) => LIPSA_INCARCARE[k]).join(', ');
+    out.push({ id: 'incarcare', level: 'warn', text: `${ce[0].toUpperCase()}${ce.slice(1)} — ${inc.daysLeft < 0 ? 'termen depășit' : inc.daysLeft === 0 ? 'ultima zi azi' : `${inc.daysLeft === 1 ? '1 zi lucrătoare' : `${inc.daysLeft} zile lucrătoare`}`}`, tab: 'obiectiv', focus: 'sec-incarcare' });
+  }
+  // ASI: după cele 90 de zile, constatarea pierderii valabilității
+  const asi = asiDeadline(c);
+  if (asi?.faza === 'pierdere') out.push({ id: 'asi-pierdere', level: 'warn', text: `ASI: constatați pierderea valabilității — ${asi.daysLeft < 0 ? 'termen depășit' : asi.daysLeft === 0 ? 'ultima zi azi' : `${zile(asi.daysLeft)}`}`, tab: 'nereguli', focus: 'a' });
   return out;
 }
 
