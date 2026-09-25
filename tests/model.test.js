@@ -10,7 +10,7 @@ import {
   fmtCoord, googleMapsUrl, gpsQuality, constructiiOf, constructiiNume, matchNeregula, pesteParter, grfVPesteParter, sablon, isGrav, syncAutoNU,
   constructiiEligibile, verifStare, verifExpirate, verifText, catalogOf, fixeazaCatalog, schimbare, SCHEMA_VERSION, matchAct,
   incarcareStatus, parseSuma,
-  sigiliiAplicate, sigiliiText, emptyNeregula,
+  sigiliiControl, sigiliiText, emptyNeregula,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -837,15 +837,25 @@ test('sumele în lei, scrise în stil românesc', () => {
   assert.equal(parseSuma(''), null); assert.equal(parseSuma('abc'), null);
 });
 
-test('sigiliile aplicate: doar rândurile grave constatate, cu bifa Sigiliu', () => {
+test('sigiliul: pe construcție; neregulile grave bifate sunt criteriile lui', () => {
   const c = newControl({ start: '2026-10-01' });
-  const g = c.nereguli.find((n) => isGrav(n));
+  c.constructii.push(emptyConstructie(2));
+  const [k1, k2] = c.constructii.map((k) => k.id);
+  const grave = c.nereguli.filter((n) => isGrav(n)).slice(0, 2);
   const d = c.nereguli.find((n) => n.key === 'd');
-  assert.equal(sigiliiAplicate(c), 0);
-  g.sigiliu = true; assert.equal(sigiliiAplicate(c), 0);            // bifa rămasă, dar rândul nu e constatat
-  g.status = 'nok'; assert.equal(sigiliiAplicate(c), 1);
-  d.status = 'nok'; d.sigiliu = true; assert.equal(sigiliiAplicate(c), 1);   // neregulă obișnuită: nu contează
-  c.nereguli.push({ ...emptyNeregula('custom-1'), custom: true, grav: true, status: 'nok', sigiliu: true, label: 'x' });
-  assert.equal(sigiliiAplicate(c), 2);
-  assert.equal(sigiliiText(1), '1 sigiliu aplicat'); assert.equal(sigiliiText(2), '2 sigilii aplicate');
+  assert.equal(sigiliiControl(c), null);
+  grave[0].sigiliu = true; grave[0].constructieIds = [k1];
+  assert.equal(sigiliiControl(c), null);                                          // bifa rămasă, dar rândul nu e constatat
+  grave[0].status = 'nok';
+  assert.deepEqual(sigiliiControl(c), { criterii: 1, sigilii: 1 });
+  grave[1].status = 'nok'; grave[1].sigiliu = true; grave[1].constructieIds = [k1];
+  assert.deepEqual(sigiliiControl(c), { criterii: 2, sigilii: 1 });              // aceeași construcție: un sigiliu, 2 criterii
+  d.status = 'nok'; d.sigiliu = true;
+  assert.deepEqual(sigiliiControl(c), { criterii: 2, sigilii: 1 });              // neregulă obișnuită: nu contează
+  c.nereguli.push({ ...emptyNeregula('custom-1'), custom: true, grav: true, status: 'nok', sigiliu: true, label: 'x', constructieIds: [k2] });
+  assert.deepEqual(sigiliiControl(c), { criterii: 3, sigilii: 2 });              // altă construcție: al doilea sigiliu
+  grave[1].constructieIds = [k1, k2];
+  assert.deepEqual(sigiliiControl(c), { criterii: 3, sigilii: 2 });              // în ambele: tot 2 construcții
+  assert.equal(sigiliiText({ criterii: 1, sigilii: 1 }), 'Sigiliu aplicat · 1 criteriu');
+  assert.equal(sigiliiText({ criterii: 3, sigilii: 2 }), '2 sigilii (2 construcții) · 3 criterii');
 });

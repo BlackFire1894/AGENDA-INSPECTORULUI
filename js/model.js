@@ -447,9 +447,20 @@ export function constatareLabel(n) {
 
 // Neregulă gravă: din listă (NU la dotări, GRF/NSI V peste parter) sau rând adăugat bifat „Neregulă gravă”
 export const isGrav = (n) => (n.custom ? !!n.grav : !!sablon(n.key)?.grav);
-// Sigiliile aplicate la un control: rândurile grave constatate (✗) cu bifa Sigiliu
-export const sigiliiAplicate = (c) => activeNereguli(c).filter((n) => n.status === 'nok' && isGrav(n) && n.sigiliu).length;
-export const sigiliiText = (k) => `${k} ${k === 1 ? 'sigiliu aplicat' : 'sigilii aplicate'}`;
+// Sigiliul se aplică pe construcție; neregulile grave constatate (✗) cu bifa Sigiliu sunt criteriile lui.
+// Mai multe criterii în aceeași construcție = un sigiliu; construcții diferite = câte un sigiliu pe fiecare.
+// O neregulă constatată în mai multe construcții = sigiliu în toate. null = niciun sigiliu.
+export function sigiliiControl(c) {
+  const rows = activeNereguli(c).filter((n) => n.status === 'nok' && isGrav(n) && n.sigiliu);
+  if (!rows.length) return null;
+  const ids = new Set(rows.flatMap((n) => constructiiOf(c, n).map((k) => k.id)));
+  return { criterii: rows.length, sigilii: Math.max(1, ids.size) };
+}
+export const criteriiText = (n) => `${n} ${n === 1 ? 'criteriu' : 'criterii'}`;
+export function sigiliiText(s) {
+  return s.sigilii === 1 ? `Sigiliu aplicat · ${criteriiText(s.criterii)}`
+    : `${s.sigilii} sigilii (${s.sigilii} construcții) · ${criteriiText(s.criterii)}`;
+}
 
 export const neregulaCat = (n) => (n.custom ? 'custom' : sablon(n.key)?.cat || 'custom');
 export const secOf = (n) => n.sec || 'ner';

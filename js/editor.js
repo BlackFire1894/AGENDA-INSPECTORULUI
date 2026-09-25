@@ -597,7 +597,7 @@ function catInfo(c, rows, sec, { adapostGol = false, scurt = false } = {}) {
   const tNok = `${nok.length} ${nokWord(sec, nok.length)}`;
   const tPv = `${netrec.length} ${netrec.length === 1 ? 'netrecută' : 'netrecute'} în PV`;
   const tAm = `${amend.length} ${amend.length === 1 ? 'amendată' : 'amendate'}`;
-  const tSig = `${sigil.length} cu sigiliu`;
+  const tSig = `${sigil.length} ${sigil.length === 1 ? 'criteriu' : 'criterii'} de sigilare`;
   // categorie deschisă: cuvinte întregi, fără litere (rândurile se văd dedesubt); restrânsă: și literele rândurilor
   if (scurt) {
     return `${rest ? `<span class="cat-stare st-rest">${tNec}</span>` : `<span class="cat-stare st-gata">${icon('check')} Completat</span>`}
