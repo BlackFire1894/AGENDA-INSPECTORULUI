@@ -43,12 +43,12 @@ test('amenda: galben din ziua 16 până în ziua 39', () => {
   assert.equal(fineStatus(c, n, '2026-10-10').level, 'yellow'); // ziua 39
 });
 
-test('amenda: roșu după 25 de zile peste cele 15 → „Mai ai 5 zile”', () => {
+test('amenda: roșu după 25 de zile peste cele 15 → „Mai aveți 5 zile”', () => {
   const { c, n } = withFine('2026-09-01');
   const st = fineStatus(c, n, '2026-10-11'); // ziua 40
   assert.equal(st.level, 'red');
   assert.equal(st.daysLeft, 5);
-  assert.match(st.msg, /Mai ai 5 zile până să o trimiți la ANAF, consultă calculatorul de termene/);
+  assert.match(st.msg, /Mai aveți 5 zile până să o trimiteți la ANAF; consultați calculatorul de termene/);
   assert.equal(st.anafPana, '2026-10-16');
   assert.match(fineStatus(c, n, '2026-10-20').msg, /depășit cu 4 zile/);
 });
@@ -230,7 +230,7 @@ test('termenul de plată într-o zi nelucrătoare: avertizare, fără mutare', (
   const st = fineStatus(c, n, '2026-09-20');
   assert.equal(st.plataPana, '2026-10-03');               // nu se mută
   assert.equal(st.plataNelucr, 'sâmbătă');
-  assert.match(st.nelucr, /cade sâmbătă — verifică prelungirea/);
+  assert.match(st.nelucr, /cade sâmbătă — verificați prelungirea/);
   const ok = fineStatus(withFine('2026-09-16').c, withFine('2026-09-16').n, '2026-09-20'); // +15 = 01.10, joi
   assert.equal(ok.nelucr, '');
 });
@@ -570,12 +570,12 @@ test('v1.11: verificări defalcate, date pe construcție, expirare față de dat
   assert.equal(verifStare(c, n('b3'), k1).stare, 'valabila');
   n('c2').verificari[k2.id] = { data: '2026-03-23' };
   assert.equal(verifStare(c, n('c2'), k2).stare, 'expirata');
-  // „Ce mai ai de făcut” semnalează verificările expirate neconstatate
+  // „Ce mai aveți de făcut” semnalează verificările expirate neconstatate
   const t = todoList(c).filter((x) => x.id.startsWith('verif-')).map((x) => x.id);
   assert.deepEqual(t, ['verif-b1', 'verif-c2']);                   // b2 e pe 24 luni: valabilă
   // PV: datele la construcțiile alese
   Object.assign(n('b1'), { status: 'nok', constructieIds: [k1.id] });
-  assert.match(pvText(c, [c]).text, /Nu a prezentat \/ nu are verificare instalații electrice – construcția: Construcția 1\. Construcția 1: ultima verificare 23\.09\.2025, expirată din 23\.09\.2026/);
+  assert.match(pvText(c, [c]).text, /Nu a prezentat \/ nu are verificare instalații electrice – construcția: Construcția 1\. Construcția 1: ultima verificare 23\.09\.2025, expirată \(era valabilă până la 23\.09\.2026\)/);
   assert.ok(!todoList(c).some((x) => x.id === 'verif-b1'));
   // NEC: verificat, fără PV, fără semnalare
   n('b2').status = 'nec';
@@ -587,7 +587,7 @@ test('v1.11: verificări defalcate, date pe construcție, expirare față de dat
   assert.equal(b1.status, '');
   assert.deepEqual(Object.values(b1.verificari).map((v) => v.data).sort(), ['2025-09-23', '2025-09-24']);
   assert.equal(b1.verificari[urm.constructii[0].id].data, '2025-09-23');
-  assert.equal(verifText(urm, { ...b1, status: 'nok' }), 'Construcția 1: ultima verificare 23.09.2025, expirată din 23.09.2026');
+  assert.equal(verifText(urm, { ...b1, status: 'nok' }), 'Construcția 1: ultima verificare 23.09.2025, expirată (era valabilă până la 23.09.2026)');
 });
 
 test('v1.11: NEC, aj/ak, rânduri vechi b/c, an construire, nr. ASI — compatibilitate', () => {
@@ -670,7 +670,7 @@ test('v1.12: seria și nr. amenzii într-un singur câmp', () => {
   assert.equal(d.amenda.serieNr, 'DB 0012345');
   assert.ok(!('serie' in d.amenda) && !('numar' in d.amenda));
   assert.match(pvText(c, [c]).text, /sancționat cu amendă Seria DB nr\. 0012345/);
-  // „Ce mai ai de făcut”: lipsa seriei / nr.
+  // „Ce mai aveți de făcut”: lipsa seriei / nr.
   d.amenda.serieNr = '';
   assert.ok(todoList(c).some((x) => x.id === 'fine-d' && /seria \/ nr\./.test(x.text)));
 });

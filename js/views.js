@@ -9,7 +9,7 @@ import {
   neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
   constructiiNume, secOf, amendaSerieNr, vecheInfo, constatareLabel, sablon, isApplicable, fmtCoord, googleMapsUrl, appleMapsUrl,
 } from './model.js';
-import { icon, esc, pill, tipBadge, empty } from './ui.js';
+import { icon, esc, pill, finePill, tipBadge, empty } from './ui.js';
 import { APP_VERSION } from './version.js';
 import { MANUAL } from './help.js';
 
@@ -25,7 +25,8 @@ export function currentFont() {
   return f === 'mic' || f === 'mediu' ? f : 'mare';
 }
 
-const LEVEL_LABEL = { blue: 'În curs', yellow: 'Termen expirat', red: 'ANAF', green: 'Achitată' };
+// aceleași denumiri ca pastilele din Panou (fineStatus)
+const LEVEL_LABEL = { blue: 'În curs', yellow: 'Termen 15 zile expirat', red: 'Trimite la ANAF', green: 'Achitată' };
 
 export function money(v) {
   const n = Number(String(v).replace(',', '.'));
@@ -48,7 +49,7 @@ export function controlRow(c, { showName = true } = {}) {
   const [y, m, d] = c.dataInceput.split('-');
   const chips = [statusPill(c)];
   if (st.constatate) chips.push(pill('neutral', `${st.constatate} ${st.constatate === 1 ? 'neregulă' : 'nereguli'}`));
-  if (st.netrecute) chips.push(pill('warn', `${st.netrecute} netrecute în PV`, 'pv'));
+  if (st.netrecute) chips.push(pill('warn', `${st.netrecute} ${st.netrecute === 1 ? 'netrecută' : 'netrecute'} în PV`, 'pv'));
   const grave = c.nereguli.filter((n) => !n.custom && sablon(n.key)?.grav && n.status !== 'ok' && isApplicable(c, n)).length;
   if (grave) chips.unshift(pill('red', `${grave} ${grave === 1 ? 'neregulă gravă' : 'nereguli grave'}`, 'alert'));
   const vechi = activeNereguli(c).filter((n) => vecheInfo(state.controls, c, n).veche).length;
@@ -56,9 +57,12 @@ export function controlRow(c, { showName = true } = {}) {
   const byLevel = {};
   st.fines.forEach((f) => { byLevel[f.st.level] = (byLevel[f.st.level] || 0) + 1; });
   for (const lv of ['red', 'yellow', 'blue', 'green']) {
-    if (byLevel[lv]) chips.push(pill(lv, `${byLevel[lv]} ${byLevel[lv] === 1 ? 'amendă' : 'amenzi'} · ${LEVEL_LABEL[lv]}`, 'fine'));
+    if (byLevel[lv]) chips.push(finePill(lv, `${byLevel[lv]} ${byLevel[lv] === 1 ? 'amendă' : 'amenzi'} · ${lv === 'green' && byLevel[lv] > 1 ? 'Achitate' : LEVEL_LABEL[lv]}`));
   }
-  if (st.asi && !st.asi.resolved) chips.push(pill('red', st.asi.pending ? 'ASI 90 zile' : `ASI: ${st.asi.daysLeft} zile`, 'hourglass'));
+  if (st.asi && !st.asi.resolved) {
+    const z = st.asi.daysLeft;
+    chips.push(pill('red', st.asi.pending ? 'ASI 90 de zile: neînceput' : z > 0 ? `ASI: ${z === 1 ? 'mai este 1 zi' : `mai sunt ${zile(z)}`}` : z === 0 ? 'ASI: expiră azi' : `ASI: depășit cu ${zile(-z)}`, 'hourglass'));
+  }
   return `<a class="ctl-row" href="#/control/${c.id}/obiectiv">
     <span class="date-block ${isIncheiat(c) ? '' : 'is-open'}"><b>${+d}</b><span>${MONTHS_SHORT[+m - 1]}</span><small>${y}</small></span>
     <span class="ctl-main">
@@ -86,7 +90,7 @@ function searchBar(key, value, placeholder) {
 
 export function hintText(value) {
   const dq = parseDateQuery(value);
-  if (!value) return 'Scrie numele obiectivului sau o dată: 12.09.2026, 09.2026 sau 2026.';
+  if (!value) return 'Scrieți numele obiectivului sau o dată: 12.09.2026, 09.2026 sau 2026.';
   if (!dq) return `Caut după nume: „${esc(value)}”`;
   if (dq.kind === 'day') return `Controale care includ ziua de ${fmtDateLong(dq.iso)}`;
   if (dq.kind === 'month') return `Controale din ${MONTHS[dq.month - 1]} ${dq.year}`;
@@ -99,15 +103,14 @@ export function viewDashboard() {
   const t = today();
   const cs = state.controls;
   const now = new Date();
-  const head = `<header class="page-head dash-head">
-    <div>
-      <div class="eyebrow">${icon('clock')} Data și ora tabletei</div>
-      <h1 class="dash-date">${esc(ucfirst(fmtDateLong(t)))}</h1>
-    </div>
-    <div class="dash-right">
-      <div class="dash-clock-row"><a class="btn btn-ghost guide-btn" href="#/ghid">${icon('book')} Ghidul aplicației</a><div class="big-clock" data-clock>${pad(now.getHours())}:${pad(now.getMinutes())}</div></div>
+  // Antet: data și ora pe un rând. Ghidul și Backup rapid apar aici doar pe vertical (pe orizontal sunt în bara laterală).
+  const head = `<header class="dash-head">
+    <div class="eyebrow">${icon('clock')} Data și ora tabletei</div>
+    <div class="dash-actions">
+      <a class="btn btn-ghost guide-btn" href="#/ghid">${icon('book')} Ghidul aplicației</a>
       ${cs.length ? `<button class="btn btn-ghost backup-quick ${backupIsStale() ? 'stale' : ''}" data-act="backup-export">${icon('download')}<span><b>Backup rapid</b><small>${esc(backupAgeText())}</small></span></button>` : ''}
     </div>
+    <h1 class="dash-date"><span>${esc(ucfirst(fmtDateLong(t)))}</span><span class="dash-time" data-clock>${pad(now.getHours())}:${pad(now.getMinutes())}</span></h1>
   </header>`;
 
   if (!cs.length) {
@@ -131,38 +134,36 @@ export function viewDashboard() {
   const open = cs.filter((c) => !isIncheiat(c)).sort(byStartDesc);
   const asi = allAsi(cs, t);
   const asiActive = asi.filter((x) => !x.a.pending);
+  const asiPending = asi.length - asiActive.length;
   const netrecute = [];
   cs.forEach((c) => activeNereguli(c).forEach((n) => { if (n.status === 'nok' && !n.inPV) netrecute.push({ c, n }); }));
   const nearestAsi = asiActive[0]?.a.daysLeft;
 
-  const backupWarn = backupReminder();
 
   const kpis = `<section class="kpis">
     <button class="kpi kpi-fines" data-act="scroll" data-target="sec-fines">
-      <span class="kpi-ic">${icon('fine')}</span>
-      <span class="kpi-num">${active.length}</span>
+      <span class="kpi-top"><span class="kpi-ic">${icon('fine')}</span><span class="kpi-num">${active.length}</span></span>
       <span class="kpi-label">Amenzi active</span>
-      <span class="kpi-bar">${['red', 'yellow', 'blue', 'green'].map((l) => `<span class="seg seg-${l}" style="flex:${cnt[l] || 0}"></span>`).join('')}</span>
-      <span class="kpi-legend">
-        <span><i class="dot dot-red"></i>${cnt.red}</span><span><i class="dot dot-yellow"></i>${cnt.yellow}</span>
-        <span><i class="dot dot-blue"></i>${cnt.blue}</span><span><i class="dot dot-green"></i>${cnt.green}</span>
-      </span>
+      ${active.length ? `<span class="kpi-bar">${['red', 'yellow', 'blue'].map((l) => `<span class="seg seg-${l}" style="flex:${cnt[l]}"></span>`).join('')}</span>` : ''}
+      <span class="kpi-legend">${[
+        ['red', cnt.red, 'de trimis la ANAF'],
+        ['yellow', cnt.yellow, 'cu termen de plată expirat'],
+        ['blue', cnt.blue, 'în curs'],
+      ].filter(([, n]) => n).map(([l, n, t]) => `<span><i class="dot dot-${l}"></i><b>${n}</b> ${t}</span>`).join('')}</span>
+      <span class="kpi-foot">${cnt.green ? `+ ${cnt.green} ${cnt.green === 1 ? 'achitată' : 'achitate'} (nu intră în total)` : active.length ? '' : 'nicio amendă activă'}</span>
     </button>
     <button class="kpi kpi-open" data-act="scroll" data-target="sec-open">
-      <span class="kpi-ic">${icon('clock')}</span>
-      <span class="kpi-num">${open.length}</span>
+      <span class="kpi-top"><span class="kpi-ic">${icon('clock')}</span><span class="kpi-num">${open.length}</span></span>
       <span class="kpi-label">Controale neîncheiate</span>
       <span class="kpi-foot">${open.length ? `cel mai vechi: ${fmtDate(open[open.length - 1].dataInceput)}` : 'toate sunt încheiate'}</span>
     </button>
     <button class="kpi kpi-asi" data-act="scroll" data-target="sec-asi">
-      <span class="kpi-ic">${icon('hourglass')}</span>
-      <span class="kpi-num">${asiActive.length}</span>
+      <span class="kpi-top"><span class="kpi-ic">${icon('hourglass')}</span><span class="kpi-num">${asiActive.length}</span></span>
       <span class="kpi-label">Termene ASI 90 zile</span>
-      <span class="kpi-foot">${nearestAsi !== undefined ? (nearestAsi >= 0 ? `cel mai apropiat: ${zile(nearestAsi)}` : `depășit cu ${zile(-nearestAsi)}`) : 'niciun termen activ'}</span>
+      <span class="kpi-foot">${nearestAsi !== undefined ? (nearestAsi >= 0 ? `cel mai apropiat: ${nearestAsi === 0 ? 'expiră azi' : zile(nearestAsi)}` : `unul depășit cu ${zile(-nearestAsi)}`) : 'niciun termen activ'}${asiPending ? `<br>+ ${asiPending} ${asiPending === 1 ? 'neînceput' : 'neîncepute'} (control neîncheiat)` : ''}</span>
     </button>
     <button class="kpi kpi-pv" data-act="scroll" data-target="sec-pv">
-      <span class="kpi-ic">${icon('pv')}</span>
-      <span class="kpi-num">${netrecute.length}</span>
+      <span class="kpi-top"><span class="kpi-ic">${icon('pv')}</span><span class="kpi-num">${netrecute.length}</span></span>
       <span class="kpi-label">Netrecute în PV</span>
       <span class="kpi-foot">${netrecute.length ? 'de completat în procesul-verbal' : 'toate sunt trecute'}</span>
     </button>
@@ -178,12 +179,12 @@ export function viewDashboard() {
         ${vecheInfo(state.controls, c, n).veche ? `<span class="item-veche">${icon('history')} Neregulă veche</span>` : ''}
       </span>
       <span class="item-side">
-        ${pill(st.level, st.label)}
+        ${finePill(st.level, st.label)}
         ${n.amenda.suma ? `<span class="amount">${esc(money(n.amenda.suma))}</span>` : ''}
       </span>
     </a>`;
 
-  const secFines = `<section class="card dash-sec" id="sec-fines">
+  const secFines = `<section class="card dash-sec k-fines" id="sec-fines">
     <h2 class="sec-title">${icon('fine')} Amenzi</h2>
     <div class="legend">
       <span><i class="dot dot-blue"></i>în curs (≤ 15 zile)</span>
@@ -195,7 +196,7 @@ export function viewDashboard() {
     ${paid.length ? `<details class="paid"><summary>Achitate (${paid.length})</summary><div class="items">${paid.map(fineItem).join('')}</div></details>` : ''}
   </section>`;
 
-  const secAsi = `<section class="card dash-sec" id="sec-asi">
+  const secAsi = `<section class="card dash-sec k-asi" id="sec-asi">
     <h2 class="sec-title">${icon('hourglass')} Termene ASI – 90 de zile</h2>
     ${asi.length ? `<div class="items">${asi.map(({ c, a }) => `<a class="item item-red" href="#/control/${c.id}/nereguli/a">
         <span class="item-main">
@@ -203,26 +204,26 @@ export function viewDashboard() {
           <span class="item-msg">${esc(a.msg)}</span>
           ${a.nelucr ? `<span class="item-warn">⚠ ${esc(a.nelucr)}</span>` : ''}
         </span>
-        <span class="item-side">${a.pending ? pill('neutral', 'neînceput') : `<span class="countdown ${a.daysLeft < 0 ? 'over' : ''}"><b>${Math.abs(a.daysLeft)}</b><small>${a.daysLeft < 0 ? 'zile depășit' : a.daysLeft === 1 ? 'zi' : 'zile'}</small></span>`}</span>
+        <span class="item-side">${a.pending ? pill('neutral', 'neînceput') : `<span class="countdown ${a.daysLeft < 0 ? 'over' : ''}"><b>${Math.abs(a.daysLeft)}</b><small>${Math.abs(a.daysLeft) === 1 ? 'zi' : 'zile'}${a.daysLeft < 0 ? ' peste termen' : a.daysLeft === 0 ? ' — expiră azi' : ' rămase'}</small></span>`}</span>
       </a>`).join('')}</div>` : '<p class="muted pad">Niciun termen ASI activ.</p>'}
   </section>`;
 
-  const secOpen = `<section class="card dash-sec" id="sec-open">
+  const secOpen = `<section class="card dash-sec k-open" id="sec-open">
     <h2 class="sec-title">${icon('clock')} Controale neîncheiate</h2>
     ${open.length ? `<div class="items">${open.map((c) => {
       const days = diffDays(c.dataInceput, t);
       return `<a class="item item-open" href="#/control/${c.id}/obiectiv">
         <span class="item-main">
           <span class="item-title">${esc(c.denumire || 'Obiectiv fără denumire')}</span>
-          <span class="item-sub">început ${esc(fmtDateLong(c.dataInceput))}</span>
+          <span class="item-sub">${days < 0 ? 'începe' : 'început'} ${esc(fmtDateLong(c.dataInceput))}</span>
           <span class="item-msg">Lipsește data încheierii</span>
         </span>
-        <span class="item-side"><span class="countdown"><b>${Math.max(days, 0)}</b><small>${days === 1 ? 'zi' : 'zile'}</small></span></span>
+        <span class="item-side">${pill('open', days < 0 ? `începe peste ${zile(-days)}` : days === 0 ? 'început azi' : days === 1 ? 'început ieri' : `de ${zile(days)}`, 'clock')}</span>
       </a>`;
     }).join('')}</div>` : '<p class="muted pad">Toate controalele sunt încheiate.</p>'}
   </section>`;
 
-  const secPv = `<section class="card dash-sec" id="sec-pv">
+  const secPv = `<section class="card dash-sec k-pv" id="sec-pv">
     <h2 class="sec-title">${icon('pv')} Nereguli netrecute în procesul-verbal</h2>
     ${netrecute.length ? `<div class="items">${netrecute.map(({ c, n }) => `<a class="item item-warn" href="#/control/${c.id}/${tabOfNeregula(n)}/${encodeURIComponent(n.key)}">
         <span class="item-main">
@@ -234,7 +235,7 @@ export function viewDashboard() {
       </a>`).join('')}</div>` : '<p class="muted pad">Toate neregulile constatate sunt trecute în PV.</p>'}
   </section>`;
 
-  return `${head}${backupWarn}${kpis}<div class="dash-grid">${secFines}${secAsi}${secOpen}${secPv}</div>`;
+  return `${head}${kpis}<div class="dash-grid">${secFines}${secAsi}${secOpen}${secPv}</div>`;
 }
 
 // Vechimea ultimului backup (aceeași funcție de backup e disponibilă din Panou, control, bara laterală și Setări)
@@ -252,13 +253,6 @@ export function backupAgeText() {
   if (d === 0) return `ultimul: azi, ${state.meta.lastBackup.slice(11, 16)}`;
   if (d === 1) return 'ultimul: ieri';
   return `ultimul: acum ${zile(d)}`;
-}
-
-function backupReminder() {
-  if (!backupIsStale()) return '';
-  const d = backupAgeDays();
-  return `<div class="banner">${icon('alert')}<span><b>${d !== null ? `Ultimul backup acum ${zile(d)}.` : 'Nu ai făcut încă niciun backup.'}</b> Datele sunt doar pe această tabletă — salvează un backup în Fișiere / iCloud Drive.</span>
-    <button class="btn btn-primary" data-act="backup-export">${icon('download')} Backup acum</button></div>`;
 }
 
 const pad = (n) => String(n).padStart(2, '0');
@@ -291,7 +285,7 @@ export function objListHTML() {
   if (!state.controls.length) {
     return empty('building', 'Niciun obiectiv încă', 'Obiectivele apar aici după primul control.', `<button class="btn btn-primary btn-lg" data-act="new-control">${icon('plus')} Control nou</button>`);
   }
-  if (!list.length) return empty('search', 'Niciun rezultat', 'Încearcă alt nume sau altă dată.');
+  if (!list.length) return empty('search', 'Niciun rezultat', 'Încercați alt nume sau altă dată.');
   return `<p class="count">${list.length} ${list.length === 1 ? 'obiectiv' : 'obiective'}</p>
   <div class="obj-list">${list.map(({ o, hits }) => {
     const fines = allFines(o.controls, t).filter((f) => f.st.level !== 'green');
@@ -323,6 +317,7 @@ export function viewObjective(oid) {
   const t = today();
   const fines = allFines(o.controls, t);
   const totalNer = o.controls.reduce((s, c) => s + controlStats(c, t).constatate, 0);
+  const nActive = fines.filter((f) => f.st.level !== 'green').length;
   return `<header class="page-head">
       <div class="head-with-back">
         <a class="icon-btn big" href="#/obiective" aria-label="Înapoi">${icon('back')}</a>
@@ -342,10 +337,10 @@ export function viewObjective(oid) {
       }).join('')}</span></div>
     </section>
     <section class="stat-row">
-      <div class="stat"><b>${o.controls.length}</b><span>controale</span></div>
-      <div class="stat"><b>${totalNer}</b><span>nereguli constatate</span></div>
-      <div class="stat"><b>${fines.length}</b><span>amenzi aplicate</span></div>
-      <div class="stat"><b>${fines.filter((f) => f.st.level !== 'green').length}</b><span>amenzi active</span></div>
+      <div class="stat"><b>${o.controls.length}</b><span>${o.controls.length === 1 ? 'control' : 'controale'}</span></div>
+      <div class="stat"><b>${totalNer}</b><span>${totalNer === 1 ? 'neregulă constatată' : 'nereguli constatate'}</span></div>
+      <div class="stat"><b>${fines.length}</b><span>${fines.length === 1 ? 'amendă aplicată' : 'amenzi aplicate'}</span></div>
+      <div class="stat"><b>${nActive}</b><span>${nActive === 1 ? 'amendă activă' : 'amenzi active'}</span></div>
     </section>
     <h2 class="list-title">${icon('history')} Istoricul controalelor</h2>
     <div class="timeline">${o.controls.map((c) => `<div class="tl-item">${controlRow(c, { showName: false })}</div>`).join('')}</div>`;
@@ -377,7 +372,7 @@ export function histListHTML() {
     .filter((c) => u.histFilter === 'ALL' || (u.histFilter === 'OPEN' ? !isIncheiat(c) : isIncheiat(c)))
     .filter((c) => matchControl(c, u.histSearch))
     .sort(byStartDesc);
-  if (!list.length) return empty('search', 'Niciun rezultat', 'Încearcă alt nume, altă dată sau alt filtru.');
+  if (!list.length) return empty('search', 'Niciun rezultat', 'Încercați alt nume, altă dată sau alt filtru.');
   const groups = new Map();
   for (const c of list) {
     const k = c.dataInceput.slice(0, 7);
@@ -434,7 +429,8 @@ export function viewCalendar() {
   const data = calendarData(gridStart, gridEnd);
   const t = today();
   const monthCount = state.controls.filter((c) => {
-    const [s, e] = controlRange(c);
+    let [s, e] = controlRange(c);
+    if (!isIncheiat(c) && t > s) e = t;   // la fel ca în grilă: controlul neîncheiat continuă până azi
     return s <= toISO(new Date(y, m, daysInMonth)) && e >= toISO(first);
   }).length;
 
@@ -557,7 +553,7 @@ export function viewSettings(persisted) {
       <li><b>Amendă:</b> data aplicării (implicit data încheierii controlului).
         <span class="rule-row"><i class="dot dot-blue"></i> zilele 1–15: în curs</span>
         <span class="rule-row"><i class="dot dot-yellow"></i> zilele 16–39: termenul de 15 zile expirat</span>
-        <span class="rule-row"><i class="dot dot-red"></i> din ziua 40: „Mai ai 5 zile până să o trimiți la ANAF” (termen: ziua 45)</span>
+        <span class="rule-row"><i class="dot dot-red"></i> din ziua 40: „Mai aveți 5 zile până să o trimiteți la ANAF” (termen: ziua 45)</span>
         <span class="rule-row"><i class="dot dot-green"></i> achitată, cu dovadă primită</span></li>
       <li><b>ASI:</b> 90 de zile de la data încheierii controlului.</li>
       <li>Termenele care cad într-o zi nelucrătoare (weekend sau sărbătoare legală) <b>nu se mută automat</b>; aplicația afișează o avertizare ca să verifici prelungirea.</li>
@@ -565,7 +561,7 @@ export function viewSettings(persisted) {
   </section>
   <section class="card set-sec danger-zone">
     <h2 class="sec-title">${icon('trash')} Zonă periculoasă</h2>
-    <p>Șterge definitiv toate controalele de pe această tabletă. Fă întâi un backup.</p>
+    <p>Șterge definitiv toate controalele de pe această tabletă. Faceți întâi un backup.</p>
     <button class="btn btn-danger btn-lg" data-act="wipe">Șterge toate datele</button>
   </section>
   <p class="muted center">Agenda inspectorului · v${APP_VERSION} · funcționează offline</p>`;
@@ -576,10 +572,12 @@ export function viewSettings(persisted) {
 export function viewGhid() {
   const q = fold(state.ui.ghidQuery || '').trim();
   const bloc = (b) => (b.p ? `<p>${b.p}</p>`
-    : b.ul ? `<ul>${b.ul.map((x) => `<li>${x}</li>`).join('')}</ul>`
-      : b.note ? `<p class="m-note">${icon('info')}<span>${b.note}</span></p>`
-        : b.btns ? `<dl class="m-btns">${b.btns.map(([btn, t]) => `<div><dt>${btn}</dt><dd>${t}</dd></div>`).join('')}</dl>` : '');
-  const text = (cap) => fold(`${cap.title} ${cap.blocks.map((b) => [b.p, b.note, ...(b.ul || []), ...(b.btns || []).flat()].join(' ')).join(' ')}`.replace(/<[^>]+>/g, ' '));
+    : b.h ? `<h3 class="m-sub">${b.h}</h3>`
+      : b.ol ? `<ol class="m-steps">${b.ol.map((x) => `<li>${x}</li>`).join('')}</ol>`
+        : b.ul ? `<ul>${b.ul.map((x) => `<li>${x}</li>`).join('')}</ul>`
+          : b.note ? `<p class="m-note">${icon('info')}<span>${b.note}</span></p>`
+            : b.btns ? `<dl class="m-btns">${b.btns.map(([btn, t]) => `<div><dt>${btn}</dt><dd>${t}</dd></div>`).join('')}</dl>` : '');
+  const text = (cap) => fold(`${cap.title} ${cap.blocks.map((b) => [b.p, b.h, b.note, ...(b.ul || []), ...(b.ol || []), ...(b.btns || []).flat()].join(' ')).join(' ')}`.replace(/<[^>]+>/g, ' '));
   const caps = MANUAL.filter((cap) => !q || q.split(/\s+/).every((w) => text(cap).includes(w)));
   return `<header class="page-head">
       <div><div class="eyebrow">${icon('book')} Manualul aplicației · v${esc(APP_VERSION)}</div><h1>Ghidul aplicației</h1></div>

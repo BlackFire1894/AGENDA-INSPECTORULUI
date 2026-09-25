@@ -55,6 +55,11 @@ export function pill(level, text, ic) {
   return `<span class="pill pill-${level}">${ic ? icon(ic) : ''}${esc(text)}</span>`;
 }
 
+// Stadiul unei amenzi: aceeași pastilă plină peste tot (Panou, Istoric, bara neregulii)
+export function finePill(level, text) {
+  return `<span class="pill fine-st fs-${level}">${icon('fine')}${esc(text)}</span>`;
+}
+
 export function tipBadge(tip) {
   return tip === 'LOCALITATE'
     ? '<span class="badge badge-loc">Localitate</span>'

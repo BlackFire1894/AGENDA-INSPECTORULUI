@@ -30,12 +30,11 @@ export const state = {
     nerQuery: '',             // căutarea din tabul de nereguli
     constrPick: '',           // neregula al cărei meniu de construcții e deschis
     showAllNer: false,        // arată și neregulile de instalații nebifate DA la dotări
-    obsHidden: pref('agenda-obs-hidden', false),                 // setarea generală: observațiile ascunse
-    // Excepții individuale față de setarea generală: „<idControl>|<cale>” → true (ascuns) / false (afișat)
-    obsOverride: new Map(pref('agenda-obs-override', [])),
-    todoOpen: false,
+    obsOpen: new Set(),       // câmpuri de observații goale deschise acum („<idControl>|<cale>”)
+    toolsOpen: false,         // meniul „⋯” (restrânge / extinde) deschis
+    todoOpen: false,          // lista completă „Ce mai aveți de făcut” deschisă
     ghidQuery: '',            // căutarea din Ghidul aplicației
-    gpsBusy: '',              // id-ul construcției pentru care se caută poziția// lista completă „Ce mai ai de făcut” deschisă
+    gpsBusy: '',              // id-ul construcției pentru care se caută poziția
     catCollapsed: new Set(pref('agenda-cats-collapsed', [])),    // categorii de nereguli restrânse
     rowCollapsed: new Set(pref('agenda-rows-collapsed', [])),    // rânduri de nereguli restrânse: „<idControl>|<cheie>”
   },
@@ -44,6 +43,9 @@ export const state = {
 
 // Data de azi se citește mereu direct din ceasul tabletei (nu dintr-o copie), ca să nu rămână în urmă nicio clipă.
 export const today = () => todayISO(new Date());
+
+// v1.14: ascunderea observațiilor a fost înlocuită de „+ Obs.”; preferințele ei vechi se șterg
+try { localStorage.removeItem('agenda-obs-hidden'); localStorage.removeItem('agenda-obs-override'); } catch { /* stocare indisponibilă */ }
 
 export function getControl(id) {
   return state.controls.find((c) => c.id === id);

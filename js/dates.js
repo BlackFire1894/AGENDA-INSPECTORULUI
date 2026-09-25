@@ -77,7 +77,7 @@ export function fmtDateMedium(iso) {
 export function plural(n, one, many) {
   const a = Math.abs(n);
   if (a === 1) return `${n} ${one}`;
-  // În română: „20 de zile”, „101 de zile” etc. pentru n % 100 >= 20 sau 0.
+  // În română: „20 de zile”, „100 de zile”, „120 de zile”, dar „101 zile”, „115 zile” (n % 100 >= 20 sau 0).
   const r = a % 100;
   const de = a !== 0 && (r === 0 || r >= 20) ? 'de ' : '';
   return `${n} ${de}${many}`;
