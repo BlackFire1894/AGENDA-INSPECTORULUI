@@ -38,7 +38,7 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
   ok(await p.locator('.constr >> nth=0 >> .gps-coord').innerText() === '47.133500, 24.496600', 'construcția 1 neschimbată');
   ok(!/Coordonate GPS/.test(await p.locator('.todo').innerText()), 'todo: coordonatele nu mai apar');
   ok(await p.evaluate(() => window.__geo) === 3 && !(await p.evaluate(() => window.__watch)), 'exact 3 citiri, doar la apăsare; fără urmărire');
-  await p.screenshot({ path: `gps-${vp.width}.png`, fullPage: false });
+  await p.screenshot({ path: `${process.argv[2] || "."}/gps-${vp.width}.png`, fullPage: false });
   const id = await p.evaluate(() => location.hash.split('/')[2]);
   await p.goto(`http://localhost:8080/#/fisa/${id}`); await p.waitForTimeout(400);
   const f = await p.locator('.fisa-doc').textContent();
@@ -47,7 +47,7 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
   await p.fill('input[type="search"]', 'bistrita'); await p.waitForTimeout(400);
   ok(/Școala GPS/.test(await p.locator('main').innerText()), 'căutare după localitate');
   await p.locator('text=Școala GPS').first().click(); await p.waitForTimeout(300);
-  const og = await p.locator('.gps-list').innerText(); console.log(JSON.stringify(og)); await p.locator('.info-grid').screenshot({ path: 'og.png' });
+  const og = await p.locator('.gps-list').innerText(); console.log(JSON.stringify(og)); await p.locator('.info-grid').screenshot({ path: `${process.argv[2] || "."}/og.png` });
   ok(/Construcția 1:\s*47\.133500, 24\.496600/.test(og) && /Sala de sport:\s*47\.134100, 24\.497200/.test(og), 'pagina obiectivului: coordonate pe construcții');
   await p.click('text=Control nou pe acest obiectiv'); await p.waitForTimeout(300);
   if (await p.locator('#nc-create').count()) { await p.click('#nc-create'); await p.waitForTimeout(400); }
