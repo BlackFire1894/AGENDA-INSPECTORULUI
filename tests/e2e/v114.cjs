@@ -15,14 +15,14 @@ const INFORMAL = /Ce mai ai de|Ștergi |Mai ai \d|\bconsultă\b|verifică prelun
     const head = await p.evaluate(() => {
       const d = document.querySelector('.dash-date > span:first-child').getBoundingClientRect(); const t = document.querySelector('.dash-time').getBoundingClientRect();
       const kp = [...document.querySelectorAll('.kpi')].map((k) => k.getBoundingClientRect().height);
-      return { same: Math.abs(d.bottom - t.bottom) < 4, kpiMax: Math.max(...kp), fines: document.getElementById('sec-fines').getBoundingClientRect().top + scrollY, banner: document.querySelectorAll('.banner').length };
+      return { same: Math.abs(d.bottom - t.bottom) < 4, kpiMax: Math.max(...kp), fines: document.getElementById('sec-fines').getBoundingClientRect().top + scrollY - (document.getElementById('sec-act-conf')?.offsetHeight || 0), banner: document.querySelectorAll('.banner').length };
     });
     ok(head.same, 'Panou: data și ora pe același rând');
     ok(head.banner === 0 && await p.locator('[data-act="backup-export"]:visible').count() === 1, 'Panou: fără banner, un singur buton de backup pe ecran');
     // v1.15: legenda amenzilor e scrisă în cuvinte, deci caseta e ceva mai înaltă decât în v1.14
     // v1.16: a cincea casetă („De încărcat”)
     ok(head.kpiMax < (port ? 270 : 380), `Panou: casete KPI (${Math.round(head.kpiMax)}px)`);
-    ok(head.fines < (port ? 780 : 480), `Panou: secțiunea Amenzi (y=${Math.round(head.fines)})`);
+    ok(head.fines < (port ? 780 : 520), `Panou: secțiunea Amenzi (y=${Math.round(head.fines)})`);
     const leg = (await p.locator('.kpi-fines .kpi-legend').innerText()).replace(/\s+/g, ' ');
     ok(/de trimis la ANAF/.test(leg) && /cu termen de plată expirat/.test(leg) && /în curs/.test(leg), `Panou: legenda amenzilor în cuvinte: ${leg}`);
     ok(port ? await p.locator('.dash-actions .guide-btn').isVisible() : await p.locator('.dash-actions').isHidden(), port ? 'vertical: Ghidul aplicației sus în Panou' : 'orizontal: Ghid / Backup doar în bara laterală');

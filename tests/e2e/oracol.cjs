@@ -228,7 +228,8 @@ const cnt = (lv) => fines.filter((f) => f.s.lv === lv).length;
   const bad = Object.keys({ ...dots, ...exp }).filter((d) => (dots[d] || 0) !== Math.min(exp[d] || 0, 4));
   ok(!bad.length, `Calendar: bulinele termenelor pe zile ${bad.map((d) => `${d}: ${dots[d] || 0} vs ${exp[d] || 0}`).join(', ')}`);
   const inMonth = C.filter((c) => { const s = c.dataInceput; let e = inchis(c) && c.dataIncheiere >= s ? c.dataIncheiere : s; if (!inchis(c) && T > s) e = T; return s <= '2026-10-31' && e >= '2026-10-01'; }).length;
-  ok((await p.locator('.page-head .eyebrow').innerText()).includes(`${inMonth} ${inMonth === 1 ? 'control' : 'controale'} în această lună`), `Calendar: ${inMonth} controale în octombrie`);
+  const eb = await p.locator('.page-head .eyebrow').innerText();
+  ok(eb.includes(`${inMonth} ${inMonth === 1 ? 'control' : 'controale'} și `) && eb.includes('în această lună'), `Calendar: ${inMonth} controale în octombrie — „${eb.trim()}”`);
   // ── Obiective: pagina obiectivului repetat
   if (MODE === 'sintetic') {
   await p.goto('http://localhost:8080/#/obiective'); await p.waitForTimeout(300);

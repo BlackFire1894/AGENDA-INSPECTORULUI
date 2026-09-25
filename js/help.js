@@ -40,7 +40,7 @@ export const MANUAL = [
         [B('home', 'Panou'), 'Pagina de pornire: ce trebuie urmărit azi (amenzi, termene ASI, controale neîncheiate, constatări netrecute în PV).'],
         [B('building', 'Obiective'), 'Toate obiectivele controlate, cu datele și istoricul fiecăruia.'],
         [B('plus', '', 'm-prim m-round'), 'Control nou (butonul rotund din bara de jos sau „Control nou” din bara laterală).'],
-        [B('calendar', 'Calendar'), 'Controalele și termenele, zi cu zi.'],
+        [B('calendar', 'Calendar'), 'Planul lunar: controalele, activitățile și termenele, zi cu zi; raportul lunii.'],
         [B('history', 'Istoric'), 'Toate controalele, grupate pe luni.'],
         [B('settings', 'Setări'), 'Mărimea textului, tema, backupul, actualizările.'],
         [B('book', 'Ghidul aplicației'), 'Acest manual (în bara laterală; pe vertical, sus în Panou; în Setări).'],
@@ -91,6 +91,7 @@ export const MANUAL = [
       ] },
       { p: 'Atingeți orice rând și controlul se deschide exact la neregula respectivă. Semnul <b>⚠</b> apare când un termen cade într-o zi nelucrătoare; alături vedeți prima zi lucrătoare de după.' },
       { p: 'În decembrie (și în ianuarie, dacă nu ați confirmat), sus în Panou apare cererea de a verifica lista sărbătorilor legale pentru anul care vine.' },
+      { p: 'Tot sus apar <b>Activitățile de confirmat</b>: cele planificate a căror zi a trecut. Pentru fiecare alegeți <b>Efectuată</b>, <b>Reprogramează</b> sau <b>Anulată</b> (vedeți „Planul lunar”).' },
     ],
   },
   {
@@ -296,8 +297,33 @@ export const MANUAL = [
       { ul: [
         '<b>Obiective</b>: lista obiectivelor controlate. Căutați după nume, localitate, adresă sau dată (12.09.2026, 09.2026 sau 2026; butonul „Dată” deschide un calendar) și filtrați după tip. Atingeți un obiectiv ca să vedeți datele lui, coordonatele GPS ale construcțiilor, istoricul controalelor și butonul „Control nou pe acest obiectiv”.',
         '<b>Istoric</b>: toate controalele, grupate pe luni, cu căutare după obiectiv, administrator sau dată și cu filtrele În desfășurare / Încheiate. Fiecare control arată, scris: numărul de nereguli, câte nu sunt trecute în PV, amenzile cu stadiul lor, termenul ASI și încărcarea — „Neîncărcat în aplicație”, „Document neîncărcat” cu termenul, sau „Încărcat în aplicație · document încărcat”. La fel pe pagina fiecărui obiectiv; în lista Obiective, cardul arată câte controale sunt neîncărcate.',
-        '<b>Calendar</b>: anul și luna se schimbă separat. În fiecare zi vedeți controalele (violet = în desfășurare, albastru închis = încheiat) și bulinele termenelor (albastru = termen de plată, roșu = termen ANAF sau ASI, portocaliu = termen de încărcare). Atingeți o zi ca să vedeți lista completă și butonul „Control nou în această zi”.',
+        '<b>Calendar</b>: anul și luna se schimbă separat. În fiecare zi vedeți controalele (violet = în desfășurare, albastru închis = încheiat), activitățile (în culoarea tipului lor) și bulinele termenelor (albastru = termen de plată, roșu = termen ANAF sau ASI, portocaliu = termen de încărcare). Atingeți o zi ca să vedeți lista completă și butoanele „Control nou în această zi” și „Activitate nouă în această zi” (vedeți „Planul lunar”).',
       ] },
+    ],
+  },
+  {
+    id: 'plan', ic: 'calendar', title: 'Planul lunar: activități și raport',
+    blocks: [
+      { p: 'Pe lângă controale, în Calendar puteți trece orice altă activitate: planificată dinainte sau notată după ce ați făcut-o. La sfârșitul lunii, <b>Plan lunar</b> vă arată tot ce ați efectuat.' },
+      { h: 'O activitate nouă' },
+      { ol: [
+        'În Calendar, atingeți ziua, apoi <b>Activitate nouă în această zi</b>.',
+        'Alegeți tipul: Instruire / pregătire, Ședință, Activitate de birou, Informare publică, Exercițiu / aplicație, Concediu / liber sau Altă activitate. Fiecare tip are culoarea lui în calendar.',
+        'Scrieți descrierea (la „Altă activitate” e obligatorie), data, „Până la” dacă ține mai multe zile (de exemplu, un concediu), ora (opțional) și, dacă e cazul, obiectivul la care se referă.',
+        'Starea: <b>Planificată</b> sau <b>Efectuată</b> (pentru o zi trecută, aplicația propune „Efectuată”). O activitate se poate și <b>anula</b>.',
+      ] },
+      { p: 'Atingeți o activitate (în ziua selectată sau în Panou) ca s-o modificați sau s-o ștergeți. În calendar, activitățile efectuate au semnul ✓, iar cele anulate nu mai apar în zi.' },
+      { h: 'Activitățile de confirmat' },
+      { p: 'O activitate planificată a cărei zi a trecut apare în Panou, la „Activități de confirmat”, până alegeți <b>Efectuată</b>, <b>Reprogramează</b> (o mutați pe altă zi) sau <b>Anulată</b>.' },
+      { h: 'Raportul lunii' },
+      { p: `Butonul ${B('list', 'Plan lunar', 'm-prim')} din Calendar deschide raportul lunii, pe care îl puteți răsfoi lună cu lună. Arată:` },
+      { ul: [
+        'câte controale ați început în lună (și câte sunt încheiate) și câte nereguli ați constatat la ele;',
+        'amenzile aplicate în lună (după data aplicării) și suma lor; amenzile din controale neîncheiate, fără dată, apar separat;',
+        'activitățile efectuate, pe tipuri (câte și câte zile), cele încă planificate și cele anulate;',
+        'lista zi cu zi: controalele și activitățile fiecărei zile.',
+      ] },
+      { p: 'Raportul se tipărește sau se salvează ca PDF (<b>Tipărește / PDF</b>) ori se trimite ca fișier (<b>Partajează fișierul</b>), la fel ca Fișa controlului. Activitățile intră și în backup.' },
     ],
   },
   {

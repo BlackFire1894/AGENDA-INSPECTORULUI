@@ -53,7 +53,7 @@ const catsAll = async (p) => { if (!(await p.locator('[data-act="cats-all"]').co
   ok(/cel puțin o construcție/.test(await p.locator('#toast').innerText()), 'ultima nu se poate debifa');
   await p.click('#ner-d [data-act="constr-opt-all"]'); await p.waitForTimeout(150);
   ok(/Construcțiile \(3\)/.test(await p.locator('#ner-d .constr-sel-btn').innerText()), 'Toate construcțiile → 3');
-  await p.screenshot({ path: `v19-pick-${vp.width}.png` });
+  await p.screenshot({ path: `${process.argv[2] || "."}/v19-pick-${vp.width}.png` });
   await p.click('#ner-d .constr-pick [data-act="constr-pick"]'); await p.waitForTimeout(150);
   ok(await p.locator('#ner-d .constr-pick').count() === 0, 'Gata închide meniul');
   await p.click('[data-act="pv-text"]'); await p.waitForTimeout(200);
@@ -78,7 +78,7 @@ const catsAll = async (p) => { if (!(await p.locator('[data-act="cats-all"]').co
   ok(light !== dark && dark === 'rgb(12, 17, 29)', `Întunecată: fundal ${dark}`);
   await p.reload(); await p.waitForTimeout(300);
   ok(await bg() === 'rgb(12, 17, 29)' && await p.locator('.theme-opt.on').innerText().then((t) => t.includes('Întunecată')), 'Întunecată păstrată după repornire');
-  await p.screenshot({ path: `v19-dark-${vp.width}.png`, fullPage: true });
+  await p.screenshot({ path: `${process.argv[2] || "."}/v19-dark-${vp.width}.png`, fullPage: true });
   await p.click('[data-act="theme"][data-val="auto"]'); await p.waitForTimeout(200);
   ok(await bg() === light, 'Automat (iPad luminos) → luminoasă');
   await p.emulateMedia({ colorScheme: 'dark' }); await p.waitForTimeout(100);

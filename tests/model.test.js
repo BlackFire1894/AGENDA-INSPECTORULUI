@@ -1,4 +1,5 @@
 import test from 'node:test';
+import { emptyActivitate, normalizeActivitate, activitatiInZi, deConfirmat, raportLunar, titluActivitate, zileActivitate } from '../js/activitati.js';
 import assert from 'node:assert/strict';
 import { addDays, addMonths, diffDays, parseDateQuery, zile, pasteOrtodox, zinelucratoare, nextWorkingDay } from '../js/dates.js';
 import {
@@ -8,7 +9,7 @@ import {
   vecheInfo, pvText, constatareLabel, todoList, NEREGULI_GRAVE, constructiiCuNU,
   fmtCoord, googleMapsUrl, gpsQuality, constructiiOf, constructiiNume, matchNeregula, pesteParter, grfVPesteParter, sablon, isGrav, syncAutoNU,
   constructiiEligibile, verifStare, verifExpirate, verifText, catalogOf, fixeazaCatalog, schimbare, SCHEMA_VERSION, matchAct,
-  incarcareStatus,
+  incarcareStatus, parseSuma,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -764,4 +765,53 @@ test('următoarea zi lucrătoare: peste weekend și sărbători legale', () => {
   assert.equal(nextWorkingDay('2027-01-01'), '2027-01-04');   // Anul Nou → luni
   assert.equal(nextWorkingDay('2027-01-06'), '2027-01-08');   // Boboteaza, Sf. Ioan → vineri
   assert.equal(nextWorkingDay('2026-04-10'), '2026-04-14');   // Vinerea Mare → după a doua zi de Paște
+});
+
+test('activități: zile, titlu, de confirmat', () => {
+  const a = { ...emptyActivitate('2026-10-05', '2026-10-01'), tip: 'concediu', descriere: 'Odihnă', dataSfarsit: '2026-10-07' };
+  assert.equal(a.stare, 'planificat');                                        // în viitor → planificată
+  assert.equal(emptyActivitate('2026-09-20', '2026-10-01').stare, 'efectuat'); // în trecut → efectuată
+  assert.equal(zileActivitate(a), 3);
+  assert.equal(titluActivitate(a), 'Concediu / liber: Odihnă');
+  assert.equal(titluActivitate({ ...a, tip: 'alta', descriere: 'Vizită' }), 'Vizită');
+  assert.deepEqual(activitatiInZi([a], '2026-10-06').map((x) => x.id), [a.id]);
+  assert.equal(activitatiInZi([a], '2026-10-08').length, 0);
+  assert.equal(deConfirmat([a], '2026-10-07').length, 0);   // ultima zi e azi: încă nu
+  assert.equal(deConfirmat([a], '2026-10-08').length, 1);
+  assert.equal(deConfirmat([{ ...a, stare: 'efectuat' }], '2026-10-08').length, 0);
+  // date vechi / greșite
+  const n = normalizeActivitate({ id: 'x', data: '2026-10-05', tip: 'necunoscut', stare: '?', dataSfarsit: '2026-10-01' });
+  assert.equal(n.tip, 'alta'); assert.equal(n.stare, 'planificat'); assert.equal(n.dataSfarsit, '');
+});
+
+test('raportul lunar: controale, nereguli, amenzi după data aplicării, activități pe tipuri', () => {
+  const c1 = newControl({ start: '2026-10-02' }); c1.dataIncheiere = '2026-10-03';
+  const d = c1.nereguli.find((x) => x.key === 'd'); d.status = 'nok'; d.amenda = { ...d.amenda, aplicata: true, suma: '2.500', serieNr: 'DB 1' };
+  const e = c1.nereguli.find((x) => x.key === 'e'); e.status = 'nok';
+  const c2 = newControl({ start: '2026-09-28' }); c2.dataIncheiere = '2026-09-29';   // început în septembrie
+  const f = c2.nereguli.find((x) => x.key === 'd'); f.status = 'nok'; f.amenda = { ...f.amenda, aplicata: true, suma: '1000', data: '2026-10-01' };
+  const c3 = newControl({ start: '2026-10-20' });                                     // neîncheiat, amendă fără dată
+  const g = c3.nereguli.find((x) => x.key === 'd'); g.status = 'nok'; g.amenda = { ...g.amenda, aplicata: true, suma: '500' };
+  const act = [
+    { ...emptyActivitate('2026-10-05', '2026-11-01'), tip: 'instruire', stare: 'efectuat' },
+    { ...emptyActivitate('2026-10-30', '2026-11-01'), tip: 'concediu', dataSfarsit: '2026-11-02', stare: 'efectuat' },   // 2 zile în octombrie
+    { ...emptyActivitate('2026-10-12', '2026-11-01'), tip: 'sedinta', stare: 'planificat' },
+    { ...emptyActivitate('2026-10-13', '2026-11-01'), tip: 'birou', stare: 'anulat' },
+    { ...emptyActivitate('2026-11-05', '2026-11-01'), tip: 'birou', stare: 'efectuat' },                                 // altă lună
+  ];
+  const r = raportLunar([c1, c2, c3], act, 2026, 9, '2026-11-01');
+  assert.equal(r.titlu, 'Octombrie 2026');
+  assert.equal(r.controale.length, 2); assert.equal(r.incheiate, 1);
+  assert.equal(r.constatate, 3);                                   // c1: 2, c3: 1 (c2 e din septembrie)
+  assert.equal(r.amenzi.length, 2); assert.equal(r.sumaAmenzi, 3500);   // c1 (03.10, „2.500”) + c2 (aplicată 01.10)
+  assert.equal(r.amenziFaraData, 1);
+  assert.equal(r.efectuate.length, 2); assert.equal(r.planificate.length, 1); assert.equal(r.anulate.length, 1);
+  assert.deepEqual(r.peTipuri.map((t) => [t.key, t.n, t.zile]), [['instruire', 1, 1], ['concediu', 1, 2]]);
+});
+
+test('sumele în lei, scrise în stil românesc', () => {
+  assert.equal(parseSuma('2500'), 2500); assert.equal(parseSuma('2.500'), 2500); assert.equal(parseSuma('2 500'), 2500);
+  assert.equal(parseSuma('1.500,50'), 1500.5); assert.equal(parseSuma('1500,5'), 1500.5); assert.equal(parseSuma('12.345.678'), 12345678);
+  assert.equal(parseSuma('2.5'), 2.5); assert.equal(parseSuma('3000 lei'), 3000);
+  assert.equal(parseSuma(''), null); assert.equal(parseSuma('abc'), null);
 });
