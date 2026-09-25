@@ -17,6 +17,7 @@ import { MANUAL } from './help.js';
 import { FISA_CSS } from './fisa.js';
 import {
   activitatiInZi, deConfirmat, titluActivitate, tipLabel, cand, STARI_ACTIVITATE, raportLunar, raportMarkup, RAPORT_CSS,
+  ziLibera, eticheteLibera,
 } from './activitati.js';
 
 
@@ -540,11 +541,13 @@ export function viewCalendar() {
     const inMonth = +d.slice(5, 7) === m + 1;
     const ev = data.get(d) || { controls: [], deadlines: [] };
     const acts = activitatiInZi(state.activitati, d).filter((a) => a.stare !== 'anulat');
-    const toate = [...ev.controls.map((c) => `<span class="cal-ev ${isIncheiat(c) ? 'ev-done' : 'ev-open'}">${esc(c.denumire || 'Fără denumire')}</span>`),
+    const lib = ziLibera(d, t);
+    const toate = [...(lib ? [`<span class="cal-ev ev-liber ${lib.sarbatoare ? 'ev-sarb' : ''} st-${lib.stare}">${lib.stare === 'efectuat' ? '✓ ' : ''}${esc(lib.eticheta)}</span>`] : []),
+      ...ev.controls.map((c) => `<span class="cal-ev ${isIncheiat(c) ? 'ev-done' : 'ev-open'}">${esc(c.denumire || 'Fără denumire')}</span>`),
       ...acts.map((a) => `<span class="cal-ev ev-act act-${a.tip} st-${a.stare}">${a.stare === 'efectuat' ? '✓ ' : ''}${esc(titluActivitate(a))}</span>`)];
     const shown = toate.slice(0, 3);
     const more = toate.length - shown.length;
-    cells += `<button class="cal-cell ${inMonth ? '' : 'out'} ${d === t ? 'is-today' : ''} ${d === u.calSelected ? 'is-sel' : ''}" data-act="cal-day" data-date="${d}">
+    cells += `<button class="cal-cell ${inMonth ? '' : 'out'} ${lib ? 'is-liber' : ''} ${d === t ? 'is-today' : ''} ${d === u.calSelected ? 'is-sel' : ''}" data-act="cal-day" data-date="${d}">
       <span class="cal-num">${+d.slice(8)}</span>
       <span class="cal-evs">${shown.join('')}${more > 0 ? `<span class="cal-more">+${more}</span>` : ''}</span>
       ${ev.deadlines.length ? `<span class="cal-dls">${ev.deadlines.slice(0, 4).map((x) => `<i class="dot dot-${x.level}"></i>`).join('')}</span>` : ''}
@@ -557,6 +560,7 @@ export function viewCalendar() {
     <div class="day-head">
       <div><div class="eyebrow">${sel === t ? 'Astăzi' : 'Ziua selectată'}</div><h2>${esc(ucfirst(fmtDateLong(sel)))}</h2></div>
     </div>
+    ${(() => { const z = ziLibera(sel, t); return z ? `<div class="liber-note ${z.sarbatoare ? 'ev-sarb' : ''}"><b>${esc(eticheteLibera(z))}</b>${pill(PILL_STARE[z.stare], STARI_ACTIVITATE[z.stare], z.stare === 'efectuat' ? 'check' : 'clock')}</div>` : ''; })()}
     ${selData.controls.length ? `<div class="ctl-list">${selData.controls.map((c) => controlRow(c)).join('')}</div>` : '<p class="muted pad">Niciun control în această zi.</p>'}
     ${selData.deadlines.length ? `<h3 class="mini-title">Termene</h3><div class="items">${selData.deadlines.map((x) => `<a class="item item-${x.level}" href="#/control/${x.c.id}/${x.to || `${x.n ? tabOfNeregula(x.n) : 'nereguli'}/${encodeURIComponent(x.n ? x.n.key : 'a')}`}">
         <span class="item-main"><span class="item-title">${esc(x.text)}</span><span class="item-sub">${esc(x.c.denumire)}${x.n ? ` · ${esc(neregulaLetter(x.c, x.n))}. ${esc(constatareLabel(x.n))}` : ''}</span></span>
@@ -594,6 +598,7 @@ export function viewCalendar() {
           <span><i class="dot dot-red"></i>termen ANAF / ASI</span>
           <span><i class="dot dot-warn"></i>termen încărcare</span>
           <span><i class="sw sw-act"></i>activitate (culoarea tipului)</span>
+          <span><i class="sw sw-liber"></i>zi liberă „Liber”: weekend / sărbătoare legală (✓ = efectuată)</span>
         </div>
       </div>
       ${panel}

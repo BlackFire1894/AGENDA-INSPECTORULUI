@@ -3,7 +3,7 @@
 Memoria proiectului: ce face aplicația, de ce arată și funcționează așa, ce s-a decis și ce s-a respins.
 **Se citește la începutul oricărei sesiuni de lucru și se completează la fiecare versiune nouă** (regulă în `CLAUDE.md`).
 
-Ultima actualizare: v1.18.0 — 25.09.2026.
+Ultima actualizare: v1.19.0 — 25.09.2026.
 
 ---
 
@@ -66,6 +66,7 @@ Ultima actualizare: v1.18.0 — 25.09.2026.
 | 1.16 | **Încărcarea după încheiere** (aplicația ISU + documentul), cu termen de 3 zile lucrătoare; **ASI: 5 zile pentru constatarea pierderii valabilității**; caseta „De încărcat” în Panou |
 | 1.17 | Recomandarea **primei zile lucrătoare** când un termen cade într-o zi liberă; **verificarea anuală a sărbătorilor legale** (Panou, din 1 decembrie; lista în Setări); acest jurnal; testele din browser mutate în repo (`tests/e2e`) |
 | 1.18 | **Planul lunar**: activități introduse manual în Calendar (7 tipuri, dată / interval, oră, obiectiv, stare planificată / efectuată / anulată); „Activități de confirmat” în Panou; **raportul lunii** (ecran + PDF / partajare); activitățile în backup; **citirea corectă a sumelor** scrise românește („2.500”, „1.500,50”) |
+| 1.19 | **Zile libere implicite**: weekendurile și sărbătorile legale apar singure în Calendar (fundal gri, etichetă „Liber” / numele sărbătorii), efectuate până azi inclusiv, planificate după; în raportul lunii: weekend, sărbători, efectuate / planificate, zile lucrătoare și zilele libere în care s-a lucrat |
 
 ## 4. Ce face aplicația (inventar)
 
@@ -111,7 +112,7 @@ Ultima actualizare: v1.18.0 — 25.09.2026.
 ### Celelalte ecrane
 - **Obiective:** căutare după nume, localitate, adresă sau dată; pagina obiectivului (date, GPS, statistici, istoric); „Control nou pe acest obiectiv” preia datele din ultimul control.
 - **Istoric:** controalele pe luni; pastile scrise (nereguli, netrecute, amenzi cu stadiul, ASI, încărcare).
-- **Calendar = plan lunar:** controalele, **activitățile** (în culoarea tipului; ✓ = efectuată) și termenele, pe zile; ziua selectată cu listele și butoanele „Control nou / Activitate nouă în această zi”; butonul **Plan lunar** → raportul lunii (`#/luna/AAAA-LL`), de tipărit / partajat.
+- **Calendar = plan lunar:** controalele, **activitățile** (în culoarea tipului; ✓ = efectuată) termenele și **zilele libere** (weekend + sărbători legale, derivate automat), pe zile; ziua selectată cu listele și butoanele „Control nou / Activitate nouă în această zi”; butonul **Plan lunar** → raportul lunii (`#/luna/AAAA-LL`), de tipărit / partajat.
 - **Setări:**
   - mărimea textului, tema;
   - backup: Exportă / Importă (Combină sau Înlocuiește tot);
@@ -151,7 +152,7 @@ Ultima actualizare: v1.18.0 — 25.09.2026.
   - GRF/NSI V + regim de înălțime peste parter → G13;
   - NU la ASI / AVIZ / Iluminat Hint → ah / ai / am, constatate automat și retrase la DA / NEC, dacă nu s-a lucrat pe ele;
   - neregula veche = aceeași cheie constatată la un control anterior al obiectivului.
-- **Raportul lunii:** controalele începute în lună (și câte încheiate), neregulile constatate la ele; amenzile **aplicate în lună** după data aplicării (implicit data încheierii), cu suma; amenzile fără dată (controale neîncheiate) separat; activitățile care ating luna — efectuate pe tipuri (număr și zile din lună), planificate, anulate.
+- **Raportul lunii:** controalele începute în lună (și câte încheiate), neregulile constatate la ele; amenzile **aplicate în lună** după data aplicării (implicit data încheierii), cu suma; amenzile fără dată (controale neîncheiate) separat; activitățile care ating luna — efectuate pe tipuri (număr și zile din lună), planificate, anulate; **zilele libere** (weekend + sărbători legale, o sărbătoare căzută în weekend se numără o dată, ca sărbătoare): efectuate = până azi inclusiv, planificate = după; zile lucrătoare = zilele lunii − zilele libere; „lucrată” = în ziua liberă a început un control sau există o activitate efectuată, alta decât concediul.
 - **Sumele** se citesc în stil românesc: punct = mii, virgulă = zecimale („2.500” = 2500, „1.500,50” = 1500,5); până la v1.18, „2.500” apărea greșit ca 2,5 lei.
 - **Cifre consistente:** „Ce mai aveți de făcut”, filtrul „Neverificate”, sumarul, tabul și suma barelor de categorie dau aceeași cifră.
 
@@ -163,6 +164,7 @@ Ultima actualizare: v1.18.0 — 25.09.2026.
 - v1.16: încărcarea (bife în tabul Obiectiv; pastile în Istoric și Obiective; caseta și secțiunea din Panou); etapa a doua ASI.
 - v1.17: recomandarea zilei lucrătoare; verificarea anuală a sărbătorilor legale.
 - v1.18: plan lunar — tipuri fixe + „Altă activitate”; câmpuri tip, dată (interval), oră, descriere, stare, obiectiv, observații; planificatele trecute „de confirmat” în Panou; raport pe ecran + PDF / partajare.
+- v1.19: zilele libere nu se salvează (nu sunt activități) — se calculează din `zinelucratoare()`, deci nu intră în backup și nu cer confirmare; se actualizează singure odată cu lista sărbătorilor.
 
 **Respinse (nu se repropun fără un motiv nou):**
 - scoaterea ceasului din bara laterală;
