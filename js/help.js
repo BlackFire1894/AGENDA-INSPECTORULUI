@@ -86,7 +86,7 @@ export const MANUAL = [
         `<b>Amenzi</b>: fiecare amendă, cu stadiul ei scris pe o pastilă colorată — ${F('blue', 'În curs')} ${F('yellow', 'Termen 15 zile expirat')} ${F('red', 'Trimite la ANAF')} ${F('green', 'Achitată')} —, suma și un mesaj care spune exact câte zile mai sunt (vedeți „Amenzile și termenele”).`,
         '<b>Termene ASI</b>: câte zile au rămas sau cu câte zile a fost depășit termenul. După cele 90 de zile, rândul arată a doua etapă — „Constatarea pierderii valabilității” — cu cele 5 zile ale ei.',
         `<b>De încărcat în aplicație</b>: fiecare control încheiat neîncărcat, cu ce lipsește (${P('Document neîncărcat', 'red')}), termenul și câte zile lucrătoare au rămas. Portocaliu cât mai sunt zile; roșu în ultima zi și după termen.`,
-        `<b>Controale neîncheiate</b>: de când sunt deschise (${P('început azi', 'open')}, ${P('de 3 zile', 'open')}); la cele programate pentru o zi viitoare, peste câte zile încep.`,
+        `<b>Controale neîncheiate</b>: de când sunt deschise (${P('început azi', 'open')}, ${P('de 3 zile', 'open')}); la cele programate pentru o zi viitoare, peste câte zile încep; dacă ați aplicat sigilii, și ${P(`${icon('lock')}1 sigiliu aplicat`, 'red')}.`,
         '<b>Nereguli netrecute în procesul-verbal</b>: fiecare constatare pe care o mai aveți de trecut în PV.',
       ] },
       { p: 'Atingeți orice rând și controlul se deschide exact la neregula respectivă. Semnul <b>⚠</b> apare când un termen cade într-o zi nelucrătoare; alături vedeți prima zi lucrătoare de după.' },
@@ -206,7 +206,8 @@ export const MANUAL = [
         `${P('8 necompletate', 'warn')} sau ${P(`${icon('check')} Completat`, 'green')} — câte rânduri mai sunt de marcat;`,
         `${P('2 constatate', 'red')} — câte sunt constatate;`,
         `${P(`${icon('pv')} 1 netrecută în PV`, 'warn')} sau ${P(`${icon('pv')} toate în PV`, 'green')} — dacă au fost trecute în procesul-verbal;`,
-        `${P(`${icon('fine')} 1 amendată`, 'blue')} — câte sunt amendate.`,
+        `${P(`${icon('fine')} 1 amendată`, 'blue')} — câte sunt amendate;`,
+        `${P(`${icon('lock')} 1 cu sigiliu`, 'red')} — la câte nereguli grave ați aplicat sigiliu.`,
       ] },
       { p: 'Când categoria e strânsă, bara arată în plus <b>literele</b> rândurilor (de exemplu „3 necompletate: b2, c1, e”), ca să știți exact care sunt.' },
       { h: 'Rândul unei nereguli' },
@@ -296,7 +297,7 @@ export const MANUAL = [
     blocks: [
       { ul: [
         '<b>Obiective</b>: lista obiectivelor controlate. Căutați după nume, localitate, adresă sau dată (12.09.2026, 09.2026 sau 2026; butonul „Dată” deschide un calendar) și filtrați după tip. Atingeți un obiectiv ca să vedeți datele lui, coordonatele GPS ale construcțiilor, istoricul controalelor și butonul „Control nou pe acest obiectiv”.',
-        '<b>Istoric</b>: toate controalele, grupate pe luni, cu căutare după obiectiv, administrator sau dată și cu filtrele În desfășurare / Încheiate. Fiecare control arată, scris: numărul de nereguli, câte nu sunt trecute în PV, amenzile cu stadiul lor, termenul ASI și încărcarea — „Neîncărcat în aplicație”, „Document neîncărcat” cu termenul, sau „Încărcat în aplicație · document încărcat”. La fel pe pagina fiecărui obiectiv; în lista Obiective, cardul arată câte controale sunt neîncărcate.',
+        '<b>Istoric</b>: toate controalele, grupate pe luni, cu căutare după obiectiv, administrator sau dată și cu filtrele În desfășurare / Încheiate. Fiecare control arată, scris: numărul de nereguli (cele grave primele), sigiliile aplicate, câte nu sunt trecute în PV, amenzile cu stadiul lor, termenul ASI și încărcarea — „Neîncărcat în aplicație”, „Document neîncărcat” cu termenul, sau „Încărcat în aplicație · document încărcat”. La fel pe pagina fiecărui obiectiv; în lista Obiective, cardul arată câte controale sunt neîncărcate și sigiliile aplicate la ultimul control.',
         '<b>Calendar</b>: anul și luna se schimbă separat. În fiecare zi vedeți controalele (violet = în desfășurare, albastru închis = încheiat), activitățile (în culoarea tipului lor), zilele libere (fundal gri: weekend și sărbători legale) și bulinele termenelor (albastru = termen de plată, roșu = termen ANAF sau ASI, portocaliu = termen de încărcare). Atingeți o zi ca să vedeți lista completă și butoanele „Control nou în această zi” și „Activitate nouă în această zi” (vedeți „Planul lunar”).',
       ] },
     ],

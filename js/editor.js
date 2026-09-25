@@ -591,17 +591,20 @@ function catInfo(c, rows, sec, { adapostGol = false, scurt = false } = {}) {
   const nok = rows.filter((n) => n.status === 'nok');
   const netrec = nok.filter((n) => !n.inPV);
   const amend = nok.filter((n) => n.amenda?.aplicata);
+  const sigil = nok.filter((n) => isGrav(n) && n.sigiliu);
   const lit = [litere(c, gol), adapostGol ? 'adăpost' : ''].filter(Boolean).join(', ');
   const tNec = `${rest} ${rest === 1 ? 'necompletată' : 'necompletate'}`;
   const tNok = `${nok.length} ${nokWord(sec, nok.length)}`;
   const tPv = `${netrec.length} ${netrec.length === 1 ? 'netrecută' : 'netrecute'} în PV`;
   const tAm = `${amend.length} ${amend.length === 1 ? 'amendată' : 'amendate'}`;
+  const tSig = `${sigil.length} cu sigiliu`;
   // categorie deschisă: cuvinte întregi, fără litere (rândurile se văd dedesubt); restrânsă: și literele rândurilor
   if (scurt) {
     return `${rest ? `<span class="cat-stare st-rest">${tNec}</span>` : `<span class="cat-stare st-gata">${icon('check')} Completat</span>`}
       ${nok.length ? `<span class="cat-count">${tNok}</span>` : ''}
       ${nok.length ? (netrec.length ? `<span class="cat-pv pv-rest">${icon('pv')} ${tPv}</span>` : `<span class="cat-pv pv-gata">${icon('pv')} toate în PV</span>`) : ''}
-      ${amend.length ? `<span class="cat-amenzi">${icon('fine')} ${tAm}</span>` : ''}`;
+      ${amend.length ? `<span class="cat-amenzi">${icon('fine')} ${tAm}</span>` : ''}
+      ${sigil.length ? `<span class="cat-sigiliu">${icon('lock')} ${tSig}</span>` : ''}`;
   }
   return `${rest
     ? `<span class="cat-stare st-rest">${tNec}: ${esc(lit)}</span>`
@@ -610,7 +613,8 @@ function catInfo(c, rows, sec, { adapostGol = false, scurt = false } = {}) {
     ${nok.length ? (netrec.length
     ? `<span class="cat-pv pv-rest">${icon('pv')} ${tPv}: ${esc(litere(c, netrec))}</span>`
     : `<span class="cat-pv pv-gata">${icon('pv')} toate în PV</span>`) : ''}
-    ${amend.length ? `<span class="cat-amenzi">${icon('fine')} ${tAm}: ${esc(litere(c, amend))}</span>` : ''}`;
+    ${amend.length ? `<span class="cat-amenzi">${icon('fine')} ${tAm}: ${esc(litere(c, amend))}</span>` : ''}
+    ${sigil.length ? `<span class="cat-sigiliu">${icon('lock')} ${tSig}: ${esc(litere(c, sigil))}</span>` : ''}`;
 }
 
 // Lista de rânduri (se redesenează singură la căutare, ca bara de căutare să rămână activă)

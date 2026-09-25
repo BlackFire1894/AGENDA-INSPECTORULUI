@@ -447,6 +447,9 @@ export function constatareLabel(n) {
 
 // Neregulă gravă: din listă (NU la dotări, GRF/NSI V peste parter) sau rând adăugat bifat „Neregulă gravă”
 export const isGrav = (n) => (n.custom ? !!n.grav : !!sablon(n.key)?.grav);
+// Sigiliile aplicate la un control: rândurile grave constatate (✗) cu bifa Sigiliu
+export const sigiliiAplicate = (c) => activeNereguli(c).filter((n) => n.status === 'nok' && isGrav(n) && n.sigiliu).length;
+export const sigiliiText = (k) => `${k} ${k === 1 ? 'sigiliu aplicat' : 'sigilii aplicate'}`;
 
 export const neregulaCat = (n) => (n.custom ? 'custom' : sablon(n.key)?.cat || 'custom');
 export const secOf = (n) => n.sec || 'ner';

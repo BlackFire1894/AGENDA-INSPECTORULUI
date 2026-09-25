@@ -7,9 +7,9 @@ import {
 import {
   objectives, allFines, allAsi, isIncheiat, byStartDesc, controlStats, matchControl, fold,
   neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
-  constructiiNume, secOf, amendaSerieNr, vecheInfo, constatareLabel, sablon, isApplicable, fmtCoord, googleMapsUrl, appleMapsUrl,
+  constructiiNume, secOf, amendaSerieNr, vecheInfo, constatareLabel, isApplicable, fmtCoord, googleMapsUrl, appleMapsUrl,
   incarcareStatus, LIPSA_INCARCARE,
-  parseSuma,
+  parseSuma, isGrav, sigiliiAplicate, sigiliiText,
 } from './model.js';
 import { icon, esc, pill, finePill, tipBadge, empty } from './ui.js';
 import { APP_VERSION } from './version.js';
@@ -57,8 +57,10 @@ export function controlRow(c, { showName = true } = {}) {
   const chips = [statusPill(c)];
   if (st.constatate) chips.push(pill('neutral', `${st.constatate} ${st.constatate === 1 ? 'neregulă' : 'nereguli'}`));
   if (st.netrecute) chips.push(pill('warn', `${st.netrecute} ${st.netrecute === 1 ? 'netrecută' : 'netrecute'} în PV`, 'pv'));
-  const grave = c.nereguli.filter((n) => !n.custom && sablon(n.key)?.grav && n.status !== 'ok' && isApplicable(c, n)).length;
+  const grave = c.nereguli.filter((n) => isGrav(n) && n.status !== 'ok' && isApplicable(c, n)).length;
   if (grave) chips.unshift(pill('red', `${grave} ${grave === 1 ? 'neregulă gravă' : 'nereguli grave'}`, 'alert'));
+  const sigilii = sigiliiAplicate(c);
+  if (sigilii) chips.splice(grave ? 1 : 0, 0, pill('red', sigiliiText(sigilii), 'lock'));
   const vechi = activeNereguli(c).filter((n) => vecheInfo(state.controls, c, n).veche).length;
   if (vechi) chips.push(`<span class="pill pill-veche">${icon('history')}${vechi} ${vechi === 1 ? 'neregulă veche' : 'nereguli vechi'}</span>`);
   const byLevel = {};
@@ -255,7 +257,7 @@ export function viewDashboard() {
           <span class="item-sub">${days < 0 ? 'începe' : 'început'} ${esc(fmtDateLong(c.dataInceput))}</span>
           <span class="item-msg">Lipsește data încheierii</span>
         </span>
-        <span class="item-side">${pill('open', days < 0 ? `începe peste ${zile(-days)}` : days === 0 ? 'început azi' : days === 1 ? 'început ieri' : `de ${zile(days)}`, 'clock')}</span>
+        <span class="item-side">${sigiliiAplicate(c) ? pill('red', sigiliiText(sigiliiAplicate(c)), 'lock') : ''}${pill('open', days < 0 ? `începe peste ${zile(-days)}` : days === 0 ? 'început azi' : days === 1 ? 'început ieri' : `de ${zile(days)}`, 'clock')}</span>
       </a>`;
     }).join('')}</div>` : '<p class="muted pad">Toate controalele sunt încheiate.</p>'}
   </section>`;
@@ -382,6 +384,7 @@ export function objListHTML() {
     const worst = fines[0]?.st.level;
     const open = o.controls.filter((c) => !isIncheiat(c)).length;
     const deInc = o.controls.filter((c) => { const x = incarcareStatus(c, t); return x && !x.gata; }).length;
+    const sigUlt = sigiliiAplicate(o.last);
     const dateHit = parseDateQuery(q) && hits[0];
     const init = (o.denumire || '?').trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
     return `<a class="obj-card" href="#/obiectiv/${o.id}">
@@ -393,6 +396,7 @@ export function objListHTML() {
           ${pill('neutral', `${o.controls.length} ${o.controls.length === 1 ? 'control' : 'controale'}`, 'history')}
           ${pill('neutral', `ultimul: ${fmtDate(o.last.dataInceput)}`, 'calendar')}
           ${dateHit ? pill('accent', `găsit: ${rangeText(dateHit)}`, 'search') : ''}
+          ${sigUlt ? pill('red', `${sigiliiText(sigUlt)} la ultimul control`, 'lock') : ''}
           ${open ? pill('open', `${open} în desfășurare`, 'clock') : ''}
           ${deInc ? pill('warn', `${deInc} ${deInc === 1 ? 'control neîncărcat' : 'controale neîncărcate'}`, 'upload') : ''}
           ${fines.length ? pill(worst, `${fines.length} ${fines.length === 1 ? 'amendă activă' : 'amenzi active'}`, 'fine') : ''}

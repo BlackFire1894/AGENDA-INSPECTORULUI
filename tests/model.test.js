@@ -10,6 +10,7 @@ import {
   fmtCoord, googleMapsUrl, gpsQuality, constructiiOf, constructiiNume, matchNeregula, pesteParter, grfVPesteParter, sablon, isGrav, syncAutoNU,
   constructiiEligibile, verifStare, verifExpirate, verifText, catalogOf, fixeazaCatalog, schimbare, SCHEMA_VERSION, matchAct,
   incarcareStatus, parseSuma,
+  sigiliiAplicate, sigiliiText, emptyNeregula,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -834,4 +835,17 @@ test('sumele în lei, scrise în stil românesc', () => {
   assert.equal(parseSuma('1.500,50'), 1500.5); assert.equal(parseSuma('1500,5'), 1500.5); assert.equal(parseSuma('12.345.678'), 12345678);
   assert.equal(parseSuma('2.5'), 2.5); assert.equal(parseSuma('3000 lei'), 3000);
   assert.equal(parseSuma(''), null); assert.equal(parseSuma('abc'), null);
+});
+
+test('sigiliile aplicate: doar rândurile grave constatate, cu bifa Sigiliu', () => {
+  const c = newControl({ start: '2026-10-01' });
+  const g = c.nereguli.find((n) => isGrav(n));
+  const d = c.nereguli.find((n) => n.key === 'd');
+  assert.equal(sigiliiAplicate(c), 0);
+  g.sigiliu = true; assert.equal(sigiliiAplicate(c), 0);            // bifa rămasă, dar rândul nu e constatat
+  g.status = 'nok'; assert.equal(sigiliiAplicate(c), 1);
+  d.status = 'nok'; d.sigiliu = true; assert.equal(sigiliiAplicate(c), 1);   // neregulă obișnuită: nu contează
+  c.nereguli.push({ ...emptyNeregula('custom-1'), custom: true, grav: true, status: 'nok', sigiliu: true, label: 'x' });
+  assert.equal(sigiliiAplicate(c), 2);
+  assert.equal(sigiliiText(1), '1 sigiliu aplicat'); assert.equal(sigiliiText(2), '2 sigilii aplicate');
 });

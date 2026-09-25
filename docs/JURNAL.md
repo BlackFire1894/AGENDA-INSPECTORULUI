@@ -3,7 +3,7 @@
 Memoria proiectului: ce face aplicația, de ce arată și funcționează așa, ce s-a decis și ce s-a respins.
 **Se citește la începutul oricărei sesiuni de lucru și se completează la fiecare versiune nouă** (regulă în `CLAUDE.md`).
 
-Ultima actualizare: v1.19.0 — 25.09.2026.
+Ultima actualizare: v1.20.0 — 25.09.2026.
 
 ---
 
@@ -67,6 +67,7 @@ Ultima actualizare: v1.19.0 — 25.09.2026.
 | 1.17 | Recomandarea **primei zile lucrătoare** când un termen cade într-o zi liberă; **verificarea anuală a sărbătorilor legale** (Panou, din 1 decembrie; lista în Setări); acest jurnal; testele din browser mutate în repo (`tests/e2e`) |
 | 1.18 | **Planul lunar**: activități introduse manual în Calendar (7 tipuri, dată / interval, oră, obiectiv, stare planificată / efectuată / anulată); „Activități de confirmat” în Panou; **raportul lunii** (ecran + PDF / partajare); activitățile în backup; **citirea corectă a sumelor** scrise românește („2.500”, „1.500,50”) |
 | 1.19 | **Zile libere implicite**: weekendurile și sărbătorile legale apar singure în Calendar (fundal gri, etichetă „Liber” / numele sărbătorii), efectuate până azi inclusiv, planificate după; în raportul lunii: weekend, sărbători, efectuate / planificate, zile lucrătoare și zilele libere în care s-a lucrat |
+| 1.20 | **Sigiliul** vizibil și în bara categoriei („N cu sigiliu”, restrânsă: și literele, ca amenzile) și pe rândul controlului din liste (Panou, Obiective, Istoric, Calendar, pagina obiectivului: „N sigiliu aplicat / sigilii aplicate”, roșu, după „nereguli grave”), în Panou la „Controale neîncheiate” și pe cardul din Obiective („… la ultimul control”); corectat: „nereguli grave” din liste numără și rândurile adăugate marcate grave |
 
 ## 4. Ce face aplicația (inventar)
 
@@ -164,6 +165,7 @@ Ultima actualizare: v1.19.0 — 25.09.2026.
 - v1.16: încărcarea (bife în tabul Obiectiv; pastile în Istoric și Obiective; caseta și secțiunea din Panou); etapa a doua ASI.
 - v1.17: recomandarea zilei lucrătoare; verificarea anuală a sărbătorilor legale.
 - v1.18: plan lunar — tipuri fixe + „Altă activitate”; câmpuri tip, dată (interval), oră, descriere, stare, obiectiv, observații; planificatele trecute „de confirmat” în Panou; raport pe ecran + PDF / partajare.
+- v1.20: sigiliul se numără doar la rândurile grave constatate (✗) cu bifa Sigiliu; „bara obiectivului” = rândul controlului din liste (ales de utilizator, nu antetul controlului și nu pagina obiectivului).
 - v1.19: zilele libere nu se salvează (nu sunt activități) — se calculează din `zinelucratoare()`, deci nu intră în backup și nu cer confirmare; se actualizează singure odată cu lista sărbătorilor.
 
 **Respinse (nu se repropun fără un motiv nou):**
