@@ -38,7 +38,7 @@ export const state = {
     catCollapsed: new Set(pref('agenda-cats-collapsed', [])),    // categorii de nereguli restrânse
     rowCollapsed: new Set(pref('agenda-rows-collapsed', [])),    // rânduri de nereguli restrânse: „<idControl>|<cheie>”
   },
-  meta: { lastBackup: null },
+  meta: { lastBackup: null, sarbatoriVerificate: [] },   // anii pentru care lista sărbătorilor legale a fost verificată
 };
 
 // Data de azi se citește mereu direct din ceasul tabletei (nu dintr-o copie), ca să nu rămână în urmă nicio clipă.

@@ -2,7 +2,7 @@
 import { state, today } from './state.js';
 import {
   fmtDate, fmtDateLong, MONTHS, MONTHS_SHORT, WEEKDAYS_SHORT, addDays, diffDays,
-  toISO, zile, parseDateQuery, ucfirst,
+  toISO, zile, parseDateQuery, ucfirst, sarbatoriLegale,
 } from './dates.js';
 import {
   objectives, allFines, allAsi, isIncheiat, byStartDesc, controlStats, matchControl, fold,
@@ -266,7 +266,7 @@ export function viewDashboard() {
       </a>`).join('')}</div>` : '<p class="muted pad">Toate neregulile constatate sunt trecute în PV.</p>'}
   </section>`;
 
-  return `${head}${kpis}<div class="dash-grid">${secFines}${secAsi}${secInc}${secOpen}${secPv}</div>`;
+  return `${head}${sarbatoriReminder(t)}${kpis}<div class="dash-grid">${secFines}${secAsi}${secInc}${secOpen}${secPv}</div>`;
 }
 
 // Vechimea ultimului backup (aceeași funcție de backup e disponibilă din Panou, control, bara laterală și Setări)
@@ -287,6 +287,28 @@ export function backupAgeText() {
 }
 
 const pad = (n) => String(n).padStart(2, '0');
+
+// ───────── Sărbătorile legale: verificare anuală ─────────
+// Aplicația le calculează singură (date fixe + Paștele ortodox), dar legea se poate schimba (ex. 6–7 ianuarie, din 2024).
+// Din 1 decembrie (și în ianuarie, dacă n-a fost confirmată) Panoul cere verificarea listei pentru anul respectiv.
+function anSarbatoriDeVerificat(t) {
+  const y = +t.slice(0, 4), m = +t.slice(5, 7);
+  const an = m === 12 ? y + 1 : m === 1 ? y : null;
+  return an && !(state.meta.sarbatoriVerificate || []).includes(an) ? an : null;
+}
+function listaSarbatori(an) {
+  return `<ul class="hol-list">${[...sarbatoriLegale(an)].sort(([a], [b]) => a.localeCompare(b)).map(([d, nume]) => `<li><b>${esc(fmtDateLong(d))}</b> — ${esc(nume)}</li>`).join('')}</ul>`;
+}
+function sarbatoriReminder(t) {
+  const an = anSarbatoriDeVerificat(t);
+  if (!an) return '';
+  return `<section class="card hol-rem">
+    <h2 class="sec-title">${icon('calendar')} Sărbătorile legale pentru ${an}: verificați lista</h2>
+    <p>Termenele (plată, ANAF, ASI, încărcare) țin cont de zilele nelucrătoare. Aplicația calculează singură sărbătorile legale pentru ${an}, după art. 139 din Codul muncii. Verificați dacă legea s-a schimbat față de lista de mai jos; dacă da, cereți actualizarea aplicației.</p>
+    <details><summary>Lista pentru ${an} (${sarbatoriLegale(an).size} zile)</summary>${listaSarbatori(an)}</details>
+    <div class="row-gap"><button class="btn btn-primary btn-lg" data-act="sarbatori-ok" data-an="${an}">${icon('check')} Am verificat lista pentru ${an}</button></div>
+  </section>`;
+}
 
 // Numărătoarea unui termen, scrisă în clar (zile rămase / ultima zi / peste termen)
 function countdown(days, { lucr = false } = {}) {
@@ -602,9 +624,16 @@ export function viewSettings(persisted) {
         <span class="rule-row"><i class="dot dot-yellow"></i> zilele 16–39: termenul de 15 zile expirat</span>
         <span class="rule-row"><i class="dot dot-red"></i> din ziua 40: „Mai aveți 5 zile până să o trimiteți la ANAF” (termen: ziua 45)</span>
         <span class="rule-row"><i class="dot dot-green"></i> achitată, cu dovadă primită</span></li>
-      <li><b>ASI:</b> 90 de zile de la data încheierii controlului.</li>
-      <li>Termenele care cad într-o zi nelucrătoare (weekend sau sărbătoare legală) <b>nu se mută automat</b>; aplicația afișează o avertizare ca să verifici prelungirea.</li>
+      <li><b>ASI:</b> 90 de zile de la data încheierii controlului; dacă documentația nu a fost prezentată, încă 5 zile calendaristice pentru constatarea pierderii valabilității.</li>
+      <li><b>Încărcarea</b> în aplicația ISU și a documentului: 3 zile lucrătoare de la data încheierii.</li>
+      <li>Termenele care cad într-o zi nelucrătoare (weekend sau sărbătoare legală) <b>nu se mută automat</b>; aplicația vă avertizează și vă recomandă următoarea zi lucrătoare; verificați prelungirea.</li>
     </ul>
+  </section>
+  <section class="card set-sec" id="sarbatori">
+    <h2 class="sec-title">${icon('calendar')} Sărbători legale</h2>
+    <p>Calculate automat (datele fixe și Paștele ortodox), după art. 139 din Codul muncii. Dacă legea se schimbă, aplicația trebuie actualizată; în decembrie, Panoul vă cere să verificați lista pentru anul următor.</p>
+    ${[+today().slice(0, 4), +today().slice(0, 4) + 1].map((an) => `<details><summary>${an} — ${sarbatoriLegale(an).size} zile${(state.meta.sarbatoriVerificate || []).includes(an) ? ' · verificată' : ''}</summary>${listaSarbatori(an)}
+      ${(state.meta.sarbatoriVerificate || []).includes(an) ? '' : `<button class="btn btn-ghost" data-act="sarbatori-ok" data-an="${an}">${icon('check')} Am verificat lista pentru ${an}</button>`}</details>`).join('')}
   </section>
   <section class="card set-sec danger-zone">
     <h2 class="sec-title">${icon('trash')} Zonă periculoasă</h2>

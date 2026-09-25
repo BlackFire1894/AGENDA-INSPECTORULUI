@@ -1246,3 +1246,10 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
   .kpis { grid-template-columns: 1.3fr repeat(2, minmax(0, 1fr)); }
   .kpis .kpi-fines { grid-row: span 2; }
 }
+/* Sărbătorile legale: verificarea anuală (Panou, decembrie–ianuarie) și lista din Setări */
+.hol-rem { border-left: 0.3333rem solid var(--blue); background: color-mix(in srgb, var(--blue) 7%, var(--surface)); margin-bottom: 1.1111rem; }
+.hol-rem .sec-title { color: var(--blue-ink); }
+.hol-rem p { margin: 0 0 0.6667rem; line-height: 1.5; }
+.hol-rem details, #sarbatori details { margin: 0 0 0.6667rem; }
+.hol-rem summary, #sarbatori summary { min-height: 44px; display: flex; align-items: center; font-weight: 750; cursor: pointer; }
+.hol-list { margin: 0.2222rem 0 0.6667rem; padding-left: 1.3333rem; display: flex; flex-direction: column; gap: 0.2222rem; line-height: 1.45; }

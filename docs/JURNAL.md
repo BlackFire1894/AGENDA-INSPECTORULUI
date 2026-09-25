@@ -1,0 +1,198 @@
+# Jurnalul proiectului „Agenda inspectorului”
+
+Memoria proiectului: ce face aplicația, de ce arată și funcționează așa, ce s-a decis și ce s-a respins.
+**Se citește la începutul oricărei sesiuni de lucru și se completează la fiecare versiune nouă** (regulă în `CLAUDE.md`).
+
+Ultima actualizare: v1.17.0 — 25.09.2026.
+
+---
+
+## 1. Contextul
+
+- **Utilizatorul:** inspector de prevenire ISU (securitate la incendiu, protecție civilă). Lucrează pe **iPad Air 11" (M4)**, pe teren, în mișcare prin construcție, împreună cu reprezentantul obiectivului. Comunică în română.
+- **Aplicația:** PWA fără build (HTML / CSS / JS module), publicată cu GitHub Pages din `main`: repo `BlackFire1894/AGENDA-INSPECTORULUI`. Funcționează offline; datele stau **doar pe iPad** (IndexedDB); singura copie de siguranță e backupul (fișier JSON).
+- **Fluxul de lucru:**
+  1. Modificările se fac pe branch (`claude/objectives-control-app-ubn3fc`).
+  2. Se deschide un PR; utilizatorul îl aprobă cu Merge.
+  3. GitHub Pages publică `main`.
+  4. iPad-ul primește actualizarea prin service worker („Versiune nouă disponibilă → Actualizează”).
+- **Cum preferă utilizatorul să lucrăm:**
+  - rol de mentor exigent: onest, corect, verificat;
+  - greșelile se spun direct, fără laude inutile;
+  - propunerile se fac **sub formă de întrebări cu variante**, nu ca text lung („wall of text”);
+  - **nicio modificare de interfață fără aprobare**; defectele se corectează direct și se raportează;
+  - raport final scurt, în română, cu tonul formal al aplicației.
+
+## 2. Reguli permanente (detalii în `CLAUDE.md`)
+
+- **Versiunea:** la fiecare publicare, `APP_VERSION` (`js/version.js`) = `VERSION` (`sw.js`), în format semver.
+- **Service worker:** fișierele noi din `js/`, `css/` și `icons/` intră în `ASSETS` din `sw.js`.
+- **Date vechi:** orice câmp nou se completează în `normalizeControl()`; structura datelor e descrisă în `docs/MODEL_DATE.md`.
+- **Controalele încheiate** își păstrează lista de nereguli (`catalog`).
+  - Un rând nou în listă primește `din: <schemă>`; un rând scos primește `retrasDin`.
+  - O cheie nu se refolosește niciodată.
+- **CSS:**
+  - dimensiunile doar în `rem` (bază 18 / 16,5 / 15 px pentru Mare / Mediu / Mic);
+  - țintele de atingere au cel puțin 44 px (`max(44px, …)`);
+  - câmpurile de text au font de cel puțin 16 px (altfel iOS mărește pagina).
+- **Ton formal** („dumneavoastră”: „Completați…”, „Ștergeți…?”). Butoanele rămân nume de acțiuni („Anulează”, „Șterge”).
+- **Ghidul aplicației** (`js/help.js`) se actualizează odată cu funcțiile pe care le descrie.
+- **Principiul de afișare (v1.15):** informația se citește direct, fără atingeri.
+  - Nimic ascuns în `title` (pe iPad nu apare).
+  - Fără buline cu cifre neexplicate, fără prescurtări obscure, fără text mic în colț.
+  - Curat, dar nu discret.
+- **Teme și orientări:** temă luminoasă și întunecată; vertical (bara de jos) și orizontal (bara laterală, de la 1000 px).
+
+## 3. Cronologia versiunilor
+
+| Versiune | Ce a adus |
+|---|---|
+| 1.0–1.1 | PWA de bază: controale, obiective, acte, nereguli, amenzi, Panou, Calendar, Istoric; NEC = „nu este cazul”; mesajul „Versiune nouă disponibilă” |
+| 1.2 | Mărimea textului Mic / Mediu / Mare (totul în `rem`) |
+| 1.3 | Tipul Localitate: taburile Planuri și SVSU, Protecție civilă; nereguli pe categorii |
+| 1.4 | Acte despre exerciții; construcția neregulii; observații pe mai multe rânduri; seria amenzii; anul în calendar |
+| 1.5 | Neregulă veche; Text PV; Fișa controlului (PDF); avertizare pentru termenele în zile nelucrătoare; Backup rapid |
+| 1.6 | „Ce mai aveți de făcut”; Restul conform; verificare la încheiere; ghid |
+| 1.7 | Nereguli noi; detectori autonomi; **nereguli grave la NU** la dotări (G1–G12) |
+| 1.8 | Adresă, localitate, **coordonate GPS pe fiecare construcție** (doar la cerere, fără urmărire) |
+| 1.9 | Căutare în nereguli; o neregulă în mai multe construcții; tema aleasă manual; GRF/NSI pe construcție (G13: GRF/NSI V peste parter); sigiliu; confirmare la „Restul conform” |
+| 1.10 | Nereguli ah (fără ASI) și ai (lucrări fără aviz), legate de NU la ASI / AVIZ |
+| 1.11 | Anulează / Refă; NEC; verificări defalcate pe construcții, cu date; stare „completat” pe categorii |
+| 1.12 | Bare de nereguli restrângibile, fixe la derulare; Anulează / Sus / Refă; actele funcționează ca neregulile; **lista înghețată la încheiere (`catalog`)**; Ghidul aplicației în locul butoanelor „?” |
+| 1.12.1 | Bara categoriei arată constatările netrecute în PV |
+| 1.13 | Taburi evidențiate, cu bară de progres; cod de culori pe casetele Panoului |
+| 1.14 | Interfață mai curată: Panou aerisit; ✓ ✗ NEC pe bara rândului; „+ Obs.”; meniul ⋯; bara laterală compactă; ton formal |
+| 1.15 | Informația se citește direct (cuvinte în loc de buline); **audit numeric** (532 de verificări, 8 defecte corectate); Ghidul rescris pentru utilizator nou |
+| 1.16 | **Încărcarea după încheiere** (aplicația ISU + documentul), cu termen de 3 zile lucrătoare; **ASI: 5 zile pentru constatarea pierderii valabilității**; caseta „De încărcat” în Panou |
+| 1.17 | Recomandarea **primei zile lucrătoare** când un termen cade într-o zi liberă; **verificarea anuală a sărbătorilor legale** (Panou, din 1 decembrie; lista în Setări); acest jurnal; testele din browser mutate în repo (`tests/e2e`) |
+
+## 4. Ce face aplicația (inventar)
+
+### Navigarea
+- **Orizontal:** bara laterală, cu ceasul, Control nou, Panou, Obiective, Calendar, Istoric, Anulează / Sus / Refă (în control), Backup rapid, Ghidul aplicației, Setări.
+- **Vertical:** bara de jos (Panou, Obiective, +, Calendar, Istoric, Setări) și banda Anulează / Sus / Refă în control.
+- **Numerele de pe meniu:**
+  - Panou = amenzi urgente (galbene și roșii);
+  - Istoric = controale neîncheiate.
+  - Pe orizontal sunt scrise în cuvinte; pe vertical apar ca buline.
+
+### Panoul
+- **Sus:** data și ora tabletei, pe un rând.
+- **Cinci casete, fiecare cu culoarea ei:**
+  - Amenzi active, cu legenda scrisă; achitatele apar separat și nu intră în total;
+  - Controale neîncheiate;
+  - Termene ASI;
+  - De încărcat;
+  - Netrecute în PV.
+- **Secțiuni cu liste:** atingeți un rând și controlul se deschide exact la locul respectiv.
+- **Din 1 decembrie:** cererea de verificare a sărbătorilor legale pentru anul următor.
+
+### Controlul
+- **Antetul:** Înapoi, Salvat, Text PV, Fișa PDF, Istoric, Backup, Șterge.
+- **„Ce mai aveți de făcut”:** pasul următor, cu acces direct.
+- **Taburile:** Obiectiv, Acte, Nereguli; la localități în plus Planuri și SVSU, Protecție civilă. Fiecare arată starea în cuvinte și progresul („Dotări 18/38”, „Verificate 4/37”).
+- **Tabul Obiectiv:**
+  - datele obiectivului și perioada controlului (Încheie controlul / Redeschide);
+  - **Încărcare după încheiere** (două bife);
+  - construcțiile: date, GRF/NSI, GPS, dotări DA / NU / NEC, centrala termică, nr. ASI / aviz.
+- **Tabul Acte:** Prezentat / Lipsă / NEC; căutare; filtre; Restul prezentate.
+- **Tabul Nereguli:**
+  - partea de sus: sumar, căutare (cu glosar de abrevieri), meniul ⋯, filtre, Restul conform;
+  - categorii cu bară scrisă în cuvinte;
+  - rânduri cu ✓ ✗ NEC pe bară;
+  - la ✗: construcțiile, PV, amenda (seria și nr., data, suma, achitată), neregulă veche, sigiliu (la cele grave), termenul ASI la „a”;
+  - rânduri adăugate de inspector (se pot marca grave).
+- **Observațiile:** câmpul apare doar cu text, la ✗ sau când apăsați „+ Obs.”.
+- **Text PV:** constatările și actele lipsă; opțiunile „Doar netrecute” și „Include actele lipsă”; butoane Copiază, Partajează, Marchează-le trecute.
+- **Fișa PDF:** tipărire sau partajare.
+
+### Celelalte ecrane
+- **Obiective:** căutare după nume, localitate, adresă sau dată; pagina obiectivului (date, GPS, statistici, istoric); „Control nou pe acest obiectiv” preia datele din ultimul control.
+- **Istoric:** controalele pe luni; pastile scrise (nereguli, netrecute, amenzi cu stadiul, ASI, încărcare).
+- **Calendar:** controalele și termenele pe zile.
+- **Setări:**
+  - mărimea textului, tema;
+  - backup: Exportă / Importă (Combină sau Înlocuiește tot);
+  - actualizări;
+  - regulile termenelor;
+  - **sărbătorile legale** (anul curent și următorul);
+  - date demonstrative;
+  - zona periculoasă.
+
+## 5. Reguli de calcul (verificate cu teste)
+
+- **Amenda:** termenele se numără de la data aplicării (implicit, data încheierii). Ziua aplicării = ziua 0.
+  - Albastru, „În curs”: zilele 0–15.
+  - Galben, „Termen 15 zile expirat”: zilele 16–39.
+  - Roșu, „Trimite la ANAF”: din ziua 40; termenul ANAF = ziua 45.
+  - Verde: „Achitată”.
+  - Data aplicării în viitor: se afișează corect (cu data plății), nu „15 zile”.
+- **ASI (neregula „a”, bifa „Termen de prezentare 90 de zile”):**
+  - 90 de zile de la încheiere;
+  - apoi **5 zile calendaristice** pentru constatarea pierderii valabilității;
+  - termenul se închide cu „Documentație prezentată” sau „Pierderea valabilității constatată” (fiecare cu data).
+- **Încărcarea în aplicația ISU și a documentului (PV scanat):**
+  - se cere doar după încheiere;
+  - termen: **3 zile lucrătoare** de la încheiere (ziua încheierii nu se numără; weekendurile și sărbătorile se sar);
+  - portocaliu cât mai sunt zile; **roșu în ultima zi** și după termen.
+- **Zile nelucrătoare:**
+  - weekendul și cele 17 sărbători legale din art. 139 Codul muncii: 1–2 ian., 6–7 ian. (din 2024), 24 ian., Vinerea Mare, Paștele și a doua zi, 1 mai, 1 iunie, Rusaliile și a doua zi, 15 aug., 30 nov., 1 dec., 25–26 dec.;
+  - Paștele ortodox se calculează (verificat pentru 2024–2028);
+  - un termen care cade într-o zi liberă **nu se mută**: aplicația avertizează și **recomandă prima zi lucrătoare** de după (v1.17).
+- **Verificările instalațiilor:**
+  - valabilitate: b1 12 luni, b2 12 sau 24 de luni, b3 24 de luni, c1 12 luni, c2 și c3 6 luni, c4–c7 12 luni;
+  - se compară cu data începerii controlului;
+  - „valabilă până la X” include ziua X; după X: „expirată — era valabilă până la X”.
+- **Corelări:**
+  - DA la o instalație → apar neregulile ei;
+  - NU la o instalație necesară → neregulă gravă G1–G12;
+  - GRF/NSI V + regim de înălțime peste parter → G13;
+  - NU la ASI / AVIZ / Iluminat Hint → ah / ai / am, constatate automat și retrase la DA / NEC, dacă nu s-a lucrat pe ele;
+  - neregula veche = aceeași cheie constatată la un control anterior al obiectivului.
+- **Cifre consistente:** „Ce mai aveți de făcut”, filtrul „Neverificate”, sumarul, tabul și suma barelor de categorie dau aceeași cifră.
+
+## 6. Decizii de design
+
+**Aprobate și implementate:**
+- v1.14: Panou aerisit; ✓ ✗ NEC lângă denumire; fără câmpuri goale de observații; bara categoriei compactă; Anulează / Refă într-o bandă subțire; etichetă de tip discretă; stadiile amenzilor ca pastile; „început azi” / „de N zile”; bara laterală compactă, cu ceas.
+- v1.15: bara categoriei în cuvinte întregi (literele doar când e restrânsă); text în loc de buline; avertizări mai mari; pastile de amendă pline; la ✗ observațiile se deschid fără tastatură; Anulează / Refă cu contur.
+- v1.16: încărcarea (bife în tabul Obiectiv; pastile în Istoric și Obiective; caseta și secțiunea din Panou); etapa a doua ASI.
+- v1.17: recomandarea zilei lucrătoare; verificarea anuală a sărbătorilor legale.
+
+**Respinse (nu se repropun fără un motiv nou):**
+- scoaterea ceasului din bara laterală;
+- mai puține culori;
+- **antet de control compact** (nici doar pe orizontal, v1.15: „Las așa”);
+- fără texte repetate;
+- titluri scurte;
+- Text PV cu font normal;
+- calendar cu buline;
+- etichete ✓ ✗ NEC mai mari;
+- nume mai mari în calendar;
+- „+ Obs.” mare.
+
+**Compromis acceptat:** pe orizontal, în control, primul rând de neregulă stă chiar sub marginea ecranului (textele scrise din taburi și din sumar ocupă ~60 px). Pe vertical nu e afectat.
+
+## 7. Verificarea
+
+- **`npm test`**: logica de termene, catalog, corelări, zile lucrătoare, încărcare, ASI (node:test, `tests/model.test.js`).
+- **`tests/e2e/ruleaza.sh`**: testele din browser (Playwright + Chromium), pe aplicația servită local pe portul 8080.
+  - **Suitele pe versiuni** (`v110` … `v114`, `flow`, `loc`, `obsind`, `bk`, `gps`, `live`, `hol`, …) verifică funcțiile introduse de fiecare versiune.
+  - **`audit.cjs`**: 459 de ecrane (3 mărimi de text × 2 orientări × 2 teme). Caută scroll orizontal, ținte de atingere sub 44 px (prin hit-test real), câmpuri cu font sub 16 px și text tăiat.
+  - **`oracol.cjs`** (cu `gen.mjs`): **oracolul numeric**. Compară fiecare cifră afișată (Panou, meniu, Istoric, taburi, sumar, bare, filtre, fișă, Text PV, Calendar, încărcare, ASI) cu o numărătoare independentă făcută direct din date, pe un set cu toate cazurile-limită și pe datele demonstrative.
+  - **`reguli.cjs`** (cu `reguli.mjs`): ce rânduri apar la DA / NU / GRF V, comparat cu listele-șablon.
+  - **`upd.cjs`**: actualizarea prin service worker (versiunea curentă → următoarea).
+- **ESLint** pe `js/*.js` și `sw.js`.
+
+## 8. Anual
+
+- **Decembrie:**
+  - Panoul cere verificarea sărbătorilor legale pentru anul următor.
+  - Se verifică legea (art. 139 Codul muncii, eventuale modificări). Dacă s-a schimbat, se actualizează `sarbatoriLegale()` din `js/dates.js` și testele, apoi se publică o versiune nouă.
+  - O rutină programată (1 decembrie) amintește acest lucru și în sesiunea de lucru.
+
+## 9. Limite cunoscute și idei
+
+- Datele sunt doar pe tabletă; fără backup regulat, se pot pierde.
+- Controalele încheiate înainte de v1.3 (schema < 3) ar arăta actele despre exerciții ca neverificate; în practică nu există astfel de date pe iPad.
+- Testele din browser încarcă Playwright dintr-o cale a mediului Claude Code (`/opt/node22/...`).

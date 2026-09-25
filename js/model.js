@@ -3,7 +3,7 @@
 import {
   addDays, diffDays, isISO, todayISO, parseDateQuery, queryRange, rangesOverlap, zile,
   TERMEN_PLATA, PRAG_ROSU, TERMEN_ANAF, TERMEN_ASI, TERMEN_PIERDERE_ASI, TERMEN_INCARCARE, fmtDate, zinelucratoare, addMonths,
-  addWorkingDays, workingDaysBetween,
+  addWorkingDays, workingDaysBetween, nextWorkingDay, fmtDateLong,
 } from './dates.js';
 
 export const SCHEMA_VERSION = 10; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS · 7: mai multe construcții pe neregulă, GRF/NSI pe construcție · 8: nereguli ah, ai · 9: verificări defalcate cu date pe construcție, NEC, aj/ak, an construire, nr. ASI/aviz · 10: lista înghețată la încheiere (catalog), seria și nr. amenzii într-un câmp
@@ -520,6 +520,10 @@ export function fineDate(control, n) {
   return isISO(control.dataIncheiere) ? control.dataIncheiere : '';
 }
 
+// Termen într-o zi nelucrătoare: avertizare + recomandarea primei zile lucrătoare (numărătoarea nu se schimbă)
+export function nelucrNota(ce, iso, motiv) {
+  return `${ce} (${fmtDate(iso)}) cade ${motiv} — următoarea zi lucrătoare: ${fmtDateLong(nextWorkingDay(iso))}; verificați prelungirea`;
+}
 const maiSunt = (n) => (n === 1 ? 'Mai este 1 zi' : `Mai sunt ${zile(n)}`);
 
 // Stadiul amenzii:
@@ -551,7 +555,7 @@ export function fineStatus(control, n, today = todayISO()) {
     else msg = `${maiSunt(left)} din termenul de plată (${fmtDate(plataPana)})`;
     return {
       level: 'blue', label: 'În curs', elapsed, plataPana, anafPana, plataNelucr, anafNelucr, daysLeft: left,
-      nelucr: plataNelucr ? `Termenul de plată (${fmtDate(plataPana)}) cade ${plataNelucr} — verificați prelungirea` : '',
+      nelucr: plataNelucr ? nelucrNota('Termenul de plată', plataPana, plataNelucr) : '',
       msg,
     };
   }
@@ -559,7 +563,7 @@ export function fineStatus(control, n, today = todayISO()) {
     const over = elapsed - TERMEN_PLATA;
     return {
       level: 'yellow', label: 'Termen 15 zile expirat', elapsed, plataPana, anafPana, plataNelucr, anafNelucr, daysLeft: leftAnaf,
-      nelucr: anafNelucr ? `Termenul ANAF (${fmtDate(anafPana)}) cade ${anafNelucr} — verificați prelungirea` : '',
+      nelucr: anafNelucr ? nelucrNota('Termenul ANAF', anafPana, anafNelucr) : '',
       msg: `Termenul de plată a expirat de ${zile(over)} (${fmtDate(plataPana)})`,
     };
   }
@@ -569,7 +573,7 @@ export function fineStatus(control, n, today = todayISO()) {
   else msg = `Termenul de trimitere la ANAF (${fmtDate(anafPana)}) a fost depășit cu ${zile(-leftAnaf)}`;
   return {
     level: 'red', label: 'Trimite la ANAF', elapsed, plataPana, anafPana, plataNelucr, anafNelucr, daysLeft: leftAnaf, msg,
-    nelucr: anafNelucr && leftAnaf >= 0 ? `Termenul ANAF (${fmtDate(anafPana)}) cade ${anafNelucr} — verificați prelungirea` : '',
+    nelucr: anafNelucr && leftAnaf >= 0 ? nelucrNota('Termenul ANAF', anafPana, anafNelucr) : '',
   };
 }
 
@@ -588,7 +592,7 @@ export function asiDeadline(control, today = todayISO()) {
   if (left >= 0) {
     const msg = left > 0 ? `${maiSunt(left)} până la ${fmtDate(deadline)}` : `Termenul expiră astăzi (${fmtDate(deadline)})`;
     const nl = zinelucratoare(deadline);
-    return { deadline, daysLeft: left, msg, nelucr: nl ? `Termenul (${fmtDate(deadline)}) cade ${nl} — verificați prelungirea` : '' };
+    return { deadline, daysLeft: left, msg, nelucr: nl ? nelucrNota('Termenul', deadline, nl) : '' };
   }
   // Etapa a doua: după cele 90 de zile, 5 zile calendaristice pentru constatarea pierderii valabilității
   if (n.asiPierdere) {
@@ -603,7 +607,7 @@ export function asiDeadline(control, today = todayISO()) {
   const nl = zinelucratoare(termenPierdere);
   return {
     deadline, faza: 'pierdere', termenPierdere, daysLeft: left2, msg,
-    nelucr: nl && left2 >= 0 ? `Termenul (${fmtDate(termenPierdere)}) cade ${nl} — verificați prelungirea` : '',
+    nelucr: nl && left2 >= 0 ? nelucrNota('Termenul', termenPierdere, nl) : '',
   };
 }
 

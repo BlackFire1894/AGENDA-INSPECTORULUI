@@ -89,7 +89,8 @@ export const MANUAL = [
         `<b>Controale neîncheiate</b>: de când sunt deschise (${P('început azi', 'open')}, ${P('de 3 zile', 'open')}); la cele programate pentru o zi viitoare, peste câte zile încep.`,
         '<b>Nereguli netrecute în procesul-verbal</b>: fiecare constatare pe care o mai aveți de trecut în PV.',
       ] },
-      { p: 'Atingeți orice rând și controlul se deschide exact la neregula respectivă. Semnul <b>⚠</b> apare când un termen cade într-o zi nelucrătoare.' },
+      { p: 'Atingeți orice rând și controlul se deschide exact la neregula respectivă. Semnul <b>⚠</b> apare când un termen cade într-o zi nelucrătoare; alături vedeți prima zi lucrătoare de după.' },
+      { p: 'În decembrie (și în ianuarie, dacă nu ați confirmat), sus în Panou apare cererea de a verifica lista sărbătorilor legale pentru anul care vine.' },
     ],
   },
   {
@@ -273,7 +274,9 @@ export const MANUAL = [
       { h: 'Încărcarea în aplicație' },
       { p: 'Controlul încheiat și documentul (PV scanat) se încarcă în <b>3 zile lucrătoare</b> de la data încheierii; ziua încheierii nu se numără, iar weekendurile și sărbătorile legale se sar. Exemplu: control încheiat joi, 24 septembrie 2026 → vineri 25, luni 28, marți 29 → termen marți, 29 septembrie. Cât mai sunt zile, termenul e portocaliu; în ultima zi și după termen, roșu.' },
       { h: 'Zile nelucrătoare' },
-      { p: 'Dacă un termen cade sâmbătă, duminică sau într-o sărbătoare legală (art. 139 din Codul muncii), aplicația <b>nu</b> mută termenul, dar vă avertizează: ⚠ „cade duminică — verificați prelungirea”. În exemplul de mai sus, 3 ianuarie 2027 este duminică.' },
+      { p: 'Dacă un termen cade sâmbătă, duminică sau într-o sărbătoare legală (art. 139 din Codul muncii), aplicația <b>nu</b> mută termenul și nici numărătoarea, dar vă avertizează și vă recomandă prima zi lucrătoare de după: ⚠ „cade duminică — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea”. În exemplul de mai sus, 3 ianuarie 2027 este duminică.' },
+      { h: 'Sărbătorile legale, în fiecare an' },
+      { p: 'Aplicația calculează singură sărbătorile legale (datele fixe și Paștele ortodox). Legea se poate schimba — de exemplu, 6 și 7 ianuarie au devenit zile libere din 2024 —, așa că din 1 decembrie Panoul vă arată lista pentru anul următor și vă cere s-o verificați. Dacă lista e corectă, apăsați „Am verificat lista pentru …”; dacă nu, cereți actualizarea aplicației. Lista pentru anul curent și cel următor se vede oricând în Setări → Sărbători legale.' },
     ],
   },
   {
@@ -305,6 +308,7 @@ export const MANUAL = [
         '<b>Tema</b>: Automat (urmează setarea iPad-ului), Luminoasă sau Întunecată.',
         '<b>Backup</b>: „Exportă backup” (același lucru ca Backup rapid) creează un fișier cu toate controalele; salvați-l în Fișiere sau în iCloud Drive. „Importă backup” are două variante: <b>Combină</b> (adaugă controalele din fișier; dacă un control există deja, păstrează versiunea cea mai recentă) și <b>Înlocuiește tot</b>.',
         '<b>Actualizări</b>: aplicația verifică singură, la fiecare deschidere. Când apare bara „Versiune nouă disponibilă”, apăsați <b>Actualizează</b>. „Verifică acum” caută manual.',
+        '<b>Sărbători legale</b>: lista pentru anul curent și pentru cel următor, cu starea verificării (vedeți „Amenzile și termenele”).',
         '<b>Date demonstrative</b>: se pot încărca și șterge oricând, fără să vă atingă datele.',
         '<b>Zona periculoasă</b>: ștergerea tuturor datelor. Faceți întâi un backup.',
       ] },

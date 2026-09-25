@@ -192,3 +192,10 @@ export function workingDaysBetween(fromISO, toISO_) {
   for (let d = addDays(fromISO, 1); d <= toISO_; d = addDays(d, 1)) if (!zinelucratoare(d)) n++;
   return n;
 }
+
+// Prima zi lucrătoare după o zi nelucrătoare (recomandare; termenele afișate nu se mută).
+export function nextWorkingDay(iso) {
+  let d = addDays(iso, 1);
+  while (zinelucratoare(d)) d = addDays(d, 1);
+  return d;
+}

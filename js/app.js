@@ -397,6 +397,14 @@ document.addEventListener('click', async (e) => {
     }
     case 'obj-tip': state.ui.objTip = el.dataset.val; render({ keepScroll: true }); return;
     case 'hist-filter': state.ui.histFilter = el.dataset.val; render({ keepScroll: true }); return;
+    case 'sarbatori-ok': {
+      // lista sărbătorilor legale pentru anul respectiv a fost verificată: reminderul dispare
+      const an = +el.dataset.an;
+      state.meta.sarbatoriVerificate = [...new Set([...state.meta.sarbatoriVerificate, an])];
+      await store.setMeta('sarbatoriVerificate', state.meta.sarbatoriVerificate);
+      toast(`Lista sărbătorilor legale pentru ${an} a fost marcată verificată`, 'ok');
+      render({ keepScroll: true }); return;
+    }
     case 'cal-prev': case 'cal-next': {
       const d = new Date(state.ui.calYear, state.ui.calMonth + (act === 'cal-next' ? 1 : -1), 1);
       state.ui.calYear = d.getFullYear(); state.ui.calMonth = d.getMonth();
@@ -1148,6 +1156,7 @@ async function boot() {
     const list = await store.loadAll();
     state.controls = (list || []).map(normalizeControl);
     state.meta.lastBackup = (await store.getMeta('lastBackup')) || null;
+    state.meta.sarbatoriVerificate = (await store.getMeta('sarbatoriVerificate')) || [];
   } catch (e) {
     console.error(e);
     toast('Nu am putut încărca datele', 'warn');

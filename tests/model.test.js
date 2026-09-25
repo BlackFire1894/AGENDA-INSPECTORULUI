@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { addDays, addMonths, diffDays, parseDateQuery, zile, pasteOrtodox, zinelucratoare } from '../js/dates.js';
+import { addDays, addMonths, diffDays, parseDateQuery, zile, pasteOrtodox, zinelucratoare, nextWorkingDay } from '../js/dates.js';
 import {
   newControl, fineStatus, asiDeadline, matchControl, objectives, controlFromPrevious,
   normalizeControl, allFines, NEREGULI, SABLON, isApplicable, secStats, sectiuniActive, activeNereguli,
@@ -231,7 +231,7 @@ test('termenul de plată într-o zi nelucrătoare: avertizare, fără mutare', (
   const st = fineStatus(c, n, '2026-09-20');
   assert.equal(st.plataPana, '2026-10-03');               // nu se mută
   assert.equal(st.plataNelucr, 'sâmbătă');
-  assert.match(st.nelucr, /cade sâmbătă — verificați prelungirea/);
+  assert.equal(st.nelucr, 'Termenul de plată (03.10.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 5 octombrie 2026; verificați prelungirea');
   const ok = fineStatus(withFine('2026-09-16').c, withFine('2026-09-16').n, '2026-09-20'); // +15 = 01.10, joi
   assert.equal(ok.nelucr, '');
 });
@@ -756,4 +756,12 @@ test('date vechi: controlul fără „incarcare” primește câmpurile goale', 
   const c = newControl({ start: '2026-01-01' }); delete c.incarcare;
   const n = normalizeControl(c);
   assert.deepEqual(n.incarcare, { aplicatie: false, aplicatieData: '', document: false, documentData: '' });
+});
+
+test('următoarea zi lucrătoare: peste weekend și sărbători legale', () => {
+  assert.equal(nextWorkingDay('2026-10-03'), '2026-10-05');   // sâmbătă → luni
+  assert.equal(nextWorkingDay('2026-12-25'), '2026-12-28');   // Crăciun (vineri) → luni
+  assert.equal(nextWorkingDay('2027-01-01'), '2027-01-04');   // Anul Nou → luni
+  assert.equal(nextWorkingDay('2027-01-06'), '2027-01-08');   // Boboteaza, Sf. Ioan → vineri
+  assert.equal(nextWorkingDay('2026-04-10'), '2026-04-14');   // Vinerea Mare → după a doua zi de Paște
 });
