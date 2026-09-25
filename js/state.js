@@ -22,6 +22,8 @@ export const state = {
     objTip: 'ALL',
     histSearch: '',
     histFilter: 'ALL',
+    histFlt: new Set(),   // filtrele active din Istoric (chei din FILTRE, views.js)
+    objFlt: new Set(),    // filtrele active din Obiective
     calYear: new Date().getFullYear(),
     calMonth: new Date().getMonth(),
     calSelected: todayISO(),

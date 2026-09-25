@@ -7,9 +7,9 @@ import {
 import {
   objectives, allFines, allAsi, isIncheiat, byStartDesc, controlStats, matchControl, fold,
   neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
-  constructiiNume, secOf, amendaSerieNr, vecheInfo, constatareLabel, sablon, isApplicable, fmtCoord, googleMapsUrl, appleMapsUrl,
+  constructiiNume, secOf, amendaSerieNr, vecheInfo, constatareLabel, isApplicable, fmtCoord, googleMapsUrl, appleMapsUrl,
   incarcareStatus, LIPSA_INCARCARE,
-  parseSuma,
+  parseSuma, isGrav, sigiliiControl, sigiliiText,
 } from './model.js';
 import { icon, esc, pill, finePill, tipBadge, empty } from './ui.js';
 import { APP_VERSION } from './version.js';
@@ -51,14 +51,48 @@ function statusPill(c) {
   return isIncheiat(c) ? pill('done', 'Încheiat', 'check') : pill('open', 'În desfășurare', 'clock');
 }
 
+// Nereguli grave (șablon G sau rânduri adăugate marcate grave) care nu sunt conforme
+const graveCount = (c) => c.nereguli.filter((n) => isGrav(n) && n.status !== 'ok' && isApplicable(c, n)).length;
+
+// Filtrele din Istoric și Obiective, după informațiile de pe rândul controlului; active împreună = toate îndeplinite.
+// ultim: în Obiective se verifică doar ultimul control (starea actuală); celelalte, la oricare control.
+const FILTRE = [
+  { key: 'am-blue', label: 'Amendă în curs', ic: 'fine', lv: 'blue', test: (c, st) => st.fines.some((f) => f.st.level === 'blue') },
+  { key: 'am-yellow', label: 'Termen 15 zile expirat', ic: 'fine', lv: 'yellow', test: (c, st) => st.fines.some((f) => f.st.level === 'yellow') },
+  { key: 'am-red', label: 'Trimite la ANAF', ic: 'fine', lv: 'red', test: (c, st) => st.fines.some((f) => f.st.level === 'red') },
+  { key: 'am-green', label: 'Amendă achitată', ic: 'fine', lv: 'green', test: (c, st) => st.fines.some((f) => f.st.level === 'green') },
+  { key: 'asi', label: 'ASI în curs', ic: 'hourglass', lv: 'red', test: (c, st) => !!st.asi && !st.asi.resolved && !st.asi.pending },
+  { key: 'inc', label: 'De încărcat', ic: 'upload', lv: 'warn', test: (c, st) => !!st.incarcare && !st.incarcare.gata },
+  { key: 'pv', label: 'Netrecute în PV', ic: 'pv', lv: 'warn', test: (c, st) => st.netrecute > 0 },
+  { key: 'grave', label: 'Nereguli grave', ic: 'alert', lv: 'red', ultim: true, test: (c) => graveCount(c) > 0 },
+  { key: 'sigiliu', label: 'Sigiliu aplicat', ic: 'lock', lv: 'red', ultim: true, test: (c) => !!sigiliiControl(c) },
+];
+const FILTRU = Object.fromEntries(FILTRE.map((f) => [f.key, f]));
+export const controlPotrivit = (c, keys, t) => { const st = controlStats(c, t); return keys.every((k) => FILTRU[k].test(c, st)); };
+export const obiectivPotrivit = (o, keys, t) => keys.every((k) => (FILTRU[k].ultim ? [o.last] : o.controls).some((c) => FILTRU[k].test(c, controlStats(c, t))));
+
+// Rândul de filtre: fiecare cu numărul rezultatelor dacă l-ați adăuga (sau, activ, câte sunt acum)
+function filtreHTML(lista, activeSet, numara) {
+  const active = [...activeSet].filter((k) => FILTRU[k]);
+  const btns = FILTRE.map((f) => {
+    const on = active.includes(f.key);
+    const n = numara(on ? active : [...active, f.key]);
+    return `<button class="flt-btn flt-${f.lv} ${on ? 'on' : ''}" data-act="flt-toggle" data-list="${lista}" data-val="${f.key}" aria-pressed="${on}" ${!n && !on ? 'disabled' : ''}>
+      ${icon(on ? 'check' : f.ic)}<span>${f.label}</span><b>${n}</b></button>`;
+  }).join('');
+  return `<div class="flt-row" id="flt-${lista}">${btns}${active.length ? `<button class="flt-btn flt-clear" data-act="flt-clear" data-list="${lista}">${icon('x')}<span>Șterge filtrele</span></button>` : ''}</div>`;
+}
+
 export function controlRow(c, { showName = true } = {}) {
   const st = controlStats(c, today());
   const [y, m, d] = c.dataInceput.split('-');
   const chips = [statusPill(c)];
   if (st.constatate) chips.push(pill('neutral', `${st.constatate} ${st.constatate === 1 ? 'neregulă' : 'nereguli'}`));
   if (st.netrecute) chips.push(pill('warn', `${st.netrecute} ${st.netrecute === 1 ? 'netrecută' : 'netrecute'} în PV`, 'pv'));
-  const grave = c.nereguli.filter((n) => !n.custom && sablon(n.key)?.grav && n.status !== 'ok' && isApplicable(c, n)).length;
+  const grave = graveCount(c);
   if (grave) chips.unshift(pill('red', `${grave} ${grave === 1 ? 'neregulă gravă' : 'nereguli grave'}`, 'alert'));
+  const sig = sigiliiControl(c);
+  if (sig) chips.splice(grave ? 1 : 0, 0, pill('red', sigiliiText(sig), 'lock'));
   const vechi = activeNereguli(c).filter((n) => vecheInfo(state.controls, c, n).veche).length;
   if (vechi) chips.push(`<span class="pill pill-veche">${icon('history')}${vechi} ${vechi === 1 ? 'neregulă veche' : 'nereguli vechi'}</span>`);
   const byLevel = {};
@@ -255,7 +289,7 @@ export function viewDashboard() {
           <span class="item-sub">${days < 0 ? 'începe' : 'început'} ${esc(fmtDateLong(c.dataInceput))}</span>
           <span class="item-msg">Lipsește data încheierii</span>
         </span>
-        <span class="item-side">${pill('open', days < 0 ? `începe peste ${zile(-days)}` : days === 0 ? 'început azi' : days === 1 ? 'început ieri' : `de ${zile(days)}`, 'clock')}</span>
+        <span class="item-side">${(() => { const sig = sigiliiControl(c); return sig ? pill('red', sigiliiText(sig), 'lock') : ''; })()}${pill('open', days < 0 ? `începe peste ${zile(-days)}` : days === 0 ? 'început azi' : days === 1 ? 'început ieri' : `de ${zile(days)}`, 'clock')}</span>
       </a>`;
     }).join('')}</div>` : '<p class="muted pad">Toate controalele sunt încheiate.</p>'}
   </section>`;
@@ -368,20 +402,29 @@ export function objListHTML() {
   const u = state.ui;
   const q = u.objSearch;
   const t = today();
-  const list = objectives(state.controls)
+  const baza = objectives(state.controls)
     .filter((o) => u.objTip === 'ALL' || o.tip === u.objTip)
     .map((o) => ({ o, hits: o.controls.filter((c) => matchControl(c, q)) }))
     .filter((x) => x.hits.length || (!parseDateQuery(q) && fold(x.o.denumire).includes(fold(q))));
+  const flt = [...u.objFlt].filter((k) => FILTRU[k]);
+  const list = baza.filter((x) => obiectivPotrivit(x.o, flt, t));
+  const filtre = state.controls.length ? filtreHTML('obj', u.objFlt, (keys) => baza.filter((x) => obiectivPotrivit(x.o, keys, t)).length) : '';
   if (!state.controls.length) {
     return empty('building', 'Niciun obiectiv încă', 'Obiectivele apar aici după primul control.', `<button class="btn btn-primary btn-lg" data-act="new-control">${icon('plus')} Control nou</button>`);
   }
-  if (!list.length) return empty('search', 'Niciun rezultat', 'Încercați alt nume sau altă dată.');
-  return `<p class="count">${list.length} ${list.length === 1 ? 'obiectiv' : 'obiective'}</p>
+  if (!list.length) return filtre + empty('search', 'Niciun rezultat', flt.length ? 'Niciun obiectiv nu îndeplinește toate filtrele alese.' : 'Încercați alt nume sau altă dată.');
+  return `${filtre}<p class="count">${list.length} ${list.length === 1 ? 'obiectiv' : 'obiective'}${flt.length ? ` · filtre: ${flt.map((k) => FILTRU[k].label).join(' + ')}` : ''}</p>
   <div class="obj-list">${list.map(({ o, hits }) => {
-    const fines = allFines(o.controls, t).filter((f) => f.st.level !== 'green');
-    const worst = fines[0]?.st.level;
     const open = o.controls.filter((c) => !isIncheiat(c)).length;
     const deInc = o.controls.filter((c) => { const x = incarcareStatus(c, t); return x && !x.gata; }).length;
+    const sigUlt = sigiliiControl(o.last);
+    // aceleași informații pe care le folosesc filtrele, ca motivul potrivirii să se vadă pe card
+    const sts = o.controls.map((c) => controlStats(c, t));
+    const peNivel = (lv) => sts.reduce((k, st) => k + st.fines.filter((f) => f.st.level === lv).length, 0);
+    const achitate = u.objFlt.has('am-green') ? peNivel('green') : 0;
+    const asi = sts.filter((st) => FILTRU.asi.test(null, st)).length;
+    const netrec = sts.reduce((k, st) => k + st.netrecute, 0);
+    const graveUlt = graveCount(o.last);
     const dateHit = parseDateQuery(q) && hits[0];
     const init = (o.denumire || '?').trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
     return `<a class="obj-card" href="#/obiectiv/${o.id}">
@@ -393,9 +436,14 @@ export function objListHTML() {
           ${pill('neutral', `${o.controls.length} ${o.controls.length === 1 ? 'control' : 'controale'}`, 'history')}
           ${pill('neutral', `ultimul: ${fmtDate(o.last.dataInceput)}`, 'calendar')}
           ${dateHit ? pill('accent', `găsit: ${rangeText(dateHit)}`, 'search') : ''}
+          ${graveUlt ? pill('red', `La ultimul control: ${graveUlt} ${graveUlt === 1 ? 'neregulă gravă' : 'nereguli grave'}`, 'alert') : ''}
+          ${sigUlt ? pill('red', `La ultimul control: ${sigiliiText(sigUlt).replace(/^S/, 's')}`, 'lock') : ''}
           ${open ? pill('open', `${open} în desfășurare`, 'clock') : ''}
           ${deInc ? pill('warn', `${deInc} ${deInc === 1 ? 'control neîncărcat' : 'controale neîncărcate'}`, 'upload') : ''}
-          ${fines.length ? pill(worst, `${fines.length} ${fines.length === 1 ? 'amendă activă' : 'amenzi active'}`, 'fine') : ''}
+          ${asi ? pill('red', asi === 1 ? 'ASI în curs' : `ASI în curs la ${asi} controale`, 'hourglass') : ''}
+          ${netrec ? pill('warn', `${netrec} ${netrec === 1 ? 'netrecută' : 'netrecute'} în PV`, 'pv') : ''}
+          ${['red', 'yellow', 'blue'].map((lv) => { const k = peNivel(lv); return k ? finePill(lv, `${k} ${k === 1 ? 'amendă' : 'amenzi'} · ${LEVEL_LABEL[lv]}`) : ''; }).join('')}
+          ${achitate ? finePill('green', `${achitate} ${achitate === 1 ? 'amendă achitată' : 'amenzi achitate'}`) : ''}
         </span>
       </span>
       ${icon('chevR', 'row-chev')}
@@ -460,18 +508,21 @@ export function histListHTML() {
   if (!state.controls.length) {
     return empty('history', 'Niciun control încă', 'Istoricul se completează automat pe măsură ce lucrezi.', `<button class="btn btn-primary btn-lg" data-act="new-control">${icon('plus')} Control nou</button>`);
   }
-  const list = state.controls
+  const t = today();
+  const baza = state.controls
     .filter((c) => u.histFilter === 'ALL' || (u.histFilter === 'OPEN' ? !isIncheiat(c) : isIncheiat(c)))
-    .filter((c) => matchControl(c, u.histSearch))
-    .sort(byStartDesc);
-  if (!list.length) return empty('search', 'Niciun rezultat', 'Încercați alt nume, altă dată sau alt filtru.');
+    .filter((c) => matchControl(c, u.histSearch));
+  const flt = [...u.histFlt].filter((k) => FILTRU[k]);
+  const list = baza.filter((c) => controlPotrivit(c, flt, t)).sort(byStartDesc);
+  const filtre = filtreHTML('hist', u.histFlt, (keys) => baza.filter((c) => controlPotrivit(c, keys, t)).length);
+  if (!list.length) return filtre + empty('search', 'Niciun rezultat', flt.length ? 'Niciun control nu îndeplinește toate filtrele alese.' : 'Încercați alt nume, altă dată sau alt filtru.');
   const groups = new Map();
   for (const c of list) {
     const k = c.dataInceput.slice(0, 7);
     if (!groups.has(k)) groups.set(k, []);
     groups.get(k).push(c);
   }
-  let html = `<p class="count">${list.length} ${list.length === 1 ? 'control' : 'controale'}</p>`;
+  let html = `${filtre}<p class="count">${list.length} ${list.length === 1 ? 'control' : 'controale'}${flt.length ? ` · filtre: ${flt.map((k) => FILTRU[k].label).join(' + ')}` : ''}</p>`;
   for (const [k, cs] of groups) {
     const [y, m] = k.split('-');
     html += `<h3 class="group-title">${MONTHS[+m - 1]} ${y} <span>${cs.length}</span></h3><div class="ctl-list">${cs.map((c) => controlRow(c)).join('')}</div>`;

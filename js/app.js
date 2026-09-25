@@ -400,6 +400,12 @@ document.addEventListener('click', async (e) => {
     }
     case 'obj-tip': state.ui.objTip = el.dataset.val; render({ keepScroll: true }); return;
     case 'hist-filter': state.ui.histFilter = el.dataset.val; render({ keepScroll: true }); return;
+    case 'flt-toggle': {
+      const set = el.dataset.list === 'obj' ? state.ui.objFlt : state.ui.histFlt;
+      if (set.has(el.dataset.val)) set.delete(el.dataset.val); else set.add(el.dataset.val);
+      render({ keepScroll: true }); return;
+    }
+    case 'flt-clear': (el.dataset.list === 'obj' ? state.ui.objFlt : state.ui.histFlt).clear(); render({ keepScroll: true }); return;
     // ── planul lunar: activități
     case 'act-new': openActivitate(null, { data: el.dataset.date }); return;
     case 'act-edit': openActivitate(el.dataset.id); return;
