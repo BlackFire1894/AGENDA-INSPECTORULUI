@@ -65,14 +65,14 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
     }
     await p.goto('http://localhost:8080/#/setari'); await p.waitForTimeout(200);
     await p.click('#main a[href="#/ghid"]'); await p.waitForTimeout(300);
-    ok(/Ghidul aplicației/.test(await p.locator('h1').innerText()) && await p.locator('.m-cap').count() === 17, 'Setări → Ghidul aplicației: 17 capitole');
+    ok(/Ghidul aplicației/.test(await p.locator('h1').innerText()) && await p.locator('.m-cap').count() === 18, 'Setări → Ghidul aplicației: 18 capitole');
     const ctrl = p.locator('#ghid-control');
     ok(await ctrl.locator('.m-btn:has-text("Anulează") svg').count() === 1 && await ctrl.locator('.m-btn:has-text("Refă") svg').count() === 1 && await ctrl.locator('.m-btn:has-text("Text PV") svg').count() === 1, 'butoanele sunt desenate cu pictogramele din aplicație (Anulează, Refă, Text PV…)');
     await p.fill('[data-search="ghid"]', 'sigiliu'); await p.dispatchEvent('[data-search="ghid"]', 'input'); await p.waitForTimeout(200);
     const caps = await p.locator('.m-cap h2').allInnerTexts();
     ok(caps.length >= 1 && caps.length < 16 && caps.every((t) => t.length) && await p.evaluate(() => document.activeElement?.dataset?.search) === 'ghid', `căutare „sigiliu” → ${caps.length} capitole, focusul rămâne`);
     await p.click('[data-act="search-clear"][data-key="ghid"]'); await p.waitForTimeout(200);
-    ok(await p.locator('.m-cap').count() === 17, '✕ golește căutarea');
+    ok(await p.locator('.m-cap').count() === 18, '✕ golește căutarea');
     await p.click('.m-toc-item[href="#/ghid/verificari"]'); await p.waitForTimeout(400);
     ok(await p.locator('#ghid-verificari').evaluate((e) => { const r = e.getBoundingClientRect(); return r.top >= -2 && r.top < 200; }), 'cuprins → capitolul „Verificări”');
     await p.click('[data-act="ghid-back"]'); await p.waitForTimeout(400);

@@ -207,6 +207,17 @@ export const sablon = (key) => SABLON_BY_KEY.get(key);
 export const STRUCTURI = ['Beton armat', 'Cadre din beton armat', 'Zidărie portantă', 'Structură metalică', 'Lemn', 'Mixtă'];
 export const MATERIALE_PERETI = ['Cărămidă', 'BCA', 'Beton', 'Panouri sandwich', 'Gips-carton', 'Lemn', 'Mixt'];
 
+// Suma scrisă de inspector, în lei: „2500”, „2.500”, „2 500”, „1.500,50”, „1500,5” (punct = mii, virgulă = zecimale).
+// Întoarce numărul sau null dacă textul nu e o sumă.
+export function parseSuma(v) {
+  let x = String(v ?? '').replace(/lei/gi, '').replace(/\s/g, '');
+  if (!x) return null;
+  if (x.includes(',')) x = x.replace(/\./g, '').replace(',', '.');
+  else if (/^\d{1,3}(\.\d{3})+$/.test(x)) x = x.replace(/\./g, '');
+  const n = Number(x);
+  return Number.isFinite(n) ? n : null;
+}
+
 export function uid() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }

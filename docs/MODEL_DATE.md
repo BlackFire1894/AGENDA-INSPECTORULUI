@@ -68,3 +68,23 @@ Calculul termenelor: `js/model.js` → `fineStatus()`, `asiDeadline()`.
 - Schema 2 → 3: câmpurile noi (`constructieId`, `amenda.serie`, `amenda.numar`, actele noi) se completează cu valori goale de `normalizeControl()`.
 - Schema 1 → 2: `normalizeControl()` adaugă `sec: "ner"` rândurilor vechi și creează rândurile Planuri/PC și `adapostPC`.
 - v1.16: `normalizeControl()` adaugă `incarcare` (bife goale) controalelor vechi; rândurile primesc `asiPierdere: false`, `asiDataPierdere: ""` din șablonul gol. Fără schimbare de `SCHEMA_VERSION` (lista de nereguli nu se schimbă).
+
+## Activitățile planului lunar (v1.18)
+
+Se păstrează separat de controale, în `meta` (cheia `activitati`, o listă), și intră în backup (`activitati` lângă `controls`). Un backup mai vechi, fără `activitati`, nu le atinge pe cele de pe tabletă.
+
+| Câmp | Valori | Rol |
+|---|---|---|
+| `id` | text | identificator |
+| `tip` | `instruire`, `sedinta`, `birou`, `informare`, `exercitiu`, `concediu`, `alta` | tipul (culoarea în calendar, gruparea în raport) |
+| `data`, `dataSfarsit` | `AAAA-LL-ZZ`; `dataSfarsit` gol = o singură zi | perioada |
+| `ora` | `HH:MM` sau gol | opțional |
+| `descriere` | text | obligatorie la `alta` |
+| `stare` | `planificat` / `efectuat` / `anulat` | planificatele trecute apar în Panou „de confirmat” |
+| `obs` | text | observații |
+| `objectiveId` | id sau gol | obiectivul la care se referă (opțional) |
+| `demo` | `true` | doar la datele demonstrative |
+| `createdAt`, `updatedAt` | ISO | la import „Combină” rămâne versiunea mai nouă |
+
+`normalizeActivitate()` (în `js/activitati.js`) completează câmpurile lipsă și corectează valorile necunoscute.
+

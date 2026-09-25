@@ -13,6 +13,7 @@ export function savePref(key, value) {
 
 export const state = {
   controls: [],
+  activitati: [],   // planul lunar: activitățile introduse manual (altele decât controalele)
   now: new Date(),
   // Stare de interfață (nu se salvează)
   ui: {
@@ -157,4 +158,9 @@ export async function removeControl(id) {
   state.controls = state.controls.filter((c) => c.id !== id);
   pending.delete(id);
   await store.deleteControl(id);
+}
+
+// Activitățile se salvează împreună (listă mică), în meta „activitati”
+export async function saveActivitati() {
+  try { await store.setMeta('activitati', state.activitati); } catch (e) { console.error(e); }
 }

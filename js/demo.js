@@ -1,5 +1,6 @@
 // Date demonstrative, relative la data curentă, ca să se vadă toate stările (se pot șterge din Setări).
 import { addDays } from './dates.js';
+import { emptyActivitate } from './activitati.js';
 import { newControl, controlFromPrevious, emptyConstructie, uid, AUTO_NU, syncAutoNU } from './model.js';
 
 function fill(k, o) {
@@ -106,4 +107,17 @@ export function buildDemo(today) {
     }
   }
   return out;
+}
+
+// Activități demonstrative pentru planul lunar (relative la azi)
+export function buildDemoActivitati(today, controls = []) {
+  const a = (zi, o) => ({ ...emptyActivitate(addDays(today, zi), today), ...o, demo: true });
+  const scoala = controls.find((c) => /Școala/.test(c.denumire));
+  return [
+    a(-3, { tip: 'instruire', descriere: 'Pregătire profesională lunară', ora: '09:00', stare: 'efectuat' }),
+    a(-2, { tip: 'informare', descriere: 'Informare preventivă elevi', ora: '11:00', stare: 'efectuat', objectiveId: scoala?.objectiveId || '' }),
+    a(-1, { tip: 'birou', descriere: 'Rapoarte și corespondență', stare: 'planificat' }),
+    a(2, { tip: 'sedinta', descriere: 'Analiza activității', ora: '09:30', stare: 'planificat' }),
+    a(10, { tip: 'concediu', descriere: 'Concediu de odihnă', dataSfarsit: addDays(today, 12), stare: 'planificat' }),
+  ];
 }

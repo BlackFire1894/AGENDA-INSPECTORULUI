@@ -1,6 +1,6 @@
 // Punctul de intrare: rutare, evenimente, fluxuri (control nou, backup, date demo).
 import * as store from './store.js';
-import { state, today, getControl, touch, flush, addControl, removeControl, onSaveState, savePref, historyStart, historyMove, checkpoint, onHistory } from './state.js';
+import { state, today, getControl, touch, flush, addControl, removeControl, onSaveState, savePref, historyStart, historyMove, checkpoint, onHistory, saveActivitati } from './state.js';
 import { fmtDate, fmtDateLong, toISO, parseDateQuery, isISO } from './dates.js';
 import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
@@ -9,11 +9,12 @@ import {
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
-  viewCalendar, viewSettings, hintText, backupAgeText, backupIsStale, viewGhid,
+  viewCalendar, viewSettings, hintText, backupAgeText, backupIsStale, viewGhid, viewLuna,
 } from './views.js';
 import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML, listaHTML, grfBlock, editToolsHTML, rowKey } from './editor.js';
 import { icon, esc, toast, openModal, closeModal, confirmDialog } from './ui.js';
-import { buildDemo } from './demo.js';
+import { buildDemo, buildDemoActivitati } from './demo.js';
+import { normalizeActivitate, emptyActivitate, TIPURI_ACTIVITATE, STARI_ACTIVITATE, titluActivitate, raportLunar, raportDocument, raportFileName } from './activitati.js';
 import { APP_VERSION } from './version.js';
 import { fisaMarkup, fisaDocument, fisaFileName, FISA_CSS } from './fisa.js';
 
@@ -35,6 +36,7 @@ function parseRoute() {
     case 'setari': return { name };
     case 'ghid': return { name, id: a };
     case 'fisa': return { name, id: a };
+    case 'luna': return { name, id: /^\d{4}-\d{2}$/.test(a || '') ? a : today().slice(0, 7) };
     case 'control': return { name, id: a, tab: TABS.some((t) => t.key === b) ? b : 'obiectiv', focus: c };
     default: return { name: 'panou' };
   }
@@ -55,6 +57,7 @@ async function render({ keepScroll = false } = {}) {
     case 'istoric': html = viewHistory(); break;
     case 'setari': html = viewSettings(persisted); break;
     case 'ghid': html = viewGhid(); break;
+    case 'luna': html = viewLuna(route.id); break;
     case 'fisa': {
       const c = getControl(route.id);
       if (!c) { location.hash = '#/panou'; return; }
@@ -168,7 +171,7 @@ function updateEditTools() {
 }
 
 function updateNav() {
-  const active = route.name === 'control' || route.name === 'fisa' ? (state.ui.backTo.match(/^#\/(\w+)/)?.[1] || 'panou') : route.name === 'obiectiv' ? 'obiective' : route.name;
+  const active = route.name === 'control' || route.name === 'fisa' ? (state.ui.backTo.match(/^#\/(\w+)/)?.[1] || 'panou') : route.name === 'obiectiv' ? 'obiective' : route.name === 'luna' ? 'calendar' : route.name;
   document.querySelectorAll('[data-nav]').forEach((a) => a.classList.toggle('on', a.dataset.nav === active));
   const t = today();
   const fines = allFines(state.controls, t).filter((f) => f.st.level === 'red' || f.st.level === 'yellow').length;
@@ -397,6 +400,20 @@ document.addEventListener('click', async (e) => {
     }
     case 'obj-tip': state.ui.objTip = el.dataset.val; render({ keepScroll: true }); return;
     case 'hist-filter': state.ui.histFilter = el.dataset.val; render({ keepScroll: true }); return;
+    // ── planul lunar: activități
+    case 'act-new': openActivitate(null, { data: el.dataset.date }); return;
+    case 'act-edit': openActivitate(el.dataset.id); return;
+    case 'act-reprog': openActivitate(el.dataset.id, { reprogramare: true }); return;
+    case 'act-stare': {
+      const a = state.activitati.find((x) => x.id === el.dataset.id);
+      if (!a) return;
+      a.stare = el.dataset.val; a.updatedAt = new Date().toISOString();
+      await saveActivitati();
+      toast(`${titluActivitate(a)}: ${STARI_ACTIVITATE[a.stare].toLowerCase()}`, 'ok');
+      render({ keepScroll: true }); return;
+    }
+    case 'raport-print': window.print(); return;
+    case 'raport-share': shareRaport(+el.dataset.an, +el.dataset.luna); return;
     case 'sarbatori-ok': {
       // lista sărbătorilor legale pentru anul respectiv a fost verificată: reminderul dispare
       const an = +el.dataset.an;
@@ -957,6 +974,93 @@ function openPvText(c) {
   });
 }
 
+// ───────── Planul lunar: activitate nouă / editare ─────────
+function openActivitate(id, { data, reprogramare = false } = {}) {
+  const orig = id ? state.activitati.find((x) => x.id === id) : null;
+  if (id && !orig) return;
+  const a = orig ? { ...orig } : emptyActivitate(data || today(), today());
+  if (reprogramare) a.stare = 'planificat';
+  const obs = objectives(state.controls).sort((x, y) => (x.denumire || '').localeCompare(y.denumire || '', 'ro'));
+  const m = openModal(`
+    <div class="modal-head">
+      <h2>${icon('calendar')} ${orig ? (reprogramare ? 'Reprogramați activitatea' : 'Activitate') : 'Activitate nouă'}</h2>
+      <button class="icon-btn big" data-act="modal-close" aria-label="Închide">${icon('x')}</button>
+    </div>
+    <div class="modal-body act-form">
+      <div class="field"><span class="lbl">Tip</span>
+        <div class="chip-set" id="af-tip">${TIPURI_ACTIVITATE.map((t) => `<button type="button" class="chip-sel act-${t.key} ${t.key === a.tip ? 'on' : ''}" data-tip="${t.key}">${esc(t.label)}</button>`).join('')}</div></div>
+      <label class="field"><span class="lbl" id="af-desc-lbl">Descriere</span>
+        <span class="inp-wrap"><input id="af-desc" value="${esc(a.descriere)}" autocomplete="off" enterkeyhint="done"></span></label>
+      <div class="form-grid g3">
+        <label class="field"><span class="lbl">Data</span><span class="inp-wrap"><input type="date" id="af-data" value="${esc(a.data)}"></span></label>
+        <label class="field"><span class="lbl">Până la (mai multe zile)</span><span class="inp-wrap"><input type="date" id="af-sf" value="${esc(a.dataSfarsit)}"></span></label>
+        <label class="field"><span class="lbl">Ora (opțional)</span><span class="inp-wrap"><input type="time" id="af-ora" value="${esc(a.ora)}"></span></label>
+      </div>
+      <label class="field"><span class="lbl">Obiectiv (opțional)</span>
+        <span class="inp-wrap"><select id="af-ob"><option value="">— fără obiectiv —</option>${obs.map((o) => `<option value="${esc(o.id)}" ${o.id === a.objectiveId ? 'selected' : ''}>${esc(o.denumire || 'Fără denumire')}</option>`).join('')}</select></span></label>
+      <div class="field"><span class="lbl">Stare</span>
+        <div class="segmented seg-lg" id="af-stare">${Object.entries(STARI_ACTIVITATE).map(([k, l]) => `<button type="button" data-st="${k}" class="${k === a.stare ? 'on' : ''}">${l}</button>`).join('')}</div></div>
+      <label class="field"><span class="lbl">Observații</span>
+        <div class="obs-wrap"><textarea class="obs row-obs" id="af-obs" rows="2" placeholder="Observații">${esc(a.obs)}</textarea></div></label>
+      <p class="field-err" id="af-err" hidden></p>
+      <div class="row-gap">
+        <button class="btn btn-primary btn-lg" id="af-save">${icon('check')} Salvează</button>
+        ${orig ? `<button class="btn btn-ghost btn-lg danger" id="af-del">${icon('trash')} Șterge</button>` : ''}
+      </div>
+    </div>`, { wide: true });
+  const $ = (q) => m.querySelector(q);
+  const descLbl = () => { $('#af-desc-lbl').textContent = a.tip === 'alta' ? 'Descriere (obligatorie)' : 'Descriere (opțional)'; };
+  descLbl();
+  $('#af-tip').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-tip]'); if (!b) return;
+    a.tip = b.dataset.tip; m.querySelectorAll('#af-tip [data-tip]').forEach((x) => x.classList.toggle('on', x === b)); descLbl();
+  });
+  $('#af-stare').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-st]'); if (!b) return;
+    a.stare = b.dataset.st; m.querySelectorAll('#af-stare [data-st]').forEach((x) => x.classList.toggle('on', x === b));
+  });
+  $('#af-save').addEventListener('click', async () => {
+    a.descriere = $('#af-desc').value.trim(); a.data = $('#af-data').value; a.dataSfarsit = $('#af-sf').value;
+    a.ora = $('#af-ora').value; a.objectiveId = $('#af-ob').value; a.obs = $('#af-obs').value;
+    const err = !isISO(a.data) ? 'Alegeți data activității.'
+      : a.dataSfarsit && a.dataSfarsit < a.data ? '„Până la” nu poate fi înaintea datei de început.'
+        : a.tip === 'alta' && !a.descriere ? 'Scrieți descrierea activității.' : '';
+    if (err) { $('#af-err').textContent = err; $('#af-err').hidden = false; return; }
+    a.updatedAt = new Date().toISOString();
+    const na = normalizeActivitate(a);
+    state.activitati = orig ? state.activitati.map((x) => (x.id === na.id ? na : x)) : [...state.activitati, na];
+    await saveActivitati();
+    closeModal();
+    toast(orig ? 'Activitate salvată' : 'Activitate adăugată', 'ok');
+    render({ keepScroll: true });
+  });
+  $('#af-del')?.addEventListener('click', async () => {
+    const ok = await confirmDialog({ title: 'Ștergeți activitatea?', text: `„${titluActivitate(orig)}” va fi ștearsă din plan.`, ok: 'Șterge', danger: true });
+    if (!ok) return;
+    state.activitati = state.activitati.filter((x) => x.id !== orig.id);
+    await saveActivitati();
+    toast('Activitate ștearsă');
+    render({ keepScroll: true });
+  });
+}
+
+// ───────── Planul lunar: raportul, partajat ca fișier ─────────
+async function shareRaport(an, luna) {
+  const r = raportLunar(state.controls, state.activitati, an, luna, today());
+  const file = new File([raportDocument(r, state.controls, FISA_CSS)], raportFileName(r), { type: 'text/html' });
+  try {
+    if (navigator.canShare && navigator.canShare({ files: [file] })) await navigator.share({ files: [file], title: file.name });
+    else {
+      const url = URL.createObjectURL(file);
+      const link = document.createElement('a'); link.href = url; link.download = file.name;
+      document.body.appendChild(link); link.click(); link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
+    }
+  } catch (e) {
+    if (e.name !== 'AbortError') toast('Partajarea a eșuat', 'warn');
+  }
+}
+
 // ───────── Fișa controlului: partajare ca fișier ─────────
 
 async function shareFisa(c) {
@@ -986,7 +1090,7 @@ function nowStamp() {
 
 async function exportBackup() {
   await flush();
-  const payload = { app: 'agenda-inspectorului', schema: SCHEMA_VERSION, exportedAt: new Date().toISOString(), controls: state.controls };
+  const payload = { app: 'agenda-inspectorului', schema: SCHEMA_VERSION, exportedAt: new Date().toISOString(), controls: state.controls, activitati: state.activitati };
   const json = JSON.stringify(payload, null, 1);
   const d = new Date();
   const name = `agenda-inspectorului-backup-${today()}_${String(d.getHours()).padStart(2, '0')}-${String(d.getMinutes()).padStart(2, '0')}.json`;
@@ -1027,10 +1131,12 @@ async function importBackup(file) {
     return;
   }
   const incoming = list.map(normalizeControl);
+  // activitățile planului lunar (backupurile mai vechi de v1.18 nu le au: cele de pe tabletă rămân)
+  const incomingAct = Array.isArray(data?.activitati) ? data.activitati.filter((a) => a && a.id && isISO(a.data)).map(normalizeActivitate) : null;
   const m = openModal(`
     <div class="modal-head"><h2>${icon('upload')} Importă backup</h2><button class="icon-btn big" data-act="modal-close" aria-label="Închide">${icon('x')}</button></div>
     <div class="modal-body">
-      <p class="lead">Fișierul conține <b>${incoming.length}</b> controale${data.exportedAt ? `, exportate pe ${esc(fmtDateLong(toISO(new Date(data.exportedAt))))}` : ''}. Pe tabletă sunt acum <b>${state.controls.length}</b>.</p>
+      <p class="lead">Fișierul conține <b>${incoming.length}</b> controale${incomingAct ? ` și <b>${incomingAct.length}</b> activități` : ''}${data.exportedAt ? `, exportate pe ${esc(fmtDateLong(toISO(new Date(data.exportedAt))))}` : ''}. Pe tabletă sunt acum <b>${state.controls.length}</b>.</p>
       <div class="choice-list">
         <button class="choice" data-mode="merge"><b>Combină</b><span>Adaugă controalele noi; la cele existente păstrează versiunea modificată cel mai recent.</span></button>
         <button class="choice danger" data-mode="replace"><b>Înlocuiește tot</b><span>Șterge datele de pe tabletă și le pune pe cele din fișier.</span></button>
@@ -1051,6 +1157,15 @@ async function importBackup(file) {
     await flush();
     await store.replaceAll(result);
     state.controls = result;
+    if (incomingAct) {
+      if (b.dataset.mode === 'replace') state.activitati = incomingAct;
+      else {
+        const am = new Map(state.activitati.map((a) => [a.id, a]));
+        for (const a of incomingAct) { const cur = am.get(a.id); if (!cur || (a.updatedAt || '') > (cur.updatedAt || '')) am.set(a.id, a); }
+        state.activitati = [...am.values()];
+      }
+      await saveActivitati();
+    }
     closeModal();
     toast(`Import reușit: ${result.length} controale`);
     render();
@@ -1080,6 +1195,8 @@ function setTheme(t) {
 async function loadDemo() {
   const demo = buildDemo(today());
   for (const c of demo) await addControl(c);
+  state.activitati = [...state.activitati, ...buildDemoActivitati(today(), demo)];
+  await saveActivitati();
   toast(`Am încărcat ${demo.length} controale demonstrative`);
   render();
 }
@@ -1088,15 +1205,19 @@ async function removeDemo() {
   const ok = await confirmDialog({ title: 'Ștergeți datele demonstrative?', text: 'Doar controalele demonstrative vor fi șterse. Datele dumneavoastră rămân.', ok: 'Șterge', danger: true });
   if (!ok) return;
   for (const c of state.controls.filter((x) => x.demo)) await removeControl(c.id);
+  state.activitati = state.activitati.filter((a) => !a.demo);
+  await saveActivitati();
   toast('Date demonstrative șterse');
   render();
 }
 
 async function wipeAll() {
-  const ok = await confirmDialog({ title: 'Ștergeți TOATE datele?', text: `${state.controls.length} controale vor fi șterse definitiv de pe această tabletă. Operația nu poate fi anulată.`, ok: 'Șterge tot', danger: true });
+  const ok = await confirmDialog({ title: 'Ștergeți TOATE datele?', text: `${state.controls.length} controale${state.activitati.length ? ` și ${state.activitati.length} activități` : ''} vor fi șterse definitiv de pe această tabletă. Operația nu poate fi anulată.`, ok: 'Șterge tot', danger: true });
   if (!ok) return;
   await store.replaceAll([]);
   state.controls = [];
+  state.activitati = [];
+  await saveActivitati();
   toast('Toate datele au fost șterse');
   location.hash = '#/panou';
   render();
@@ -1157,6 +1278,7 @@ async function boot() {
     state.controls = (list || []).map(normalizeControl);
     state.meta.lastBackup = (await store.getMeta('lastBackup')) || null;
     state.meta.sarbatoriVerificate = (await store.getMeta('sarbatoriVerificate')) || [];
+    state.activitati = ((await store.getMeta('activitati')) || []).map(normalizeActivitate);
   } catch (e) {
     console.error(e);
     toast('Nu am putut încărca datele', 'warn');

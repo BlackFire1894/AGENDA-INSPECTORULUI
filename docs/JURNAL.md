@@ -3,7 +3,7 @@
 Memoria proiectului: ce face aplicația, de ce arată și funcționează așa, ce s-a decis și ce s-a respins.
 **Se citește la începutul oricărei sesiuni de lucru și se completează la fiecare versiune nouă** (regulă în `CLAUDE.md`).
 
-Ultima actualizare: v1.17.0 — 25.09.2026.
+Ultima actualizare: v1.18.0 — 25.09.2026.
 
 ---
 
@@ -65,6 +65,7 @@ Ultima actualizare: v1.17.0 — 25.09.2026.
 | 1.15 | Informația se citește direct (cuvinte în loc de buline); **audit numeric** (532 de verificări, 8 defecte corectate); Ghidul rescris pentru utilizator nou |
 | 1.16 | **Încărcarea după încheiere** (aplicația ISU + documentul), cu termen de 3 zile lucrătoare; **ASI: 5 zile pentru constatarea pierderii valabilității**; caseta „De încărcat” în Panou |
 | 1.17 | Recomandarea **primei zile lucrătoare** când un termen cade într-o zi liberă; **verificarea anuală a sărbătorilor legale** (Panou, din 1 decembrie; lista în Setări); acest jurnal; testele din browser mutate în repo (`tests/e2e`) |
+| 1.18 | **Planul lunar**: activități introduse manual în Calendar (7 tipuri, dată / interval, oră, obiectiv, stare planificată / efectuată / anulată); „Activități de confirmat” în Panou; **raportul lunii** (ecran + PDF / partajare); activitățile în backup; **citirea corectă a sumelor** scrise românește („2.500”, „1.500,50”) |
 
 ## 4. Ce face aplicația (inventar)
 
@@ -86,6 +87,7 @@ Ultima actualizare: v1.17.0 — 25.09.2026.
   - Netrecute în PV.
 - **Secțiuni cu liste:** atingeți un rând și controlul se deschide exact la locul respectiv.
 - **Din 1 decembrie:** cererea de verificare a sărbătorilor legale pentru anul următor.
+- **Activități de confirmat:** planificatele a căror zi a trecut (Efectuată / Reprogramează / Anulată).
 
 ### Controlul
 - **Antetul:** Înapoi, Salvat, Text PV, Fișa PDF, Istoric, Backup, Șterge.
@@ -109,7 +111,7 @@ Ultima actualizare: v1.17.0 — 25.09.2026.
 ### Celelalte ecrane
 - **Obiective:** căutare după nume, localitate, adresă sau dată; pagina obiectivului (date, GPS, statistici, istoric); „Control nou pe acest obiectiv” preia datele din ultimul control.
 - **Istoric:** controalele pe luni; pastile scrise (nereguli, netrecute, amenzi cu stadiul, ASI, încărcare).
-- **Calendar:** controalele și termenele pe zile.
+- **Calendar = plan lunar:** controalele, **activitățile** (în culoarea tipului; ✓ = efectuată) și termenele, pe zile; ziua selectată cu listele și butoanele „Control nou / Activitate nouă în această zi”; butonul **Plan lunar** → raportul lunii (`#/luna/AAAA-LL`), de tipărit / partajat.
 - **Setări:**
   - mărimea textului, tema;
   - backup: Exportă / Importă (Combină sau Înlocuiește tot);
@@ -149,6 +151,8 @@ Ultima actualizare: v1.17.0 — 25.09.2026.
   - GRF/NSI V + regim de înălțime peste parter → G13;
   - NU la ASI / AVIZ / Iluminat Hint → ah / ai / am, constatate automat și retrase la DA / NEC, dacă nu s-a lucrat pe ele;
   - neregula veche = aceeași cheie constatată la un control anterior al obiectivului.
+- **Raportul lunii:** controalele începute în lună (și câte încheiate), neregulile constatate la ele; amenzile **aplicate în lună** după data aplicării (implicit data încheierii), cu suma; amenzile fără dată (controale neîncheiate) separat; activitățile care ating luna — efectuate pe tipuri (număr și zile din lună), planificate, anulate.
+- **Sumele** se citesc în stil românesc: punct = mii, virgulă = zecimale („2.500” = 2500, „1.500,50” = 1500,5); până la v1.18, „2.500” apărea greșit ca 2,5 lei.
 - **Cifre consistente:** „Ce mai aveți de făcut”, filtrul „Neverificate”, sumarul, tabul și suma barelor de categorie dau aceeași cifră.
 
 ## 6. Decizii de design
@@ -158,6 +162,7 @@ Ultima actualizare: v1.17.0 — 25.09.2026.
 - v1.15: bara categoriei în cuvinte întregi (literele doar când e restrânsă); text în loc de buline; avertizări mai mari; pastile de amendă pline; la ✗ observațiile se deschid fără tastatură; Anulează / Refă cu contur.
 - v1.16: încărcarea (bife în tabul Obiectiv; pastile în Istoric și Obiective; caseta și secțiunea din Panou); etapa a doua ASI.
 - v1.17: recomandarea zilei lucrătoare; verificarea anuală a sărbătorilor legale.
+- v1.18: plan lunar — tipuri fixe + „Altă activitate”; câmpuri tip, dată (interval), oră, descriere, stare, obiectiv, observații; planificatele trecute „de confirmat” în Panou; raport pe ecran + PDF / partajare.
 
 **Respinse (nu se repropun fără un motiv nou):**
 - scoaterea ceasului din bara laterală;
@@ -180,6 +185,7 @@ Ultima actualizare: v1.17.0 — 25.09.2026.
   - **Suitele pe versiuni** (`v110` … `v114`, `flow`, `loc`, `obsind`, `bk`, `gps`, `live`, `hol`, …) verifică funcțiile introduse de fiecare versiune.
   - **`audit.cjs`**: 459 de ecrane (3 mărimi de text × 2 orientări × 2 teme). Caută scroll orizontal, ținte de atingere sub 44 px (prin hit-test real), câmpuri cu font sub 16 px și text tăiat.
   - **`oracol.cjs`** (cu `gen.mjs`): **oracolul numeric**. Compară fiecare cifră afișată (Panou, meniu, Istoric, taburi, sumar, bare, filtre, fișă, Text PV, Calendar, încărcare, ASI) cu o numărătoare independentă făcută direct din date, pe un set cu toate cazurile-limită și pe datele demonstrative.
+  - **`activitati.cjs`**: planul lunar (adăugare, validare, confirmare, reprogramare, raport comparat cu datele din backup, backup dus-întors, ștergerea datelor demonstrative).
   - **`reguli.cjs`** (cu `reguli.mjs`): ce rânduri apar la DA / NU / GRF V, comparat cu listele-șablon.
   - **`upd.cjs`**: actualizarea prin service worker (versiunea curentă → următoarea).
 - **ESLint** pe `js/*.js` și `sw.js`.

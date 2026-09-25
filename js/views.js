@@ -9,10 +9,15 @@ import {
   neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
   constructiiNume, secOf, amendaSerieNr, vecheInfo, constatareLabel, sablon, isApplicable, fmtCoord, googleMapsUrl, appleMapsUrl,
   incarcareStatus, LIPSA_INCARCARE,
+  parseSuma,
 } from './model.js';
 import { icon, esc, pill, finePill, tipBadge, empty } from './ui.js';
 import { APP_VERSION } from './version.js';
 import { MANUAL } from './help.js';
+import { FISA_CSS } from './fisa.js';
+import {
+  activitatiInZi, deConfirmat, titluActivitate, tipLabel, cand, STARI_ACTIVITATE, raportLunar, raportMarkup, RAPORT_CSS,
+} from './activitati.js';
 
 
 export const FONT_SIZES = [
@@ -30,8 +35,8 @@ export function currentFont() {
 const LEVEL_LABEL = { blue: 'În curs', yellow: 'Termen 15 zile expirat', red: 'Trimite la ANAF', green: 'Achitată' };
 
 export function money(v) {
-  const n = Number(String(v).replace(',', '.'));
-  if (!v || Number.isNaN(n)) return '';
+  const n = parseSuma(v);
+  if (n === null) return '';
   return `${n.toLocaleString('ro-RO', { maximumFractionDigits: 2 })} lei`;
 }
 
@@ -266,7 +271,13 @@ export function viewDashboard() {
       </a>`).join('')}</div>` : '<p class="muted pad">Toate neregulile constatate sunt trecute în PV.</p>'}
   </section>`;
 
-  return `${head}${sarbatoriReminder(t)}${kpis}<div class="dash-grid">${secFines}${secAsi}${secInc}${secOpen}${secPv}</div>`;
+  const conf = deConfirmat(state.activitati, t);
+  const secConf = conf.length ? `<section class="card act-conf" id="sec-act-conf">
+    <h2 class="sec-title">${icon('calendar')} Activități de confirmat (${conf.length})</h2>
+    <p class="muted">Ziua lor a trecut și sunt încă planificate: marcați-le efectuate, reprogramați-le sau anulați-le. Raportul lunar numără doar activitățile efectuate.</p>
+    <div class="act-list">${conf.map((a) => actItem(a, { confirmare: true })).join('')}</div>
+  </section>` : '';
+  return `${head}${sarbatoriReminder(t)}${secConf}${kpis}<div class="dash-grid">${secFines}${secAsi}${secInc}${secOpen}${secPv}</div>`;
 }
 
 // Vechimea ultimului backup (aceeași funcție de backup e disponibilă din Panou, control, bara laterală și Setări)
@@ -287,6 +298,24 @@ export function backupAgeText() {
 }
 
 const pad = (n) => String(n).padStart(2, '0');
+
+// ───────── Planul lunar: o activitate (Calendar, Panou) ─────────
+const PILL_STARE = { planificat: 'open', efectuat: 'green', anulat: 'neutral' };
+function actItem(a, { confirmare = false } = {}) {
+  const ob = a.objectiveId && objectives(state.controls).find((o) => o.id === a.objectiveId);
+  const btn = (act, val, txt, ic, cls = '') => `<button class="chip-btn ${cls}" data-act="${act}" data-id="${a.id}" ${val ? `data-val="${val}"` : ''}>${ic ? icon(ic) : ''}${txt}</button>`;
+  return `<div class="act-item act-${a.tip} st-${a.stare}">
+    <button class="act-main" data-act="act-edit" data-id="${a.id}">
+      <span class="act-tip">${esc(tipLabel(a))}</span>
+      <b>${esc(String(a.descriere || '').trim() || tipLabel(a))}</b>
+      <small>${esc(cand(a))}${ob ? ` · ${esc(ob.denumire || '')}` : ''}</small>
+    </button>
+    <span class="act-side">
+      ${pill(PILL_STARE[a.stare], STARI_ACTIVITATE[a.stare], a.stare === 'efectuat' ? 'check' : a.stare === 'planificat' ? 'clock' : '')}
+      ${a.stare === 'planificat' ? `<span class="act-btns">${btn('act-stare', 'efectuat', 'Efectuată', 'check', 'ok')}${confirmare ? btn('act-reprog', '', 'Reprogramează', 'calendar') : ''}${btn('act-stare', 'anulat', 'Anulată', 'x')}</span>` : ''}
+    </span>
+  </div>`;
+}
 
 // ───────── Sărbătorile legale: verificare anuală ─────────
 // Aplicația le calculează singură (date fixe + Paștele ortodox), dar legea se poate schimba (ex. 6–7 ianuarie, din 2024).
@@ -502,17 +531,22 @@ export function viewCalendar() {
     if (!isIncheiat(c) && t > s) e = t;   // la fel ca în grilă: controlul neîncheiat continuă până azi
     return s <= toISO(new Date(y, m, daysInMonth)) && e >= toISO(first);
   }).length;
+  const pre = `${y}-${pad(m + 1)}`;
+  const actLuna = state.activitati.filter((a) => a.stare !== 'anulat' && a.data.slice(0, 7) <= pre && (a.dataSfarsit || a.data).slice(0, 7) >= pre).length;
 
   let cells = '';
   for (let i = 0; i < weeks * 7; i++) {
     const d = addDays(gridStart, i);
     const inMonth = +d.slice(5, 7) === m + 1;
     const ev = data.get(d) || { controls: [], deadlines: [] };
-    const shown = ev.controls.slice(0, 3);
-    const more = ev.controls.length - shown.length;
+    const acts = activitatiInZi(state.activitati, d).filter((a) => a.stare !== 'anulat');
+    const toate = [...ev.controls.map((c) => `<span class="cal-ev ${isIncheiat(c) ? 'ev-done' : 'ev-open'}">${esc(c.denumire || 'Fără denumire')}</span>`),
+      ...acts.map((a) => `<span class="cal-ev ev-act act-${a.tip} st-${a.stare}">${a.stare === 'efectuat' ? '✓ ' : ''}${esc(titluActivitate(a))}</span>`)];
+    const shown = toate.slice(0, 3);
+    const more = toate.length - shown.length;
     cells += `<button class="cal-cell ${inMonth ? '' : 'out'} ${d === t ? 'is-today' : ''} ${d === u.calSelected ? 'is-sel' : ''}" data-act="cal-day" data-date="${d}">
       <span class="cal-num">${+d.slice(8)}</span>
-      <span class="cal-evs">${shown.map((c) => `<span class="cal-ev ${isIncheiat(c) ? 'ev-done' : 'ev-open'}">${esc(c.denumire || 'Fără denumire')}</span>`).join('')}${more > 0 ? `<span class="cal-more">+${more}</span>` : ''}</span>
+      <span class="cal-evs">${shown.join('')}${more > 0 ? `<span class="cal-more">+${more}</span>` : ''}</span>
       ${ev.deadlines.length ? `<span class="cal-dls">${ev.deadlines.slice(0, 4).map((x) => `<i class="dot dot-${x.level}"></i>`).join('')}</span>` : ''}
     </button>`;
   }
@@ -527,11 +561,13 @@ export function viewCalendar() {
     ${selData.deadlines.length ? `<h3 class="mini-title">Termene</h3><div class="items">${selData.deadlines.map((x) => `<a class="item item-${x.level}" href="#/control/${x.c.id}/${x.to || `${x.n ? tabOfNeregula(x.n) : 'nereguli'}/${encodeURIComponent(x.n ? x.n.key : 'a')}`}">
         <span class="item-main"><span class="item-title">${esc(x.text)}</span><span class="item-sub">${esc(x.c.denumire)}${x.n ? ` · ${esc(neregulaLetter(x.c, x.n))}. ${esc(constatareLabel(x.n))}` : ''}</span></span>
       </a>`).join('')}</div>` : ''}
+    ${(() => { const al = activitatiInZi(state.activitati, sel); return al.length ? `<h3 class="mini-title">Activități</h3><div class="act-list">${al.map((a) => actItem(a)).join('')}</div>` : '<p class="muted pad">Nicio activitate în această zi.</p>'; })()}
     <button class="btn btn-primary btn-lg btn-block" data-act="new-control" data-date="${sel}">${icon('plus')} Control nou în această zi</button>
+    <button class="btn btn-ghost btn-lg btn-block" data-act="act-new" data-date="${sel}">${icon('plus')} Activitate nouă în această zi</button>
   </aside>`;
 
   return `<header class="page-head">
-      <div><div class="eyebrow">${icon('calendar')} ${monthCount} ${monthCount === 1 ? 'control' : 'controale'} în această lună</div><h1 class="cap">${MONTHS[m]} ${y}</h1></div>
+      <div><div class="eyebrow">${icon('calendar')} ${monthCount} ${monthCount === 1 ? 'control' : 'controale'} și ${actLuna} ${actLuna === 1 ? 'activitate' : 'activități'} în această lună</div><h1 class="cap">${MONTHS[m]} ${y}</h1></div>
       <div class="row-gap cal-nav">
         <div class="stepper cal-step" aria-label="Anul">
           <button class="step-btn" data-act="cal-year-prev" aria-label="Anul anterior">${icon('chevL')}</button>
@@ -544,6 +580,7 @@ export function viewCalendar() {
           <button class="step-btn" data-act="cal-next" aria-label="Luna următoare">${icon('chevR')}</button>
         </div>
         <button class="btn btn-ghost btn-lg" data-act="cal-today">Azi</button>
+        <a class="btn btn-primary btn-lg" href="#/luna/${pre}">${icon('list')} Plan lunar</a>
       </div>
     </header>
     <div class="cal-layout">
@@ -555,10 +592,40 @@ export function viewCalendar() {
           <span><i class="sw sw-done"></i>control încheiat</span>
           <span><i class="dot dot-blue"></i>termen plată amendă</span>
           <span><i class="dot dot-red"></i>termen ANAF / ASI</span>
+          <span><i class="dot dot-warn"></i>termen încărcare</span>
+          <span><i class="sw sw-act"></i>activitate (culoarea tipului)</span>
         </div>
       </div>
       ${panel}
     </div>`;
+}
+
+// ───────────────────────── PLAN LUNAR (raport) ─────────────────────────
+export function viewLuna(id) {
+  const [an, lu] = id.split('-').map(Number);
+  const luna = lu - 1;
+  const r = raportLunar(state.controls, state.activitati, an, luna, today());
+  const nav = (d) => { const x = new Date(an, luna + d, 1); return `${x.getFullYear()}-${pad(x.getMonth() + 1)}`; };
+  return `<div class="fisa-page">
+    <header class="page-head fisa-actions">
+      <div class="head-with-back">
+        <a class="icon-btn big" href="#/calendar" aria-label="Înapoi la calendar">${icon('back')}</a>
+        <div><div class="eyebrow">${icon('calendar')} Tot ce s-a planificat și efectuat în lună</div><h1>Plan lunar</h1></div>
+      </div>
+      <div class="row-gap">
+        <div class="stepper cal-step" aria-label="Luna">
+          <a class="step-btn" href="#/luna/${nav(-1)}" aria-label="Luna anterioară">${icon('chevL')}</a>
+          <span class="step-val"><b class="cap">${MONTHS_SHORT[luna]}</b><small>${an}</small></span>
+          <a class="step-btn" href="#/luna/${nav(1)}" aria-label="Luna următoare">${icon('chevR')}</a>
+        </div>
+        <button class="btn btn-primary btn-lg" data-act="raport-print">${icon('download')} Tipărește / PDF</button>
+        <button class="btn btn-ghost btn-lg" data-act="raport-share" data-an="${an}" data-luna="${luna}">${icon('upload')} Partajează fișierul</button>
+      </div>
+    </header>
+    <p class="muted fisa-hint">Pentru PDF: <b>Tipărește / PDF</b> → în fereastra de tipărire, butonul Partajare → <b>Salvează în Fișiere</b>. Dacă tipărirea nu pornește, folosiți <b>Partajează fișierul</b>.</p>
+    <style>${FISA_CSS}${RAPORT_CSS}</style>
+    <article class="fisa-doc card">${raportMarkup(r, state.controls)}</article>
+  </div>`;
 }
 
 // ───────────────────────── SETĂRI ─────────────────────────

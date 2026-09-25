@@ -4,14 +4,16 @@ import {
   DOTARI, ACTE, SECTIUNI, CATEGORII, sectiuniActive, secOf, neregulaLetter, neregulaCat,
   constructiiNume, amendaSerieNr, fineStatus, asiDeadline, vecheInfo, isIncheiat, controlStats, isLocalitate, constatareLabel,
   sablon, isGrav, isApplicable, fmtCoord, isVerificare, verifStare, constructiiEligibile, grfText, grfVPesteParter, googleMapsUrl,
+  parseSuma,
 } from './model.js';
 import { esc } from './ui.js';
 
 const STATUS = { ok: 'Conform', nok: 'Neconform', nec: 'NEC (nu este cazul)' };
 
 function money(v) {
-  const n = Number(String(v).replace(',', '.'));
-  return v && !Number.isNaN(n) ? `${n.toLocaleString('ro-RO', { maximumFractionDigits: 2 })} lei` : '';
+  const n = parseSuma(v);
+  if (n === null) return '';
+  return `${n.toLocaleString('ro-RO', { maximumFractionDigits: 2 })} lei`;
 }
 
 const obs = (t) => (t && t.trim() ? esc(t.trim()).replace(/\n/g, '<br>') : '');
