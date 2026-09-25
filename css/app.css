@@ -1263,6 +1263,15 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .ev-act { background: color-mix(in srgb, var(--act) 18%, var(--surface)); color: var(--text); border-left: 3px solid var(--act); }
 .ev-act.st-efectuat { background: color-mix(in srgb, var(--act) 38%, var(--surface)); }
 .sw-act { background: linear-gradient(90deg, #0f766e 0 33%, #1d4ed8 33% 66%, #c2410c 66%); }
+/* v1.19 – zile libere implicite (weekend, sărbători legale) */
+.cal-cell.is-liber:not(.is-sel) { background: color-mix(in srgb, var(--muted) 16%, var(--surface-2)); }
+.ev-liber { background: transparent; color: var(--muted); border: 1.5px dashed color-mix(in srgb, var(--muted) 60%, transparent); padding: 1px 0.1667rem; white-space: normal; }
+.ev-liber.st-efectuat { border-style: solid; }
+.ev-liber.ev-sarb { color: var(--red-ink); border-color: color-mix(in srgb, var(--red) 55%, transparent); }
+.sw-liber { background: color-mix(in srgb, var(--muted) 30%, var(--surface-2)); border: 1.5px dashed var(--muted); }
+.liber-note { display: flex; align-items: center; justify-content: space-between; gap: 0.6667rem; flex-wrap: wrap; padding: 0.5556rem 0.7778rem;
+  border-radius: 0.8889rem; background: var(--surface-2); border-left: 0.3333rem solid var(--muted); min-height: 44px; }
+.liber-note.ev-sarb { border-left-color: var(--red); }
 /* o activitate: tipul, titlul, când; starea și butoanele la dreapta */
 .act-list { display: flex; flex-direction: column; gap: 0.5556rem; margin-bottom: 0.8889rem; }
 .act-item { display: flex; align-items: center; gap: 0.6667rem; flex-wrap: wrap; padding: 0.5556rem 0.7778rem; border-radius: 0.8889rem;

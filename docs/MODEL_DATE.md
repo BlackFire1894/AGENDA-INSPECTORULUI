@@ -88,3 +88,5 @@ Se păstrează separat de controale, în `meta` (cheia `activitati`, o listă), 
 
 `normalizeActivitate()` (în `js/activitati.js`) completează câmpurile lipsă și corectează valorile necunoscute.
 
+
+Zilele libere (weekend + sărbători legale, v1.19) **nu se salvează**: `ziLibera()` le calculează la afișare din `zinelucratoare()` (efectuate până azi inclusiv, planificate după), deci nu intră în backup și nu schimbă structura datelor.

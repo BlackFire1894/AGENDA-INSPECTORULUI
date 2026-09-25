@@ -1,5 +1,5 @@
 import test from 'node:test';
-import { emptyActivitate, normalizeActivitate, activitatiInZi, deConfirmat, raportLunar, titluActivitate, zileActivitate } from '../js/activitati.js';
+import { emptyActivitate, normalizeActivitate, activitatiInZi, deConfirmat, raportLunar, titluActivitate, zileActivitate, ziLibera } from '../js/activitati.js';
 import assert from 'node:assert/strict';
 import { addDays, addMonths, diffDays, parseDateQuery, zile, pasteOrtodox, zinelucratoare, nextWorkingDay } from '../js/dates.js';
 import {
@@ -807,6 +807,26 @@ test('raportul lunar: controale, nereguli, amenzi după data aplicării, activit
   assert.equal(r.amenziFaraData, 1);
   assert.equal(r.efectuate.length, 2); assert.equal(r.planificate.length, 1); assert.equal(r.anulate.length, 1);
   assert.deepEqual(r.peTipuri.map((t) => [t.key, t.n, t.zile]), [['instruire', 1, 1], ['concediu', 1, 2]]);
+});
+
+test('zilele libere: weekend și sărbători legale, implicit; efectuate până azi, planificate după', () => {
+  assert.equal(ziLibera('2026-12-02', '2026-12-15'), null);                          // miercuri
+  assert.deepEqual(ziLibera('2026-12-05', '2026-12-15'), { d: '2026-12-05', motiv: 'sâmbătă', sarbatoare: '', eticheta: 'Liber', stare: 'efectuat' });
+  assert.equal(ziLibera('2026-12-15', '2026-12-15'), null);                          // marți
+  assert.equal(ziLibera('2026-12-13', '2026-12-13').stare, 'efectuat');              // azi = efectuată
+  assert.equal(ziLibera('2026-12-19', '2026-12-15').stare, 'planificat');
+  const z = ziLibera('2026-12-01', '2026-11-20');
+  assert.equal(z.sarbatoare, 'Ziua Națională'); assert.equal(z.stare, 'planificat');
+  assert.equal(ziLibera('2026-12-26', '2026-12-15').eticheta, 'Crăciun (ziua 2)');   // sărbătoare căzută sâmbăta
+  const c = newControl({ start: '2026-12-12' });                                     // control început sâmbătă
+  const act = [{ ...emptyActivitate('2026-12-06', '2026-12-15'), tip: 'instruire', stare: 'efectuat' },
+    { ...emptyActivitate('2026-12-19', '2026-12-15'), tip: 'concediu', dataSfarsit: '2026-12-20', stare: 'efectuat' }];
+  const r = raportLunar([c], act, 2026, 11, '2026-12-15');
+  assert.equal(r.libere.length, 10);                                                 // 8 zile de weekend + 1 și 25 decembrie
+  assert.equal(r.libere.filter((x) => x.sarbatoare).length, 3);                      // 1, 25, 26 decembrie
+  assert.equal(r.lucratoare, 21); assert.equal(r.zileLuna, 31);
+  assert.equal(r.libere.filter((x) => x.stare === 'efectuat').length, 5);            // 1, 5, 6, 12, 13
+  assert.deepEqual(r.libere.filter((x) => x.lucrata).map((x) => x.d), ['2026-12-06', '2026-12-12']);   // concediul nu contează ca lucru
 });
 
 test('sumele în lei, scrise în stil românesc', () => {
