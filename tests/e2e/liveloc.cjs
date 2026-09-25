@@ -1,0 +1,32 @@
+const { chromium } = require('/opt/node22/lib/node_modules/playwright');
+const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
+(async () => {
+  const b = await chromium.launch(); const errs = [];
+  const p = await (await b.newContext({ viewport: { width: 1180, height: 820 }, serviceWorkers: 'block' })).newPage();
+  p.on('pageerror', (e) => errs.push(e.message));
+  await p.clock.install({ time: new Date(2026, 11, 22, 10, 0) });   // 22.12.2026
+  await p.goto('http://localhost:8080/'); await p.click('.welcome [data-act="new-control"]'); await p.waitForTimeout(200);
+  await p.fill('#nc-name', 'Comuna Livezile'); await p.click('#nc-tip [data-tip="LOCALITATE"]'); await p.click('#nc-create'); await p.waitForTimeout(400);
+  ok(await p.locator('.ed-tab').count() === 5, 'localitate live: 5 taburi');
+  await p.click('.ed-tab >> nth=2'); await p.waitForTimeout(200);
+  await p.click('#ner-paar .nok-btn'); await p.click('#ner-paar [data-path$=".amenda.aplicata"]'); await p.waitForTimeout(150);
+  await p.fill('#ner-paar [data-bind$=".amenda.serieNr"]', 'BN 11'); await p.fill('#ner-paar [data-bind$=".amenda.suma"]', '5000');
+  await p.click('[data-act="rest-ok"]'); await p.click('#bulk-ok'); await p.click('.modal [data-r="1"]'); await p.waitForTimeout(300);
+  await p.click('.ed-tab >> nth=3'); await p.waitForTimeout(200);
+  await p.click('#ner-pcSireneNumar .nok-btn'); await p.click('#ner-adapostPC button:has-text("NU")'); await p.waitForTimeout(150);
+  await p.click('[data-act="ner-add"][data-sec="pc"]'); await p.keyboard.type('Sirenă S2 fără alimentare de rezervă'); await p.waitForTimeout(400);
+  await p.click('.ed-tab >> nth=0'); await p.click('[data-act="close-control"]'); await p.waitForTimeout(300);
+  if (await p.locator('#close-anyway').count()) await p.click('#close-anyway'); await p.waitForTimeout(300);
+  await p.click('[data-act="pv-text"]'); await p.waitForTimeout(200);
+  const pv = await p.locator('.pv-text').inputValue();
+  ok(/PAAR neavizat \(sancționat cu amendă Seria BN nr\. 11\)/.test(pv) && /Număr insuficient de sirene/.test(pv) && /Sirenă S2 fără alimentare de rezervă/.test(pv), 'PV live: formulare negativă, amendă, rând adăugat');
+  await p.keyboard.press('Escape');
+  await p.goto('http://localhost:8080/#/panou'); await p.waitForTimeout(300);
+  const fine = await p.locator('#sec-fines .item').innerText();
+  ok(/PAAR neavizat/.test(fine) && /Termenul de plată \(06\.01\.2027\) cade sărbătoare legală – Boboteaza/.test(fine), `Panou: amendă PAAR, termen 06.01.2027 = Boboteaza → avertizare`);
+  const id = await p.evaluate(() => document.querySelector('#sec-fines a').getAttribute('href').split('/')[2]);
+  await p.goto(`http://localhost:8080/#/fisa/${id}`); await p.waitForTimeout(300);
+  const f = await p.locator('.fisa-doc').textContent();
+  ok(/Adăpost de protecție civilă:\s*NU/.test(f) && f.includes('PAAR neavizat'), 'fișa localitate live');
+  console.log(errs.length ? 'ERRORS:\n' + errs.join('\n') : 'no page errors'); await b.close();
+})();

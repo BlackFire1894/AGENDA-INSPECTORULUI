@@ -12,6 +12,8 @@ export const TERMEN_PLATA = 15;          // plata amenzii
 export const PRAG_ROSU = 15 + 25;        // 25 de zile trecute după cele 15 inițiale
 export const TERMEN_ANAF = 15 + 30;      // 30 de zile de la expirarea termenului de plată
 export const TERMEN_ASI = 90;            // prezentare documentație ASI
+export const TERMEN_PIERDERE_ASI = 5;    // după cele 90 de zile: constatarea pierderii valabilității (zile calendaristice)
+export const TERMEN_INCARCARE = 3;       // încărcarea în aplicația ISU și a documentului (zile lucrătoare de la încheiere)
 
 const pad = (n) => String(n).padStart(2, '0');
 
@@ -175,4 +177,25 @@ export function zinelucratoare(iso) {
   if (wd === 6) return 'sâmbătă';
   if (wd === 0) return 'duminică';
   return '';
+}
+
+// + n zile lucrătoare (fără weekend și sărbători legale); ziua de pornire nu se numără.
+export function addWorkingDays(iso, n) {
+  let d = iso;
+  for (let k = 0; k < n;) { d = addDays(d, 1); if (!zinelucratoare(d)) k++; }
+  return d;
+}
+
+// Zilele lucrătoare din intervalul (de la, până la] — câte au mai rămas până la un termen.
+export function workingDaysBetween(fromISO, toISO_) {
+  let n = 0;
+  for (let d = addDays(fromISO, 1); d <= toISO_; d = addDays(d, 1)) if (!zinelucratoare(d)) n++;
+  return n;
+}
+
+// Prima zi lucrătoare după o zi nelucrătoare (recomandare; termenele afișate nu se mută).
+export function nextWorkingDay(iso) {
+  let d = addDays(iso, 1);
+  while (zinelucratoare(d)) d = addDays(d, 1);
+  return d;
 }

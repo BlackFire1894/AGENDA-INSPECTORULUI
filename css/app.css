@@ -754,7 +754,7 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .nelucr { font-style: normal; color: var(--warn-ink); font-weight: 650; }
 .nelucr-warn { display: flex; align-items: center; gap: 0.5rem; padding: 0.5556rem 0.7778rem; border-radius: 0.6667rem; background: var(--warn-soft); color: var(--warn-ink); font-weight: 650; font-size: 0.9444rem; }
 .nelucr-inline { display: block; margin-top: 0.2222rem; font-weight: 700; }
-.item-warn { font-size: 0.8889rem; font-weight: 700; color: var(--warn-ink); }
+.item-main > .item-warn { font-size: 0.8889rem; font-weight: 700; color: var(--warn-ink); }
 
 /* Observații ascunse: indicator pentru cele completate */
 
@@ -1225,3 +1225,31 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .m-cap .m-sub:first-of-type { margin-top: 0.4444rem; }
 .m-steps { margin: 0 0 0.7778rem; padding-left: 1.5556rem; display: flex; flex-direction: column; gap: 0.5556rem; line-height: 1.55; }
 .m-steps li::marker { font-weight: 850; color: var(--accent-ink); }
+
+/* ───────── v1.16: încărcarea după încheiere, termenul de constatare ASI ───────── */
+.dl-warn { background: var(--warn-soft); color: var(--warn-ink); border: 1.5px solid var(--warn); }
+.dl-warn .countdown { background: var(--surface); }
+.dl-warn .countdown b { color: var(--warn-ink); }
+.countdown.big.over b { color: var(--red); }
+.dl-red .countdown.over b { color: #fff; }
+.inc-toggles { display: flex; flex-wrap: wrap; gap: 0.6667rem 1.1111rem; margin-bottom: 0.7778rem; }
+.inc-toggles > div { display: flex; flex-direction: column; gap: 0.2222rem; }
+.dot-warn { background: var(--warn); }
+/* Panou: caseta „De încărcat” are culoarea ei (ardezie), ca și secțiunea */
+:root { --k-inc: #475569; --k-inc-soft: #e2e8f0; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --k-inc: #a5b4c8; --k-inc-soft: #1e293b; } }
+:root[data-theme="dark"] { --k-inc: #a5b4c8; --k-inc-soft: #1e293b; }
+.kpi-inc, .k-inc { --k: var(--k-inc); --k-soft: var(--k-inc-soft); }
+/* cinci casete: pe vertical, amenzile pe tot rândul, apoi 2 × 2; pe orizontal, amenzile în stânga (două rânduri) și 2 × 2 în dreapta */
+@media (max-width: 999px) { .kpis .kpi-fines { grid-column: 1 / -1; } }
+@media (min-width: 1000px) {
+  .kpis { grid-template-columns: 1.3fr repeat(2, minmax(0, 1fr)); }
+  .kpis .kpi-fines { grid-row: span 2; }
+}
+/* Sărbătorile legale: verificarea anuală (Panou, decembrie–ianuarie) și lista din Setări */
+.hol-rem { border-left: 0.3333rem solid var(--blue); background: color-mix(in srgb, var(--blue) 7%, var(--surface)); margin-bottom: 1.1111rem; }
+.hol-rem .sec-title { color: var(--blue-ink); }
+.hol-rem p { margin: 0 0 0.6667rem; line-height: 1.5; }
+.hol-rem details, #sarbatori details { margin: 0 0 0.6667rem; }
+.hol-rem summary, #sarbatori summary { min-height: 44px; display: flex; align-items: center; font-weight: 750; cursor: pointer; }
+.hol-list { margin: 0.2222rem 0 0.6667rem; padding-left: 1.3333rem; display: flex; flex-direction: column; gap: 0.2222rem; line-height: 1.45; }

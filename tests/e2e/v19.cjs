@@ -1,0 +1,92 @@
+const { chromium } = require('/opt/node22/lib/node_modules/playwright');
+const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
+const catsAll = async (p) => { if (!(await p.locator('[data-act="cats-all"]').count())) { await p.click('[data-act="tools-more"]'); await p.waitForTimeout(150); } await p.click('[data-act="cats-all"]'); };
+(async () => {
+  const b = await chromium.launch(); const errs = [];
+  for (const vp of [{ width: 1180, height: 820 }, { width: 820, height: 1180 }]) {
+  console.log('--', vp.width);
+  const ctx = await b.newContext({ viewport: vp, serviceWorkers: 'block', hasTouch: true });
+  const p = await ctx.newPage(); p.on('pageerror', (e) => errs.push(e.message));
+  await p.goto('http://localhost:8080/'); await p.click('.welcome [data-act="new-control"]'); await p.waitForTimeout(200);
+  await p.fill('#nc-name', 'SC Alfa SRL'); await p.click('#nc-create'); await p.waitForTimeout(400);
+  await p.click('[data-act="constr-inc"]'); await p.click('[data-act="constr-inc"]'); await p.waitForTimeout(300);
+  await p.fill('.constr >> nth=1 >> .constr-name', 'Hală'); await p.fill('.constr >> nth=2 >> .constr-name', 'Depozit'); await p.waitForTimeout(400);
+  await p.click('.ed-tab >> nth=2'); await p.waitForTimeout(300);
+  const total = await p.locator('#ner-results .ner-row').count();
+  // căutare: tastare → focus păstrat
+  await p.click('#ner-search'); await p.keyboard.type('sting', { delay: 30 }); await p.waitForTimeout(200);
+  ok(await p.evaluate(() => document.activeElement?.id) === 'ner-search', 'focus rămâne în căutare în timpul tastării');
+  const n1 = await p.locator('#ner-results .ner-row').count();
+  ok(n1 > 0 && n1 < total, `„sting”: ${n1} din ${total} rânduri`);
+  ok(/rânduri găsite pentru „sting”/.test(await p.locator('.search-result').innerText()), 'mesaj: N rânduri găsite');
+  await p.fill('#ner-search', 'd'); await p.dispatchEvent('#ner-search', 'input'); await p.waitForTimeout(200);
+  ok(await p.locator('#ner-results .ner-row').count() === 1 && await p.locator('#ner-d').count() === 1, 'literă „d” → doar rândul d');
+  await p.fill('#ner-search', 'hidranti'); await p.dispatchEvent('#ner-search', 'input'); await p.waitForTimeout(200);
+  const sr = await p.locator('.search-result').innerText();
+  ok(/Arată toate/.test(sr) && /ascuns/.test(sr), `„hidranti” → potriviri ascunse: ${sr.replace(/\n/g, ' ')}`);
+  await p.click('.search-result [data-act="toggle-all-ner"]'); await p.waitForTimeout(300);
+  ok(await p.locator('#ner-results .ner-row').count() > 0 && await p.inputValue('#ner-search') === 'hidranti', 'Arată toate → rândurile hidranților, căutarea rămâne');
+  await p.click('[data-act="toggle-all-ner"] >> nth=0'); await p.waitForTimeout(200);
+  // categorie restrânsă se deschide la căutare
+  await p.fill('#ner-search', ''); await p.dispatchEvent('#ner-search', 'input'); await p.waitForTimeout(200);
+  await catsAll(p); await p.waitForTimeout(200);
+  ok(await p.locator('#ner-results .ner-row').count() === 0, 'categorii restrânse');
+  await p.fill('#ner-search', 'expirate'); await p.dispatchEvent('#ner-search', 'input'); await p.waitForTimeout(200);
+  ok(await p.locator('#ner-results .ner-row').count() >= 1, 'căutarea deschide categoriile restrânse');
+  await p.fill('#ner-search', 'qqqq'); await p.dispatchEvent('#ner-search', 'input'); await p.waitForTimeout(200);
+  ok(/Niciun rând/.test(await p.locator('.search-result').innerText()), 'fără rezultate: mesaj');
+  await p.click('[data-act="ner-q-clear"]'); await p.waitForTimeout(200);
+  ok(await p.inputValue('#ner-search') === '' && await p.evaluate(() => document.activeElement?.id) === 'ner-search', '✕ golește și păstrează focusul');
+  await catsAll(p); await p.waitForTimeout(200);
+  // selecție multiplă
+  await p.click('#ner-d .nok-btn'); await p.waitForTimeout(200);
+  ok((await p.locator('#ner-d .constr-sel-btn').innerText()).includes('Construcția 1'), 'implicit: Construcția 1');
+  await p.click('#ner-d .constr-sel-btn'); await p.waitForTimeout(200);
+  ok(await p.locator('#ner-d .constr-opt').count() === 3, 'meniu: 3 construcții');
+  await p.click('#ner-d .constr-opt >> nth=2'); await p.waitForTimeout(150);
+  await p.click('#ner-d .constr-opt >> nth=1'); await p.waitForTimeout(150);
+  await p.click('#ner-d .constr-opt >> nth=0'); await p.waitForTimeout(150);
+  const btn = await p.locator('#ner-d .constr-sel-btn').innerText();
+  ok(/Construcțiile \(2\)/.test(btn) && /Hală, Depozit/.test(btn), `bifate 2: ${btn.replace(/\n/g, ' ')}`);
+  await p.click('#ner-d .constr-opt >> nth=1'); await p.waitForTimeout(150);
+  await p.click('#ner-d .constr-opt >> nth=2'); await p.waitForTimeout(300);
+  ok(/cel puțin o construcție/.test(await p.locator('#toast').innerText()), 'ultima nu se poate debifa');
+  await p.click('#ner-d [data-act="constr-opt-all"]'); await p.waitForTimeout(150);
+  ok(/Construcțiile \(3\)/.test(await p.locator('#ner-d .constr-sel-btn').innerText()), 'Toate construcțiile → 3');
+  await p.screenshot({ path: `v19-pick-${vp.width}.png` });
+  await p.click('#ner-d .constr-pick [data-act="constr-pick"]'); await p.waitForTimeout(150);
+  ok(await p.locator('#ner-d .constr-pick').count() === 0, 'Gata închide meniul');
+  await p.click('[data-act="pv-text"]'); await p.waitForTimeout(200);
+  ok(/construcțiile: Construcția 1, Hală, Depozit/.test(await p.locator('.pv-text').inputValue()), 'Text PV: toate cele 3 construcții');
+  await p.keyboard.press('Escape'); await p.click('.modal-backdrop').catch(() => {});
+  const id = await p.evaluate(() => location.hash.split('/')[2]);
+  await p.reload(); await p.waitForTimeout(400);
+  ok(/Construcțiile \(3\)/.test(await p.locator('#ner-d .constr-sel-btn').innerText()), 'salvat: după reîncărcare tot 3');
+  await p.goto(`http://localhost:8080/#/fisa/${id}`); await p.waitForTimeout(300);
+  ok((await p.locator('.fisa-doc').textContent()).includes('Construcția 1, Hală, Depozit'), 'fișa: toate construcțiile');
+  // id-uri unice pe pagina de nereguli (toate rândurile afișate)
+  await p.goto(`http://localhost:8080/#/control/${id}/nereguli`); await p.waitForTimeout(400);
+  await p.click('[data-act="toggle-all-ner"]'); await p.waitForTimeout(300);
+  const dup = await p.evaluate(() => { const ids = [...document.querySelectorAll('[id]')].map((e) => e.id); return ids.filter((x, i) => ids.indexOf(x) !== i); });
+  ok(dup.length === 0 && await p.locator('#ner-q.ner-row').count() === 1, `id-uri unice (rândul q există, fără dubluri): ${dup.join(',')}`);
+  // tema
+  await p.goto('http://localhost:8080/#/setari'); await p.waitForTimeout(300);
+  const bg = () => p.evaluate(() => getComputedStyle(document.body).backgroundColor);
+  const light = await bg();
+  await p.click('[data-act="theme"][data-val="dark"]'); await p.waitForTimeout(200);
+  const dark = await bg();
+  ok(light !== dark && dark === 'rgb(12, 17, 29)', `Întunecată: fundal ${dark}`);
+  await p.reload(); await p.waitForTimeout(300);
+  ok(await bg() === 'rgb(12, 17, 29)' && await p.locator('.theme-opt.on').innerText().then((t) => t.includes('Întunecată')), 'Întunecată păstrată după repornire');
+  await p.screenshot({ path: `v19-dark-${vp.width}.png`, fullPage: true });
+  await p.click('[data-act="theme"][data-val="auto"]'); await p.waitForTimeout(200);
+  ok(await bg() === light, 'Automat (iPad luminos) → luminoasă');
+  await p.emulateMedia({ colorScheme: 'dark' }); await p.waitForTimeout(100);
+  ok(await bg() === 'rgb(12, 17, 29)', 'Automat + iPad întunecat → întunecată');
+  await p.click('[data-act="theme"][data-val="light"]'); await p.waitForTimeout(200);
+  ok(await bg() === light, 'Luminoasă forțată, chiar cu iPad întunecat');
+  ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'fără scroll orizontal');
+  await ctx.close();
+  }
+  console.log(errs.length ? 'ERRORS:\n' + errs.join('\n') : 'no page errors'); await b.close();
+})();
