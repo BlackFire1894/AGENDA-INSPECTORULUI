@@ -1173,6 +1173,7 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .dash-date { grid-area: dt; display: flex; flex-wrap: wrap; align-items: baseline; column-gap: 0.8889rem; font-size: 2rem; }
 .dash-time { font-weight: 850; letter-spacing: -.02em; font-variant-numeric: tabular-nums; color: var(--accent-ink); }
 @media (min-width: 1000px) { .dash-actions { display: none; } }
+.dash-actions .set-btn { display: none; }   /* doar pe telefon (css/telefon.css), unde Setări nu mai e în bara de jos */
 /* stadiile amenzilor: aceeași pastilă pentru toate (vizibilă și pe fondul colorat al rândului) */
 .fine-st { background: var(--fs); color: var(--fs-ink); border: 0; font-weight: 800; }
 .fs-red { --fs: #c62a1f; --fs-ink: #fff; }

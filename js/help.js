@@ -1,6 +1,6 @@
 // Ghidul aplicației — manualul complet, scris pentru cineva care vede aplicația prima dată.
 // Se actualizează odată cu funcțiile pe care le descrie (regulă în CLAUDE.md).
-import { icon } from './ui.js';
+import { icon, dsp } from './ui.js';
 
 // Replici mici ale butoanelor din aplicație, ca inspectorul să le recunoască pe ecran
 const B = (ic, text, cls = '') => `<span class="m-btn ${cls}">${ic ? icon(ic) : ''}${text ? `<span>${text}</span>` : ''}</span>`;
@@ -20,7 +20,7 @@ export const MANUAL = [
     id: 'start', ic: 'home', title: 'Pe scurt: la ce folosește aplicația',
     blocks: [
       { p: 'Agenda inspectorului ține locul agendei de teren. În ea notați fiecare control: datele obiectivului, construcțiile și dotările lor, actele verificate și neregulile constatate. Aplicația urmărește apoi amenzile și termenele și vă arată în fiecare zi ce trebuie făcut.' },
-      { p: 'Tot ce scrieți se salvează <b>automat</b>, pe loc, pe această tabletă. Aplicația funcționează și fără internet.' },
+      { p: `Tot ce scrieți se salvează <b>automat</b>, pe loc, pe ${dsp('această tabletă', 'acest telefon')}. Aplicația funcționează și fără internet.` },
       { h: 'Un control, pas cu pas' },
       { ol: [
         `Apăsați ${B('plus', 'Control nou', 'm-prim')} și scrieți denumirea obiectivului. Dacă obiectivul a mai fost controlat, alegeți-l din listă: datele lui se preiau din ultimul control.`,
@@ -31,7 +31,7 @@ export const MANUAL = [
         'După încheiere, în cel mult 3 zile lucrătoare, încărcați controlul în aplicația ISU și documentul (PV scanat) și bifați-le în tabul Obiectiv.',
       ] },
       { p: 'Pe tot parcursul controlului, bara <b>„Ce mai aveți de făcut”</b> vă arată pasul următor.' },
-      { note: `Datele există doar pe această tabletă. Faceți des ${B('download', 'Backup rapid')}: este singura copie de siguranță.` },
+      { note: `Datele există doar pe ${dsp('această tabletă', 'acest telefon')}. Faceți des ${B('download', 'Backup rapid')}: este singura copie de siguranță.` },
     ],
   },
   {
@@ -52,6 +52,15 @@ export const MANUAL = [
       { ul: [
         'La <b>Panou</b>: câte <b>amenzi urgente</b> aveți, adică amenzi cu termenul de plată expirat sau de trimis la ANAF. Pe orizontal scrie „2 amenzi urgente”; pe vertical apare doar numărul, pe o bulină roșie.',
         'La <b>Istoric</b>: câte controale sunt <b>neîncheiate</b>. Pe orizontal scrie „2 neîncheiate”; pe vertical apare doar numărul.',
+      ] },
+      { h: 'Pe telefon' },
+      { ul: [
+        `Bara de jos are 5 butoane: Panou, Obiective, ${B('plus', '', 'm-prim m-round')}, Calendar, Istoric. <b>Setările</b> se deschid din Panou, de sus, lângă Ghidul aplicației și Backup rapid.`,
+        'În control, butoanele Text PV, Fișa PDF, Istoric, Backup și taburile (Obiectiv, Acte, Nereguli…) stau pe câte un rând care se derulează orizontal, cu degetul; tabul deschis apare mereu în vedere.',
+        'La fiecare rând de verificat, butoanele Conform / Constatat / NEC stau sub denumire, pe toată lățimea.',
+        'În Calendar, fiecare zi arată <b>buline</b> colorate (controale, activități, termene), iar zilele libere au fundal gri. Atingeți ziua: dedesubt apare tot ce are, scris.',
+        'Filtrele din Istoric și Obiective stau pe două rânduri care se derulează orizontal.',
+        'Textul e puțin mai mic decât pe tabletă, la aceeași alegere (Mare / Mediu / Mic). Ținut orizontal, telefonul are barele de jos mai subțiri.',
       ] },
     ],
   },
@@ -344,7 +353,7 @@ export const MANUAL = [
     blocks: [
       { ul: [
         '<b>Mărimea textului</b>: Mic, Mediu sau Mare; toată interfața se mărește sau se micșorează proporțional.',
-        '<b>Tema</b>: Automat (urmează setarea iPad-ului), Luminoasă sau Întunecată.',
+        `<b>Tema</b>: Automat (urmează setarea ${dsp('iPad-ului', 'telefonului')}), Luminoasă sau Întunecată.`,
         '<b>Backup</b>: „Exportă backup” (același lucru ca Backup rapid) creează un fișier cu toate controalele; salvați-l în Fișiere sau în iCloud Drive. „Importă backup” are două variante: <b>Combină</b> (adaugă controalele din fișier; dacă un control există deja, păstrează versiunea cea mai recentă) și <b>Înlocuiește tot</b>.',
         '<b>Actualizări</b>: aplicația verifică singură, la fiecare deschidere. Când apare bara „Versiune nouă disponibilă”, apăsați <b>Actualizează</b>. „Verifică acum” caută manual.',
         '<b>Sărbători legale</b>: lista pentru anul curent și pentru cel următor, cu starea verificării (vedeți „Amenzile și termenele”).',
@@ -357,7 +366,7 @@ export const MANUAL = [
     id: 'date', ic: 'shield', title: 'Datele dumneavoastră și siguranța lor',
     blocks: [
       { ul: [
-        'Datele stau <b>doar pe această tabletă</b>, nu pe internet. Singura copie de siguranță este backupul, deci faceți-l des.',
+        `Datele stau <b>doar pe ${dsp('această tabletă', 'acest telefon')}</b>, nu pe internet. Singura copie de siguranță este backupul, deci faceți-l des.`,
         'Instalați aplicația pe ecranul principal (Safari → Partajare → „Adaugă pe ecranul principal”): așa datele sunt păstrate în siguranță, iar aplicația merge fără internet.',
         'Localizarea se folosește doar când apăsați „Completează coordonatele”.',
         'Actualizările nu schimbă controalele încheiate: acestea își păstrează lista de nereguli. Câmpurile noi se completează automat și la controalele vechi.',

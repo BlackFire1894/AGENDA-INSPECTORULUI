@@ -12,3 +12,4 @@
 - **Ghidul aplicației** (`js/help.js`, ecranul `#/ghid`) e manualul complet: butoanele (cu pictograme), funcțiile, corelările, fluxul. Se actualizează odată cu funcțiile pe care le descrie — orice buton sau comportament nou intră în capitolul lui.
 - Tonul textelor din aplicație e formal („dumneavoastră”: „Completați…”, „Ștergeți…?”); etichetele butoanelor rămân nume de acțiuni („Anulează”, „Șterge”).
 - UI: text mare, ținte de atingere ≥ 44px, temă luminoasă și întunecată, portret (bara de jos) și peisaj (bara laterală, ≥ 1000px).
+- **Telefon**: regulile stau doar în `css/telefon.css` (încărcat cu `media="(max-width: 599px), (max-height: 519px)"`), ca aspectul de tabletă să rămână neschimbat. Textele care pomenesc tableta / iPad-ul se aleg cu `dsp('…tabletă…', '…telefon…')` din `js/ui.js`. Verificare: `tests/e2e/telefon.cjs` (iPhone 12 Pro Max 428×926 și 926×428, 390×844, 375×667); la o schimbare de telefon, capturile de tabletă trebuie să rămână identice.

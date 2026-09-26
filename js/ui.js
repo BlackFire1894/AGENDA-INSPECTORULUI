@@ -47,6 +47,11 @@ export function icon(name, cls = '') {
   return `<svg class="ic ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ''}</svg>`;
 }
 
+// Telefon = aceeași condiție ca foaia css/telefon.css (portret sub 600px sau peisaj sub 520px înălțime)
+export const peTelefon = () => typeof window !== 'undefined' && !!window.matchMedia && window.matchMedia('(max-width: 599px), (max-height: 519px)').matches;
+// Textul potrivit dispozitivului: pe tabletă rămâne exact cel de până acum („această tabletă”), pe telefon „acest telefon”
+export const dsp = (tab, tel) => (peTelefon() ? tel : tab);
+
 export function esc(s) {
   return String(s ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
 }

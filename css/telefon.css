@@ -1,0 +1,138 @@
+/* Telefon: se încarcă doar sub 600px lățime (portret) sau sub 520px înălțime (peisaj) — vezi <link media> din index.html.
+   Pe tabletă browserul nu aplică nimic de aici, deci aspectul de iPad rămâne neschimbat.
+   Aceleași reguli ca în app.css: dimensiuni în rem, ținte de atingere ≥ 44px, fontul câmpurilor ≥ 16px. */
+
+/* Mărimea textului, puțin mai mică decât pe tabletă (Mare 17 / Mediu 16 / Mic 15) */
+html { font-size: 17px; }
+html[data-font="mediu"] { font-size: 16px; }
+html[data-font="mic"] { font-size: 15px; }
+:root { --gutter: max(0.8889rem, env(safe-area-inset-left)); }
+h1 { font-size: 1.5556rem; }
+.card { padding: 0.8889rem; }
+.page-head { margin-bottom: 0.8889rem; gap: 0.6667rem; }
+.page-head > .row-gap { width: 100%; }
+
+/* ───────── bara de jos: 5 butoane (Setări se deschide din Panou) ───────── */
+.tabbar { grid-template-columns: repeat(5, 1fr); }
+.tabbar a[data-nav="setari"] { display: none; }
+.tabbar a { font-size: 0.7222rem; }
+.dash-actions .set-btn { display: inline-flex; }
+.dash-actions { flex-wrap: wrap; justify-content: flex-end; }
+.dash-actions .btn { padding: 0 0.6667rem; }
+.dash-head { grid-template-columns: minmax(0, 1fr); grid-template-areas: "act" "eb" "dt"; row-gap: 0.4444rem; }
+.dash-actions { justify-content: flex-start; }
+.dash-date { font-size: 1.4444rem; }
+
+/* ───────── Panou ───────── */
+.kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5556rem; }
+.kpi { padding: 0.6667rem 0.7778rem; }
+.kpi-num { font-size: 2rem; }
+.kpi-ic { width: 2rem; height: 2rem; }
+.kpi-label { font-size: 0.9444rem; line-height: 1.2; }
+.item { flex-wrap: wrap; }
+.item-side { max-width: none; }
+
+/* ───────── liste: Obiective, Istoric ───────── */
+.obj-card, .ctl-row { padding: 0.7778rem; gap: 0.6667rem; align-items: flex-start; }
+.obj-title, .ctl-title { font-size: 1.0556rem; }
+.row-chev { display: none; }
+.chips .pill, .item .pill { white-space: normal; max-width: 100%; }
+.seg-row { overflow: visible; }
+.seg-row .segmented { display: flex; width: 100%; }
+.seg-row .segmented button { flex: 1 1 auto; padding: 0 0.5556rem; }
+.searchbar { padding-left: 0.7778rem; }
+.date-pick { padding: 0 0.6667rem; }
+.flt-btn { font-size: 0.8333rem; padding: 0 0.6667rem; }
+
+/* ───────── antetul și taburile controlului: compacte ───────── */
+.ed-head { gap: 0.5556rem; margin-bottom: 0.6667rem; align-items: flex-start; }
+.ed-title { flex-basis: calc(100% - 3.5rem); }
+.ed-title h1 { font-size: 1.3333rem; }
+.ed-meta { flex-wrap: nowrap; overflow: hidden; }
+.ed-meta .pill { flex: none; }
+.ed-head > .icon-btn.big { width: max(44px, 2.8889rem); height: max(44px, 2.8889rem); }
+.ed-dates { font-size: 0.8889rem; }
+.ed-actions { flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start; gap: 0.4444rem; padding-bottom: 2px; scrollbar-width: none; }
+.ed-actions::-webkit-scrollbar { display: none; }
+.ed-actions .btn { flex: none; padding: 0 0.6667rem; font-size: 0.8333rem; gap: 0.3333rem; }
+.ed-actions .danger { margin-left: 0; flex: none; }
+.ed-tabs {
+  display: flex; overflow-x: auto; gap: 0.3333rem; scrollbar-width: none; scroll-snap-type: x proximity;
+  border-radius: 1rem; padding-left: 0.3333rem; padding-right: 0.3333rem;
+}
+.ed-tabs::-webkit-scrollbar { display: none; }
+.ed-tab, .ed-tabs[style*="--tabs:5"] .ed-tab { flex: none; scroll-snap-align: center; min-height: max(44px, 3.3333rem); padding: 0.4444rem 0.6667rem; gap: 0.4444rem; }
+.ed-tab .tab-num, .ed-tabs[style*="--tabs:5"] .tab-num { display: grid; width: 1.5556rem; height: 1.5556rem; border-radius: 0.4444rem; font-size: 0.8333rem; }
+.tab-txt b, .ed-tabs[style*="--tabs:5"] .tab-txt b { font-size: 0.9444rem; white-space: nowrap; }
+.tab-txt small { white-space: nowrap; font-size: 0.7222rem; }
+
+/* ───────── rândurile de verificat (acte, nereguli, dotări) ───────── */
+.check-row { padding: 0.5556rem; gap: 0.5556rem; }
+.cat-group .check-row { padding-left: 0.8889rem; }
+.ner-row > .ner-bar { grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.5556rem; }
+.ner-row .ner-bar > .oknok { grid-column: 1 / -1; grid-row: 2; }
+.ner-row .ner-bar > .oknok > button { flex: 1 1 0; width: auto; }
+.ner-row > .row-main { padding-left: 0; }
+.ner-row > .row-side { padding-left: 0; }
+.oknok { width: 100%; }
+.ok-btn, .nok-btn { height: max(44px, 3.1111rem); }
+.row-side { flex-wrap: wrap; }
+.row-idx { width: max(44px, 2.2222rem); height: max(44px, 2.2222rem); }
+.cat-title { flex-wrap: wrap; font-size: 0.9444rem; }
+.cat-info { margin-left: 0; }
+.tools-row { gap: 0.4444rem; }
+.tools-row .searchbar { min-width: 0; }
+.form-grid, .form-grid.g3 { grid-template-columns: minmax(0, 1fr); }
+.dot-row { grid-template-columns: minmax(0, 1fr) auto; }
+.dot-row .obs-add, .dot-row .obs-wrap { grid-column: 1 / -1; justify-self: start; }
+
+/* ───────── calendar: buline în celule, detaliile la ziua atinsă ───────── */
+.cal-card { padding: 0.4444rem; }
+.cal-grid { gap: 0.2222rem; }
+.cal-cell, .cal-cell:is(*) { min-height: 3.6667rem; padding: 0.2222rem; border-radius: 0.5556rem; align-items: center; }
+.cal-num { width: 1.5556rem; height: 1.5556rem; font-size: 0.8889rem; }
+.cal-evs { flex-direction: row; flex-wrap: wrap; justify-content: center; gap: 2px; }
+.cal-ev { width: 0.5556rem; height: 0.5556rem; padding: 0; border-radius: 50%; font-size: 0; border: 0; }
+.cal-ev.ev-act { background: var(--act); }
+.cal-ev.ev-liber { display: none; }                               /* ziua liberă se vede din fundalul gri */
+.cal-more { font-size: 0.6667rem; padding: 0; }
+.cal-dls { position: static; justify-content: center; }
+.cal-dls .dot { width: 0.4444rem; height: 0.4444rem; }
+.cal-nav { width: 100%; }
+.cal-legend .sw { width: 0.6667rem; height: 0.6667rem; border-radius: 50%; }
+.cal-legend .sw-liber { border-radius: 0.2222rem; width: 1rem; }
+.cal-step .step-val { min-width: 4.4444rem; }
+
+/* ───────── Setări, fișă, raport ───────── */
+.font-opts { gap: 0.4444rem; }
+.font-opt { padding: 0.5556rem 0.3333rem; min-width: 0; min-height: 0; }
+.font-opt small { font-size: 0.7222rem; text-align: center; line-height: 1.2; }
+.fisa-doc.card { padding: 0.7778rem; }
+.fisa-doc .f-sum { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.fisa-doc table { display: block; overflow-x: auto; }
+
+/* Filtrele din Istoric și Obiective: două rânduri care se derulează orizontal (portret) */
+.flt-row { display: grid; grid-auto-flow: column; grid-template-rows: repeat(2, auto); justify-content: start; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+.flt-row::-webkit-scrollbar { display: none; }
+.flt-btn { white-space: nowrap; }
+
+/* ───────── telefon culcat (înălțime mică): barele fixe, cât mai subțiri ───────── */
+@media (max-height: 519px) {
+  .flt-row { grid-template-rows: auto; }
+  .tabbar { padding-top: 0.2222rem; padding-bottom: calc(env(safe-area-inset-bottom) + 0.2222rem); }
+  .tabbar a { flex-direction: row; gap: 0.4444rem; font-size: 0.8333rem; padding: 0; min-height: 44px; }
+  .tabbar a .ic { width: 1.3333rem; height: 1.3333rem; }
+  .tabbar .nav-badge { position: static; order: 3; }
+  .tab-new { width: max(44px, 2.8889rem); height: 44px; border-radius: 0.8889rem; }
+  .edit-strip:not([hidden]) { padding-top: 0.1111rem; padding-bottom: 0.1111rem; }
+  .edit-strip .et-btn { min-height: 44px; }
+  .ed-tabs { position: static; }                                  /* nu mai fixăm taburile: lasă loc conținutului */
+  .main { padding-left: max(0.8889rem, env(safe-area-inset-left)); padding-right: max(0.8889rem, env(safe-area-inset-right)); }
+}
+
+/* Filtrele Toate / Constatate / Neverificate: pe un rând, lățimi egale (textul se poate rupe pe două rânduri) */
+.toolbar .segmented { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); width: 100%; }
+.toolbar .segmented button { white-space: normal; line-height: 1.15; padding: 0.2222rem 0.3333rem; }
+/* Fișa: caracteristicile construcției pe două coloane, nu un tabel lat */
+.fisa-doc .f-kv, .fisa-doc .f-kv tbody { display: block; overflow: visible; }
+.fisa-doc .f-kv tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }

@@ -11,7 +11,7 @@ import {
   incarcareStatus, LIPSA_INCARCARE,
   parseSuma, isGrav, sigiliiControl, sigiliiText, adaposturiStats, adaposturiText,
 } from './model.js';
-import { icon, esc, pill, finePill, tipBadge, empty } from './ui.js';
+import { icon, esc, pill, finePill, tipBadge, empty, dsp } from './ui.js';
 import { APP_VERSION } from './version.js';
 import { MANUAL } from './help.js';
 import { FISA_CSS } from './fisa.js';
@@ -160,9 +160,10 @@ export function viewDashboard() {
   const now = new Date();
   // Antet: data și ora pe un rând. Ghidul și Backup rapid apar aici doar pe vertical (pe orizontal sunt în bara laterală).
   const head = `<header class="dash-head">
-    <div class="eyebrow">${icon('clock')} Data și ora tabletei</div>
+    <div class="eyebrow">${icon('clock')} Data și ora ${dsp('tabletei', 'telefonului')}</div>
     <div class="dash-actions">
       <a class="btn btn-ghost guide-btn" href="#/ghid">${icon('book')} Ghidul aplicației</a>
+      <a class="btn btn-ghost set-btn" href="#/setari" aria-label="Setări">${icon('settings')}<span>Setări</span></a>
       ${cs.length ? `<button class="btn btn-ghost backup-quick ${backupIsStale() ? 'stale' : ''}" data-act="backup-export">${icon('download')}<span><b>Backup rapid</b><small>${esc(backupAgeText())}</small></span></button>` : ''}
     </div>
     <h1 class="dash-date"><span>${esc(ucfirst(fmtDateLong(t)))}</span><span class="dash-time" data-clock>${pad(now.getHours())}:${pad(now.getMinutes())}</span></h1>
@@ -172,7 +173,7 @@ export function viewDashboard() {
     return `${head}<div class="welcome card">
       <div class="welcome-art">${icon('shield')}</div>
       <h2>Bun venit în Agenda inspectorului</h2>
-      <p>Toate datele rămân pe această tabletă. Începeți cu un control nou sau încercați aplicația pe date demonstrative. Tot ce face aplicația e explicat în <b>Ghidul aplicației</b>.</p>
+      <p>Toate datele rămân pe ${dsp('această tabletă', 'acest telefon')}. Începeți cu un control nou sau încercați aplicația pe date demonstrative. Tot ce face aplicația e explicat în <b>Ghidul aplicației</b>.</p>
       <div class="row-gap">
         <button class="btn btn-primary btn-xl" data-act="new-control">${icon('plus')} Control nou</button>
         <button class="btn btn-ghost btn-xl" data-act="demo-load">Încarcă date demonstrative</button>
@@ -660,7 +661,7 @@ export function viewCalendar() {
           <span><i class="dot dot-red"></i>termen ANAF / ASI</span>
           <span><i class="dot dot-warn"></i>termen încărcare</span>
           <span><i class="sw sw-act"></i>activitate (culoarea tipului)</span>
-          <span><i class="sw sw-liber"></i>zi liberă „Liber”: weekend / sărbătoare legală (✓ = efectuată)</span>
+          <span><i class="sw sw-liber"></i>${dsp('zi liberă „Liber”: weekend / sărbătoare legală (✓ = efectuată)', 'zi liberă (fundal gri): weekend / sărbătoare legală')}</span>
         </div>
       </div>
       ${panel}
@@ -698,7 +699,7 @@ export function viewLuna(id) {
 // ───────────────────────── SETĂRI ─────────────────────────
 
 const THEMES = [
-  { key: 'auto', label: 'Automat', hint: 'ca iPad-ul', ic: 'contrast' },
+  { key: 'auto', label: 'Automat', hint: dsp('ca iPad-ul', 'ca telefonul'), ic: 'contrast' },
   { key: 'light', label: 'Luminoasă', hint: 'mereu', ic: 'sun' },
   { key: 'dark', label: 'Întunecată', hint: 'mereu', ic: 'moon' },
 ];
@@ -720,7 +721,7 @@ export function viewSettings(persisted) {
   </section>
   <section class="card set-sec">
     <h2 class="sec-title">${icon('moon')} Tema</h2>
-    <p><b>Automat</b> urmează iPad-ul (Setări → Afișaj și luminozitate): luminoasă ziua, întunecată seara, dacă așa e setat. Sau alegeți una fixă.</p>
+    <p><b>Automat</b> urmează ${dsp('iPad-ul', 'telefonul')} (Setări → Afișaj și luminozitate): luminoasă ziua, întunecată seara, dacă așa e setat. Sau alegeți una fixă.</p>
     <div class="font-opts" role="radiogroup" aria-label="Tema">
       ${THEMES.map((t) => `<button class="font-opt theme-opt ${currentTheme() === t.key ? 'on' : ''}" data-act="theme" data-val="${t.key}" role="radio" aria-checked="${currentTheme() === t.key}">
         <span class="aa">${icon(t.ic)}</span><span>${t.label}</span><small>${t.hint}</small>
@@ -729,7 +730,7 @@ export function viewSettings(persisted) {
   </section>
   <section class="card set-sec">
     <h2 class="sec-title">${icon('download')} Backup</h2>
-    <p>Butonul <b>Backup rapid</b> din Panou, din bara laterală și din fiecare control face exact același export ca butonul de aici. Datele sunt salvate <b>doar pe această tabletă</b>. Exportă periodic un fișier de backup și salvează-l în <b>Fișiere → iCloud Drive</b> (sau alt loc sigur).</p>
+    <p>Butonul <b>Backup rapid</b> din Panou, din bara laterală și din fiecare control face exact același export ca butonul de aici. Datele sunt salvate <b>doar pe ${dsp('această tabletă', 'acest telefon')}</b>. Exportă periodic un fișier de backup și salvează-l în <b>Fișiere → iCloud Drive</b> (sau alt loc sigur).</p>
     <div class="set-status"><span class="lbl">Ultimul backup</span><b>${last ? `${fmtDateLong(last.slice(0, 10))}, ${last.slice(11, 16)}` : 'niciodată'}</b></div>
     <div class="row-gap">
       <button class="btn btn-primary btn-lg" data-act="backup-export">${icon('download')} Exportă backup</button>
@@ -752,7 +753,7 @@ export function viewSettings(persisted) {
   <section class="card set-sec">
     <h2 class="sec-title">${icon('hourglass')} Cum se calculează termenele</h2>
     <ul class="rules">
-      <li><b>Toate termenele</b> curg de la data de referință + 1 zi, după data și ora tabletei.</li>
+      <li><b>Toate termenele</b> curg de la data de referință + 1 zi, după data și ora ${dsp('tabletei', 'telefonului')}.</li>
       <li><b>Amendă:</b> data aplicării (implicit data încheierii controlului).
         <span class="rule-row"><i class="dot dot-blue"></i> zilele 1–15: în curs</span>
         <span class="rule-row"><i class="dot dot-yellow"></i> zilele 16–39: termenul de 15 zile expirat</span>
@@ -771,7 +772,7 @@ export function viewSettings(persisted) {
   </section>
   <section class="card set-sec danger-zone">
     <h2 class="sec-title">${icon('trash')} Zonă periculoasă</h2>
-    <p>Șterge definitiv toate controalele de pe această tabletă. Faceți întâi un backup.</p>
+    <p>Șterge definitiv toate controalele de pe ${dsp('această tabletă', 'acest telefon')}. Faceți întâi un backup.</p>
     <button class="btn btn-danger btn-lg" data-act="wipe">Șterge toate datele</button>
   </section>
   <p class="muted center">Agenda inspectorului · v${APP_VERSION} · funcționează offline</p>`;
