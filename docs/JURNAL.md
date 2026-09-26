@@ -3,7 +3,7 @@
 Memoria proiectului: ce face aplicația, de ce arată și funcționează așa, ce s-a decis și ce s-a respins.
 **Se citește la începutul oricărei sesiuni de lucru și se completează la fiecare versiune nouă** (regulă în `CLAUDE.md`).
 
-Ultima actualizare: v1.20.0 — 25.09.2026.
+Ultima actualizare: v1.21.0 — 25.09.2026.
 
 ---
 
@@ -68,6 +68,7 @@ Ultima actualizare: v1.20.0 — 25.09.2026.
 | 1.18 | **Planul lunar**: activități introduse manual în Calendar (7 tipuri, dată / interval, oră, obiectiv, stare planificată / efectuată / anulată); „Activități de confirmat” în Panou; **raportul lunii** (ecran + PDF / partajare); activitățile în backup; **citirea corectă a sumelor** scrise românește („2.500”, „1.500,50”) |
 | 1.19 | **Zile libere implicite**: weekendurile și sărbătorile legale apar singure în Calendar (fundal gri, etichetă „Liber” / numele sărbătorii), efectuate până azi inclusiv, planificate după; în raportul lunii: weekend, sărbători, efectuate / planificate, zile lucrătoare și zilele libere în care s-a lucrat |
 | 1.20 | **Sigiliul** vizibil și în bara categoriei („N criterii de sigilare”, restrânsă: și literele, ca amenzile) și pe rândul controlului din liste (Istoric, Calendar, pagina obiectivului), în Panou la „Controale neîncheiate” și pe cardul din Obiective (ultimul control): „Sigiliu aplicat · 2 criterii” / „2 sigilii (2 construcții) · 3 criterii”; corectat: „nereguli grave” din liste numără și rândurile adăugate marcate grave; **filtre în Istoric și Obiective** (butoane vizibile cu numărul rezultatelor, combinate cu ȘI): amendă în curs / 15 zile expirat / ANAF / achitată, ASI în curs, de încărcat, netrecute în PV, nereguli grave, sigiliu; cardul din Obiective arată acum și amenzile pe stadii, ASI în curs, netrecutele în PV și grave la ultimul control |
+| 1.21 | **Panou**: secțiunile cu ceva de rezolvat (amenzi active, ASI, de încărcat, controale neîncheiate, netrecute în PV) urcă primele, sub statistici; cele goale coboară la final; corectat: pe orizontal, pastilele lungi din „De încărcat” intrau sub caseta cu zilele rămase |
 
 ## 4. Ce face aplicația (inventar)
 
@@ -165,6 +166,7 @@ Ultima actualizare: v1.20.0 — 25.09.2026.
 - v1.16: încărcarea (bife în tabul Obiectiv; pastile în Istoric și Obiective; caseta și secțiunea din Panou); etapa a doua ASI.
 - v1.17: recomandarea zilei lucrătoare; verificarea anuală a sărbătorilor legale.
 - v1.18: plan lunar — tipuri fixe + „Altă activitate”; câmpuri tip, dată (interval), oră, descriere, stare, obiectiv, observații; planificatele trecute „de confirmat” în Panou; raport pe ecran + PDF / partajare.
+- v1.21: ordinea secțiunilor din Panou e dinamică: întâi cele cu elemente (în ordinea fixă amenzi → ASI → încărcare → neîncheiate → PV), apoi cele goale; casetele de statistici rămân pe loc.
 - v1.20: filtrele — alese de utilizator din propuneri (respinse: „nereguli vechi”, „fără nereguli”; afișare în fereastră „Filtre”); în Obiective regula „mixt”: termenele la oricare control, gravitatea (grave, sigiliu) la ultimul; filtrele țin doar cât e deschisă aplicația (nu se salvează).
 - v1.20: **sigiliul se aplică pe construcție**; neregulile grave constatate (✗) cu bifa Sigiliu sunt **criteriile** lui (precizarea utilizatorului): mai multe criterii în aceeași construcție = un sigiliu; construcții diferite = câte un sigiliu pe fiecare; o neregulă constatată în mai multe construcții = sigiliu în toate (fără alegere separată a construcțiilor sigilate); „bara obiectivului” = rândul controlului din liste (ales de utilizator, nu antetul controlului și nu pagina obiectivului).
 - v1.19: zilele libere nu se salvează (nu sunt activități) — se calculează din `zinelucratoare()`, deci nu intră în backup și nu cer confirmare; se actualizează singure odată cu lista sărbătorilor.
@@ -200,7 +202,7 @@ Ultima actualizare: v1.20.0 — 25.09.2026.
 - **Decembrie:**
   - Panoul cere verificarea sărbătorilor legale pentru anul următor.
   - Se verifică legea (art. 139 Codul muncii, eventuale modificări). Dacă s-a schimbat, se actualizează `sarbatoriLegale()` din `js/dates.js` și testele, apoi se publică o versiune nouă.
-  - O rutină programată (1 decembrie) amintește acest lucru și în sesiunea de lucru.
+  - Singurul semnal e mementoul din aplicație (Panou). Rutina programată din sesiunea de lucru a fost ștearsă la cererea utilizatorului (v1.21).
 
 ## 9. Limite cunoscute și idei
 

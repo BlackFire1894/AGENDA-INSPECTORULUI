@@ -312,7 +312,10 @@ export function viewDashboard() {
     <p class="muted">Ziua lor a trecut și sunt încă planificate: marcați-le efectuate, reprogramați-le sau anulați-le. Raportul lunar numără doar activitățile efectuate.</p>
     <div class="act-list">${conf.map((a) => actItem(a, { confirmare: true })).join('')}</div>
   </section>` : '';
-  return `${head}${sarbatoriReminder(t)}${secConf}${kpis}<div class="dash-grid">${secFines}${secAsi}${secInc}${secOpen}${secPv}</div>`;
+  // secțiunile cu ceva de rezolvat urcă primele (în ordinea obișnuită); cele goale coboară la final
+  const sectiuni = [[secFines, active.length], [secAsi, asi.length], [secInc, deInc.length], [secOpen, open.length], [secPv, netrecute.length]];
+  const ordonate = [...sectiuni.filter(([, n]) => n), ...sectiuni.filter(([, n]) => !n)].map(([h]) => h).join('');
+  return `${head}${sarbatoriReminder(t)}${secConf}${kpis}<div class="dash-grid">${ordonate}</div>`;
 }
 
 // Vechimea ultimului backup (aceeași funcție de backup e disponibilă din Panou, control, bara laterală și Setări)
