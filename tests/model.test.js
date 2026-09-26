@@ -904,3 +904,35 @@ test('schema 11: cele 4 rubrici de organizare a protecției civile, doar la cont
   assert.equal(constatareLabel(n), 'Lipsă convenții cu OPEC');
 });
 
+
+test('aplicația nativă: cifrele pe zile (widget) și notificările, cu aceleași reguli ca Panoul', async () => {
+  const { stareNativa, cifreZi } = await import('./nativ/referinta.mjs');
+  const c = newControl({ tip: 'OPEC', start: '2026-10-01' });
+  c.denumire = 'Școala Test'; c.dataIncheiere = '2026-10-01';
+  const d = c.nereguli.find((n) => n.key === 'd');
+  d.status = 'nok'; d.amenda = { ...d.amenda, aplicata: true, suma: '1000' };      // data aplicării = data încheierii
+  const s = stareNativa([c], [], { lastBackup: '2026-10-05T10:00', sarbatoriVerificate: [2027] }, '2026-10-06');
+  assert.equal(s.v, 1); assert.equal(s.zile.length, 21); assert.equal(s.zile[0].data, '2026-10-06');
+  assert.deepEqual(s.zile[0].amenzi, { rosu: 0, galben: 0, albastru: 1 });
+  assert.equal(s.zile[0].netrecute, 1); assert.equal(s.zile[0].deIncarcat, 1);   // încheiat 01.10, nimic încărcat
+  const z17 = s.zile.find((z) => z.data === '2026-10-17');
+  assert.deepEqual(z17.amenzi, { rosu: 0, galben: 1, albastru: 0 });              // ziua 16: termenul de plată expirat
+  assert.equal(z17.urgente, 1 + z17.incarcareUrgent);
+  const ev = s.notificari.filter((e) => e.id.startsWith(`agenda-amenda-${c.id}`)).map((e) => e.data);
+  assert.deepEqual(ev, ['2026-10-17', '2026-11-10']);                              // expirat (ziua 16), de trimis la ANAF (ziua 40)
+  assert.ok(s.notificari.some((e) => e.id === `agenda-anaf1-${c.id}-d-2026-11-14`));
+  assert.ok(s.notificari.some((e) => e.id === `agenda-anaf0-${c.id}-d-2026-11-15`));
+  assert.ok(s.notificari.some((e) => e.id === 'agenda-backup-2026-10-12' && e.ora === '17:00'));
+  assert.ok(s.notificari.some((e) => e.id === 'agenda-sarbatori-2027-2026-12-01') === false);   // 2027 deja verificat
+  assert.ok(s.notificari.every((e) => e.data >= '2026-10-06'));
+  assert.ok(s.urmatoare.some((x) => x.titlu === 'Plata amenzii' && x.data === '2026-10-16'));
+  // aceeași cifră ca Panoul: amenzile active = cele neachitate
+  d.amenda.achitata = true;
+  assert.equal(cifreZi([c], [], '2026-10-06').amenziActive, 0);
+});
+
+test('datele și cazurile de test pentru aplicația nativă sunt la zi (altfel: npm run nativ)', async () => {
+  const { execFileSync } = await import('node:child_process');
+  execFileSync(process.execPath, ['tests/nativ/exporta.mjs', '--verifica'], { stdio: 'pipe' });
+});
+
