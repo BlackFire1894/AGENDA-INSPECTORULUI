@@ -4,7 +4,7 @@ import {
   DOTARI, ACTE, SECTIUNI, CATEGORII, sectiuniActive, secOf, neregulaLetter, neregulaCat,
   constructiiNume, amendaSerieNr, fineStatus, asiDeadline, vecheInfo, isIncheiat, controlStats, isLocalitate, constatareLabel,
   sablon, isGrav, isApplicable, fmtCoord, isVerificare, verifStare, constructiiEligibile, grfText, grfVPesteParter, googleMapsUrl,
-  parseSuma,
+  parseSuma, adaposturi, adaposturiStats, adaposturiText,
 } from './model.js';
 import { esc } from './ui.js';
 
@@ -78,6 +78,8 @@ export function fisaMarkup(c, controls, now = new Date()) {
     </div>`);
   });
   h.push('</section>');
+  // OPEC / Instituție: adăposturile stau la datele obiectivului (la Localitate, în Protecție civilă)
+  if (!isLocalitate(c)) h.push(`<section><h2>Adăposturi de protecție civilă</h2>${adaposturiFisa(c)}</section>`);
 
   // Acte
   h.push(`<section><h2>Acte de autoritate și evidențe</h2><table class="f-table">
@@ -132,10 +134,7 @@ export function fisaMarkup(c, controls, now = new Date()) {
       h.push('</tbody></table>');
     }
     if (neverif) h.push(`<p class="f-small">${neverif} ${neverif === 1 ? 'rubrică neverificată' : 'rubrici neverificate'} (nu apar în tabel).</p>`);
-    if (sec === 'pc' && isLocalitate(c)) {
-      const a = c.adapostPC || {};
-      h.push(`<p><b>Adăpost de protecție civilă:</b> ${esc(a.v || '—')}${a.v === 'NEC' ? ' (nu este cazul)' : ''}${obs(a.obs) ? ` — ${obs(a.obs)}` : ''}</p>`);
-    }
+    if (sec === 'pc') h.push(adaposturiFisa(c));
     h.push('</section>');
   }
 
@@ -144,6 +143,19 @@ export function fisaMarkup(c, controls, now = new Date()) {
 }
 
 // Stiluri pentru fișă: folosite și în aplicație, și în fișierul partajat. Mereu pe fond alb, ca pe hârtie.
+// Adăposturile de protecție civilă: DA / NU / NEC, apoi fiecare adăpost cu locația, starea și observațiile
+function adaposturiFisa(c) {
+  const a = c.adapostPC || {};
+  const st = adaposturiStats(c);
+  let h = `<p><b>Adăposturi de protecție civilă:</b> ${esc(a.v || '—')}${a.v === 'NEC' ? ' (nu este cazul)' : ''}${st ? ` — ${esc(adaposturiText(st))}` : ''}${obs(a.obs) ? ` — ${obs(a.obs)}` : ''}</p>`;
+  const l = st ? adaposturi(c) : [];
+  if (l.length) {
+    h += `<table class="f-table"><thead><tr><th>Nr.</th><th>Locația</th><th>Stare</th><th>Observații</th></tr></thead><tbody>
+      ${l.map((n, i) => `<tr><td>A${i + 1}</td><td>${esc(String(n.locatie || '').trim() || '—')}</td><td>${n.status === 'ok' ? 'Conform' : n.status === 'nok' ? '<b>Neconform</b>' : '<b>Neverificat</b>'}</td><td>${obs(n.obs) || ''}</td></tr>`).join('')}</tbody></table>`;
+  }
+  return h;
+}
+
 export const FISA_CSS = `
 .fisa-doc { background: #fff; color: #111; font: 10.5pt/1.4 -apple-system, "Helvetica Neue", Arial, sans-serif; }
 .fisa-doc h1 { font-size: 18pt; margin: 2pt 0 6pt; }

@@ -8,6 +8,8 @@ const P = (text, cls = 'neutral', ic = '') => `<span class="pill pill-${cls}">${
 const F = (level, text) => `<span class="pill fine-st fs-${level}">${icon('fine')}${text}</span>`;
 const OK = B('check', 'Conform', 'm-ok');
 const NOK = B('x', 'Constatat', 'm-nok');
+// Adăposturile de protecție civilă: același text în tabul Obiectiv (OPEC) și în Protecție civilă (Localitate)
+const ADP = 'Adăposturile de protecție civilă: alegeți <b>DA</b>, <b>NU</b> sau <b>NEC</b>. La DA apare întrebarea <b>„Câte adăposturi?”</b>: apăsați + pentru fiecare. Fiecare adăpost (A1, A2…) are locația, butoanele <b>Conform</b> / <b>Neconform</b> și observațiile. Un adăpost <b>neconform</b> este neregulă: are bifele Trecut în PV, Sancționat cu amendă și Neregulă veche și intră în Text PV („Adăpost de protecție civilă neconform – locația”). La controlul următor al obiectivului, adăposturile se preiau cu locația, iar starea se verifică din nou. Dacă treceți înapoi pe NU sau NEC, aplicația cere confirmare și șterge adăposturile.';
 const NEC = B('', '<b>NEC</b>', 'm-nec');
 
 // Fiecare capitol: id (legătură directă #/ghid/<id>), pictogramă, titlu, blocuri.
@@ -148,6 +150,8 @@ export const MANUAL = [
       { p: 'Data începerii și butonul <b>Încheie controlul</b> (vedeți capitolul „La final”).' },
       { h: 'Încărcare după încheiere' },
       { p: `După ce încheiați controlul, apare secțiunea „Încărcare după încheiere”, cu două bife: ${B('check', 'Încărcat în aplicație', 'm-ok')} (controlul introdus în aplicația ISU) și ${B('check', 'Document încărcat', 'm-ok')} (procesul-verbal scanat). Aplicația reține ziua în care ați bifat. Dedesubt vedeți termenul: <b>3 zile lucrătoare</b> de la data încheierii (vedeți „Amenzile și termenele”).` },
+      { h: 'Adăposturi de protecție civilă (OPEC / Instituție)' },
+      { p: `La OPEC / Instituție, sub construcții. ${ADP} Cele neconforme apar și în tabul Nereguli, în grupul „Adăposturi de protecție civilă”. (La Localitate, adăposturile sunt în tabul Protecție civilă.)` },
       { h: 'Construcțiile' },
       { p: 'Numărul construcțiilor se schimbă cu − și +. Fiecare construcție se deschide și se strânge din antetul ei. Antetul arată pe scurt: dotările completate, suprafața, regimul de înălțime, GRF/NSI, „GPS ✓” și avertizările (instalații lipsă, GRF/NSI V peste parter). Pentru fiecare construcție completați:' },
       { ul: [
@@ -234,7 +238,8 @@ export const MANUAL = [
       { h: 'Restul conform' },
       { p: `${B('check', 'Restul conform (N)', 'm-green-out')} marchează Conform toate rândurile rămase nemarcate. Înainte, vă arată lista exactă și vă cere să confirmați „Am verificat la fața locului…”. Neregulile grave nu sunt incluse niciodată. Imediat după, puteți apăsa Anulează.` },
       { h: 'Planuri și SVSU, Protecție civilă (doar la localități)' },
-      { p: 'Funcționează la fel, cu Conform / Neconform / NEC. În Text PV, rubricile neconforme apar formulate negativ (de exemplu „PAAR neavizat”). Protecție civilă are în plus adăpostul (DA / NU / NEC).' },
+      { p: 'Funcționează la fel, cu Conform / Neconform / NEC. În Text PV, rubricile neconforme apar formulate negativ (de exemplu „PAAR neavizat”). Protecție civilă are categoria <b>Organizare protecție civilă</b> (agent de inundații, inspector de protecție civilă, taxa de protecție civilă, convenții cu OPEC) și, la „Dotare și adăpost”, adăposturile.' },
+      { p: `${ADP}` },
     ],
   },
   {
@@ -298,12 +303,12 @@ export const MANUAL = [
     blocks: [
       { ul: [
         '<b>Obiective</b>: lista obiectivelor controlate. Căutați după nume, localitate, adresă sau dată (12.09.2026, 09.2026 sau 2026; butonul „Dată” deschide un calendar) și filtrați după tip și după <b>filtrele</b> de mai jos. Cardul arată, la toate controalele obiectivului, amenzile pe stadii, ASI în curs, netrecutele în PV și încărcarea, iar pentru <b>ultimul control</b> neregulile grave și sigiliul. Atingeți un obiectiv ca să vedeți datele lui, coordonatele GPS ale construcțiilor, istoricul controalelor și butonul „Control nou pe acest obiectiv”.',
-        '<b>Istoric</b>: toate controalele, grupate pe luni, cu căutare după obiectiv, administrator sau dată și cu filtrele În desfășurare / Încheiate și filtrele de mai jos. Fiecare control arată, scris: numărul de nereguli (cele grave primele), sigiliul („Sigiliu aplicat · 2 criterii” sau, la construcții diferite, „2 sigilii (2 construcții) · 3 criterii”), câte nu sunt trecute în PV, amenzile cu stadiul lor, termenul ASI și încărcarea — „Neîncărcat în aplicație”, „Document neîncărcat” cu termenul, sau „Încărcat în aplicație · document încărcat”. La fel pe pagina fiecărui obiectiv; în lista Obiective, cardul arată câte controale sunt neîncărcate și sigiliul aplicat la ultimul control.',
+        '<b>Istoric</b>: toate controalele, grupate pe luni, cu căutare după obiectiv, administrator sau dată și cu filtrele În desfășurare / Încheiate și filtrele de mai jos. Fiecare control arată, scris: numărul de nereguli (cele grave primele), adăposturile („3 adăposturi: 2 conforme, 1 neconform”), sigiliul („Sigiliu aplicat · 2 criterii” sau, la construcții diferite, „2 sigilii (2 construcții) · 3 criterii”), câte nu sunt trecute în PV, amenzile cu stadiul lor, termenul ASI și încărcarea — „Neîncărcat în aplicație”, „Document neîncărcat” cu termenul, sau „Încărcat în aplicație · document încărcat”. La fel pe pagina fiecărui obiectiv; în lista Obiective, cardul arată câte controale sunt neîncărcate și sigiliul aplicat la ultimul control.',
         '<b>Calendar</b>: anul și luna se schimbă separat. În fiecare zi vedeți controalele (violet = în desfășurare, albastru închis = încheiat), activitățile (în culoarea tipului lor), zilele libere (fundal gri: weekend și sărbători legale) și bulinele termenelor (albastru = termen de plată, roșu = termen ANAF sau ASI, portocaliu = termen de încărcare). Atingeți o zi ca să vedeți lista completă și butoanele „Control nou în această zi” și „Activitate nouă în această zi” (vedeți „Planul lunar”).',
       ] },
       { h: 'Filtrele din Istoric și Obiective' },
-      { p: `Sub căutare, un rând de butoane: ${B('fine', 'Amendă în curs')} ${B('fine', 'Termen 15 zile expirat')} ${B('fine', 'Trimite la ANAF')} ${B('fine', 'Amendă achitată')} ${B('hourglass', 'ASI în curs')} ${B('upload', 'De încărcat')} ${B('pv', 'Netrecute în PV')} ${B('alert', 'Nereguli grave')} ${B('lock', 'Sigiliu aplicat')}. Fiecare arată câte rezultate ați avea dacă îl atingeți; butonul cu 0 e inactiv. Puteți activa mai multe deodată: rămân doar cele care le îndeplinesc pe <b>toate</b> (de exemplu, Netrecute în PV + Trimite la ANAF). Deasupra listei scrie ce filtre sunt active; ${B('x', 'Șterge filtrele')} le anulează. Filtrele se combină cu căutarea și cu În desfășurare / Încheiate (sau tipul obiectivului).` },
-      { p: 'În <b>Obiective</b>, amenzile, ASI, încărcarea și PV se caută la <b>oricare</b> control al obiectivului (sunt lucruri încă deschise); neregulile grave și sigiliul, doar la <b>ultimul control</b> (starea actuală a obiectivului).' },
+      { p: `Sub căutare, un rând de butoane: ${B('fine', 'Amendă în curs')} ${B('fine', 'Termen 15 zile expirat')} ${B('fine', 'Trimite la ANAF')} ${B('fine', 'Amendă achitată')} ${B('hourglass', 'ASI în curs')} ${B('upload', 'De încărcat')} ${B('pv', 'Netrecute în PV')} ${B('alert', 'Nereguli grave')} ${B('lock', 'Sigiliu aplicat')} ${B('shield', 'Adăposturi PC')}. Fiecare arată câte rezultate ați avea dacă îl atingeți; butonul cu 0 e inactiv. Puteți activa mai multe deodată: rămân doar cele care le îndeplinesc pe <b>toate</b> (de exemplu, Netrecute în PV + Trimite la ANAF). Deasupra listei scrie ce filtre sunt active; ${B('x', 'Șterge filtrele')} le anulează. Filtrele se combină cu căutarea și cu În desfășurare / Încheiate (sau tipul obiectivului).` },
+      { p: 'În <b>Obiective</b>, amenzile, ASI, încărcarea și PV se caută la <b>oricare</b> control al obiectivului (sunt lucruri încă deschise); neregulile grave, sigiliul și adăposturile, doar la <b>ultimul control</b> (starea actuală a obiectivului).' },
     ],
   },
   {

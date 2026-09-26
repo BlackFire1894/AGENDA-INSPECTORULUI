@@ -6,7 +6,7 @@ import {
   addWorkingDays, workingDaysBetween, nextWorkingDay, fmtDateLong,
 } from './dates.js';
 
-export const SCHEMA_VERSION = 10; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS · 7: mai multe construcții pe neregulă, GRF/NSI pe construcție · 8: nereguli ah, ai · 9: verificări defalcate cu date pe construcție, NEC, aj/ak, an construire, nr. ASI/aviz · 10: lista înghețată la încheiere (catalog), seria și nr. amenzii într-un câmp
+export const SCHEMA_VERSION = 11; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS · 7: mai multe construcții pe neregulă, GRF/NSI pe construcție · 8: nereguli ah, ai · 9: verificări defalcate cu date pe construcție, NEC, aj/ak, an construire, nr. ASI/aviz · 10: lista înghețată la încheiere (catalog), seria și nr. amenzii într-un câmp · 11: organizare protecție civilă (agent inundații, inspector PC, taxă, convenții OPEC)
 
 export const TIP_OBIECTIV = [
   { key: 'OPEC', label: 'OPEC / Instituție' },
@@ -76,6 +76,8 @@ export const CATEGORII = {
   svsu: 'SVSU',
   avertizare: 'Avertizare – sirene',
   pcdotare: 'Dotare și adăpost',
+  pcorg: 'Organizare protecție civilă',
+  adapost: 'Adăposturi de protecție civilă',
   custom: 'Nereguli suplimentare',
 };
 
@@ -197,6 +199,10 @@ export const PROTECTIE_CIVILA = [
   { key: 'pcSireneDefecte', cat: 'avertizare', label: 'Sirene defecte' },
   { key: 'pcSireneNefunctionale', cat: 'avertizare', label: 'Sirene nefuncționale' },
   { key: 'pcDotare', cat: 'pcdotare', label: 'Dotare conformă planurilor comunei', nokLabel: 'Dotare neconformă cu planurile comunei' },
+  { key: 'pcAgentInundatii', din: 11, cat: 'pcorg', label: 'Agent de inundații stabilit', nokLabel: 'Agent de inundații nestabilit' },
+  { key: 'pcInspector', din: 11, cat: 'pcorg', label: 'Inspector de protecție civilă stabilit', nokLabel: 'Inspector de protecție civilă nestabilit' },
+  { key: 'pcTaxa', din: 11, cat: 'pcorg', label: 'Taxa de protecție civilă stabilită', nokLabel: 'Taxa de protecție civilă nestabilită' },
+  { key: 'pcConventii', din: 11, cat: 'pcorg', label: 'Convenții cu OPEC', nokLabel: 'Lipsă convenții cu OPEC' },
 ].map((n) => ({ ...n, sec: 'pc' }));
 
 // Toate rândurile șablon, în toate secțiunile
@@ -271,7 +277,7 @@ export function newControl({ objectiveId, tip = 'OPEC', denumire = '', start } =
     constructii: [emptyConstructie(1)],
     acte,
     nereguli: SABLON.map((n) => emptyNeregula(n.key, false, n.sec)),
-    adapostPC: { v: '', obs: '' },   // Adăpost de protecție civilă: DA / NU / NEC (doar LOCALITATE)
+    adapostPC: { v: '', obs: '' },   // Adăposturi de protecție civilă: DA / NU / NEC; la DA, fiecare adăpost e un rând `adapost` în nereguli
     // După încheiere: controlul încărcat în aplicația ISU și documentul (PV scanat) încărcat — bifa și data bifării
     incarcare: { aplicatie: false, aplicatieData: '', document: false, documentData: '' },
   };
@@ -296,6 +302,8 @@ export function controlFromPrevious(prev, start) {
     for (const [kid, v] of Object.entries(p.verificari)) if (idNou.has(kid)) n.verificari[idNou.get(kid)] = { ...v };
   }
   if (prev.adapostPC) c.adapostPC = { ...prev.adapostPC };
+  // adăposturile rămân (aceeași cheie și locație, ca „neregulă veche” să se recunoască); starea se verifică din nou
+  if (c.adapostPC.v === 'DA') for (const a of adaposturi(prev)) c.nereguli.push({ ...emptyAdapost(c, a.key), locatie: a.locatie || '' });
   for (const dot of Object.keys(AUTO_NU)) syncAutoNU(c, dot);   // NU la ASI / AVIZ moștenit → neregula apare din start
   return c;
 }
@@ -433,6 +441,7 @@ export function amendaSerieNr(a) {
 }
 
 export function neregulaLabel(n) {
+  if (n.adapost) return `Adăpost de protecție civilă – ${String(n.locatie || '').trim() || 'locație necompletată'}`;
   if (n.custom) return n.label || 'Neregulă suplimentară';
   return sablon(n.key)?.label || n.label;
 }
@@ -440,6 +449,7 @@ export function neregulaLabel(n) {
 // Formularea constatării (ce se trece în PV / Panou): la rubricile formulate pozitiv („PAAR avizat”)
 // se folosește forma negativă („PAAR neavizat”); la nereguli, textul lor.
 export function constatareLabel(n) {
+  if (n.adapost && n.status === 'nok') return `Adăpost de protecție civilă neconform – ${String(n.locatie || '').trim() || 'locație necompletată'}`;
   if (n.custom) return neregulaLabel(n);
   const t = sablon(n.key);
   return (n.status === 'nok' && t?.nokLabel) || neregulaLabel(n);
@@ -462,14 +472,15 @@ export function sigiliiText(s) {
     : `${s.sigilii} sigilii (${s.sigilii} construcții) · ${criteriiText(s.criterii)}`;
 }
 
-export const neregulaCat = (n) => (n.custom ? 'custom' : sablon(n.key)?.cat || 'custom');
+export const neregulaCat = (n) => (n.adapost ? 'adapost' : n.custom ? 'custom' : sablon(n.key)?.cat || 'custom');
 export const secOf = (n) => n.sec || 'ner';
 export const tabOfNeregula = (n) => SECTIUNI[secOf(n)].tab;
 
 // Numerotarea afișată: literă (a–z) la Nereguli, număr în cadrul grupului la Planuri/PC, „+n” la cele adăugate.
 export function neregulaLetter(c, n) {
+  if (n.adapost) return `A${adaposturi(c).indexOf(n) + 1}`;
   if (n.custom) {
-    const idx = c.nereguli.filter((x) => x.custom && secOf(x) === secOf(n)).indexOf(n);
+    const idx = c.nereguli.filter((x) => x.custom && !x.adapost && secOf(x) === secOf(n)).indexOf(n);
     return `+${idx + 1}`;
   }
   const t = sablon(n.key);
@@ -479,6 +490,33 @@ export function neregulaLetter(c, n) {
 }
 
 export const isLocalitate = (c) => c.tip === 'LOCALITATE';
+
+// ───────── Adăposturi de protecție civilă ─────────
+// La DA, fiecare adăpost e un rând de neregulă (`adapost: true`): locație, Conform / Neconform, observații;
+// neconform = neregulă completă (PV, amendă, neregulă veche). Localitate: tabul Protecție civilă;
+// OPEC / Instituție: tabul Obiectiv (date) și tabul Nereguli (constatarea).
+export const secAdapost = (c) => (isLocalitate(c) ? 'pc' : 'ner');
+export const adaposturi = (c) => (c.nereguli || []).filter((n) => n.adapost);
+export function emptyAdapost(c, key = `adp${uid()}`) {
+  return { ...emptyNeregula(key, true, secAdapost(c)), adapost: true, locatie: '' };
+}
+// Tipul obiectivului s-a schimbat → adăposturile trec în tabul potrivit
+export function syncAdaposturi(c) {
+  const sec = secAdapost(c);
+  for (const n of adaposturi(c)) n.sec = sec;
+}
+// { total, conforme, neconforme, neverificate } la DA; null altfel
+export function adaposturiStats(c) {
+  if (c.adapostPC?.v !== 'DA') return null;
+  const l = adaposturi(c);
+  return { total: l.length, conforme: l.filter((n) => n.status === 'ok').length, neconforme: l.filter((n) => n.status === 'nok').length, neverificate: l.filter((n) => !n.status).length };
+}
+export function adaposturiText(s) {
+  if (!s.total) return 'Adăposturi: DA, număr necompletat';
+  const p = [`${s.conforme} ${s.conforme === 1 ? 'conform' : 'conforme'}`, `${s.neconforme} ${s.neconforme === 1 ? 'neconform' : 'neconforme'}`];
+  if (s.neverificate) p.push(`${s.neverificate} ${s.neverificate === 1 ? 'neverificat' : 'neverificate'}`);
+  return `${s.total} ${s.total === 1 ? 'adăpost' : 'adăposturi'}: ${p.join(', ')}`;
+}
 
 // Secțiunile care se aplică acestui control (Planuri/PC doar la localități)
 export function sectiuniActive(c) {
@@ -503,6 +541,7 @@ export function hasDotare(c, key) {
 // Neregulile de instalații apar doar dacă instalația există (DA la dotări).
 // Un rând deja completat rămâne mereu vizibil, ca să nu „dispară” date.
 export function isApplicable(c, n) {
+  if (n.adapost) return c.adapostPC?.v === 'DA';
   if (n.custom || n.status) return true;
   const t = sablon(n.key);
   if (t && !inCatalog(c, t)) return false;
@@ -805,6 +844,7 @@ export function allAsi(controls, today = todayISO()) {
 // Același rând (aceeași cheie; la rândurile adăugate: același text) constatat și la un control anterior
 // al aceluiași obiectiv. Întoarce cel mai recent astfel de control, sau null.
 function sameRow(a, b) {
+  if (a.adapost || b.adapost) return !!(a.adapost && b.adapost && a.key === b.key);
   if (a.custom || b.custom) return !!(a.custom && b.custom && fold(a.label).trim() && fold(a.label).trim() === fold(b.label).trim());
   return a.key === b.key;
 }
@@ -897,7 +937,12 @@ export function todoList(c, { includeClose = true } = {}) {
     }
   }
   const active = activeNereguli(c);
-  for (const n of active.filter((x) => x.custom && x.status && !String(x.label || '').trim())) {
+  const adp = adaposturiStats(c);
+  if (adp && !adp.total) out.push({ id: 'adp-nr', level: 'todo', text: 'Adăposturi de protecție civilă: completați câte sunt', tab: isLocalitate(c) ? 'pc' : 'obiectiv', focus: isLocalitate(c) ? 'adapostPC' : 'sec-adaposturi' });
+  for (const n of active.filter((x) => x.adapost && isApplicable(c, x) && !String(x.locatie || '').trim())) {
+    out.push({ id: `loc-${n.key}`, level: 'warn', text: `Adăpostul ${neregulaLetter(c, n)} fără locație`, tab: tabOf(secOf(n)), focus: n.key });
+  }
+  for (const n of active.filter((x) => x.custom && !x.adapost && x.status && !String(x.label || '').trim())) {
     out.push({ id: `label-${n.key}`, level: 'warn', text: 'Rând suplimentar fără descriere', tab: tabOf(secOf(n)), focus: n.key });
   }
   const netrec = active.filter((n) => n.status === 'nok' && !n.inPV);

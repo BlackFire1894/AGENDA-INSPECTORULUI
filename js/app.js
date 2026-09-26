@@ -6,6 +6,7 @@ import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
   fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat, pvText, sectiuniActive, secOf,
   todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality, constructiiOf, schimbare, grfVPesteParter, constructiiEligibile, verifExpirate, ascunsaDeDotari, neregulaLetter, neregulaLabel, AUTO_NU, syncAutoNU,
+  adaposturi, emptyAdapost,
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
@@ -524,6 +525,12 @@ document.addEventListener('click', async (e) => {
       const cur = getPath(c, el.dataset.path);
       const noClear = el.closest('.no-clear');
       const v = el.dataset.toggle && cur === el.dataset.val && !noClear ? '' : el.dataset.val;
+      // adăposturile nu mai au temei fără DA: se șterg, cu confirmare
+      if (el.dataset.path === 'adapostPC.v' && cur === 'DA' && v !== 'DA' && adaposturi(c).length) {
+        const k = adaposturi(c).length;
+        if (!await confirmDialog({ title: `Ștergeți ${k === 1 ? 'adăpostul' : `cele ${k} adăposturi`}?`, text: `Fără „DA”, ${k === 1 ? 'adăpostul completat se elimină' : 'adăposturile completate se elimină'} din acest control (locație, stare, observații, PV, amendă).`, ok: 'Șterge', danger: true })) return;
+        c.nereguli = c.nereguli.filter((x) => !x.adapost);
+      }
       setPath(c, el.dataset.path, v);
       // ✓ Conform / NEC → rândul se restrânge singur (la Constatat rămâne deschis, pentru PV și amendă)
       const mSt = el.dataset.path.match(/^nereguli\.@(.+)\.status$/) || el.dataset.path.match(/^acte\.(\w+)\.status$/);
@@ -692,9 +699,25 @@ document.addEventListener('click', async (e) => {
       input?.focus();
       return;
     }
+    case 'adp-count': {
+      const list = adaposturi(c);
+      if (el.dataset.val === '1') {
+        const n = emptyAdapost(c);
+        c.nereguli.push(n);
+        touch(c, true); rerenderEditor();
+        document.querySelector(`#ner-${CSS.escape(n.key)} .adp-loc`)?.focus();
+        return;
+      }
+      const n = list[list.length - 1];
+      if (!n) return;
+      const areDate = n.status || String(n.locatie || '').trim() || String(n.obs || '').trim();
+      if (areDate && !await confirmDialog({ title: `Ștergeți adăpostul ${neregulaLetter(c, n)}?`, text: `„${neregulaLabel(n)}” are date completate și va fi eliminat din acest control.`, ok: 'Șterge', danger: true })) return;
+      c.nereguli = c.nereguli.filter((x) => x !== n);
+      break;
+    }
     case 'ner-del': {
       const n = c.nereguli.find((x) => x.key === el.dataset.key);
-      const ok = await confirmDialog({ title: 'Ștergeți rândul?', text: `„${n.label || 'Neregulă suplimentară'}” va fi eliminată din acest control.`, ok: 'Șterge', danger: true });
+      const ok = await confirmDialog({ title: n.adapost ? `Ștergeți adăpostul ${neregulaLetter(c, n)}?` : 'Ștergeți rândul?', text: `„${n.adapost ? neregulaLabel(n) : n.label || 'Neregulă suplimentară'}” va fi eliminat${n.adapost ? '' : 'ă'} din acest control.`, ok: 'Șterge', danger: true });
       if (!ok) return;
       c.nereguli = c.nereguli.filter((x) => x !== n);
       break;

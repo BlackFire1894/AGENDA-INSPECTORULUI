@@ -7,6 +7,7 @@ import {
   neregulaCat, secOf, isApplicable, isLocalitate, constructiiOf, constructiiNume, matchNeregula, fold, amendaSerieNr, vecheInfo, todoList,
   LIPSA_DOTARI, isGrav, constructiiDeclansate, GRF_NIVELURI, grfVPesteParter, sablon, fmtCoord, googleMapsUrl, appleMapsUrl, gpsQuality,
   constructiiEligibile, isVerificare, verifStare, verifExpirate, ascunsaDeDotari, matchAct,
+  adaposturi, adaposturiStats, adaposturiText,
 } from './model.js';
 import { icon, esc, pill, finePill, tipBadge } from './ui.js';
 
@@ -340,6 +341,11 @@ function tabObiectiv(c) {
     </div>
     <div class="constr-list">${c.constructii.map((k, i) => constructieHTML(c, k, i)).join('')}</div>
   </section>
+  ${isLocalitate(c) ? '' : `<section class="card form-card" id="sec-adaposturi">
+    <h2 class="sec-title">${icon('shield')} Adăposturi de protecție civilă</h2>
+    <div class="check-list">${adapostRow(c)}${adaposturi(c).filter((n) => isApplicable(c, n)).map((n) => neregulaRow(c, n)).join('')}</div>
+    ${adaposturiStats(c)?.neconforme ? `<p class="hint">Adăposturile neconforme sunt nereguli: apar și în tabul Nereguli (PV, amendă), la „Adăposturi de protecție civilă”.</p>` : ''}
+  </section>`}
   <datalist id="dl-structura">${STRUCTURI.map((s) => `<option value="${esc(s)}">`).join('')}</datalist>
   <datalist id="dl-pereti">${MATERIALE_PERETI.map((s) => `<option value="${esc(s)}">`).join('')}</datalist>`;
 }
@@ -564,7 +570,8 @@ function sectionRows(c, sec) {
   const showAll = state.ui.showAllNer;
   const rows = c.nereguli.filter((n) => secOf(n) === sec);
   const tmpl = rows.filter((n) => !n.custom && (isApplicable(c, n) || (showAll && ascunsaDeDotari(c, n))));
-  const custom = rows.filter((n) => n.custom);
+  const custom = rows.filter((n) => n.custom && !n.adapost);
+  const adp = rows.filter((n) => n.adapost && isApplicable(c, n));
   const show = (n) => (f === 'ALL' || (f === 'NOK' ? n.status === 'nok' : !n.status)) && matchNeregula(c, n, q);
   const groups = [];
   for (const n of tmpl) {
@@ -572,6 +579,11 @@ function sectionRows(c, sec) {
     let g = groups.find((x) => x.cat === cat);
     if (!g) { g = { cat, rows: [] }; groups.push(g); }
     g.rows.push(n);
+  }
+  // adăposturile: la Localitate lângă rubrica „Adăposturi” (Dotare și adăpost); la OPEC, grup propriu în Nereguli
+  if (adp.length) {
+    const g = groups.find((x) => x.cat === (sec === 'pc' ? 'pcdotare' : 'adapost'));
+    if (g) g.rows.push(...adp); else groups.push({ cat: 'adapost', rows: adp });
   }
   // rânduri care s-ar potrivi, dar sunt ascunse (instalații nebifate DA la dotări)
   const ascunse = q && !showAll ? rows.filter((n) => ascunsaDeDotari(c, n) && matchNeregula(c, n, q)).length : 0;
@@ -636,7 +648,7 @@ export function nerResultsHTML(c, sec) {
         <span class="cat-meta">${nRows} ${nRows === 1 ? 'rând' : 'rânduri'}</span>
         <span class="cat-info">${catInfo(c, g.rows, sec, { adapostGol: sec === 'pc' && g.cat === 'pcdotare' && !c.adapostPC.v, scurt: !closed })}</span>
       </button>
-      ${closed ? '' : `<div class="check-list">${vis.map((n) => neregulaRow(c, n)).join('')}${adapost}</div>`}
+      ${closed ? '' : `<div class="check-list">${vis.filter((n) => !n.adapost).map((n) => neregulaRow(c, n)).join('')}${adapost}${vis.filter((n) => n.adapost).map((n) => neregulaRow(c, n)).join('')}</div>`}
     </div>`;
   }).join('');
   const customVis = custom.filter(show);
@@ -737,12 +749,23 @@ function restBtn(n, sec, label) {
 }
 
 
+// Adăposturi de protecție civilă: DA / NU / NEC; la DA, câte sunt (fiecare devine un rând A1, A2…)
 function adapostRow(c) {
   const v = c.adapostPC;
+  const n = adaposturi(c).length;
   return `<div class="check-row adapost-row" id="ner-adapostPC">
-    <span class="row-idx letter">2</span>
+    <span class="row-idx letter">${isLocalitate(c) ? '2' : icon('shield')}</span>
     <div class="row-main">
-      <span class="row-label">Adăpost de protecție civilă <small class="muted">NEC = nu este cazul</small></span>
+      <span class="row-label">Adăposturi de protecție civilă <small class="muted">NEC = nu este cazul</small></span>
+      ${v.v === 'DA' ? `<div class="adp-count">
+        <span class="lbl">Câte adăposturi?</span>
+        <div class="stepper" aria-label="Număr adăposturi">
+          <button class="step-btn" data-act="adp-count" data-val="-1" aria-label="Mai puține" ${n ? '' : 'disabled'}>−</button>
+          <span class="step-val ${n ? '' : 'is-empty'}"><b>${n}</b><small>${n === 1 ? 'adăpost' : 'adăposturi'}</small></span>
+          <button class="step-btn" data-act="adp-count" data-val="1" aria-label="Mai multe">+</button>
+        </div>
+        ${n ? `<span class="adp-sum">${esc(adaposturiText(adaposturiStats(c)))}</span>` : '<span class="hint">Apăsați + pentru fiecare adăpost; apoi completați locația și starea lui.</span>'}
+      </div>` : ''}
       ${obsField('adapostPC.obs', v.obs)}
     </div>
     <div class="row-side">${segBtns('adapostPC.v', v.v, ['DA', 'NU', 'NEC'], 'seg-dnn seg-adapost')}</div>
@@ -758,7 +781,7 @@ function rowPills(c, n, collapsed) {
   const pills = [];
   if (collapsed) {
     pills.push(n.status === 'ok' ? pill('green', sec.ok, 'check')
-      : n.status === 'nok' ? pill('red', sec.nok, 'x')
+      : n.status === 'nok' ? pill('red', n.adapost ? 'Neconform' : sec.nok, 'x')
         : n.status === 'nec' ? pill('neutral', 'NEC') : '<span class="pill pill-todo">Necompletat</span>');
   }
   const vi = vecheInfo(state.controls, c, n);
@@ -787,13 +810,15 @@ function neregulaRow(c, n) {
   const sec = SECTIUNI[secOf(n)];
   const collapsed = rowCollapsed(c, n);
   const vi = vecheInfo(state.controls, c, n);
-  const labelHTML = n.custom
+  const labelHTML = n.adapost
+    ? `<span class="row-label">Adăpost de protecție civilă</span><input class="row-label-input adp-loc" data-bind="${path}.locatie" value="${esc(n.locatie || '')}" placeholder="Locația adăpostului (ex.: subsol bloc A2)" autocomplete="off" aria-label="Locația adăpostului ${esc(letter)}">`
+    : n.custom
     ? `<input class="row-label-input" data-bind="${path}.label" value="${esc(n.label)}" placeholder="Descrieți ${secOf(n) === 'ner' ? 'neregula' : 'rubrica'}…" autocomplete="off">`
     : `<span class="row-label">${esc(neregulaLabel(n))}</span>`;
   const pills = rowPills(c, n, collapsed);
   const tgl = `data-act="row-toggle" data-key="${esc(n.key)}"`;
   const verif = isVerificare(n) && n.status !== 'nec' ? verifBlock(c, n) : '';
-  const constr = sablon(n.key)?.grav ? constrNU(c, n) : ((n.sec === 'ner' || !n.sec) && n.status !== 'nec' ? constrSelect(c, n) : '');
+  const constr = n.adapost ? '' : sablon(n.key)?.grav ? constrNU(c, n) : ((n.sec === 'ner' || !n.sec) && n.status !== 'nec' ? constrSelect(c, n) : '');
   const obsGol = !String(n.obs || '').trim() && !state.ui.obsOpen.has(obsKey(`${path}.obs`)) && n.status !== 'nok';
   const faraCorp = !verif && !constr && obsGol && !n.custom && n.status !== 'nok';   // corpul ar avea doar „+ Obs.”
   if (faraCorp && !collapsed) pills.push(obsField(`${path}.obs`, ''));
@@ -804,7 +829,7 @@ function neregulaRow(c, n) {
         ${labelHTML}
         ${pills.length ? `<span class="chips">${pills.join('')}</span>` : ''}
       </div>
-      ${collapsed ? '' : okNok(path, n.status, sec.ok, sec.nok, { nec: !sablon(n.key)?.grav || n.custom })}
+      ${collapsed ? '' : n.adapost ? okNok(path, n.status, 'Conform', 'Neconform') : okNok(path, n.status, sec.ok, sec.nok, { nec: !sablon(n.key)?.grav || n.custom })}
       <button type="button" class="icon-btn row-tgl" ${tgl} aria-expanded="${!collapsed}" aria-label="${collapsed ? 'Deschide' : 'Restrânge'} rândul ${esc(letter)}">${icon('chevD', collapsed ? '' : 'rot')}</button>
     </div>
     ${collapsed || faraCorp ? '' : `<div class="row-main">
@@ -875,7 +900,7 @@ function neregulaDetail(c, n, path) {
       ${toggle(`${path}.inPV`, n.inPV, 'Trecut în procesul-verbal', { level: 'green', ic: 'pv', offLabel: 'Netrecut în procesul-verbal' })}
       ${toggle(`${path}.amenda.aplicata`, a.aplicata, 'Sancționat cu amendă', { level: 'blue', ic: 'fine' })}
       ${veche}
-      ${n.custom ? toggle(`${path}.grav`, n.grav, 'Neregulă gravă', { level: 'red', ic: 'alert' }) : ''}
+      ${n.custom && !n.adapost ? toggle(`${path}.grav`, n.grav, 'Neregulă gravă', { level: 'red', ic: 'alert' }) : ''}
       ${isGrav(n) ? toggle(`${path}.sigiliu`, n.sigiliu, 'Sigiliu', { level: 'red', ic: 'lock' }) : ''}
     </div>
     ${asi}${fine}
