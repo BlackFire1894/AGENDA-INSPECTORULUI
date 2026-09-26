@@ -11,7 +11,7 @@ mkdir -p "$OUT/site" && cp -r "$ROOT"/{index.html,sw.js,manifest.webmanifest,js,
 python3 -m http.server 8090 --bind 127.0.0.1 --directory "$OUT/site" > "$OUT/srv8090.log" 2>&1 & SRV=$!
 trap 'kill $SRV 2>/dev/null' EXIT
 node gen.mjs > /dev/null && node reguli.mjs > reguli.json
-for t in activitati libere libere2 sigiliu filtre ordine adaposturi telefon nativ v114 v113 v1121 v112 v111 v110 flow loc v14 v15 obsind bk v16 v17 live liveloc gps v19 v19b hol titlecheck audit upd; do
+for t in activitati libere libere2 sigiliu filtre ordine adaposturi telefon v114 v113 v1121 v112 v111 v110 flow loc v14 v15 obsind bk v16 v17 live liveloc gps v19 v19b hol titlecheck audit upd; do
   timeout 590 node "$t.cjs" "$OUT" > "$OUT/$t.txt" 2>&1
   echo "== $t: ok=$(grep -c '^ok:' "$OUT/$t.txt") fail=$(grep -c '^FAIL' "$OUT/$t.txt") $(tail -1 "$OUT/$t.txt" | cut -c1-80)"
   grep -E '^FAIL|at .*cjs:[0-9]' "$OUT/$t.txt" | head -4

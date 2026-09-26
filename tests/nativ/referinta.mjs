@@ -1,12 +1,11 @@
-// Legătura cu aplicația nativă iOS (widgeturi, notificări, insigna iconiței). În browser nu face nimic.
-// Aplicația nativă afișează aceeași aplicație web; aici se calculează — cu aceleași reguli ca Panoul — cifrele
-// pentru fiecare din zilele următoare (ca widgetul să se schimbe singur la miezul nopții) și notificările.
-// Contractul de date e descris în ios/README.md („Ce primește aplicația nativă”); `v` crește la o schimbare de format.
-import { addDays, fmtDate, fmtDateLong, isISO } from './dates.js';
+// Implementarea de referință pentru partea nativă (widgeturi, notificări, insigna iconiței) a aplicației iOS scrise în Swift.
+// Nu face parte din aplicația web. Aplicația nativă trebuie să dea aceleași rezultate: vedeți docs/nativ/vectori/demo.json
+// (câmpul „nativ”) și docs/nativ/SPECIFICATIE.md („Widgeturi și notificări”).
+import { addDays, fmtDate, fmtDateLong, isISO } from '../../js/dates.js';
 import {
   activeNereguli, fineStatus, asiDeadline, incarcareStatus, isIncheiat, neregulaLetter, constatareLabel,
-} from './model.js';
-import { deConfirmat, sfarsitActivitate, titluActivitate } from './activitati.js';
+} from '../../js/model.js';
+import { deConfirmat, sfarsitActivitate, titluActivitate } from '../../js/activitati.js';
 
 export const ZILE_WIDGET = 21;        // câte zile în avans are widgetul cifrele gata calculate
 const ZILE_NOTIFICARI = 75;           // cât de departe se caută termene pentru notificări
@@ -126,19 +125,4 @@ export function stareNativa(controls, activitati, meta, azi, acum = new Date()) 
     notificari: notificari(controls, activitati, meta, azi),
     insigna: zile[0].urgente,
   };
-}
-
-// ───────── trimiterea (doar în aplicația nativă) ─────────
-const canal = () => (typeof window !== 'undefined' ? window.webkit?.messageHandlers?.agenda : null);
-export const inAplicatiaNativa = () => !!canal();
-let timer;
-export function trimiteStareNativa(sursa) {
-  if (!canal()) return;
-  clearTimeout(timer);
-  timer = setTimeout(() => {
-    try {
-      const { controls, activitati, meta, azi } = sursa();
-      canal().postMessage({ tip: 'stare', stare: stareNativa(controls, activitati, meta, azi) });
-    } catch (e) { console.error(e); }
-  }, 800);
 }

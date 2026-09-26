@@ -1,0 +1,7210 @@
+{
+ "amenzi": [
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-09-29",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": -2,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 17,
+    "nelucr": "",
+    "msg": "Data aplicării amenzii e în viitor (01.10.2026); plata până la 16.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-09-30",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": -1,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 16,
+    "nelucr": "",
+    "msg": "Data aplicării amenzii e în viitor (01.10.2026); plata până la 16.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-01",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 0,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 15,
+    "nelucr": "",
+    "msg": "Mai sunt 15 zile din termenul de plată (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-02",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 1,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 14,
+    "nelucr": "",
+    "msg": "Mai sunt 14 zile din termenul de plată (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-03",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 2,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 13,
+    "nelucr": "",
+    "msg": "Mai sunt 13 zile din termenul de plată (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-04",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 3,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 12,
+    "nelucr": "",
+    "msg": "Mai sunt 12 zile din termenul de plată (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-05",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 4,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 11,
+    "nelucr": "",
+    "msg": "Mai sunt 11 zile din termenul de plată (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-06",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 5,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 10,
+    "nelucr": "",
+    "msg": "Mai sunt 10 zile din termenul de plată (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-07",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 6,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 9,
+    "nelucr": "",
+    "msg": "Mai sunt 9 zile din termenul de plată (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-08",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 7,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 8,
+    "nelucr": "",
+    "msg": "Mai sunt 8 zile din termenul de plată (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-09",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 8,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 7,
+    "nelucr": "",
+    "msg": "Mai sunt 7 zile din termenul de plată (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-10",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 9,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 6,
+    "nelucr": "",
+    "msg": "Mai sunt 6 zile din termenul de plată (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-11",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 10,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 5,
+    "nelucr": "",
+    "msg": "Mai sunt 5 zile din termenul de plată (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-12",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 11,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 4,
+    "nelucr": "",
+    "msg": "Mai sunt 4 zile din termenul de plată (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-13",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 12,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 3,
+    "nelucr": "",
+    "msg": "Mai sunt 3 zile din termenul de plată (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-14",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 13,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 2,
+    "nelucr": "",
+    "msg": "Mai sunt 2 zile din termenul de plată (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-15",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 14,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 1,
+    "nelucr": "",
+    "msg": "Mai este 1 zi din termenul de plată (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-16",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 15,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 0,
+    "nelucr": "",
+    "msg": "Astăzi este ultima zi de plată"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-17",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 16,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 29,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 1 zi (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-18",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 17,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 28,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 2 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-19",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 18,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 27,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 3 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-20",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 19,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 26,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 4 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-21",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 20,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 25,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 5 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-22",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 21,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 24,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 6 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-23",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 22,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 23,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 7 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-24",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 23,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 22,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 8 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-25",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 24,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 21,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 9 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-26",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 25,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 20,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 10 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-27",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 26,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 19,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 11 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-28",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 27,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 18,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 12 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-29",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 28,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 17,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 13 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-30",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 29,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 16,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 14 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-10-31",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 30,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 15,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 15 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-01",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 31,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 14,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 16 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-02",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 32,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 13,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 17 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-03",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 33,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 12,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 18 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-04",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 34,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 11,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 19 zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-05",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 35,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 10,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 20 de zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-06",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 36,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 9,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 21 de zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-07",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 37,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 8,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 22 de zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-08",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 38,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 7,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 23 de zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-09",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 39,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 6,
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 24 de zile (16.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-10",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 40,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 5,
+    "msg": "Mai aveți 5 zile până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-11",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 41,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 4,
+    "msg": "Mai aveți 4 zile până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-12",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 42,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 3,
+    "msg": "Mai aveți 3 zile până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-13",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 43,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 2,
+    "msg": "Mai aveți 2 zile până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-14",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 44,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 1,
+    "msg": "Mai aveți 1 zi până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-15",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 45,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": 0,
+    "msg": "Astăzi este ultima zi pentru trimiterea la ANAF; consultați calculatorul de termene",
+    "nelucr": "Termenul ANAF (15.11.2026) cade duminică — următoarea zi lucrătoare: luni, 16 noiembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-16",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 46,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": -1,
+    "msg": "Termenul de trimitere la ANAF (15.11.2026) a fost depășit cu 1 zi",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-17",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 47,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": -2,
+    "msg": "Termenul de trimitere la ANAF (15.11.2026) a fost depășit cu 2 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-18",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 48,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": -3,
+    "msg": "Termenul de trimitere la ANAF (15.11.2026) a fost depășit cu 3 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-19",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 49,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": -4,
+    "msg": "Termenul de trimitere la ANAF (15.11.2026) a fost depășit cu 4 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "dataAplicarii": "",
+   "azi": "2026-11-20",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 50,
+    "plataPana": "2026-10-16",
+    "anafPana": "2026-11-15",
+    "plataNelucr": "",
+    "anafNelucr": "duminică",
+    "daysLeft": -5,
+    "msg": "Termenul de trimitere la ANAF (15.11.2026) a fost depășit cu 5 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-11-18",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": -2,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 17,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Data aplicării amenzii e în viitor (20.11.2026); plata până la 05.12.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-11-19",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": -1,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 16,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Data aplicării amenzii e în viitor (20.11.2026); plata până la 05.12.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-11-20",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 0,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 15,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 15 zile din termenul de plată (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-11-21",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 1,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 14,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 14 zile din termenul de plată (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-11-22",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 2,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 13,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 13 zile din termenul de plată (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-11-23",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 3,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 12,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 12 zile din termenul de plată (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-11-24",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 4,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 11,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 11 zile din termenul de plată (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-11-25",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 5,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 10,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 10 zile din termenul de plată (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-11-26",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 6,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 9,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 9 zile din termenul de plată (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-11-27",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 7,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 8,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 8 zile din termenul de plată (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-11-28",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 8,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 7,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 7 zile din termenul de plată (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-11-29",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 9,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 6,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 6 zile din termenul de plată (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-11-30",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 10,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 5,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 5 zile din termenul de plată (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-01",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 11,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 4,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 4 zile din termenul de plată (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-02",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 12,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 3,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 3 zile din termenul de plată (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-03",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 13,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 2,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 2 zile din termenul de plată (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-04",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 14,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 1,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Mai este 1 zi din termenul de plată (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-05",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 15,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 0,
+    "nelucr": "Termenul de plată (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea",
+    "msg": "Astăzi este ultima zi de plată"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-06",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 16,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 29,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 1 zi (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-07",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 17,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 28,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 2 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-08",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 18,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 27,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 3 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-09",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 19,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 26,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 4 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-10",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 20,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 25,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 5 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-11",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 21,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 24,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 6 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-12",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 22,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 23,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 7 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-13",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 23,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 22,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 8 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-14",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 24,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 21,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 9 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-15",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 25,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 20,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 10 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-16",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 26,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 19,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 11 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-17",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 27,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 18,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 12 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-18",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 28,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 17,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 13 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-19",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 29,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 16,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 14 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-20",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 30,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 15,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 15 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-21",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 31,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 14,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 16 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-22",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 32,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 13,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 17 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-23",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 33,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 12,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 18 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-24",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 34,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 11,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 19 zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-25",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 35,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 10,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 20 de zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-26",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 36,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 9,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 21 de zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-27",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 37,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 8,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 22 de zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-28",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 38,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 7,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 23 de zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-29",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 39,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 6,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 24 de zile (05.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-30",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 40,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 5,
+    "msg": "Mai aveți 5 zile până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2026-12-31",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 41,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 4,
+    "msg": "Mai aveți 4 zile până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2027-01-01",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 42,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 3,
+    "msg": "Mai aveți 3 zile până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2027-01-02",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 43,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 2,
+    "msg": "Mai aveți 2 zile până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2027-01-03",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 44,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 1,
+    "msg": "Mai aveți 1 zi până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2027-01-04",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 45,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": 0,
+    "msg": "Astăzi este ultima zi pentru trimiterea la ANAF; consultați calculatorul de termene",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2027-01-05",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 46,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": -1,
+    "msg": "Termenul de trimitere la ANAF (04.01.2027) a fost depășit cu 1 zi",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2027-01-06",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 47,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": -2,
+    "msg": "Termenul de trimitere la ANAF (04.01.2027) a fost depășit cu 2 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2027-01-07",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 48,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": -3,
+    "msg": "Termenul de trimitere la ANAF (04.01.2027) a fost depășit cu 3 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2027-01-08",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 49,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": -4,
+    "msg": "Termenul de trimitere la ANAF (04.01.2027) a fost depășit cu 4 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-20",
+   "dataAplicarii": "",
+   "azi": "2027-01-09",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 50,
+    "plataPana": "2026-12-05",
+    "anafPana": "2027-01-04",
+    "plataNelucr": "sâmbătă",
+    "anafNelucr": "",
+    "daysLeft": -5,
+    "msg": "Termenul de trimitere la ANAF (04.01.2027) a fost depășit cu 5 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-09",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": -2,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 17,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Data aplicării amenzii e în viitor (11.12.2026); plata până la 26.12.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-10",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": -1,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 16,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Data aplicării amenzii e în viitor (11.12.2026); plata până la 26.12.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-11",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 0,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 15,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 15 zile din termenul de plată (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-12",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 1,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 14,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 14 zile din termenul de plată (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-13",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 2,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 13,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 13 zile din termenul de plată (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-14",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 3,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 12,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 12 zile din termenul de plată (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-15",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 4,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 11,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 11 zile din termenul de plată (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-16",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 5,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 10,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 10 zile din termenul de plată (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-17",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 6,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 9,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 9 zile din termenul de plată (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-18",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 7,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 8,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 8 zile din termenul de plată (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-19",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 8,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 7,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 7 zile din termenul de plată (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-20",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 9,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 6,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 6 zile din termenul de plată (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-21",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 10,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 5,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 5 zile din termenul de plată (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-22",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 11,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 4,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 4 zile din termenul de plată (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-23",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 12,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 3,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 3 zile din termenul de plată (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-24",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 13,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 2,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Mai sunt 2 zile din termenul de plată (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-25",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 14,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 1,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Mai este 1 zi din termenul de plată (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-26",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 15,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 0,
+    "nelucr": "Termenul de plată (26.12.2026) cade sărbătoare legală – a doua zi de Crăciun — următoarea zi lucrătoare: luni, 28 decembrie 2026; verificați prelungirea",
+    "msg": "Astăzi este ultima zi de plată"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-27",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 16,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 29,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 1 zi (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-28",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 17,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 28,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 2 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-29",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 18,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 27,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 3 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-30",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 19,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 26,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 4 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2026-12-31",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 20,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 25,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 5 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-01",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 21,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 24,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 6 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-02",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 22,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 23,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 7 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-03",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 23,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 22,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 8 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-04",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 24,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 21,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 9 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-05",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 25,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 20,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 10 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-06",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 26,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 19,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 11 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-07",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 27,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 18,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 12 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-08",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 28,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 17,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 13 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-09",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 29,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 16,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 14 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-10",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 30,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 15,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 15 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-11",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 31,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 14,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 16 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-12",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 32,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 13,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 17 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-13",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 33,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 12,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 18 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-14",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 34,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 11,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 19 zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-15",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 35,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 10,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 20 de zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-16",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 36,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 9,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 21 de zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-17",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 37,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 8,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 22 de zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-18",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 38,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 7,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 23 de zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-19",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 39,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 6,
+    "nelucr": "",
+    "msg": "Termenul de plată a expirat de 24 de zile (26.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-20",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 40,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 5,
+    "msg": "Mai aveți 5 zile până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-21",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 41,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 4,
+    "msg": "Mai aveți 4 zile până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-22",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 42,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 3,
+    "msg": "Mai aveți 3 zile până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-23",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 43,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 2,
+    "msg": "Mai aveți 2 zile până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-24",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 44,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 1,
+    "msg": "Mai aveți 1 zi până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-25",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 45,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": 0,
+    "msg": "Astăzi este ultima zi pentru trimiterea la ANAF; consultați calculatorul de termene",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-26",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 46,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": -1,
+    "msg": "Termenul de trimitere la ANAF (25.01.2027) a fost depășit cu 1 zi",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-27",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 47,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": -2,
+    "msg": "Termenul de trimitere la ANAF (25.01.2027) a fost depășit cu 2 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-28",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 48,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": -3,
+    "msg": "Termenul de trimitere la ANAF (25.01.2027) a fost depășit cu 3 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-29",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 49,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": -4,
+    "msg": "Termenul de trimitere la ANAF (25.01.2027) a fost depășit cu 4 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-10",
+   "dataAplicarii": "2026-12-11",
+   "azi": "2027-01-30",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 50,
+    "plataPana": "2026-12-26",
+    "anafPana": "2027-01-25",
+    "plataNelucr": "sărbătoare legală – a doua zi de Crăciun",
+    "anafNelucr": "",
+    "daysLeft": -5,
+    "msg": "Termenul de trimitere la ANAF (25.01.2027) a fost depășit cu 5 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2026-12-15",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": -2,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 17,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Data aplicării amenzii e în viitor (17.12.2026); plata până la 01.01.2027"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2026-12-16",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": -1,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 16,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Data aplicării amenzii e în viitor (17.12.2026); plata până la 01.01.2027"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2026-12-17",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 0,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 15,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Mai sunt 15 zile din termenul de plată (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2026-12-18",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 1,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 14,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Mai sunt 14 zile din termenul de plată (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2026-12-19",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 2,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 13,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Mai sunt 13 zile din termenul de plată (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2026-12-20",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 3,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 12,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Mai sunt 12 zile din termenul de plată (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2026-12-21",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 4,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 11,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Mai sunt 11 zile din termenul de plată (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2026-12-22",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 5,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 10,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Mai sunt 10 zile din termenul de plată (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2026-12-23",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 6,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 9,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Mai sunt 9 zile din termenul de plată (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2026-12-24",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 7,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 8,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Mai sunt 8 zile din termenul de plată (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2026-12-25",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 8,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 7,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Mai sunt 7 zile din termenul de plată (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2026-12-26",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 9,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 6,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Mai sunt 6 zile din termenul de plată (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2026-12-27",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 10,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 5,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Mai sunt 5 zile din termenul de plată (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2026-12-28",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 11,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 4,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Mai sunt 4 zile din termenul de plată (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2026-12-29",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 12,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 3,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Mai sunt 3 zile din termenul de plată (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2026-12-30",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 13,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 2,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Mai sunt 2 zile din termenul de plată (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2026-12-31",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 14,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 1,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Mai este 1 zi din termenul de plată (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-01",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "elapsed": 15,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 0,
+    "nelucr": "Termenul de plată (01.01.2027) cade sărbătoare legală – Anul Nou — următoarea zi lucrătoare: luni, 4 ianuarie 2027; verificați prelungirea",
+    "msg": "Astăzi este ultima zi de plată"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-02",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 16,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 29,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 1 zi (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-03",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 17,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 28,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 2 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-04",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 18,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 27,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 3 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-05",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 19,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 26,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 4 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-06",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 20,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 25,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 5 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-07",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 21,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 24,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 6 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-08",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 22,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 23,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 7 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-09",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 23,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 22,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 8 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-10",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 24,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 21,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 9 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-11",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 25,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 20,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 10 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-12",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 26,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 19,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 11 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-13",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 27,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 18,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 12 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-14",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 28,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 17,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 13 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-15",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 29,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 16,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 14 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-16",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 30,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 15,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 15 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-17",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 31,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 14,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 16 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-18",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 32,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 13,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 17 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-19",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 33,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 12,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 18 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-20",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 34,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 11,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 19 zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-21",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 35,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 10,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 20 de zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-22",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 36,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 9,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 21 de zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-23",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 37,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 8,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 22 de zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-24",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 38,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 7,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 23 de zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-25",
+   "rezultat": {
+    "level": "yellow",
+    "label": "Termen 15 zile expirat",
+    "elapsed": 39,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 6,
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea",
+    "msg": "Termenul de plată a expirat de 24 de zile (01.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-26",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 40,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 5,
+    "msg": "Mai aveți 5 zile până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-27",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 41,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 4,
+    "msg": "Mai aveți 4 zile până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-28",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 42,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 3,
+    "msg": "Mai aveți 3 zile până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-29",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 43,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 2,
+    "msg": "Mai aveți 2 zile până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-30",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 44,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 1,
+    "msg": "Mai aveți 1 zi până să o trimiteți la ANAF; consultați calculatorul de termene",
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-01-31",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 45,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": 0,
+    "msg": "Astăzi este ultima zi pentru trimiterea la ANAF; consultați calculatorul de termene",
+    "nelucr": "Termenul ANAF (31.01.2027) cade duminică — următoarea zi lucrătoare: luni, 1 februarie 2027; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-02-01",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 46,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": -1,
+    "msg": "Termenul de trimitere la ANAF (31.01.2027) a fost depășit cu 1 zi",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-02-02",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 47,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": -2,
+    "msg": "Termenul de trimitere la ANAF (31.01.2027) a fost depășit cu 2 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-02-03",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 48,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": -3,
+    "msg": "Termenul de trimitere la ANAF (31.01.2027) a fost depășit cu 3 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-02-04",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 49,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": -4,
+    "msg": "Termenul de trimitere la ANAF (31.01.2027) a fost depășit cu 4 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-17",
+   "dataAplicarii": "",
+   "azi": "2027-02-05",
+   "rezultat": {
+    "level": "red",
+    "label": "Trimite la ANAF",
+    "elapsed": 50,
+    "plataPana": "2027-01-01",
+    "anafPana": "2027-01-31",
+    "plataNelucr": "sărbătoare legală – Anul Nou",
+    "anafNelucr": "duminică",
+    "daysLeft": -5,
+    "msg": "Termenul de trimitere la ANAF (31.01.2027) a fost depășit cu 5 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "achitata": "2026-10-10",
+   "azi": "2026-10-12",
+   "rezultat": {
+    "level": "green",
+    "label": "Achitată",
+    "msg": "Dovadă primită · 10.10.2026"
+   }
+  },
+  {
+   "neincheiat": true,
+   "azi": "2026-10-12",
+   "rezultat": {
+    "level": "blue",
+    "label": "În curs",
+    "msg": "Termenele pornesc de la data încheierii controlului",
+    "pending": true
+   }
+  }
+ ],
+ "asi": [
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-09-01",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 90,
+    "msg": "Mai sunt 90 de zile până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-09-08",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 83,
+    "msg": "Mai sunt 83 de zile până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-09-15",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 76,
+    "msg": "Mai sunt 76 de zile până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-09-22",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 69,
+    "msg": "Mai sunt 69 de zile până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-09-29",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 62,
+    "msg": "Mai sunt 62 de zile până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-10-06",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 55,
+    "msg": "Mai sunt 55 de zile până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-10-13",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 48,
+    "msg": "Mai sunt 48 de zile până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-10-20",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 41,
+    "msg": "Mai sunt 41 de zile până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-10-27",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 34,
+    "msg": "Mai sunt 34 de zile până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-11-03",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 27,
+    "msg": "Mai sunt 27 de zile până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-11-10",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 20,
+    "msg": "Mai sunt 20 de zile până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-11-17",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 13,
+    "msg": "Mai sunt 13 zile până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-11-24",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 6,
+    "msg": "Mai sunt 6 zile până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-11-25",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 5,
+    "msg": "Mai sunt 5 zile până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-11-26",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 4,
+    "msg": "Mai sunt 4 zile până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-11-27",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 3,
+    "msg": "Mai sunt 3 zile până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-11-28",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 2,
+    "msg": "Mai sunt 2 zile până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-11-29",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 1,
+    "msg": "Mai este 1 zi până la 30.11.2026",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-11-30",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "daysLeft": 0,
+    "msg": "Termenul expiră astăzi (30.11.2026)",
+    "nelucr": "Termenul (30.11.2026) cade sărbătoare legală – Sfântul Andrei — următoarea zi lucrătoare: miercuri, 2 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-12-01",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "faza": "pierdere",
+    "termenPierdere": "2026-12-05",
+    "daysLeft": 4,
+    "msg": "Termenul de 90 de zile a expirat (30.11.2026). Mai sunt 4 zile pentru constatarea pierderii valabilității (până la 05.12.2026)",
+    "nelucr": "Termenul (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-12-02",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "faza": "pierdere",
+    "termenPierdere": "2026-12-05",
+    "daysLeft": 3,
+    "msg": "Termenul de 90 de zile a expirat (30.11.2026). Mai sunt 3 zile pentru constatarea pierderii valabilității (până la 05.12.2026)",
+    "nelucr": "Termenul (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-12-03",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "faza": "pierdere",
+    "termenPierdere": "2026-12-05",
+    "daysLeft": 2,
+    "msg": "Termenul de 90 de zile a expirat (30.11.2026). Mai sunt 2 zile pentru constatarea pierderii valabilității (până la 05.12.2026)",
+    "nelucr": "Termenul (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-12-04",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "faza": "pierdere",
+    "termenPierdere": "2026-12-05",
+    "daysLeft": 1,
+    "msg": "Termenul de 90 de zile a expirat (30.11.2026). Mai este 1 zi pentru constatarea pierderii valabilității (până la 05.12.2026)",
+    "nelucr": "Termenul (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-12-05",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "faza": "pierdere",
+    "termenPierdere": "2026-12-05",
+    "daysLeft": 0,
+    "msg": "Astăzi este ultima zi pentru constatarea pierderii valabilității (05.12.2026)",
+    "nelucr": "Termenul (05.12.2026) cade sâmbătă — următoarea zi lucrătoare: luni, 7 decembrie 2026; verificați prelungirea"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-12-06",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "faza": "pierdere",
+    "termenPierdere": "2026-12-05",
+    "daysLeft": -1,
+    "msg": "Termenul pentru constatarea pierderii valabilității (05.12.2026) a fost depășit cu 1 zi",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-12-07",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "faza": "pierdere",
+    "termenPierdere": "2026-12-05",
+    "daysLeft": -2,
+    "msg": "Termenul pentru constatarea pierderii valabilității (05.12.2026) a fost depășit cu 2 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {},
+   "azi": "2026-12-08",
+   "rezultat": {
+    "deadline": "2026-11-30",
+    "faza": "pierdere",
+    "termenPierdere": "2026-12-05",
+    "daysLeft": -3,
+    "msg": "Termenul pentru constatarea pierderii valabilității (05.12.2026) a fost depășit cu 3 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-10-02",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 90,
+    "msg": "Mai sunt 90 de zile până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-10-09",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 83,
+    "msg": "Mai sunt 83 de zile până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-10-16",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 76,
+    "msg": "Mai sunt 76 de zile până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-10-23",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 69,
+    "msg": "Mai sunt 69 de zile până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-10-30",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 62,
+    "msg": "Mai sunt 62 de zile până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-11-06",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 55,
+    "msg": "Mai sunt 55 de zile până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-11-13",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 48,
+    "msg": "Mai sunt 48 de zile până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-11-20",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 41,
+    "msg": "Mai sunt 41 de zile până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-11-27",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 34,
+    "msg": "Mai sunt 34 de zile până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-12-04",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 27,
+    "msg": "Mai sunt 27 de zile până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-12-11",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 20,
+    "msg": "Mai sunt 20 de zile până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-12-18",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 13,
+    "msg": "Mai sunt 13 zile până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-12-25",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 6,
+    "msg": "Mai sunt 6 zile până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-12-26",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 5,
+    "msg": "Mai sunt 5 zile până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-12-27",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 4,
+    "msg": "Mai sunt 4 zile până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-12-28",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 3,
+    "msg": "Mai sunt 3 zile până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-12-29",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 2,
+    "msg": "Mai sunt 2 zile până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-12-30",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 1,
+    "msg": "Mai este 1 zi până la 31.12.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2026-12-31",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "daysLeft": 0,
+    "msg": "Termenul expiră astăzi (31.12.2026)",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2027-01-01",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "faza": "pierdere",
+    "termenPierdere": "2027-01-05",
+    "daysLeft": 4,
+    "msg": "Termenul de 90 de zile a expirat (31.12.2026). Mai sunt 4 zile pentru constatarea pierderii valabilității (până la 05.01.2027)",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2027-01-02",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "faza": "pierdere",
+    "termenPierdere": "2027-01-05",
+    "daysLeft": 3,
+    "msg": "Termenul de 90 de zile a expirat (31.12.2026). Mai sunt 3 zile pentru constatarea pierderii valabilității (până la 05.01.2027)",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2027-01-03",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "faza": "pierdere",
+    "termenPierdere": "2027-01-05",
+    "daysLeft": 2,
+    "msg": "Termenul de 90 de zile a expirat (31.12.2026). Mai sunt 2 zile pentru constatarea pierderii valabilității (până la 05.01.2027)",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2027-01-04",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "faza": "pierdere",
+    "termenPierdere": "2027-01-05",
+    "daysLeft": 1,
+    "msg": "Termenul de 90 de zile a expirat (31.12.2026). Mai este 1 zi pentru constatarea pierderii valabilității (până la 05.01.2027)",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2027-01-05",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "faza": "pierdere",
+    "termenPierdere": "2027-01-05",
+    "daysLeft": 0,
+    "msg": "Astăzi este ultima zi pentru constatarea pierderii valabilității (05.01.2027)",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2027-01-06",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "faza": "pierdere",
+    "termenPierdere": "2027-01-05",
+    "daysLeft": -1,
+    "msg": "Termenul pentru constatarea pierderii valabilității (05.01.2027) a fost depășit cu 1 zi",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2027-01-07",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "faza": "pierdere",
+    "termenPierdere": "2027-01-05",
+    "daysLeft": -2,
+    "msg": "Termenul pentru constatarea pierderii valabilității (05.01.2027) a fost depășit cu 2 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-02",
+   "cfg": {},
+   "azi": "2027-01-08",
+   "rezultat": {
+    "deadline": "2026-12-31",
+    "faza": "pierdere",
+    "termenPierdere": "2027-01-05",
+    "daysLeft": -3,
+    "msg": "Termenul pentru constatarea pierderii valabilității (05.01.2027) a fost depășit cu 3 zile",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-09-01",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-09-08",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-09-15",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-09-22",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-09-29",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-10-06",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-10-13",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-10-20",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-10-27",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-11-03",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-11-10",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-11-17",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-11-24",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-11-25",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-11-26",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-11-27",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-11-28",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-11-29",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-11-30",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-12-01",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-12-02",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-12-03",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-12-04",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-12-05",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-12-06",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-12-07",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-09-01",
+   "cfg": {
+    "asiPrezentat": true,
+    "asiDataPrezentare": "2026-10-20"
+   },
+   "azi": "2026-12-08",
+   "rezultat": {
+    "resolved": true,
+    "msg": "Documentație prezentată · 20.10.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-06-10",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 90,
+    "msg": "Mai sunt 90 de zile până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-06-17",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 83,
+    "msg": "Mai sunt 83 de zile până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-06-24",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 76,
+    "msg": "Mai sunt 76 de zile până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-07-01",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 69,
+    "msg": "Mai sunt 69 de zile până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-07-08",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 62,
+    "msg": "Mai sunt 62 de zile până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-07-15",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 55,
+    "msg": "Mai sunt 55 de zile până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-07-22",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 48,
+    "msg": "Mai sunt 48 de zile până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-07-29",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 41,
+    "msg": "Mai sunt 41 de zile până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-08-05",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 34,
+    "msg": "Mai sunt 34 de zile până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-08-12",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 27,
+    "msg": "Mai sunt 27 de zile până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-08-19",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 20,
+    "msg": "Mai sunt 20 de zile până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-08-26",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 13,
+    "msg": "Mai sunt 13 zile până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-09-02",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 6,
+    "msg": "Mai sunt 6 zile până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-09-03",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 5,
+    "msg": "Mai sunt 5 zile până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-09-04",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 4,
+    "msg": "Mai sunt 4 zile până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-09-05",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 3,
+    "msg": "Mai sunt 3 zile până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-09-06",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 2,
+    "msg": "Mai sunt 2 zile până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-09-07",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 1,
+    "msg": "Mai este 1 zi până la 08.09.2026",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-09-08",
+   "rezultat": {
+    "deadline": "2026-09-08",
+    "daysLeft": 0,
+    "msg": "Termenul expiră astăzi (08.09.2026)",
+    "nelucr": ""
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-09-09",
+   "rezultat": {
+    "resolved": true,
+    "pierdere": true,
+    "msg": "Pierderea valabilității constatată · 10.09.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-09-10",
+   "rezultat": {
+    "resolved": true,
+    "pierdere": true,
+    "msg": "Pierderea valabilității constatată · 10.09.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-09-11",
+   "rezultat": {
+    "resolved": true,
+    "pierdere": true,
+    "msg": "Pierderea valabilității constatată · 10.09.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-09-12",
+   "rezultat": {
+    "resolved": true,
+    "pierdere": true,
+    "msg": "Pierderea valabilității constatată · 10.09.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-09-13",
+   "rezultat": {
+    "resolved": true,
+    "pierdere": true,
+    "msg": "Pierderea valabilității constatată · 10.09.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-09-14",
+   "rezultat": {
+    "resolved": true,
+    "pierdere": true,
+    "msg": "Pierderea valabilității constatată · 10.09.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-09-15",
+   "rezultat": {
+    "resolved": true,
+    "pierdere": true,
+    "msg": "Pierderea valabilității constatată · 10.09.2026"
+   }
+  },
+  {
+   "dataIncheiere": "2026-06-10",
+   "cfg": {
+    "asiPierdere": true,
+    "asiDataPierdere": "2026-09-10"
+   },
+   "azi": "2026-09-16",
+   "rezultat": {
+    "resolved": true,
+    "pierdere": true,
+    "msg": "Pierderea valabilității constatată · 10.09.2026"
+   }
+  },
+  {
+   "neincheiat": true,
+   "azi": "2026-10-05",
+   "rezultat": {
+    "pending": true,
+    "msg": "Termenul de 90 de zile începe după încheierea controlului"
+   }
+  }
+ ],
+ "incarcare": [
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {},
+   "azi": "2026-10-01",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 06.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {},
+   "azi": "2026-10-02",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 06.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {},
+   "azi": "2026-10-03",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 06.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {},
+   "azi": "2026-10-04",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 06.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {},
+   "azi": "2026-10-05",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": 1,
+    "level": "warn",
+    "msg": "Mai este 1 zi lucrătoare pentru încărcare (până la 06.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {},
+   "azi": "2026-10-06",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": 0,
+    "level": "red",
+    "msg": "Astăzi este ultima zi pentru încărcare (06.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {},
+   "azi": "2026-10-07",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": -1,
+    "level": "red",
+    "msg": "Termenul de încărcare (06.10.2026) a fost depășit cu 1 zi"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {},
+   "azi": "2026-10-08",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": -2,
+    "level": "red",
+    "msg": "Termenul de încărcare (06.10.2026) a fost depășit cu 2 zile"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {},
+   "azi": "2026-10-09",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": -3,
+    "level": "red",
+    "msg": "Termenul de încărcare (06.10.2026) a fost depășit cu 3 zile"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {},
+   "azi": "2026-10-10",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": -4,
+    "level": "red",
+    "msg": "Termenul de încărcare (06.10.2026) a fost depășit cu 4 zile"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-10-01",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 06.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-10-02",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 06.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-10-03",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 06.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-10-04",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 06.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-10-05",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": 1,
+    "level": "warn",
+    "msg": "Mai este 1 zi lucrătoare pentru încărcare (până la 06.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-10-06",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": 0,
+    "level": "red",
+    "msg": "Astăzi este ultima zi pentru încărcare (06.10.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-10-07",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": -1,
+    "level": "red",
+    "msg": "Termenul de încărcare (06.10.2026) a fost depășit cu 1 zi"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-10-08",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": -2,
+    "level": "red",
+    "msg": "Termenul de încărcare (06.10.2026) a fost depășit cu 2 zile"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-10-09",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": -3,
+    "level": "red",
+    "msg": "Termenul de încărcare (06.10.2026) a fost depășit cu 3 zile"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-10-10",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-10-06",
+    "daysLeft": -4,
+    "level": "red",
+    "msg": "Termenul de încărcare (06.10.2026) a fost depășit cu 4 zile"
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-10-01",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-10-02",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-10-03",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-10-04",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-10-05",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-10-06",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-10-07",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-10-08",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-10-09",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-10-01",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-10-10",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {},
+   "azi": "2026-11-26",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 03.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {},
+   "azi": "2026-11-27",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 03.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {},
+   "azi": "2026-11-28",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 03.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {},
+   "azi": "2026-11-29",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 03.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {},
+   "azi": "2026-11-30",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 03.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {},
+   "azi": "2026-12-01",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 03.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {},
+   "azi": "2026-12-02",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": 1,
+    "level": "warn",
+    "msg": "Mai este 1 zi lucrătoare pentru încărcare (până la 03.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {},
+   "azi": "2026-12-03",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": 0,
+    "level": "red",
+    "msg": "Astăzi este ultima zi pentru încărcare (03.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {},
+   "azi": "2026-12-04",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": -1,
+    "level": "red",
+    "msg": "Termenul de încărcare (03.12.2026) a fost depășit cu 1 zi"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {},
+   "azi": "2026-12-05",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": -2,
+    "level": "red",
+    "msg": "Termenul de încărcare (03.12.2026) a fost depășit cu 2 zile"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-11-26",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 03.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-11-27",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 03.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-11-28",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 03.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-11-29",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 03.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-11-30",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 03.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-01",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 03.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-02",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": 1,
+    "level": "warn",
+    "msg": "Mai este 1 zi lucrătoare pentru încărcare (până la 03.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-03",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": 0,
+    "level": "red",
+    "msg": "Astăzi este ultima zi pentru încărcare (03.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-04",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": -1,
+    "level": "red",
+    "msg": "Termenul de încărcare (03.12.2026) a fost depășit cu 1 zi"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-05",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-03",
+    "daysLeft": -2,
+    "level": "red",
+    "msg": "Termenul de încărcare (03.12.2026) a fost depășit cu 2 zile"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-11-26",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-11-27",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-11-28",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-11-29",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-11-30",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-01",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-02",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-03",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-04",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-26",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-05",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {},
+   "azi": "2026-11-27",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 04.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {},
+   "azi": "2026-11-28",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 04.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {},
+   "azi": "2026-11-29",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 04.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {},
+   "azi": "2026-11-30",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 04.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {},
+   "azi": "2026-12-01",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 04.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {},
+   "azi": "2026-12-02",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 04.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {},
+   "azi": "2026-12-03",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": 1,
+    "level": "warn",
+    "msg": "Mai este 1 zi lucrătoare pentru încărcare (până la 04.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {},
+   "azi": "2026-12-04",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": 0,
+    "level": "red",
+    "msg": "Astăzi este ultima zi pentru încărcare (04.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {},
+   "azi": "2026-12-05",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": -1,
+    "level": "red",
+    "msg": "Termenul de încărcare (04.12.2026) a fost depășit cu 1 zi"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {},
+   "azi": "2026-12-06",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": -2,
+    "level": "red",
+    "msg": "Termenul de încărcare (04.12.2026) a fost depășit cu 2 zile"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-11-27",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 04.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-11-28",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 04.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-11-29",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 04.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-11-30",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 04.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-01",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 04.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-02",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 04.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-03",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": 1,
+    "level": "warn",
+    "msg": "Mai este 1 zi lucrătoare pentru încărcare (până la 04.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-04",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": 0,
+    "level": "red",
+    "msg": "Astăzi este ultima zi pentru încărcare (04.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-05",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": -1,
+    "level": "red",
+    "msg": "Termenul de încărcare (04.12.2026) a fost depășit cu 1 zi"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-06",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-04",
+    "daysLeft": -2,
+    "level": "red",
+    "msg": "Termenul de încărcare (04.12.2026) a fost depășit cu 2 zile"
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-11-27",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-11-28",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-11-29",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-11-30",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-01",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-02",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-03",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-04",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-05",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-11-27",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-06",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {},
+   "azi": "2026-12-23",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 29.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {},
+   "azi": "2026-12-24",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 29.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {},
+   "azi": "2026-12-25",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 29.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {},
+   "azi": "2026-12-26",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 29.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {},
+   "azi": "2026-12-27",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 29.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {},
+   "azi": "2026-12-28",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": 1,
+    "level": "warn",
+    "msg": "Mai este 1 zi lucrătoare pentru încărcare (până la 29.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {},
+   "azi": "2026-12-29",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": 0,
+    "level": "red",
+    "msg": "Astăzi este ultima zi pentru încărcare (29.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {},
+   "azi": "2026-12-30",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": -1,
+    "level": "red",
+    "msg": "Termenul de încărcare (29.12.2026) a fost depășit cu 1 zi"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {},
+   "azi": "2026-12-31",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": -2,
+    "level": "red",
+    "msg": "Termenul de încărcare (29.12.2026) a fost depășit cu 2 zile"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {},
+   "azi": "2027-01-01",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": -3,
+    "level": "red",
+    "msg": "Termenul de încărcare (29.12.2026) a fost depășit cu 3 zile"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-23",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 29.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-24",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 29.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-25",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 29.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-26",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 29.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-27",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 29.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-28",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": 1,
+    "level": "warn",
+    "msg": "Mai este 1 zi lucrătoare pentru încărcare (până la 29.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-29",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": 0,
+    "level": "red",
+    "msg": "Astăzi este ultima zi pentru încărcare (29.12.2026)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-30",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": -1,
+    "level": "red",
+    "msg": "Termenul de încărcare (29.12.2026) a fost depășit cu 1 zi"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-31",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": -2,
+    "level": "red",
+    "msg": "Termenul de încărcare (29.12.2026) a fost depășit cu 2 zile"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2027-01-01",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2026-12-29",
+    "daysLeft": -3,
+    "level": "red",
+    "msg": "Termenul de încărcare (29.12.2026) a fost depășit cu 3 zile"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-23",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-24",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-25",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-26",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-27",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-28",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-29",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-30",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-31",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-23",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2027-01-01",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {},
+   "azi": "2026-12-31",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {},
+   "azi": "2027-01-01",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {},
+   "azi": "2027-01-02",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {},
+   "azi": "2027-01-03",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {},
+   "azi": "2027-01-04",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {},
+   "azi": "2027-01-05",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 1,
+    "level": "warn",
+    "msg": "Mai este 1 zi lucrătoare pentru încărcare (până la 08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {},
+   "azi": "2027-01-06",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 1,
+    "level": "warn",
+    "msg": "Mai este 1 zi lucrătoare pentru încărcare (până la 08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {},
+   "azi": "2027-01-07",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 1,
+    "level": "warn",
+    "msg": "Mai este 1 zi lucrătoare pentru încărcare (până la 08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {},
+   "azi": "2027-01-08",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 0,
+    "level": "red",
+    "msg": "Astăzi este ultima zi pentru încărcare (08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {},
+   "azi": "2027-01-09",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "aplicatie",
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": -1,
+    "level": "red",
+    "msg": "Termenul de încărcare (08.01.2027) a fost depășit cu 1 zi"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2026-12-31",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2027-01-01",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2027-01-02",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2027-01-03",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 3,
+    "level": "warn",
+    "msg": "Mai sunt 3 zile lucrătoare pentru încărcare (până la 08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2027-01-04",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 2,
+    "level": "warn",
+    "msg": "Mai sunt 2 zile lucrătoare pentru încărcare (până la 08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2027-01-05",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 1,
+    "level": "warn",
+    "msg": "Mai este 1 zi lucrătoare pentru încărcare (până la 08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2027-01-06",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 1,
+    "level": "warn",
+    "msg": "Mai este 1 zi lucrătoare pentru încărcare (până la 08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2027-01-07",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 1,
+    "level": "warn",
+    "msg": "Mai este 1 zi lucrătoare pentru încărcare (până la 08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2027-01-08",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": 0,
+    "level": "red",
+    "msg": "Astăzi este ultima zi pentru încărcare (08.01.2027)"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true
+   },
+   "azi": "2027-01-09",
+   "rezultat": {
+    "gata": false,
+    "lipsa": [
+     "document"
+    ],
+    "termen": "2027-01-08",
+    "daysLeft": -1,
+    "level": "red",
+    "msg": "Termenul de încărcare (08.01.2027) a fost depășit cu 1 zi"
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2026-12-31",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2027-01-01",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2027-01-02",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2027-01-03",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2027-01-04",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2027-01-05",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2027-01-06",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2027-01-07",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2027-01-08",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  },
+  {
+   "dataIncheiere": "2026-12-31",
+   "bife": {
+    "aplicatie": true,
+    "document": true
+   },
+   "azi": "2027-01-09",
+   "rezultat": {
+    "gata": true,
+    "lipsa": []
+   }
+  }
+ ]
+}

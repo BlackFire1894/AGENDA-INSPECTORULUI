@@ -1,0 +1,24 @@
+.fisa-doc { background: #fff; color: #111; font: 10.5pt/1.4 -apple-system, "Helvetica Neue", Arial, sans-serif; }
+.fisa-doc h1 { font-size: 18pt; margin: 2pt 0 6pt; }
+.fisa-doc h2 { font-size: 12.5pt; margin: 14pt 0 6pt; padding-bottom: 3pt; border-bottom: 1.5pt solid #16213a; }
+.fisa-doc h3 { font-size: 11pt; margin: 8pt 0 4pt; }
+.fisa-doc p { margin: 3pt 0; }
+.f-kicker { text-transform: uppercase; letter-spacing: .08em; font-size: 8.5pt; font-weight: 700; color: #5a3de0; }
+.f-meta { display: flex; flex-wrap: wrap; gap: 3pt 14pt; font-size: 10pt; }
+.f-sum { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6pt; margin-top: 10pt; }
+.f-sum div { border: 1pt solid #c9cfdc; border-radius: 5pt; padding: 5pt 7pt; }
+.f-sum b { display: block; font-size: 15pt; }
+.f-sum span { font-size: 8.5pt; color: #444; }
+.f-table, .f-kv { width: 100%; border-collapse: collapse; }
+.f-table th, .f-table td, .f-kv td { border: 0.75pt solid #c9cfdc; padding: 3pt 5pt; text-align: left; vertical-align: top; }
+.f-table th { background: #eef0f5; font-size: 9pt; }
+.f-table tr, .f-constr { break-inside: avoid; page-break-inside: avoid; }
+.f-nok td { background: #fde7e5; }
+.f-cat { font-size: 8pt; color: #666; }
+.f-dot { font-size: 9.5pt; }
+.f-small { font-size: 9pt; color: #444; }
+.f-foot { margin-top: 16pt; padding-top: 6pt; border-top: 0.75pt solid #c9cfdc; font-size: 8.5pt; color: #666; }
+.fisa-doc * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.fisa-doc .f-list { margin: 0 0 6pt; padding-left: 14pt; }
+.fisa-doc .f-list li { margin: 2pt 0; }
+.fisa-doc .f-sum.f-sum-6 { grid-template-columns: repeat(3, 1fr) !important; }

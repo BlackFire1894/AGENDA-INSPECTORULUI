@@ -906,7 +906,7 @@ test('schema 11: cele 4 rubrici de organizare a protecției civile, doar la cont
 
 
 test('aplicația nativă: cifrele pe zile (widget) și notificările, cu aceleași reguli ca Panoul', async () => {
-  const { stareNativa, cifreZi } = await import('../js/nativ.js');
+  const { stareNativa, cifreZi } = await import('./nativ/referinta.mjs');
   const c = newControl({ tip: 'OPEC', start: '2026-10-01' });
   c.denumire = 'Școala Test'; c.dataIncheiere = '2026-10-01';
   const d = c.nereguli.find((n) => n.key === 'd');
@@ -930,3 +930,9 @@ test('aplicația nativă: cifrele pe zile (widget) și notificările, cu acelea�
   d.amenda.achitata = true;
   assert.equal(cifreZi([c], [], '2026-10-06').amenziActive, 0);
 });
+
+test('datele și cazurile de test pentru aplicația nativă sunt la zi (altfel: npm run nativ)', async () => {
+  const { execFileSync } = await import('node:child_process');
+  execFileSync(process.execPath, ['tests/nativ/exporta.mjs', '--verifica'], { stdio: 'pipe' });
+});
+

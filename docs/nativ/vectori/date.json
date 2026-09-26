@@ -1,0 +1,3977 @@
+{
+ "fmt": [
+  {
+   "iso": "2026-01-01",
+   "fmtDate": "01.01.2026",
+   "fmtDateLong": "joi, 1 ianuarie 2026",
+   "fmtDateMedium": "1 ian 2026"
+  },
+  {
+   "iso": "2026-01-12",
+   "fmtDate": "12.01.2026",
+   "fmtDateLong": "luni, 12 ianuarie 2026",
+   "fmtDateMedium": "12 ian 2026"
+  },
+  {
+   "iso": "2026-01-23",
+   "fmtDate": "23.01.2026",
+   "fmtDateLong": "vineri, 23 ianuarie 2026",
+   "fmtDateMedium": "23 ian 2026"
+  },
+  {
+   "iso": "2026-02-03",
+   "fmtDate": "03.02.2026",
+   "fmtDateLong": "marți, 3 februarie 2026",
+   "fmtDateMedium": "3 feb 2026"
+  },
+  {
+   "iso": "2026-02-14",
+   "fmtDate": "14.02.2026",
+   "fmtDateLong": "sâmbătă, 14 februarie 2026",
+   "fmtDateMedium": "14 feb 2026"
+  },
+  {
+   "iso": "2026-02-25",
+   "fmtDate": "25.02.2026",
+   "fmtDateLong": "miercuri, 25 februarie 2026",
+   "fmtDateMedium": "25 feb 2026"
+  },
+  {
+   "iso": "2026-03-08",
+   "fmtDate": "08.03.2026",
+   "fmtDateLong": "duminică, 8 martie 2026",
+   "fmtDateMedium": "8 mar 2026"
+  },
+  {
+   "iso": "2026-03-19",
+   "fmtDate": "19.03.2026",
+   "fmtDateLong": "joi, 19 martie 2026",
+   "fmtDateMedium": "19 mar 2026"
+  },
+  {
+   "iso": "2026-03-30",
+   "fmtDate": "30.03.2026",
+   "fmtDateLong": "luni, 30 martie 2026",
+   "fmtDateMedium": "30 mar 2026"
+  },
+  {
+   "iso": "2026-04-10",
+   "fmtDate": "10.04.2026",
+   "fmtDateLong": "vineri, 10 aprilie 2026",
+   "fmtDateMedium": "10 apr 2026"
+  },
+  {
+   "iso": "2026-04-21",
+   "fmtDate": "21.04.2026",
+   "fmtDateLong": "marți, 21 aprilie 2026",
+   "fmtDateMedium": "21 apr 2026"
+  },
+  {
+   "iso": "2026-05-02",
+   "fmtDate": "02.05.2026",
+   "fmtDateLong": "sâmbătă, 2 mai 2026",
+   "fmtDateMedium": "2 mai 2026"
+  },
+  {
+   "iso": "2026-05-13",
+   "fmtDate": "13.05.2026",
+   "fmtDateLong": "miercuri, 13 mai 2026",
+   "fmtDateMedium": "13 mai 2026"
+  },
+  {
+   "iso": "2026-05-24",
+   "fmtDate": "24.05.2026",
+   "fmtDateLong": "duminică, 24 mai 2026",
+   "fmtDateMedium": "24 mai 2026"
+  },
+  {
+   "iso": "2026-06-04",
+   "fmtDate": "04.06.2026",
+   "fmtDateLong": "joi, 4 iunie 2026",
+   "fmtDateMedium": "4 iun 2026"
+  },
+  {
+   "iso": "2026-06-15",
+   "fmtDate": "15.06.2026",
+   "fmtDateLong": "luni, 15 iunie 2026",
+   "fmtDateMedium": "15 iun 2026"
+  },
+  {
+   "iso": "2026-06-26",
+   "fmtDate": "26.06.2026",
+   "fmtDateLong": "vineri, 26 iunie 2026",
+   "fmtDateMedium": "26 iun 2026"
+  },
+  {
+   "iso": "2026-07-07",
+   "fmtDate": "07.07.2026",
+   "fmtDateLong": "marți, 7 iulie 2026",
+   "fmtDateMedium": "7 iul 2026"
+  },
+  {
+   "iso": "2026-07-18",
+   "fmtDate": "18.07.2026",
+   "fmtDateLong": "sâmbătă, 18 iulie 2026",
+   "fmtDateMedium": "18 iul 2026"
+  },
+  {
+   "iso": "2026-07-29",
+   "fmtDate": "29.07.2026",
+   "fmtDateLong": "miercuri, 29 iulie 2026",
+   "fmtDateMedium": "29 iul 2026"
+  },
+  {
+   "iso": "2026-08-09",
+   "fmtDate": "09.08.2026",
+   "fmtDateLong": "duminică, 9 august 2026",
+   "fmtDateMedium": "9 aug 2026"
+  },
+  {
+   "iso": "2026-08-20",
+   "fmtDate": "20.08.2026",
+   "fmtDateLong": "joi, 20 august 2026",
+   "fmtDateMedium": "20 aug 2026"
+  },
+  {
+   "iso": "2026-08-31",
+   "fmtDate": "31.08.2026",
+   "fmtDateLong": "luni, 31 august 2026",
+   "fmtDateMedium": "31 aug 2026"
+  },
+  {
+   "iso": "2026-09-11",
+   "fmtDate": "11.09.2026",
+   "fmtDateLong": "vineri, 11 septembrie 2026",
+   "fmtDateMedium": "11 sep 2026"
+  },
+  {
+   "iso": "2026-09-22",
+   "fmtDate": "22.09.2026",
+   "fmtDateLong": "marți, 22 septembrie 2026",
+   "fmtDateMedium": "22 sep 2026"
+  },
+  {
+   "iso": "2026-10-03",
+   "fmtDate": "03.10.2026",
+   "fmtDateLong": "sâmbătă, 3 octombrie 2026",
+   "fmtDateMedium": "3 oct 2026"
+  },
+  {
+   "iso": "2026-10-14",
+   "fmtDate": "14.10.2026",
+   "fmtDateLong": "miercuri, 14 octombrie 2026",
+   "fmtDateMedium": "14 oct 2026"
+  },
+  {
+   "iso": "2026-10-25",
+   "fmtDate": "25.10.2026",
+   "fmtDateLong": "duminică, 25 octombrie 2026",
+   "fmtDateMedium": "25 oct 2026"
+  },
+  {
+   "iso": "2026-11-05",
+   "fmtDate": "05.11.2026",
+   "fmtDateLong": "joi, 5 noiembrie 2026",
+   "fmtDateMedium": "5 nov 2026"
+  },
+  {
+   "iso": "2026-11-16",
+   "fmtDate": "16.11.2026",
+   "fmtDateLong": "luni, 16 noiembrie 2026",
+   "fmtDateMedium": "16 nov 2026"
+  },
+  {
+   "iso": "2026-11-27",
+   "fmtDate": "27.11.2026",
+   "fmtDateLong": "vineri, 27 noiembrie 2026",
+   "fmtDateMedium": "27 nov 2026"
+  },
+  {
+   "iso": "2026-12-08",
+   "fmtDate": "08.12.2026",
+   "fmtDateLong": "marți, 8 decembrie 2026",
+   "fmtDateMedium": "8 dec 2026"
+  },
+  {
+   "iso": "2026-12-19",
+   "fmtDate": "19.12.2026",
+   "fmtDateLong": "sâmbătă, 19 decembrie 2026",
+   "fmtDateMedium": "19 dec 2026"
+  },
+  {
+   "iso": "2026-12-30",
+   "fmtDate": "30.12.2026",
+   "fmtDateLong": "miercuri, 30 decembrie 2026",
+   "fmtDateMedium": "30 dec 2026"
+  }
+ ],
+ "plural": [
+  {
+   "n": 0,
+   "zile": "0 zile"
+  },
+  {
+   "n": 1,
+   "zile": "1 zi"
+  },
+  {
+   "n": 2,
+   "zile": "2 zile"
+  },
+  {
+   "n": 5,
+   "zile": "5 zile"
+  },
+  {
+   "n": 19,
+   "zile": "19 zile"
+  },
+  {
+   "n": 20,
+   "zile": "20 de zile"
+  },
+  {
+   "n": 21,
+   "zile": "21 de zile"
+  },
+  {
+   "n": 101,
+   "zile": "101 zile"
+  },
+  {
+   "n": 120,
+   "zile": "120 de zile"
+  }
+ ],
+ "nelucratoare": [
+  {
+   "d": "2024-01-01",
+   "motiv": "sărbătoare legală – Anul Nou"
+  },
+  {
+   "d": "2024-01-02",
+   "motiv": "sărbătoare legală – Anul Nou"
+  },
+  {
+   "d": "2024-01-06",
+   "motiv": "sărbătoare legală – Boboteaza"
+  },
+  {
+   "d": "2024-01-07",
+   "motiv": "sărbătoare legală – Sfântul Ioan Botezătorul"
+  },
+  {
+   "d": "2024-01-13",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-01-14",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-01-20",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-01-21",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-01-24",
+   "motiv": "sărbătoare legală – Ziua Unirii"
+  },
+  {
+   "d": "2024-01-27",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-01-28",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-02-03",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-02-04",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-02-10",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-02-11",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-02-17",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-02-18",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-02-24",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-02-25",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-03-02",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-03-03",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-03-09",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-03-10",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-03-16",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-03-17",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-03-23",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-03-24",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-03-30",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-03-31",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-04-06",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-04-07",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-04-13",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-04-14",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-04-20",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-04-21",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-04-27",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-04-28",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-05-01",
+   "motiv": "sărbătoare legală – Ziua Muncii"
+  },
+  {
+   "d": "2024-05-03",
+   "motiv": "sărbătoare legală – Vinerea Mare"
+  },
+  {
+   "d": "2024-05-04",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-05-05",
+   "motiv": "sărbătoare legală – Paștele"
+  },
+  {
+   "d": "2024-05-06",
+   "motiv": "sărbătoare legală – a doua zi de Paște"
+  },
+  {
+   "d": "2024-05-11",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-05-12",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-05-18",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-05-19",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-05-25",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-05-26",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-06-01",
+   "motiv": "sărbătoare legală – Ziua Copilului"
+  },
+  {
+   "d": "2024-06-02",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-06-08",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-06-09",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-06-15",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-06-16",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-06-22",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-06-23",
+   "motiv": "sărbătoare legală – Rusaliile"
+  },
+  {
+   "d": "2024-06-24",
+   "motiv": "sărbătoare legală – a doua zi de Rusalii"
+  },
+  {
+   "d": "2024-06-29",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-06-30",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-07-06",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-07-07",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-07-13",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-07-14",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-07-20",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-07-21",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-07-27",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-07-28",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-08-03",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-08-04",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-08-10",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-08-11",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-08-15",
+   "motiv": "sărbătoare legală – Adormirea Maicii Domnului"
+  },
+  {
+   "d": "2024-08-17",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-08-18",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-08-24",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-08-25",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-08-31",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-09-01",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-09-07",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-09-08",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-09-14",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-09-15",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-09-21",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-09-22",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-09-28",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-09-29",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-10-05",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-10-06",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-10-12",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-10-13",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-10-19",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-10-20",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-10-26",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-10-27",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-11-02",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-11-03",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-11-09",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-11-10",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-11-16",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-11-17",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-11-23",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-11-24",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-11-30",
+   "motiv": "sărbătoare legală – Sfântul Andrei"
+  },
+  {
+   "d": "2024-12-01",
+   "motiv": "sărbătoare legală – Ziua Națională"
+  },
+  {
+   "d": "2024-12-07",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-12-08",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-12-14",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-12-15",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-12-21",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-12-22",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2024-12-25",
+   "motiv": "sărbătoare legală – Crăciunul"
+  },
+  {
+   "d": "2024-12-26",
+   "motiv": "sărbătoare legală – a doua zi de Crăciun"
+  },
+  {
+   "d": "2024-12-28",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2024-12-29",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-01-01",
+   "motiv": "sărbătoare legală – Anul Nou"
+  },
+  {
+   "d": "2025-01-02",
+   "motiv": "sărbătoare legală – Anul Nou"
+  },
+  {
+   "d": "2025-01-04",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-01-05",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-01-06",
+   "motiv": "sărbătoare legală – Boboteaza"
+  },
+  {
+   "d": "2025-01-07",
+   "motiv": "sărbătoare legală – Sfântul Ioan Botezătorul"
+  },
+  {
+   "d": "2025-01-11",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-01-12",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-01-18",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-01-19",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-01-24",
+   "motiv": "sărbătoare legală – Ziua Unirii"
+  },
+  {
+   "d": "2025-01-25",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-01-26",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-02-01",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-02-02",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-02-08",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-02-09",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-02-15",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-02-16",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-02-22",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-02-23",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-03-01",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-03-02",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-03-08",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-03-09",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-03-15",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-03-16",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-03-22",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-03-23",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-03-29",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-03-30",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-04-05",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-04-06",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-04-12",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-04-13",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-04-18",
+   "motiv": "sărbătoare legală – Vinerea Mare"
+  },
+  {
+   "d": "2025-04-19",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-04-20",
+   "motiv": "sărbătoare legală – Paștele"
+  },
+  {
+   "d": "2025-04-21",
+   "motiv": "sărbătoare legală – a doua zi de Paște"
+  },
+  {
+   "d": "2025-04-26",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-04-27",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-05-01",
+   "motiv": "sărbătoare legală – Ziua Muncii"
+  },
+  {
+   "d": "2025-05-03",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-05-04",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-05-10",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-05-11",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-05-17",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-05-18",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-05-24",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-05-25",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-05-31",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-06-01",
+   "motiv": "sărbătoare legală – Ziua Copilului"
+  },
+  {
+   "d": "2025-06-07",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-06-08",
+   "motiv": "sărbătoare legală – Rusaliile"
+  },
+  {
+   "d": "2025-06-09",
+   "motiv": "sărbătoare legală – a doua zi de Rusalii"
+  },
+  {
+   "d": "2025-06-14",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-06-15",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-06-21",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-06-22",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-06-28",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-06-29",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-07-05",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-07-06",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-07-12",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-07-13",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-07-19",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-07-20",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-07-26",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-07-27",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-08-02",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-08-03",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-08-09",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-08-10",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-08-15",
+   "motiv": "sărbătoare legală – Adormirea Maicii Domnului"
+  },
+  {
+   "d": "2025-08-16",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-08-17",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-08-23",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-08-24",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-08-30",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-08-31",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-09-06",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-09-07",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-09-13",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-09-14",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-09-20",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-09-21",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-09-27",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-09-28",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-10-04",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-10-05",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-10-11",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-10-12",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-10-18",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-10-19",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-10-25",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-10-26",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-11-01",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-11-02",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-11-08",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-11-09",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-11-15",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-11-16",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-11-22",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-11-23",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-11-29",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-11-30",
+   "motiv": "sărbătoare legală – Sfântul Andrei"
+  },
+  {
+   "d": "2025-12-01",
+   "motiv": "sărbătoare legală – Ziua Națională"
+  },
+  {
+   "d": "2025-12-06",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-12-07",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-12-13",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-12-14",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-12-20",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-12-21",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2025-12-25",
+   "motiv": "sărbătoare legală – Crăciunul"
+  },
+  {
+   "d": "2025-12-26",
+   "motiv": "sărbătoare legală – a doua zi de Crăciun"
+  },
+  {
+   "d": "2025-12-27",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2025-12-28",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-01-01",
+   "motiv": "sărbătoare legală – Anul Nou"
+  },
+  {
+   "d": "2026-01-02",
+   "motiv": "sărbătoare legală – Anul Nou"
+  },
+  {
+   "d": "2026-01-03",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-01-04",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-01-06",
+   "motiv": "sărbătoare legală – Boboteaza"
+  },
+  {
+   "d": "2026-01-07",
+   "motiv": "sărbătoare legală – Sfântul Ioan Botezătorul"
+  },
+  {
+   "d": "2026-01-10",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-01-11",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-01-17",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-01-18",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-01-24",
+   "motiv": "sărbătoare legală – Ziua Unirii"
+  },
+  {
+   "d": "2026-01-25",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-01-31",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-02-01",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-02-07",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-02-08",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-02-14",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-02-15",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-02-21",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-02-22",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-02-28",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-03-01",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-03-07",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-03-08",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-03-14",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-03-15",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-03-21",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-03-22",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-03-28",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-03-29",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-04-04",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-04-05",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-04-10",
+   "motiv": "sărbătoare legală – Vinerea Mare"
+  },
+  {
+   "d": "2026-04-11",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-04-12",
+   "motiv": "sărbătoare legală – Paștele"
+  },
+  {
+   "d": "2026-04-13",
+   "motiv": "sărbătoare legală – a doua zi de Paște"
+  },
+  {
+   "d": "2026-04-18",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-04-19",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-04-25",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-04-26",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-05-01",
+   "motiv": "sărbătoare legală – Ziua Muncii"
+  },
+  {
+   "d": "2026-05-02",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-05-03",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-05-09",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-05-10",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-05-16",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-05-17",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-05-23",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-05-24",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-05-30",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-05-31",
+   "motiv": "sărbătoare legală – Rusaliile"
+  },
+  {
+   "d": "2026-06-01",
+   "motiv": "sărbătoare legală – Ziua Copilului / a doua zi de Rusalii"
+  },
+  {
+   "d": "2026-06-06",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-06-07",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-06-13",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-06-14",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-06-20",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-06-21",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-06-27",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-06-28",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-07-04",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-07-05",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-07-11",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-07-12",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-07-18",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-07-19",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-07-25",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-07-26",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-08-01",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-08-02",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-08-08",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-08-09",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-08-15",
+   "motiv": "sărbătoare legală – Adormirea Maicii Domnului"
+  },
+  {
+   "d": "2026-08-16",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-08-22",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-08-23",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-08-29",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-08-30",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-09-05",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-09-06",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-09-12",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-09-13",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-09-19",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-09-20",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-09-26",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-09-27",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-10-03",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-10-04",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-10-10",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-10-11",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-10-17",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-10-18",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-10-24",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-10-25",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-10-31",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-11-01",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-11-07",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-11-08",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-11-14",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-11-15",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-11-21",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-11-22",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-11-28",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-11-29",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-11-30",
+   "motiv": "sărbătoare legală – Sfântul Andrei"
+  },
+  {
+   "d": "2026-12-01",
+   "motiv": "sărbătoare legală – Ziua Națională"
+  },
+  {
+   "d": "2026-12-05",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-12-06",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-12-12",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-12-13",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-12-19",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2026-12-20",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2026-12-25",
+   "motiv": "sărbătoare legală – Crăciunul"
+  },
+  {
+   "d": "2026-12-26",
+   "motiv": "sărbătoare legală – a doua zi de Crăciun"
+  },
+  {
+   "d": "2026-12-27",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-01-01",
+   "motiv": "sărbătoare legală – Anul Nou"
+  },
+  {
+   "d": "2027-01-02",
+   "motiv": "sărbătoare legală – Anul Nou"
+  },
+  {
+   "d": "2027-01-03",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-01-06",
+   "motiv": "sărbătoare legală – Boboteaza"
+  },
+  {
+   "d": "2027-01-07",
+   "motiv": "sărbătoare legală – Sfântul Ioan Botezătorul"
+  },
+  {
+   "d": "2027-01-09",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-01-10",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-01-16",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-01-17",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-01-23",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-01-24",
+   "motiv": "sărbătoare legală – Ziua Unirii"
+  },
+  {
+   "d": "2027-01-30",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-01-31",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-02-06",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-02-07",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-02-13",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-02-14",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-02-20",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-02-21",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-02-27",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-02-28",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-03-06",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-03-07",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-03-13",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-03-14",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-03-20",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-03-21",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-03-27",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-03-28",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-04-03",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-04-04",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-04-10",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-04-11",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-04-17",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-04-18",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-04-24",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-04-25",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-04-30",
+   "motiv": "sărbătoare legală – Vinerea Mare"
+  },
+  {
+   "d": "2027-05-01",
+   "motiv": "sărbătoare legală – Ziua Muncii"
+  },
+  {
+   "d": "2027-05-02",
+   "motiv": "sărbătoare legală – Paștele"
+  },
+  {
+   "d": "2027-05-03",
+   "motiv": "sărbătoare legală – a doua zi de Paște"
+  },
+  {
+   "d": "2027-05-08",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-05-09",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-05-15",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-05-16",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-05-22",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-05-23",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-05-29",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-05-30",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-06-01",
+   "motiv": "sărbătoare legală – Ziua Copilului"
+  },
+  {
+   "d": "2027-06-05",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-06-06",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-06-12",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-06-13",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-06-19",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-06-20",
+   "motiv": "sărbătoare legală – Rusaliile"
+  },
+  {
+   "d": "2027-06-21",
+   "motiv": "sărbătoare legală – a doua zi de Rusalii"
+  },
+  {
+   "d": "2027-06-26",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-06-27",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-07-03",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-07-04",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-07-10",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-07-11",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-07-17",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-07-18",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-07-24",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-07-25",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-07-31",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-08-01",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-08-07",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-08-08",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-08-14",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-08-15",
+   "motiv": "sărbătoare legală – Adormirea Maicii Domnului"
+  },
+  {
+   "d": "2027-08-21",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-08-22",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-08-28",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-08-29",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-09-04",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-09-05",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-09-11",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-09-12",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-09-18",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-09-19",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-09-25",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-09-26",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-10-02",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-10-03",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-10-09",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-10-10",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-10-16",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-10-17",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-10-23",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-10-24",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-10-30",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-10-31",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-11-06",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-11-07",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-11-13",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-11-14",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-11-20",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-11-21",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-11-27",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-11-28",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-11-30",
+   "motiv": "sărbătoare legală – Sfântul Andrei"
+  },
+  {
+   "d": "2027-12-01",
+   "motiv": "sărbătoare legală – Ziua Națională"
+  },
+  {
+   "d": "2027-12-04",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-12-05",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-12-11",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-12-12",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-12-18",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2027-12-19",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2027-12-25",
+   "motiv": "sărbătoare legală – Crăciunul"
+  },
+  {
+   "d": "2027-12-26",
+   "motiv": "sărbătoare legală – a doua zi de Crăciun"
+  },
+  {
+   "d": "2028-01-01",
+   "motiv": "sărbătoare legală – Anul Nou"
+  },
+  {
+   "d": "2028-01-02",
+   "motiv": "sărbătoare legală – Anul Nou"
+  },
+  {
+   "d": "2028-01-06",
+   "motiv": "sărbătoare legală – Boboteaza"
+  },
+  {
+   "d": "2028-01-07",
+   "motiv": "sărbătoare legală – Sfântul Ioan Botezătorul"
+  },
+  {
+   "d": "2028-01-08",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-01-09",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-01-15",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-01-16",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-01-22",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-01-23",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-01-24",
+   "motiv": "sărbătoare legală – Ziua Unirii"
+  },
+  {
+   "d": "2028-01-29",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-01-30",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-02-05",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-02-06",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-02-12",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-02-13",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-02-19",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-02-20",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-02-26",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-02-27",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-03-04",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-03-05",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-03-11",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-03-12",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-03-18",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-03-19",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-03-25",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-03-26",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-04-01",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-04-02",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-04-08",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-04-09",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-04-14",
+   "motiv": "sărbătoare legală – Vinerea Mare"
+  },
+  {
+   "d": "2028-04-15",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-04-16",
+   "motiv": "sărbătoare legală – Paștele"
+  },
+  {
+   "d": "2028-04-17",
+   "motiv": "sărbătoare legală – a doua zi de Paște"
+  },
+  {
+   "d": "2028-04-22",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-04-23",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-04-29",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-04-30",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-05-01",
+   "motiv": "sărbătoare legală – Ziua Muncii"
+  },
+  {
+   "d": "2028-05-06",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-05-07",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-05-13",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-05-14",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-05-20",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-05-21",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-05-27",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-05-28",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-06-01",
+   "motiv": "sărbătoare legală – Ziua Copilului"
+  },
+  {
+   "d": "2028-06-03",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-06-04",
+   "motiv": "sărbătoare legală – Rusaliile"
+  },
+  {
+   "d": "2028-06-05",
+   "motiv": "sărbătoare legală – a doua zi de Rusalii"
+  },
+  {
+   "d": "2028-06-10",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-06-11",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-06-17",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-06-18",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-06-24",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-06-25",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-07-01",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-07-02",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-07-08",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-07-09",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-07-15",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-07-16",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-07-22",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-07-23",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-07-29",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-07-30",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-08-05",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-08-06",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-08-12",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-08-13",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-08-15",
+   "motiv": "sărbătoare legală – Adormirea Maicii Domnului"
+  },
+  {
+   "d": "2028-08-19",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-08-20",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-08-26",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-08-27",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-09-02",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-09-03",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-09-09",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-09-10",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-09-16",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-09-17",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-09-23",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-09-24",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-09-30",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-10-01",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-10-07",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-10-08",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-10-14",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-10-15",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-10-21",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-10-22",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-10-28",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-10-29",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-11-04",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-11-05",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-11-11",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-11-12",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-11-18",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-11-19",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-11-25",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-11-26",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-11-30",
+   "motiv": "sărbătoare legală – Sfântul Andrei"
+  },
+  {
+   "d": "2028-12-01",
+   "motiv": "sărbătoare legală – Ziua Națională"
+  },
+  {
+   "d": "2028-12-02",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-12-03",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-12-09",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-12-10",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-12-16",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-12-17",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-12-23",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-12-24",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2028-12-25",
+   "motiv": "sărbătoare legală – Crăciunul"
+  },
+  {
+   "d": "2028-12-26",
+   "motiv": "sărbătoare legală – a doua zi de Crăciun"
+  },
+  {
+   "d": "2028-12-30",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2028-12-31",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-01-01",
+   "motiv": "sărbătoare legală – Anul Nou"
+  },
+  {
+   "d": "2029-01-02",
+   "motiv": "sărbătoare legală – Anul Nou"
+  },
+  {
+   "d": "2029-01-06",
+   "motiv": "sărbătoare legală – Boboteaza"
+  },
+  {
+   "d": "2029-01-07",
+   "motiv": "sărbătoare legală – Sfântul Ioan Botezătorul"
+  },
+  {
+   "d": "2029-01-13",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-01-14",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-01-20",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-01-21",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-01-24",
+   "motiv": "sărbătoare legală – Ziua Unirii"
+  },
+  {
+   "d": "2029-01-27",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-01-28",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-02-03",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-02-04",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-02-10",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-02-11",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-02-17",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-02-18",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-02-24",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-02-25",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-03-03",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-03-04",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-03-10",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-03-11",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-03-17",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-03-18",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-03-24",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-03-25",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-03-31",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-04-01",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-04-06",
+   "motiv": "sărbătoare legală – Vinerea Mare"
+  },
+  {
+   "d": "2029-04-07",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-04-08",
+   "motiv": "sărbătoare legală – Paștele"
+  },
+  {
+   "d": "2029-04-09",
+   "motiv": "sărbătoare legală – a doua zi de Paște"
+  },
+  {
+   "d": "2029-04-14",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-04-15",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-04-21",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-04-22",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-04-28",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-04-29",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-05-01",
+   "motiv": "sărbătoare legală – Ziua Muncii"
+  },
+  {
+   "d": "2029-05-05",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-05-06",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-05-12",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-05-13",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-05-19",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-05-20",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-05-26",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-05-27",
+   "motiv": "sărbătoare legală – Rusaliile"
+  },
+  {
+   "d": "2029-05-28",
+   "motiv": "sărbătoare legală – a doua zi de Rusalii"
+  },
+  {
+   "d": "2029-06-01",
+   "motiv": "sărbătoare legală – Ziua Copilului"
+  },
+  {
+   "d": "2029-06-02",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-06-03",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-06-09",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-06-10",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-06-16",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-06-17",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-06-23",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-06-24",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-06-30",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-07-01",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-07-07",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-07-08",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-07-14",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-07-15",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-07-21",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-07-22",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-07-28",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-07-29",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-08-04",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-08-05",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-08-11",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-08-12",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-08-15",
+   "motiv": "sărbătoare legală – Adormirea Maicii Domnului"
+  },
+  {
+   "d": "2029-08-18",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-08-19",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-08-25",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-08-26",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-09-01",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-09-02",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-09-08",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-09-09",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-09-15",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-09-16",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-09-22",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-09-23",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-09-29",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-09-30",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-10-06",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-10-07",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-10-13",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-10-14",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-10-20",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-10-21",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-10-27",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-10-28",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-11-03",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-11-04",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-11-10",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-11-11",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-11-17",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-11-18",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-11-24",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-11-25",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-11-30",
+   "motiv": "sărbătoare legală – Sfântul Andrei"
+  },
+  {
+   "d": "2029-12-01",
+   "motiv": "sărbătoare legală – Ziua Națională"
+  },
+  {
+   "d": "2029-12-02",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-12-08",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-12-09",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-12-15",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-12-16",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-12-22",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-12-23",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2029-12-25",
+   "motiv": "sărbătoare legală – Crăciunul"
+  },
+  {
+   "d": "2029-12-26",
+   "motiv": "sărbătoare legală – a doua zi de Crăciun"
+  },
+  {
+   "d": "2029-12-29",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2029-12-30",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-01-01",
+   "motiv": "sărbătoare legală – Anul Nou"
+  },
+  {
+   "d": "2030-01-02",
+   "motiv": "sărbătoare legală – Anul Nou"
+  },
+  {
+   "d": "2030-01-05",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-01-06",
+   "motiv": "sărbătoare legală – Boboteaza"
+  },
+  {
+   "d": "2030-01-07",
+   "motiv": "sărbătoare legală – Sfântul Ioan Botezătorul"
+  },
+  {
+   "d": "2030-01-12",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-01-13",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-01-19",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-01-20",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-01-24",
+   "motiv": "sărbătoare legală – Ziua Unirii"
+  },
+  {
+   "d": "2030-01-26",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-01-27",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-02-02",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-02-03",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-02-09",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-02-10",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-02-16",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-02-17",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-02-23",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-02-24",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-03-02",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-03-03",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-03-09",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-03-10",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-03-16",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-03-17",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-03-23",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-03-24",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-03-30",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-03-31",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-04-06",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-04-07",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-04-13",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-04-14",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-04-20",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-04-21",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-04-26",
+   "motiv": "sărbătoare legală – Vinerea Mare"
+  },
+  {
+   "d": "2030-04-27",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-04-28",
+   "motiv": "sărbătoare legală – Paștele"
+  },
+  {
+   "d": "2030-04-29",
+   "motiv": "sărbătoare legală – a doua zi de Paște"
+  },
+  {
+   "d": "2030-05-01",
+   "motiv": "sărbătoare legală – Ziua Muncii"
+  },
+  {
+   "d": "2030-05-04",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-05-05",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-05-11",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-05-12",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-05-18",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-05-19",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-05-25",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-05-26",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-06-01",
+   "motiv": "sărbătoare legală – Ziua Copilului"
+  },
+  {
+   "d": "2030-06-02",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-06-08",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-06-09",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-06-15",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-06-16",
+   "motiv": "sărbătoare legală – Rusaliile"
+  },
+  {
+   "d": "2030-06-17",
+   "motiv": "sărbătoare legală – a doua zi de Rusalii"
+  },
+  {
+   "d": "2030-06-22",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-06-23",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-06-29",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-06-30",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-07-06",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-07-07",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-07-13",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-07-14",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-07-20",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-07-21",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-07-27",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-07-28",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-08-03",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-08-04",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-08-10",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-08-11",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-08-15",
+   "motiv": "sărbătoare legală – Adormirea Maicii Domnului"
+  },
+  {
+   "d": "2030-08-17",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-08-18",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-08-24",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-08-25",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-08-31",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-09-01",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-09-07",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-09-08",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-09-14",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-09-15",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-09-21",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-09-22",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-09-28",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-09-29",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-10-05",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-10-06",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-10-12",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-10-13",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-10-19",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-10-20",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-10-26",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-10-27",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-11-02",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-11-03",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-11-09",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-11-10",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-11-16",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-11-17",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-11-23",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-11-24",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-11-30",
+   "motiv": "sărbătoare legală – Sfântul Andrei"
+  },
+  {
+   "d": "2030-12-01",
+   "motiv": "sărbătoare legală – Ziua Națională"
+  },
+  {
+   "d": "2030-12-07",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-12-08",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-12-14",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-12-15",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-12-21",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-12-22",
+   "motiv": "duminică"
+  },
+  {
+   "d": "2030-12-25",
+   "motiv": "sărbătoare legală – Crăciunul"
+  },
+  {
+   "d": "2030-12-26",
+   "motiv": "sărbătoare legală – a doua zi de Crăciun"
+  },
+  {
+   "d": "2030-12-28",
+   "motiv": "sâmbătă"
+  },
+  {
+   "d": "2030-12-29",
+   "motiv": "duminică"
+  }
+ ],
+ "addWorkingDays": [
+  {
+   "d": "2026-11-20",
+   "n": 3,
+   "rezultat": "2026-11-25"
+  },
+  {
+   "d": "2026-11-21",
+   "n": 3,
+   "rezultat": "2026-11-25"
+  },
+  {
+   "d": "2026-11-22",
+   "n": 3,
+   "rezultat": "2026-11-25"
+  },
+  {
+   "d": "2026-11-23",
+   "n": 3,
+   "rezultat": "2026-11-26"
+  },
+  {
+   "d": "2026-11-24",
+   "n": 3,
+   "rezultat": "2026-11-27"
+  },
+  {
+   "d": "2026-11-25",
+   "n": 3,
+   "rezultat": "2026-12-02"
+  },
+  {
+   "d": "2026-11-26",
+   "n": 3,
+   "rezultat": "2026-12-03"
+  },
+  {
+   "d": "2026-11-27",
+   "n": 3,
+   "rezultat": "2026-12-04"
+  },
+  {
+   "d": "2026-11-28",
+   "n": 3,
+   "rezultat": "2026-12-04"
+  },
+  {
+   "d": "2026-11-29",
+   "n": 3,
+   "rezultat": "2026-12-04"
+  },
+  {
+   "d": "2026-11-30",
+   "n": 3,
+   "rezultat": "2026-12-04"
+  },
+  {
+   "d": "2026-12-01",
+   "n": 3,
+   "rezultat": "2026-12-04"
+  },
+  {
+   "d": "2026-12-02",
+   "n": 3,
+   "rezultat": "2026-12-07"
+  },
+  {
+   "d": "2026-12-03",
+   "n": 3,
+   "rezultat": "2026-12-08"
+  },
+  {
+   "d": "2026-12-04",
+   "n": 3,
+   "rezultat": "2026-12-09"
+  },
+  {
+   "d": "2026-12-05",
+   "n": 3,
+   "rezultat": "2026-12-09"
+  },
+  {
+   "d": "2026-12-06",
+   "n": 3,
+   "rezultat": "2026-12-09"
+  },
+  {
+   "d": "2026-12-07",
+   "n": 3,
+   "rezultat": "2026-12-10"
+  },
+  {
+   "d": "2026-12-08",
+   "n": 3,
+   "rezultat": "2026-12-11"
+  },
+  {
+   "d": "2026-12-09",
+   "n": 3,
+   "rezultat": "2026-12-14"
+  },
+  {
+   "d": "2026-12-10",
+   "n": 3,
+   "rezultat": "2026-12-15"
+  },
+  {
+   "d": "2026-12-11",
+   "n": 3,
+   "rezultat": "2026-12-16"
+  },
+  {
+   "d": "2026-12-12",
+   "n": 3,
+   "rezultat": "2026-12-16"
+  },
+  {
+   "d": "2026-12-13",
+   "n": 3,
+   "rezultat": "2026-12-16"
+  },
+  {
+   "d": "2026-12-14",
+   "n": 3,
+   "rezultat": "2026-12-17"
+  },
+  {
+   "d": "2026-12-15",
+   "n": 3,
+   "rezultat": "2026-12-18"
+  },
+  {
+   "d": "2026-12-16",
+   "n": 3,
+   "rezultat": "2026-12-21"
+  },
+  {
+   "d": "2026-12-17",
+   "n": 3,
+   "rezultat": "2026-12-22"
+  },
+  {
+   "d": "2026-12-18",
+   "n": 3,
+   "rezultat": "2026-12-23"
+  },
+  {
+   "d": "2026-12-19",
+   "n": 3,
+   "rezultat": "2026-12-23"
+  },
+  {
+   "d": "2026-12-20",
+   "n": 3,
+   "rezultat": "2026-12-23"
+  },
+  {
+   "d": "2026-12-21",
+   "n": 3,
+   "rezultat": "2026-12-24"
+  },
+  {
+   "d": "2026-12-22",
+   "n": 3,
+   "rezultat": "2026-12-28"
+  },
+  {
+   "d": "2026-12-23",
+   "n": 3,
+   "rezultat": "2026-12-29"
+  },
+  {
+   "d": "2026-12-24",
+   "n": 3,
+   "rezultat": "2026-12-30"
+  },
+  {
+   "d": "2026-12-25",
+   "n": 3,
+   "rezultat": "2026-12-30"
+  },
+  {
+   "d": "2026-12-26",
+   "n": 3,
+   "rezultat": "2026-12-30"
+  },
+  {
+   "d": "2026-12-27",
+   "n": 3,
+   "rezultat": "2026-12-30"
+  },
+  {
+   "d": "2026-12-28",
+   "n": 3,
+   "rezultat": "2026-12-31"
+  },
+  {
+   "d": "2026-12-29",
+   "n": 3,
+   "rezultat": "2027-01-04"
+  },
+  {
+   "d": "2026-12-30",
+   "n": 3,
+   "rezultat": "2027-01-05"
+  },
+  {
+   "d": "2026-12-31",
+   "n": 3,
+   "rezultat": "2027-01-08"
+  },
+  {
+   "d": "2027-01-01",
+   "n": 3,
+   "rezultat": "2027-01-08"
+  },
+  {
+   "d": "2027-01-02",
+   "n": 3,
+   "rezultat": "2027-01-08"
+  },
+  {
+   "d": "2027-01-03",
+   "n": 3,
+   "rezultat": "2027-01-08"
+  },
+  {
+   "d": "2027-01-04",
+   "n": 3,
+   "rezultat": "2027-01-11"
+  },
+  {
+   "d": "2027-01-05",
+   "n": 3,
+   "rezultat": "2027-01-12"
+  },
+  {
+   "d": "2027-01-06",
+   "n": 3,
+   "rezultat": "2027-01-12"
+  },
+  {
+   "d": "2027-01-07",
+   "n": 3,
+   "rezultat": "2027-01-12"
+  },
+  {
+   "d": "2027-01-08",
+   "n": 3,
+   "rezultat": "2027-01-13"
+  },
+  {
+   "d": "2027-01-09",
+   "n": 3,
+   "rezultat": "2027-01-13"
+  },
+  {
+   "d": "2027-01-10",
+   "n": 3,
+   "rezultat": "2027-01-13"
+  }
+ ],
+ "workingDaysBetween": [
+  {
+   "de": "2026-12-20",
+   "pana": "2027-01-08",
+   "rezultat": 11
+  },
+  {
+   "de": "2026-12-21",
+   "pana": "2027-01-08",
+   "rezultat": 10
+  },
+  {
+   "de": "2026-12-22",
+   "pana": "2027-01-08",
+   "rezultat": 9
+  },
+  {
+   "de": "2026-12-23",
+   "pana": "2027-01-08",
+   "rezultat": 8
+  },
+  {
+   "de": "2026-12-24",
+   "pana": "2027-01-08",
+   "rezultat": 7
+  },
+  {
+   "de": "2026-12-25",
+   "pana": "2027-01-08",
+   "rezultat": 7
+  },
+  {
+   "de": "2026-12-26",
+   "pana": "2027-01-08",
+   "rezultat": 7
+  },
+  {
+   "de": "2026-12-27",
+   "pana": "2027-01-08",
+   "rezultat": 7
+  },
+  {
+   "de": "2026-12-28",
+   "pana": "2027-01-08",
+   "rezultat": 6
+  },
+  {
+   "de": "2026-12-29",
+   "pana": "2027-01-08",
+   "rezultat": 5
+  },
+  {
+   "de": "2026-12-30",
+   "pana": "2027-01-08",
+   "rezultat": 4
+  },
+  {
+   "de": "2026-12-31",
+   "pana": "2027-01-08",
+   "rezultat": 3
+  },
+  {
+   "de": "2027-01-01",
+   "pana": "2027-01-08",
+   "rezultat": 3
+  },
+  {
+   "de": "2027-01-02",
+   "pana": "2027-01-08",
+   "rezultat": 3
+  },
+  {
+   "de": "2027-01-03",
+   "pana": "2027-01-08",
+   "rezultat": 3
+  },
+  {
+   "de": "2027-01-04",
+   "pana": "2027-01-08",
+   "rezultat": 2
+  },
+  {
+   "de": "2027-01-05",
+   "pana": "2027-01-08",
+   "rezultat": 1
+  }
+ ],
+ "nextWorkingDay": [
+  {
+   "d": "2026-12-20",
+   "rezultat": "2026-12-21"
+  },
+  {
+   "d": "2026-12-21",
+   "rezultat": "2026-12-22"
+  },
+  {
+   "d": "2026-12-22",
+   "rezultat": "2026-12-23"
+  },
+  {
+   "d": "2026-12-23",
+   "rezultat": "2026-12-24"
+  },
+  {
+   "d": "2026-12-24",
+   "rezultat": "2026-12-28"
+  },
+  {
+   "d": "2026-12-25",
+   "rezultat": "2026-12-28"
+  },
+  {
+   "d": "2026-12-26",
+   "rezultat": "2026-12-28"
+  },
+  {
+   "d": "2026-12-27",
+   "rezultat": "2026-12-28"
+  },
+  {
+   "d": "2026-12-28",
+   "rezultat": "2026-12-29"
+  },
+  {
+   "d": "2026-12-29",
+   "rezultat": "2026-12-30"
+  },
+  {
+   "d": "2026-12-30",
+   "rezultat": "2026-12-31"
+  },
+  {
+   "d": "2026-12-31",
+   "rezultat": "2027-01-04"
+  },
+  {
+   "d": "2027-01-01",
+   "rezultat": "2027-01-04"
+  },
+  {
+   "d": "2027-01-02",
+   "rezultat": "2027-01-04"
+  },
+  {
+   "d": "2027-01-03",
+   "rezultat": "2027-01-04"
+  },
+  {
+   "d": "2027-01-04",
+   "rezultat": "2027-01-05"
+  },
+  {
+   "d": "2027-01-05",
+   "rezultat": "2027-01-08"
+  },
+  {
+   "d": "2027-01-06",
+   "rezultat": "2027-01-08"
+  },
+  {
+   "d": "2027-01-07",
+   "rezultat": "2027-01-08"
+  },
+  {
+   "d": "2027-01-08",
+   "rezultat": "2027-01-11"
+  },
+  {
+   "d": "2027-01-09",
+   "rezultat": "2027-01-11"
+  },
+  {
+   "d": "2027-01-10",
+   "rezultat": "2027-01-11"
+  }
+ ],
+ "parseDateQuery": [
+  {
+   "q": "12.09.2026",
+   "rezultat": {
+    "kind": "day",
+    "iso": "2026-09-12"
+   }
+  },
+  {
+   "q": "09.2026",
+   "rezultat": {
+    "kind": "month",
+    "year": 2026,
+    "month": 9
+   }
+  },
+  {
+   "q": "2026",
+   "rezultat": {
+    "kind": "year",
+    "year": 2026
+   }
+  },
+  {
+   "q": "1.2.2026",
+   "rezultat": {
+    "kind": "day",
+    "iso": "2026-02-01"
+   }
+  },
+  {
+   "q": "31.02.2026",
+   "rezultat": null
+  },
+  {
+   "q": "școala",
+   "rezultat": null
+  },
+  {
+   "q": "",
+   "rezultat": null
+  },
+  {
+   "q": "2026-10-15",
+   "rezultat": {
+    "kind": "day",
+    "iso": "2026-10-15"
+   }
+  },
+  {
+   "q": "10.2026 x",
+   "rezultat": null
+  }
+ ]
+}

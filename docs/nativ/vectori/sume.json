@@ -1,0 +1,67 @@
+[
+ {
+  "text": "2500",
+  "parseSuma": 2500,
+  "lei": "2.500 lei"
+ },
+ {
+  "text": "2.500",
+  "parseSuma": 2500,
+  "lei": "2.500 lei"
+ },
+ {
+  "text": "2 500",
+  "parseSuma": 2500,
+  "lei": "2.500 lei"
+ },
+ {
+  "text": "1.500,50",
+  "parseSuma": 1500.5,
+  "lei": "1.500,5 lei"
+ },
+ {
+  "text": "1500,5",
+  "parseSuma": 1500.5,
+  "lei": "1.500,5 lei"
+ },
+ {
+  "text": "12.345.678",
+  "parseSuma": 12345678,
+  "lei": "12.345.678 lei"
+ },
+ {
+  "text": "2.5",
+  "parseSuma": 2.5,
+  "lei": "2,5 lei"
+ },
+ {
+  "text": "3000 lei",
+  "parseSuma": 3000,
+  "lei": "3.000 lei"
+ },
+ {
+  "text": "",
+  "parseSuma": null,
+  "lei": null
+ },
+ {
+  "text": "abc",
+  "parseSuma": null,
+  "lei": null
+ },
+ {
+  "text": "0",
+  "parseSuma": 0,
+  "lei": "0 lei"
+ },
+ {
+  "text": "1.000.000,99",
+  "parseSuma": 1000000.99,
+  "lei": "1.000.000,99 lei"
+ },
+ {
+  "text": " 750 ",
+  "parseSuma": 750,
+  "lei": "750 lei"
+ }
+]

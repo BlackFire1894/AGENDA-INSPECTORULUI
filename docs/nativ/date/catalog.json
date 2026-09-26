@@ -1,0 +1,1141 @@
+{
+ "versiuneAplicatieWeb": "1.23.0",
+ "schema": 11,
+ "termene": {
+  "TERMEN_PLATA": 15,
+  "PRAG_ROSU": 40,
+  "TERMEN_ANAF": 45,
+  "TERMEN_ASI": 90,
+  "TERMEN_PIERDERE_ASI": 5,
+  "TERMEN_INCARCARE": 3
+ },
+ "luni": [
+  "ianuarie",
+  "februarie",
+  "martie",
+  "aprilie",
+  "mai",
+  "iunie",
+  "iulie",
+  "august",
+  "septembrie",
+  "octombrie",
+  "noiembrie",
+  "decembrie"
+ ],
+ "luniScurt": [
+  "ian",
+  "feb",
+  "mar",
+  "apr",
+  "mai",
+  "iun",
+  "iul",
+  "aug",
+  "sep",
+  "oct",
+  "nov",
+  "dec"
+ ],
+ "zileSaptamana": [
+  "duminică",
+  "luni",
+  "marți",
+  "miercuri",
+  "joi",
+  "vineri",
+  "sâmbătă"
+ ],
+ "zileScurt": [
+  "Lu",
+  "Ma",
+  "Mi",
+  "Jo",
+  "Vi",
+  "Sâ",
+  "Du"
+ ],
+ "tipObiectiv": [
+  {
+   "key": "OPEC",
+   "label": "OPEC / Instituție"
+  },
+  {
+   "key": "LOCALITATE",
+   "label": "Localitate"
+  }
+ ],
+ "dotari": [
+  {
+   "key": "asi",
+   "label": "ASI",
+   "opts": [
+    "DA",
+    "NU",
+    "NEC"
+   ],
+   "nr": "Nr. autorizație"
+  },
+  {
+   "key": "aviz",
+   "label": "AVIZ",
+   "opts": [
+    "DA",
+    "NU",
+    "NEC"
+   ],
+   "nr": "Nr. aviz"
+  },
+  {
+   "key": "hidInt",
+   "label": "Hidranți interiori",
+   "opts": [
+    "DA",
+    "NU",
+    "NEC"
+   ]
+  },
+  {
+   "key": "hidExt",
+   "label": "Hidranți exteriori",
+   "opts": [
+    "DA",
+    "NU",
+    "NEC"
+   ]
+  },
+  {
+   "key": "sprinklere",
+   "label": "Sprinklere",
+   "opts": [
+    "DA",
+    "NU",
+    "NEC"
+   ]
+  },
+  {
+   "key": "drencere",
+   "label": "Drencere",
+   "opts": [
+    "DA",
+    "NU",
+    "NEC"
+   ]
+  },
+  {
+   "key": "instSpeciale",
+   "label": "Instalații speciale",
+   "opts": [
+    "DA",
+    "NU",
+    "NEC"
+   ]
+  },
+  {
+   "key": "idsai",
+   "label": "IDSAI",
+   "opts": [
+    "DA",
+    "NU",
+    "NEC"
+   ]
+  },
+  {
+   "key": "detectoriAutonomi",
+   "label": "Detectori autonomi",
+   "opts": [
+    "DA",
+    "NU",
+    "NEC"
+   ]
+  },
+  {
+   "key": "exit",
+   "label": "EXIT",
+   "opts": [
+    "DA",
+    "NU",
+    "NEC"
+   ]
+  },
+  {
+   "key": "desfumare",
+   "label": "Desfumare",
+   "opts": [
+    "DA",
+    "NU",
+    "NEC"
+   ]
+  },
+  {
+   "key": "ignifugare",
+   "label": "Ignifugare",
+   "opts": [
+    "DA",
+    "NU",
+    "NEC"
+   ]
+  },
+  {
+   "key": "rezervaApa",
+   "label": "Rezervă de apă",
+   "opts": [
+    "DA",
+    "NU",
+    "NEC"
+   ]
+  },
+  {
+   "key": "statiePompe",
+   "label": "Stație de pompe",
+   "opts": [
+    "DA",
+    "NU",
+    "NEC"
+   ]
+  },
+  {
+   "key": "fotovoltaice",
+   "label": "Panouri fotovoltaice",
+   "opts": [
+    "DA",
+    "NU"
+   ]
+  },
+  {
+   "key": "acumulatori",
+   "label": "Acumulatori",
+   "opts": [
+    "DA",
+    "NU"
+   ]
+  },
+  {
+   "key": "ilumHint",
+   "label": "Iluminat Hint",
+   "opts": [
+    "DA",
+    "NU"
+   ]
+  },
+  {
+   "key": "centrala",
+   "label": "Centrală termică",
+   "centrala": true
+  },
+  {
+   "key": "ipt",
+   "label": "IPT",
+   "opts": [
+    "DA",
+    "NU"
+   ]
+  }
+ ],
+ "centralaTipuri": [
+  "SOLID",
+  "GAZOS",
+  "ELECTRIC"
+ ],
+ "acte": [
+  {
+   "key": "ctpsi",
+   "label": "Dispoziție CTPSI / RESP"
+  },
+  {
+   "key": "lfd",
+   "label": "Dispoziție LFD"
+  },
+  {
+   "key": "instruire",
+   "label": "Dispoziție instruire"
+  },
+  {
+   "key": "organizare",
+   "label": "Dispoziție organizarea apărării împotriva incendiilor"
+  },
+  {
+   "key": "comisie",
+   "label": "Comisie PSI"
+  },
+  {
+   "key": "sezon",
+   "label": "Dispoziție măsuri sezon canicular / secetos / rece"
+  },
+  {
+   "key": "controale",
+   "label": "Controale proprii"
+  },
+  {
+   "key": "analiza",
+   "label": "Analiza semestrială"
+  },
+  {
+   "key": "fise",
+   "label": "Fișe de instruire completate corect"
+  },
+  {
+   "key": "stingatoare",
+   "label": "Verificare lunară a stingătoarelor"
+  },
+  {
+   "key": "contract",
+   "label": "Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)"
+  },
+  {
+   "key": "exercitii",
+   "label": "Exerciții efectuate"
+  },
+  {
+   "key": "registreExercitii",
+   "label": "Registrele exercițiilor sunt la zi"
+  },
+  {
+   "key": "rapoarteExercitii",
+   "label": "Rapoarte exerciții"
+  }
+ ],
+ "categorii": {
+  "lipsa": "Instalații lipsă (NU la dotări) — nereguli grave",
+  "grf": "Rezistență la foc (GRF/NSI) — neregulă gravă",
+  "docs": "Documentație și verificări",
+  "stingatoare": "Stingătoare",
+  "electric": "Instalații electrice și compartimentări",
+  "semnalizare": "Semnalizare și iluminat",
+  "idsai": "IDSAI",
+  "hidranti": "Hidranți",
+  "desfumare": "Desfumare",
+  "stingere": "Sprinklere, drencere, instalații speciale",
+  "pompe": "Stație de pompe / generator",
+  "evacuare": "Evacuare și instrucțiuni",
+  "detectoare": "Detectoare și ignifugare",
+  "planuri": "Planuri",
+  "svsu": "SVSU",
+  "avertizare": "Avertizare – sirene",
+  "pcdotare": "Dotare și adăpost",
+  "pcorg": "Organizare protecție civilă",
+  "adapost": "Adăposturi de protecție civilă",
+  "custom": "Nereguli suplimentare"
+ },
+ "sectiuni": {
+  "ner": {
+   "tab": "nereguli",
+   "label": "Nereguli",
+   "ok": "Conform",
+   "nok": "Constatat",
+   "onlyLocalitate": false
+  },
+  "plan": {
+   "tab": "planuri",
+   "label": "Planuri și SVSU",
+   "ok": "Conform",
+   "nok": "Neconform",
+   "onlyLocalitate": true
+  },
+  "pc": {
+   "tab": "pc",
+   "label": "Protecție civilă",
+   "ok": "Conform",
+   "nok": "Neconform",
+   "onlyLocalitate": true
+  }
+ },
+ "sablon": [
+  {
+   "key": "lipsa-hidInt",
+   "din": 5,
+   "cat": "lipsa",
+   "sec": "ner",
+   "grav": true,
+   "reqNU": "hidInt",
+   "letter": "G1",
+   "label": "Lipsă hidranți interiori"
+  },
+  {
+   "key": "lipsa-hidExt",
+   "din": 5,
+   "cat": "lipsa",
+   "sec": "ner",
+   "grav": true,
+   "reqNU": "hidExt",
+   "letter": "G2",
+   "label": "Lipsă hidranți exteriori"
+  },
+  {
+   "key": "lipsa-sprinklere",
+   "din": 5,
+   "cat": "lipsa",
+   "sec": "ner",
+   "grav": true,
+   "reqNU": "sprinklere",
+   "letter": "G3",
+   "label": "Lipsă instalație de sprinklere"
+  },
+  {
+   "key": "lipsa-drencere",
+   "din": 5,
+   "cat": "lipsa",
+   "sec": "ner",
+   "grav": true,
+   "reqNU": "drencere",
+   "letter": "G4",
+   "label": "Lipsă instalație de drencere"
+  },
+  {
+   "key": "lipsa-instSpeciale",
+   "din": 5,
+   "cat": "lipsa",
+   "sec": "ner",
+   "grav": true,
+   "reqNU": "instSpeciale",
+   "letter": "G5",
+   "label": "Lipsă instalații speciale de stingere"
+  },
+  {
+   "key": "lipsa-idsai",
+   "din": 5,
+   "cat": "lipsa",
+   "sec": "ner",
+   "grav": true,
+   "reqNU": "idsai",
+   "letter": "G6",
+   "label": "Lipsă IDSAI"
+  },
+  {
+   "key": "lipsa-detectoriAutonomi",
+   "din": 5,
+   "cat": "lipsa",
+   "sec": "ner",
+   "grav": true,
+   "reqNU": "detectoriAutonomi",
+   "letter": "G7",
+   "label": "Lipsă detectori autonomi"
+  },
+  {
+   "key": "lipsa-exit",
+   "din": 5,
+   "cat": "lipsa",
+   "sec": "ner",
+   "grav": true,
+   "reqNU": "exit",
+   "letter": "G8",
+   "label": "Lipsă marcaje EXIT"
+  },
+  {
+   "key": "lipsa-desfumare",
+   "din": 5,
+   "cat": "lipsa",
+   "sec": "ner",
+   "grav": true,
+   "reqNU": "desfumare",
+   "letter": "G9",
+   "label": "Lipsă instalație de desfumare"
+  },
+  {
+   "key": "lipsa-ignifugare",
+   "din": 5,
+   "cat": "lipsa",
+   "sec": "ner",
+   "grav": true,
+   "reqNU": "ignifugare",
+   "letter": "G10",
+   "label": "Lipsă ignifugare"
+  },
+  {
+   "key": "lipsa-rezervaApa",
+   "din": 5,
+   "cat": "lipsa",
+   "sec": "ner",
+   "grav": true,
+   "reqNU": "rezervaApa",
+   "letter": "G11",
+   "label": "Lipsă rezervă de apă"
+  },
+  {
+   "key": "lipsa-statiePompe",
+   "din": 5,
+   "cat": "lipsa",
+   "sec": "ner",
+   "grav": true,
+   "reqNU": "statiePompe",
+   "letter": "G12",
+   "label": "Lipsă stație de pompe"
+  },
+  {
+   "key": "grav-grfV",
+   "din": 7,
+   "cat": "grf",
+   "sec": "ner",
+   "grav": true,
+   "reqGrfV": true,
+   "letter": "G13",
+   "label": "Construcție cu GRF/NSI V și regim de înălțime peste parter"
+  },
+  {
+   "key": "ah",
+   "din": 8,
+   "cat": "docs",
+   "label": "Construcția funcționează fără ASI (autorizație de securitate la incendiu)",
+   "autoNU": "asi",
+   "sec": "ner"
+  },
+  {
+   "key": "ai",
+   "din": 8,
+   "cat": "docs",
+   "label": "Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz",
+   "autoNU": "aviz",
+   "sec": "ner"
+  },
+  {
+   "key": "a",
+   "cat": "docs",
+   "label": "Nu a prezentat documentație ASI",
+   "asi": true,
+   "sec": "ner"
+  },
+  {
+   "key": "b1",
+   "din": 9,
+   "cat": "docs",
+   "label": "Nu a prezentat / nu are verificare instalații electrice",
+   "verif": 12,
+   "sec": "ner"
+  },
+  {
+   "key": "b2",
+   "din": 9,
+   "cat": "docs",
+   "label": "Nu a prezentat / nu are verificare împământare (IPT)",
+   "verif": 12,
+   "verifAlegeri": [
+    12,
+    24
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "b3",
+   "din": 9,
+   "cat": "docs",
+   "label": "Nu a prezentat / nu are verificare CT (centrală termică)",
+   "verif": 24,
+   "sec": "ner"
+  },
+  {
+   "key": "c1",
+   "din": 9,
+   "cat": "docs",
+   "label": "Nu a prezentat / nu are verificare IDSAI",
+   "req": [
+    "idsai"
+   ],
+   "verif": 12,
+   "sec": "ner"
+  },
+  {
+   "key": "c2",
+   "din": 9,
+   "cat": "docs",
+   "label": "Nu a prezentat / nu are verificare hidranți interiori",
+   "req": [
+    "hidInt"
+   ],
+   "verif": 6,
+   "sec": "ner"
+  },
+  {
+   "key": "c3",
+   "din": 9,
+   "cat": "docs",
+   "label": "Nu a prezentat / nu are verificare hidranți exteriori",
+   "req": [
+    "hidExt"
+   ],
+   "verif": 6,
+   "sec": "ner"
+  },
+  {
+   "key": "c4",
+   "din": 9,
+   "cat": "docs",
+   "label": "Nu a prezentat / nu are verificare desfumare",
+   "req": [
+    "desfumare"
+   ],
+   "verif": 12,
+   "sec": "ner"
+  },
+  {
+   "key": "c5",
+   "din": 9,
+   "cat": "docs",
+   "label": "Nu a prezentat / nu are verificare sprinklere",
+   "req": [
+    "sprinklere"
+   ],
+   "verif": 12,
+   "sec": "ner"
+  },
+  {
+   "key": "c6",
+   "din": 9,
+   "cat": "docs",
+   "label": "Nu a prezentat / nu are verificare drencere",
+   "req": [
+    "drencere"
+   ],
+   "verif": 12,
+   "sec": "ner"
+  },
+  {
+   "key": "c7",
+   "din": 9,
+   "cat": "docs",
+   "label": "Nu a prezentat / nu are verificare instalații speciale",
+   "req": [
+    "instSpeciale"
+   ],
+   "verif": 12,
+   "sec": "ner"
+  },
+  {
+   "key": "b",
+   "cat": "docs",
+   "label": "Nu a prezentat / nu are verificare instalații electrice / IPT / CT",
+   "retrasDin": 9,
+   "sec": "ner"
+  },
+  {
+   "key": "c",
+   "cat": "docs",
+   "label": "Nu a prezentat / nu are verificare IDSAI / Hint / Hext / Desfumare / Sprinklere / Drencere / Instalații speciale",
+   "req": [
+    "idsai",
+    "hidInt",
+    "hidExt",
+    "desfumare",
+    "sprinklere",
+    "drencere",
+    "instSpeciale"
+   ],
+   "retrasDin": 9,
+   "sec": "ner"
+  },
+  {
+   "key": "d",
+   "cat": "stingatoare",
+   "label": "Stingătoare expirate",
+   "sec": "ner"
+  },
+  {
+   "key": "e",
+   "cat": "stingatoare",
+   "label": "Stingătoare neconforme",
+   "sec": "ner"
+  },
+  {
+   "key": "al",
+   "din": 9,
+   "cat": "stingatoare",
+   "label": "Stingătoare insuficiente / lipsă",
+   "sec": "ner"
+  },
+  {
+   "key": "f",
+   "cat": "electric",
+   "label": "Instalații electrice exploatate incorect",
+   "sec": "ner"
+  },
+  {
+   "key": "g",
+   "cat": "electric",
+   "label": "Perete / planșeu / perete + planșeu cameră CT – 90 minute",
+   "req": [
+    "centrala"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "h",
+   "cat": "electric",
+   "label": "Ușă RF 15 minute cameră CT",
+   "req": [
+    "centrala"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "i",
+   "cat": "electric",
+   "label": "Ușă RF 60 minute cameră IDSAI",
+   "req": [
+    "idsai"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "j",
+   "cat": "semnalizare",
+   "label": "EXIT defect",
+   "req": [
+    "exit"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "aj",
+   "din": 9,
+   "cat": "semnalizare",
+   "label": "EXIT incomplet",
+   "req": [
+    "exit"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "k",
+   "cat": "semnalizare",
+   "label": "Iluminat Hint defect",
+   "req": [
+    "ilumHint"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "ak",
+   "din": 9,
+   "cat": "semnalizare",
+   "label": "Iluminat Hint incomplet",
+   "req": [
+    "ilumHint"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "am",
+   "din": 9,
+   "cat": "semnalizare",
+   "label": "Lipsă iluminat Hint",
+   "autoNU": "ilumHint",
+   "doarLaNU": true,
+   "sec": "ner"
+  },
+  {
+   "key": "l",
+   "cat": "idsai",
+   "label": "Erori IDSAI",
+   "req": [
+    "idsai"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "m",
+   "cat": "idsai",
+   "label": "IDSAI nefuncțional",
+   "req": [
+    "idsai"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "n",
+   "cat": "hidranti",
+   "label": "Probleme Hint",
+   "req": [
+    "hidInt"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "o",
+   "cat": "hidranti",
+   "label": "Hint nefuncțional",
+   "req": [
+    "hidInt"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "p",
+   "cat": "hidranti",
+   "label": "Probleme Hext",
+   "req": [
+    "hidExt"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "q",
+   "cat": "hidranti",
+   "label": "Hext nefuncțional",
+   "req": [
+    "hidExt"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "r",
+   "cat": "desfumare",
+   "label": "Probleme desfumare",
+   "req": [
+    "desfumare"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "s",
+   "cat": "desfumare",
+   "label": "Desfumare nefuncțională",
+   "req": [
+    "desfumare"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "ș",
+   "cat": "stingere",
+   "label": "Probleme sprinklere",
+   "req": [
+    "sprinklere"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "t",
+   "cat": "stingere",
+   "label": "Sprinklere nefuncționale",
+   "req": [
+    "sprinklere"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "ț",
+   "cat": "stingere",
+   "label": "Probleme drencere",
+   "req": [
+    "drencere"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "u",
+   "cat": "stingere",
+   "label": "Drencere nefuncționale",
+   "req": [
+    "drencere"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "v",
+   "cat": "stingere",
+   "label": "Probleme instalații speciale",
+   "req": [
+    "instSpeciale"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "x",
+   "cat": "stingere",
+   "label": "Instalații speciale nefuncționale",
+   "req": [
+    "instSpeciale"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "y",
+   "cat": "pompe",
+   "label": "Probleme stație de pompe / generator",
+   "req": [
+    "statiePompe"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "z",
+   "cat": "pompe",
+   "label": "Stație de pompe / generator nefuncțional",
+   "req": [
+    "statiePompe"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "aa",
+   "din": 5,
+   "cat": "evacuare",
+   "label": "Planuri de evacuare neafișate corespunzător",
+   "sec": "ner"
+  },
+  {
+   "key": "ab",
+   "din": 5,
+   "cat": "evacuare",
+   "label": "Căi de evacuare blocate / obturate",
+   "sec": "ner"
+  },
+  {
+   "key": "ac",
+   "din": 5,
+   "cat": "evacuare",
+   "label": "Lipsă instrucțiuni de utilizare a echipamentelor de gătit",
+   "sec": "ner"
+  },
+  {
+   "key": "ad",
+   "din": 5,
+   "cat": "evacuare",
+   "label": "Lipsă instrucțiuni de comportare (turism)",
+   "sec": "ner"
+  },
+  {
+   "key": "ae",
+   "din": 5,
+   "cat": "detectoare",
+   "label": "Detector de gaz defect / inexistent",
+   "sec": "ner"
+  },
+  {
+   "key": "af",
+   "din": 5,
+   "cat": "detectoare",
+   "label": "Detectori autonomi nefuncționali",
+   "req": [
+    "detectoriAutonomi"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "ag",
+   "din": 5,
+   "cat": "detectoare",
+   "label": "Ignifugare expirată",
+   "req": [
+    "ignifugare"
+   ],
+   "sec": "ner"
+  },
+  {
+   "key": "paar",
+   "cat": "planuri",
+   "label": "PAAR avizat",
+   "nokLabel": "PAAR neavizat",
+   "sec": "plan"
+  },
+  {
+   "key": "plInundatii",
+   "cat": "planuri",
+   "label": "Plan inundații conform",
+   "nokLabel": "Plan inundații neconform",
+   "sec": "plan"
+  },
+  {
+   "key": "plEvacuare",
+   "cat": "planuri",
+   "label": "Plan evacuare conform",
+   "nokLabel": "Plan evacuare neconform",
+   "sec": "plan"
+  },
+  {
+   "key": "plCutremur",
+   "cat": "planuri",
+   "label": "Plan cutremur conform",
+   "nokLabel": "Plan cutremur neconform",
+   "sec": "plan"
+  },
+  {
+   "key": "svsuAvizat",
+   "cat": "svsu",
+   "label": "SVSU avizat",
+   "nokLabel": "SVSU neavizat",
+   "sec": "plan"
+  },
+  {
+   "key": "svsuSef",
+   "cat": "svsu",
+   "label": "Șef SVSU avizat",
+   "nokLabel": "Șef SVSU neavizat",
+   "sec": "plan"
+  },
+  {
+   "key": "svsuDotare",
+   "cat": "svsu",
+   "label": "Dotare conformă",
+   "nokLabel": "Dotare SVSU neconformă",
+   "sec": "plan"
+  },
+  {
+   "key": "svsuPlanPregatire",
+   "cat": "svsu",
+   "label": "Plan de pregătire avizat",
+   "nokLabel": "Plan de pregătire neavizat",
+   "sec": "plan"
+  },
+  {
+   "key": "svsuGospodarii",
+   "cat": "svsu",
+   "label": "Controale gospodării",
+   "nokLabel": "Controale gospodării neefectuate / neconforme",
+   "sec": "plan"
+  },
+  {
+   "key": "pcAudibilitate",
+   "cat": "avertizare",
+   "label": "Studiu de audibilitate",
+   "nokLabel": "Lipsă studiu de audibilitate",
+   "sec": "pc"
+  },
+  {
+   "key": "pcSireneNumar",
+   "cat": "avertizare",
+   "label": "Număr suficient de sirene",
+   "nokLabel": "Număr insuficient de sirene",
+   "sec": "pc"
+  },
+  {
+   "key": "pcSireneMentenanta",
+   "cat": "avertizare",
+   "label": "Contract mentenanță sirene",
+   "nokLabel": "Lipsă contract mentenanță sirene",
+   "sec": "pc"
+  },
+  {
+   "key": "pcSireneDefecte",
+   "cat": "avertizare",
+   "label": "Sirene defecte",
+   "sec": "pc"
+  },
+  {
+   "key": "pcSireneNefunctionale",
+   "cat": "avertizare",
+   "label": "Sirene nefuncționale",
+   "sec": "pc"
+  },
+  {
+   "key": "pcDotare",
+   "cat": "pcdotare",
+   "label": "Dotare conformă planurilor comunei",
+   "nokLabel": "Dotare neconformă cu planurile comunei",
+   "sec": "pc"
+  },
+  {
+   "key": "pcAgentInundatii",
+   "din": 11,
+   "cat": "pcorg",
+   "label": "Agent de inundații stabilit",
+   "nokLabel": "Agent de inundații nestabilit",
+   "sec": "pc"
+  },
+  {
+   "key": "pcInspector",
+   "din": 11,
+   "cat": "pcorg",
+   "label": "Inspector de protecție civilă stabilit",
+   "nokLabel": "Inspector de protecție civilă nestabilit",
+   "sec": "pc"
+  },
+  {
+   "key": "pcTaxa",
+   "din": 11,
+   "cat": "pcorg",
+   "label": "Taxa de protecție civilă stabilită",
+   "nokLabel": "Taxa de protecție civilă nestabilită",
+   "sec": "pc"
+  },
+  {
+   "key": "pcConventii",
+   "din": 11,
+   "cat": "pcorg",
+   "label": "Convenții cu OPEC",
+   "nokLabel": "Lipsă convenții cu OPEC",
+   "sec": "pc"
+  }
+ ],
+ "lipsaDotari": [
+  "hidInt",
+  "hidExt",
+  "sprinklere",
+  "drencere",
+  "instSpeciale",
+  "idsai",
+  "detectoriAutonomi",
+  "exit",
+  "desfumare",
+  "ignifugare",
+  "rezervaApa",
+  "statiePompe"
+ ],
+ "autoNU": {
+  "asi": "ah",
+  "aviz": "ai",
+  "ilumHint": "am"
+ },
+ "grfNiveluri": [
+  "I",
+  "II",
+  "III",
+  "IV",
+  "V"
+ ],
+ "structuri": [
+  "Beton armat",
+  "Cadre din beton armat",
+  "Zidărie portantă",
+  "Structură metalică",
+  "Lemn",
+  "Mixtă"
+ ],
+ "materialePereti": [
+  "Cărămidă",
+  "BCA",
+  "Beton",
+  "Panouri sandwich",
+  "Gips-carton",
+  "Lemn",
+  "Mixt"
+ ],
+ "lipsaIncarcare": {
+  "aplicatie": "neîncărcat în aplicație",
+  "document": "document neîncărcat"
+ },
+ "tipuriActivitate": [
+  {
+   "key": "instruire",
+   "label": "Instruire / pregătire"
+  },
+  {
+   "key": "sedinta",
+   "label": "Ședință"
+  },
+  {
+   "key": "birou",
+   "label": "Activitate de birou"
+  },
+  {
+   "key": "informare",
+   "label": "Informare publică"
+  },
+  {
+   "key": "exercitiu",
+   "label": "Exercițiu / aplicație"
+  },
+  {
+   "key": "concediu",
+   "label": "Concediu / liber"
+  },
+  {
+   "key": "alta",
+   "label": "Altă activitate"
+  }
+ ],
+ "stariActivitate": {
+  "planificat": "Planificată",
+  "efectuat": "Efectuată",
+  "anulat": "Anulată"
+ }
+}
