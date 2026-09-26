@@ -258,6 +258,7 @@ h1 { font-size: 1.8889rem; line-height: 1.15; font-weight: 800; }
 .item-yellow { background: var(--yellow-soft); }
 .item:active { filter: brightness(.97); }
 .item-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.item-main .chips .pill { white-space: normal; max-width: 100%; }   /* pastilele lungi se rup pe rânduri, nu intră sub coloana din dreapta */
 .item-title { font-weight: 750; font-size: 1rem; }
 .item-sub { color: var(--muted); font-size: 0.8611rem; }
 .item-msg { font-weight: 650; font-size: 0.8889rem; }

@@ -82,6 +82,7 @@ export const MANUAL = [
         '<span class="m-k k-pv"></span><b>Netrecute în PV</b> (portocaliu): constatările pe care nu le-ați marcat încă „Trecut în procesul-verbal”.',
       ] },
       { h: 'Listele de sub casete' },
+      { p: 'Listele care au ceva de rezolvat apar primele, imediat sub casete; cele goale („Nicio amendă activă”, „Toate controalele sunt încheiate” etc.) coboară la final. Între cele cu conținut, ordinea rămâne: Amenzi, Termene ASI, De încărcat, Controale neîncheiate, Netrecute în PV.' },
       { ul: [
         `<b>Amenzi</b>: fiecare amendă, cu stadiul ei scris pe o pastilă colorată — ${F('blue', 'În curs')} ${F('yellow', 'Termen 15 zile expirat')} ${F('red', 'Trimite la ANAF')} ${F('green', 'Achitată')} —, suma și un mesaj care spune exact câte zile mai sunt (vedeți „Amenzile și termenele”).`,
         '<b>Termene ASI</b>: câte zile au rămas sau cu câte zile a fost depășit termenul. După cele 90 de zile, rândul arată a doua etapă — „Constatarea pierderii valabilității” — cu cele 5 zile ale ei.',
