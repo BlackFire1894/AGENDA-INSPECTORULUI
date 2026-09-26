@@ -9,7 +9,7 @@ import {
   neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
   constructiiNume, secOf, amendaSerieNr, vecheInfo, constatareLabel, isApplicable, fmtCoord, googleMapsUrl, appleMapsUrl,
   incarcareStatus, LIPSA_INCARCARE,
-  parseSuma, isGrav, sigiliiControl, sigiliiText,
+  parseSuma, isGrav, sigiliiControl, sigiliiText, adaposturiStats, adaposturiText,
 } from './model.js';
 import { icon, esc, pill, finePill, tipBadge, empty } from './ui.js';
 import { APP_VERSION } from './version.js';
@@ -66,6 +66,7 @@ const FILTRE = [
   { key: 'pv', label: 'Netrecute în PV', ic: 'pv', lv: 'warn', test: (c, st) => st.netrecute > 0 },
   { key: 'grave', label: 'Nereguli grave', ic: 'alert', lv: 'red', ultim: true, test: (c) => graveCount(c) > 0 },
   { key: 'sigiliu', label: 'Sigiliu aplicat', ic: 'lock', lv: 'red', ultim: true, test: (c) => !!sigiliiControl(c) },
+  { key: 'adapost', label: 'Adăposturi PC', ic: 'shield', lv: 'pc', ultim: true, test: (c) => !!adaposturiStats(c) },
 ];
 const FILTRU = Object.fromEntries(FILTRE.map((f) => [f.key, f]));
 export const controlPotrivit = (c, keys, t) => { const st = controlStats(c, t); return keys.every((k) => FILTRU[k].test(c, st)); };
@@ -83,6 +84,9 @@ function filtreHTML(lista, activeSet, numara) {
   return `<div class="flt-row" id="flt-${lista}">${btns}${active.length ? `<button class="flt-btn flt-clear" data-act="flt-clear" data-list="${lista}">${icon('x')}<span>Șterge filtrele</span></button>` : ''}</div>`;
 }
 
+// Adăposturile de protecție civilă, pe bară: „3 adăposturi: 2 conforme, 1 neconform” (roșu dacă e vreunul neconform)
+const adpPill = (a, pre = '') => pill(a.neconforme ? 'red' : a.total && !a.neverificate ? 'green' : 'neutral', `${pre}${adaposturiText(a)}`, 'shield');
+
 export function controlRow(c, { showName = true } = {}) {
   const st = controlStats(c, today());
   const [y, m, d] = c.dataInceput.split('-');
@@ -95,6 +99,8 @@ export function controlRow(c, { showName = true } = {}) {
   if (sig) chips.splice(grave ? 1 : 0, 0, pill('red', sigiliiText(sig), 'lock'));
   const vechi = activeNereguli(c).filter((n) => vecheInfo(state.controls, c, n).veche).length;
   if (vechi) chips.push(`<span class="pill pill-veche">${icon('history')}${vechi} ${vechi === 1 ? 'neregulă veche' : 'nereguli vechi'}</span>`);
+  const adp = adaposturiStats(c);
+  if (adp) chips.push(adpPill(adp));
   const byLevel = {};
   st.fines.forEach((f) => { byLevel[f.st.level] = (byLevel[f.st.level] || 0) + 1; });
   for (const lv of ['red', 'yellow', 'blue', 'green']) {
@@ -428,6 +434,7 @@ export function objListHTML() {
     const asi = sts.filter((st) => FILTRU.asi.test(null, st)).length;
     const netrec = sts.reduce((k, st) => k + st.netrecute, 0);
     const graveUlt = graveCount(o.last);
+    const adpUlt = adaposturiStats(o.last);
     const dateHit = parseDateQuery(q) && hits[0];
     const init = (o.denumire || '?').trim().split(/\s+/).slice(0, 2).map((w) => w[0]).join('').toUpperCase();
     return `<a class="obj-card" href="#/obiectiv/${o.id}">
@@ -439,6 +446,7 @@ export function objListHTML() {
           ${pill('neutral', `${o.controls.length} ${o.controls.length === 1 ? 'control' : 'controale'}`, 'history')}
           ${pill('neutral', `ultimul: ${fmtDate(o.last.dataInceput)}`, 'calendar')}
           ${dateHit ? pill('accent', `găsit: ${rangeText(dateHit)}`, 'search') : ''}
+          ${adpUlt ? adpPill(adpUlt, 'La ultimul control: ') : ''}
           ${graveUlt ? pill('red', `La ultimul control: ${graveUlt} ${graveUlt === 1 ? 'neregulă gravă' : 'nereguli grave'}`, 'alert') : ''}
           ${sigUlt ? pill('red', `La ultimul control: ${sigiliiText(sigUlt).replace(/^S/, 's')}`, 'lock') : ''}
           ${open ? pill('open', `${open} în desfășurare`, 'clock') : ''}

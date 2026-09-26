@@ -27,6 +27,6 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
   const id = await p.evaluate(() => document.querySelector('#sec-fines a').getAttribute('href').split('/')[2]);
   await p.goto(`http://localhost:8080/#/fisa/${id}`); await p.waitForTimeout(300);
   const f = await p.locator('.fisa-doc').textContent();
-  ok(/Adăpost de protecție civilă:\s*NU/.test(f) && f.includes('PAAR neavizat'), 'fișa localitate live');
+  ok(/Adăposturi de protecție civilă:\s*NU/.test(f) && f.includes('PAAR neavizat'), 'fișa localitate live');
   console.log(errs.length ? 'ERRORS:\n' + errs.join('\n') : 'no page errors'); await b.close();
 })();

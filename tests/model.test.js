@@ -11,6 +11,7 @@ import {
   constructiiEligibile, verifStare, verifExpirate, verifText, catalogOf, fixeazaCatalog, schimbare, SCHEMA_VERSION, matchAct,
   incarcareStatus, parseSuma,
   sigiliiControl, sigiliiText, emptyNeregula,
+  emptyAdapost, adaposturi, adaposturiStats, adaposturiText, syncAdaposturi,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -180,7 +181,7 @@ test('Planuri/SVSU și Protecție civilă: doar la Localitate, cu amenzi în Pan
   s.amenda.aplicata = true;
   assert.equal(allFines([l], '2026-09-05').length, 1);
   assert.equal(secStats(l, 'pc').constatate, 1);
-  assert.equal(secStats(l, 'pc').total, 7); // 6 rubrici + adăpost
+  assert.equal(secStats(l, 'pc').total, 11); // 10 rubrici (4 noi din schema 11) + adăpost
   // schimbat în OPEC: rubricile de localitate nu mai contează (datele rămân)
   l.tip = 'OPEC';
   assert.equal(allFines([l], '2026-09-05').length, 0);
@@ -859,3 +860,47 @@ test('sigiliul: pe construcție; neregulile grave bifate sunt criteriile lui', (
   assert.equal(sigiliiText({ criterii: 1, sigilii: 1 }), 'Sigiliu aplicat · 1 criteriu');
   assert.equal(sigiliiText({ criterii: 3, sigilii: 2 }), '2 sigilii (2 construcții) · 3 criterii');
 });
+
+test('adăposturile de protecție civilă: rânduri de neregulă, pe tipul obiectivului', () => {
+  const c = newControl({ tip: 'OPEC', start: '2026-10-01' });
+  assert.equal(adaposturiStats(c), null);
+  c.adapostPC.v = 'DA';
+  assert.deepEqual(adaposturiStats(c), { total: 0, conforme: 0, neconforme: 0, neverificate: 0 });
+  assert.ok(todoList(c).some((x) => x.id === 'adp-nr' && x.tab === 'obiectiv'));
+  const a1 = { ...emptyAdapost(c), locatie: 'Subsol corp A', status: 'ok' };
+  const a2 = { ...emptyAdapost(c), locatie: 'Demisol', status: 'nok', obs: 'Ușa etanșă lipsă' };
+  const a3 = emptyAdapost(c);
+  c.nereguli.push(a1, a2, a3);
+  assert.equal(a1.sec, 'ner'); assert.equal(neregulaLetter(c, a3), 'A3');
+  assert.equal(adaposturiText(adaposturiStats(c)), '3 adăposturi: 1 conform, 1 neconform, 1 neverificat');
+  assert.equal(constatareLabel(a2), 'Adăpost de protecție civilă neconform – Demisol');
+  assert.ok(todoList(c).some((x) => x.id === `loc-${a3.key}`));                 // fără locație
+  assert.equal(controlStats(c).constatate, 1);                                    // neconform = neregulă
+  assert.match(pvText(c).text, /Adăpost de protecție civilă neconform – Demisol\. Ușa etanșă lipsă/);
+  // un rând adăugat obișnuit își păstrează numerotarea „+1”
+  const k = emptyNeregula('kx', true, 'ner'); c.nereguli.push(k);
+  assert.equal(neregulaLetter(c, k), '+1');
+  // fără DA, adăposturile nu contează
+  c.adapostPC.v = 'NU';
+  assert.equal(isApplicable(c, a1), false); assert.equal(adaposturiStats(c), null);
+  // Localitate: trec în tabul Protecție civilă
+  c.adapostPC.v = 'DA'; c.tip = 'LOCALITATE'; syncAdaposturi(c);
+  assert.ok(adaposturi(c).every((n) => n.sec === 'pc'));
+  // controlul următor: aceleași adăposturi (cheie, locație), starea se verifică din nou; neconform din nou = neregulă veche
+  const c2 = controlFromPrevious(c, '2027-10-01');
+  assert.deepEqual(adaposturi(c2).map((n) => [n.key, n.locatie, n.status, n.sec]), adaposturi(c).map((n) => [n.key, n.locatie, '', 'pc']));
+  const b = adaposturi(c2).find((n) => n.key === a2.key); b.status = 'nok';
+  assert.equal(vecheInfo([c, c2], c2, b).veche, true);
+});
+
+test('schema 11: cele 4 rubrici de organizare a protecției civile, doar la controalele noi', () => {
+  const keys = ['pcAgentInundatii', 'pcInspector', 'pcTaxa', 'pcConventii'];
+  assert.equal(SCHEMA_VERSION, 11);
+  const l = newControl({ tip: 'LOCALITATE', start: '2026-10-01' });
+  assert.deepEqual(keys.map((k) => isApplicable(l, l.nereguli.find((n) => n.key === k))), [true, true, true, true]);
+  const inc = normalizeControl({ ...newControl({ tip: 'LOCALITATE', start: '2025-01-10' }), dataIncheiere: '2025-01-10', catalog: 10 });
+  assert.deepEqual(keys.map((k) => isApplicable(inc, inc.nereguli.find((n) => n.key === k))), [false, false, false, false]);
+  const n = l.nereguli.find((x) => x.key === 'pcConventii'); n.status = 'nok';
+  assert.equal(constatareLabel(n), 'Lipsă convenții cu OPEC');
+});
+

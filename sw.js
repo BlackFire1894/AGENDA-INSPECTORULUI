@@ -2,7 +2,7 @@
 // Fiecare versiune are propriul cache. Când VERSION se schimbă, iPad-ul descarcă versiunea nouă
 // în fundal, iar aplicația afișează „Versiune nouă disponibilă — Actualizează”.
 // IMPORTANT: VERSION trebuie să fie identic cu APP_VERSION din js/version.js.
-const VERSION = '1.21.0';
+const VERSION = '1.22.0';
 const CACHE = `agenda-${VERSION}`;
 const ASSETS = [
   './', './index.html', './manifest.webmanifest', './css/app.css',

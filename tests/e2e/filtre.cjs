@@ -14,9 +14,9 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
     const nrRez = async () => +(await p.locator('.count').innerText()).match(/^\d+/)[0];
     const total = await nrRez();
     const btns = p.locator('#flt-hist .flt-btn:not(.flt-clear)');
-    ok(await btns.count() === 9, `${vw}: Istoric: 9 filtre`);
+    ok(await btns.count() === 10, `${vw}: Istoric: 10 filtre`);
     // fiecare filtru, singur: numărul de pe buton = rezultatele = rândurile care au pastila corespunzătoare
-    const semn = { 'am-blue': /În curs/, 'am-yellow': /Termen 15 zile expirat/, 'am-red': /Trimite la ANAF/, 'am-green': /Achitat/, asi: /ASI(?!.*neînceput)/, inc: /Încărcare:/, pv: /netrecut[ăe] în PV/, grave: /grav[ăe]/, sigiliu: /[Ss]igili/ };
+    const semn = { 'am-blue': /În curs/, 'am-yellow': /Termen 15 zile expirat/, 'am-red': /Trimite la ANAF/, 'am-green': /Achitat/, asi: /ASI(?!.*neînceput)/, inc: /Încărcare:/, pv: /netrecut[ăe] în PV/, grave: /grav[ăe]/, sigiliu: /[Ss]igili/, adapost: /adăpost/ };
     for (const k of Object.keys(semn)) {
       const btn = p.locator(`#flt-hist [data-val="${k}"]`);
       const n = +(await btn.locator('b').innerText());
@@ -41,7 +41,7 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
     ok(await nrRez() === total && await p.locator('#flt-hist .flt-btn.on').count() === 0, `${vw}: Șterge filtrele`);
     // Obiective: ANAF la oricare control, grave doar la ultimul control
     await p.goto('http://localhost:8080/#/obiective'); await p.waitForTimeout(300);
-    ok(await p.locator('#flt-obj .flt-btn:not(.flt-clear)').count() === 9, `${vw}: Obiective: 9 filtre`);
+    ok(await p.locator('#flt-obj .flt-btn:not(.flt-clear)').count() === 10, `${vw}: Obiective: 10 filtre`);
     const date = await p.evaluate(async () => {
       const m = await import('./js/model.js'); const { state } = await import('./js/state.js');
       const t = '2026-10-15';
@@ -52,7 +52,7 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
         grave: ob.filter((o) => grave(o.last)).map((o) => o.denumire).sort(),
       };
     });
-    const semnOb = { 'am-blue': /În curs/, 'am-yellow': /Termen 15 zile expirat/, 'am-red': /Trimite la ANAF/, 'am-green': /achitat/, asi: /ASI în curs/, inc: /neîncărcat/, pv: /în PV/, grave: /La ultimul control: \d+ nereg\S+ grav/, sigiliu: /sigiliu/ };
+    const semnOb = { 'am-blue': /În curs/, 'am-yellow': /Termen 15 zile expirat/, 'am-red': /Trimite la ANAF/, 'am-green': /achitat/, asi: /ASI în curs/, inc: /neîncărcat/, pv: /în PV/, grave: /La ultimul control: \d+ nereg\S+ grav/, sigiliu: /sigiliu/, adapost: /adăpost/ };
     for (const k of Object.keys(semnOb)) {
       const btn = p.locator(`#flt-obj [data-val="${k}"]`);
       const n = +(await btn.locator('b').innerText());

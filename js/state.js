@@ -1,7 +1,7 @@
 // Starea aplicației în memorie + salvare automată.
 import * as store from './store.js';
 import { todayISO } from './dates.js';
-import { fixeazaCatalog } from './model.js';
+import { fixeazaCatalog, syncAdaposturi } from './model.js';
 
 // Preferințe de afișare ale acestei tablete (nu fac parte din date / backup)
 function pref(key, fallback) {
@@ -66,6 +66,7 @@ function emit(s) { listeners.forEach((fn) => fn(s)); }
 export function touch(c, now = false) {
   c.updatedAt = new Date().toISOString();
   fixeazaCatalog(c);   // încheierea fixează lista de nereguli, redeschiderea o eliberează
+  syncAdaposturi(c);   // tipul obiectivului schimbat → adăposturile trec în tabul potrivit
   pending.set(c.id, c);
   emit('saving');
   clearTimeout(timer);

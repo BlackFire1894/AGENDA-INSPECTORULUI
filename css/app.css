@@ -1315,3 +1315,12 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .flt-btn.flt-yellow.on { color: #1a1300; } .flt-btn.flt-yellow.on .ic { color: #1a1300; } .flt-btn.flt-yellow.on b { color: #1a1300; }
 .flt-btn.flt-clear { border-style: dashed; color: var(--muted); }
 
+/* v1.22 – adăposturi de protecție civilă */
+.adp-count { display: flex; align-items: center; flex-wrap: wrap; gap: 0.4444rem 0.8889rem; margin: 0.4444rem 0; }
+.adp-count .lbl { font-weight: 800; }
+.adp-count .step-val { min-width: 5.5556rem; }
+.adp-count .step-val.is-empty b { color: var(--warn-ink); }
+.adp-sum { font-weight: 700; color: var(--muted); }
+.ner-row .row-label + .adp-loc { margin-top: 0.2222rem; }
+.flt-btn.flt-pc { --f: var(--k-inc, var(--accent)); }
+

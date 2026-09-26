@@ -3,7 +3,7 @@
 Memoria proiectului: ce face aplicația, de ce arată și funcționează așa, ce s-a decis și ce s-a respins.
 **Se citește la începutul oricărei sesiuni de lucru și se completează la fiecare versiune nouă** (regulă în `CLAUDE.md`).
 
-Ultima actualizare: v1.21.0 — 25.09.2026.
+Ultima actualizare: v1.22.0 — 25.09.2026.
 
 ---
 
@@ -69,6 +69,7 @@ Ultima actualizare: v1.21.0 — 25.09.2026.
 | 1.19 | **Zile libere implicite**: weekendurile și sărbătorile legale apar singure în Calendar (fundal gri, etichetă „Liber” / numele sărbătorii), efectuate până azi inclusiv, planificate după; în raportul lunii: weekend, sărbători, efectuate / planificate, zile lucrătoare și zilele libere în care s-a lucrat |
 | 1.20 | **Sigiliul** vizibil și în bara categoriei („N criterii de sigilare”, restrânsă: și literele, ca amenzile) și pe rândul controlului din liste (Istoric, Calendar, pagina obiectivului), în Panou la „Controale neîncheiate” și pe cardul din Obiective (ultimul control): „Sigiliu aplicat · 2 criterii” / „2 sigilii (2 construcții) · 3 criterii”; corectat: „nereguli grave” din liste numără și rândurile adăugate marcate grave; **filtre în Istoric și Obiective** (butoane vizibile cu numărul rezultatelor, combinate cu ȘI): amendă în curs / 15 zile expirat / ANAF / achitată, ASI în curs, de încărcat, netrecute în PV, nereguli grave, sigiliu; cardul din Obiective arată acum și amenzile pe stadii, ASI în curs, netrecutele în PV și grave la ultimul control |
 | 1.21 | **Panou**: secțiunile cu ceva de rezolvat (amenzi active, ASI, de încărcat, controale neîncheiate, netrecute în PV) urcă primele, sub statistici; cele goale coboară la final; corectat: pe orizontal, pastilele lungi din „De încărcat” intrau sub caseta cu zilele rămase |
+| 1.22 | **Protecție civilă**: categoria nouă „Organizare protecție civilă” (agent de inundații, inspector PC, taxa PC, convenții cu OPEC; schema 11). **Adăposturi de protecție civilă** la Localitate (tabul PC) și la OPEC (tabul Obiectiv + grupul din Nereguli): DA → câte → fiecare cu locație, Conform / Neconform, observații; neconform = neregulă completă; pe bară „3 adăposturi: 2 conforme, 1 neconform”; filtrul „Adăposturi PC” (Istoric, Obiective – ultimul control); în Fișa PDF (tabel) |
 
 ## 4. Ce face aplicația (inventar)
 
@@ -166,6 +167,7 @@ Ultima actualizare: v1.21.0 — 25.09.2026.
 - v1.16: încărcarea (bife în tabul Obiectiv; pastile în Istoric și Obiective; caseta și secțiunea din Panou); etapa a doua ASI.
 - v1.17: recomandarea zilei lucrătoare; verificarea anuală a sărbătorilor legale.
 - v1.18: plan lunar — tipuri fixe + „Altă activitate”; câmpuri tip, dată (interval), oră, descriere, stare, obiectiv, observații; planificatele trecute „de confirmat” în Panou; raport pe ecran + PDF / partajare.
+- v1.22: adăposturi — alese de utilizator: la OPEC în tabul Obiectiv (nu tab PC separat), neconform = neregulă completă (PV, amendă, veche), texte PV „… nestabilit(ă)” / „Lipsă convenții cu OPEC”, filtru în Obiective + Istoric. Decizii proprii: adăpostul e un rând de neregulă (reutilizează PV, amendă, numărători, Text PV, fișa); numerotare A1, A2…; fără NEC pe adăpost; trecerea pe NU / NEC șterge adăposturile după confirmare; adăposturile se preiau la controlul următor cu locația, starea golită.
 - v1.21: ordinea secțiunilor din Panou e dinamică: întâi cele cu elemente (în ordinea fixă amenzi → ASI → încărcare → neîncheiate → PV), apoi cele goale; casetele de statistici rămân pe loc.
 - v1.20: filtrele — alese de utilizator din propuneri (respinse: „nereguli vechi”, „fără nereguli”; afișare în fereastră „Filtre”); în Obiective regula „mixt”: termenele la oricare control, gravitatea (grave, sigiliu) la ultimul; filtrele țin doar cât e deschisă aplicația (nu se salvează).
 - v1.20: **sigiliul se aplică pe construcție**; neregulile grave constatate (✗) cu bifa Sigiliu sunt **criteriile** lui (precizarea utilizatorului): mai multe criterii în aceeași construcție = un sigiliu; construcții diferite = câte un sigiliu pe fiecare; o neregulă constatată în mai multe construcții = sigiliu în toate (fără alegere separată a construcțiilor sigilate); „bara obiectivului” = rândul controlului din liste (ales de utilizator, nu antetul controlului și nu pagina obiectivului).

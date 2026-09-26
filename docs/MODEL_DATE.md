@@ -16,7 +16,7 @@ Datele calendaristice sunt șiruri `AAAA-LL-ZZ` în ora locală; `""` înseamnă
 | `constructii` | Constructie[] | |
 | `acte` | `{ [cheie]: { status: "" \| "ok" \| "nok" \| "nec", obs } }` | chei: `ctpsi, lfd, instruire, organizare, comisie, sezon, controale, analiza, fise, stingatoare, contract, exercitii, registreExercitii, rapoarteExercitii` |
 | `nereguli` | Neregula[] | toate rândurile de constatări, din toate secțiunile (vezi `sec`): șablon + rânduri `custom` |
-| `adapostPC` | `{ v: "" \| "DA" \| "NU" \| "NEC", obs }` | adăpost de protecție civilă (doar LOCALITATE) |
+| `adapostPC` | `{ v: "" \| "DA" \| "NU" \| "NEC", obs }` | adăposturi de protecție civilă (Localitate: tabul PC; OPEC: tabul Obiectiv, din v1.22); la DA, fiecare adăpost e un rând `adapost` în `nereguli` |
 | `incarcare` | `{ aplicatie, aplicatieData, document, documentData }` | după încheiere: controlul încărcat în aplicația ISU / documentul (PV scanat) încărcat — bifa (`true/false`) și data bifării; termen: 3 zile lucrătoare de la `dataIncheiere` |
 | `createdAt`, `updatedAt` | ISO datetime | `updatedAt` decide la importul „Combină” |
 | `demo` | bool? | date demonstrative |
@@ -67,6 +67,8 @@ Calculul termenelor: `js/model.js` → `fineStatus()`, `asiDeadline()`.
 - Schema 3 → 4: `vecheManual: false` adăugat de `normalizeControl()`.
 - Schema 2 → 3: câmpurile noi (`constructieId`, `amenda.serie`, `amenda.numar`, actele noi) se completează cu valori goale de `normalizeControl()`.
 - Schema 1 → 2: `normalizeControl()` adaugă `sec: "ner"` rândurilor vechi și creează rândurile Planuri/PC și `adapostPC`.
+- v1.22 (schema 11): 4 rânduri noi în Protecție civilă, categoria `pcorg`: `pcAgentInundatii`, `pcInspector`, `pcTaxa`, `pcConventii` (`din: 11`; controalele încheiate înainte nu le primesc).
+- v1.22: **adăposturile** sunt rânduri în `nereguli` cu `custom: true`, `adapost: true`, cheia `adp…`, `locatie` (text) și `sec` = `pc` (Localitate) sau `ner` (OPEC), sincronizat cu tipul la fiecare salvare (`syncAdaposturi`). `status`: `ok` (conform) / `nok` (neconform = neregulă, cu PV, amendă, neregulă veche) / gol. Contează doar când `adapostPC.v === "DA"`; trecerea pe NU / NEC le șterge (cu confirmare). Controlul următor le preia cu aceeași cheie și locație, starea golită (neregula veche se recunoaște după cheie). Datele vechi nu au astfel de rânduri: nimic de completat.
 - v1.16: `normalizeControl()` adaugă `incarcare` (bife goale) controalelor vechi; rândurile primesc `asiPierdere: false`, `asiDataPierdere: ""` din șablonul gol. Fără schimbare de `SCHEMA_VERSION` (lista de nereguli nu se schimbă).
 
 ## Activitățile planului lunar (v1.18)
