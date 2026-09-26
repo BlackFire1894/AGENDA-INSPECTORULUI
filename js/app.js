@@ -17,6 +17,7 @@ import { icon, esc, toast, openModal, closeModal, confirmDialog, dsp, peTelefon 
 import { buildDemo, buildDemoActivitati } from './demo.js';
 import { normalizeActivitate, emptyActivitate, TIPURI_ACTIVITATE, STARI_ACTIVITATE, titluActivitate, raportLunar, raportDocument, raportFileName } from './activitati.js';
 import { APP_VERSION } from './version.js';
+import { trimiteStareNativa } from './nativ.js';
 import { fisaMarkup, fisaDocument, fisaFileName, FISA_CSS } from './fisa.js';
 
 const main = () => document.getElementById('main');
@@ -103,10 +104,14 @@ async function render({ keepScroll = false } = {}) {
   else window.scrollTo(0, 0);
   updateEditTools();
   tabCurentVizibil();
+  nativ();
   if (route.name === 'ghid' && route.id) document.getElementById(`ghid-${route.id}`)?.scrollIntoView({ block: 'start' });
   if (route.name === 'control' && route.focus) focusNeregula(route.focus, { strong: state.ui.focusStrong });
   state.ui.focusStrong = false;
 }
+
+// Aplicația nativă iOS (widgeturi, notificări) primește cifrele după fiecare schimbare; în browser nu se întâmplă nimic
+const nativ = () => trimiteStareNativa(() => ({ controls: state.controls, activitati: state.activitati, meta: state.meta, azi: today() }));
 
 // Pe telefon taburile controlului se derulează orizontal: tabul curent se aduce în vedere
 function tabCurentVizibil() {
@@ -209,6 +214,7 @@ function rerenderEditor() {
   window.scrollTo(0, y);
   updateNav();
   updateEditTools();
+  nativ();
 }
 
 // Bara „Ce mai aveți de făcut” se actualizează și în timpul tastării (fără a atinge câmpul în care se scrie)
@@ -1287,7 +1293,7 @@ function dayChanged() {
 
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'hidden') flush();
-  else { tick(); checkForUpdate(); }
+  else { tick(); checkForUpdate(); nativ(); }
 });
 window.addEventListener('pagehide', () => flush());
 window.addEventListener('hashchange', () => { closeModal(); render(); });
@@ -1301,6 +1307,7 @@ onHistory((c) => {
 });
 
 onSaveState((s) => {
+  if (s === 'saved') nativ();
   const el = document.getElementById('save-ind');
   if (!el) return;
   el.className = `save-ind s-${s}`;

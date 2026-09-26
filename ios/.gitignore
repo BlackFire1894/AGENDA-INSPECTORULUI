@@ -1,0 +1,9 @@
+# generat de xcodegen (vedeți project.yml)
+Agenda.xcodeproj/
+Agenda/Info.plist
+Agenda/Agenda.entitlements
+AgendaWidget/Info.plist
+AgendaWidget/AgendaWidget.entitlements
+build/
+DerivedData/
+xcuserdata/
