@@ -19,6 +19,8 @@
     try { var f = localStorage.getItem('agenda-font'); if (f === 'mic' || f === 'mediu') document.documentElement.dataset.font = f; var t = localStorage.getItem('agenda-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {}
   </script>
   <link rel="stylesheet" href="css/app.css">
+  <!-- Telefon (portret sub 600px sau peisaj sub 520px înălțime): pe tabletă browserul nu o aplică deloc -->
+  <link rel="stylesheet" href="css/telefon.css" media="(max-width: 599px), (max-height: 519px)">
 </head>
 <body>
   <div class="app">

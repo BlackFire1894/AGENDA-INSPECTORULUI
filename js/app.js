@@ -13,7 +13,7 @@ import {
   viewCalendar, viewSettings, hintText, backupAgeText, backupIsStale, viewGhid, viewLuna,
 } from './views.js';
 import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML, listaHTML, grfBlock, editToolsHTML, rowKey } from './editor.js';
-import { icon, esc, toast, openModal, closeModal, confirmDialog } from './ui.js';
+import { icon, esc, toast, openModal, closeModal, confirmDialog, dsp, peTelefon } from './ui.js';
 import { buildDemo, buildDemoActivitati } from './demo.js';
 import { normalizeActivitate, emptyActivitate, TIPURI_ACTIVITATE, STARI_ACTIVITATE, titluActivitate, raportLunar, raportDocument, raportFileName } from './activitati.js';
 import { APP_VERSION } from './version.js';
@@ -102,9 +102,18 @@ async function render({ keepScroll = false } = {}) {
   if (keepScroll || sameView) window.scrollTo(0, y);
   else window.scrollTo(0, 0);
   updateEditTools();
+  tabCurentVizibil();
   if (route.name === 'ghid' && route.id) document.getElementById(`ghid-${route.id}`)?.scrollIntoView({ block: 'start' });
   if (route.name === 'control' && route.focus) focusNeregula(route.focus, { strong: state.ui.focusStrong });
   state.ui.focusStrong = false;
+}
+
+// Pe telefon taburile controlului se derulează orizontal: tabul curent se aduce în vedere
+function tabCurentVizibil() {
+  const bar = document.getElementById('ed-tabs');
+  const on = bar?.querySelector('.ed-tab.on');
+  if (!on || bar.scrollWidth <= bar.clientWidth) return;
+  bar.scrollLeft = on.offsetLeft - (bar.clientWidth - on.offsetWidth) / 2;
 }
 
 const saveRows = () => savePref('agenda-rows-collapsed', [...state.ui.rowCollapsed].slice(-3000));
@@ -195,6 +204,7 @@ function rerenderEditor() {
   document.getElementById('ed-todo').innerHTML = todoHTML(c);
   document.getElementById('ed-tabs').innerHTML = edTabsHTML(c, route.tab);
   document.getElementById('ed-body').innerHTML = tabHTML(c, route.tab);
+  tabCurentVizibil();
   autosizeAll();
   window.scrollTo(0, y);
   updateNav();
@@ -854,12 +864,12 @@ function getGps(c, k) {
 function gpsActivatePrompt(c, k) {
   const m = openModal(`<div class="modal-head"><h2>${icon('locate')} Activați localizarea</h2></div>
     <div class="modal-body">
-      <p class="lead">Coordonatele nu pot fi completate: localizarea e oprită sau aplicația nu are permisiune. Pe iPad:</p>
+      <p class="lead">Coordonatele nu pot fi completate: localizarea e oprită sau aplicația nu are permisiune. Pe ${dsp('iPad', 'telefon')}:</p>
       <ol class="gps-steps">
         <li><b>Setări → Confidențialitate și securitate → Localizare</b>: porniți <b>Localizare</b>.</li>
         <li>În aceeași listă, <b>Site-uri Safari</b>: alegeți <b>Cât timp folosesc aplicația</b> și porniți <b>Localizare precisă</b>.</li>
         <li><b>Setări → Aplicații → Safari → Localizare</b>: alegeți <b>Întreabă</b> sau <b>Permite</b>.</li>
-        <li>Reveniți aici și apăsați <b>Încearcă din nou</b>; la întrebarea iPad-ului, alegeți <b>Permite</b>.</li>
+        <li>Reveniți aici și apăsați <b>Încearcă din nou</b>; la întrebarea ${dsp('iPad-ului', 'telefonului')}, alegeți <b>Permite</b>.</li>
       </ol>
       <p class="hint">Aplicația citește poziția doar când apăsați butonul; nu urmărește locația.</p>
     </div>
@@ -1165,10 +1175,10 @@ async function importBackup(file) {
   const m = openModal(`
     <div class="modal-head"><h2>${icon('upload')} Importă backup</h2><button class="icon-btn big" data-act="modal-close" aria-label="Închide">${icon('x')}</button></div>
     <div class="modal-body">
-      <p class="lead">Fișierul conține <b>${incoming.length}</b> controale${incomingAct ? ` și <b>${incomingAct.length}</b> activități` : ''}${data.exportedAt ? `, exportate pe ${esc(fmtDateLong(toISO(new Date(data.exportedAt))))}` : ''}. Pe tabletă sunt acum <b>${state.controls.length}</b>.</p>
+      <p class="lead">Fișierul conține <b>${incoming.length}</b> controale${incomingAct ? ` și <b>${incomingAct.length}</b> activități` : ''}${data.exportedAt ? `, exportate pe ${esc(fmtDateLong(toISO(new Date(data.exportedAt))))}` : ''}. Pe ${dsp('tabletă', 'telefon')} sunt acum <b>${state.controls.length}</b>.</p>
       <div class="choice-list">
         <button class="choice" data-mode="merge"><b>Combină</b><span>Adaugă controalele noi; la cele existente păstrează versiunea modificată cel mai recent.</span></button>
-        <button class="choice danger" data-mode="replace"><b>Înlocuiește tot</b><span>Șterge datele de pe tabletă și le pune pe cele din fișier.</span></button>
+        <button class="choice danger" data-mode="replace"><b>Înlocuiește tot</b><span>Șterge datele de pe ${dsp('tabletă', 'telefon')} și le pune pe cele din fișier.</span></button>
       </div>
     </div>`);
   m.querySelectorAll('[data-mode]').forEach((b) => b.addEventListener('click', async () => {
@@ -1241,7 +1251,7 @@ async function removeDemo() {
 }
 
 async function wipeAll() {
-  const ok = await confirmDialog({ title: 'Ștergeți TOATE datele?', text: `${state.controls.length} controale${state.activitati.length ? ` și ${state.activitati.length} activități` : ''} vor fi șterse definitiv de pe această tabletă. Operația nu poate fi anulată.`, ok: 'Șterge tot', danger: true });
+  const ok = await confirmDialog({ title: 'Ștergeți TOATE datele?', text: `${state.controls.length} controale${state.activitati.length ? ` și ${state.activitati.length} activități` : ''} vor fi șterse definitiv de pe ${peTelefon() ? 'acest telefon' : 'această tabletă'}. Operația nu poate fi anulată.`, ok: 'Șterge tot', danger: true });
   if (!ok) return;
   await store.replaceAll([]);
   state.controls = [];
