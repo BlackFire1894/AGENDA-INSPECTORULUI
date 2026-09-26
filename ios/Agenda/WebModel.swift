@@ -75,7 +75,7 @@ final class WebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUIDele
         if ["about", "blob", "data"].contains(scheme) || (scheme == "https" && url.host == AgendaConfig.adresa.host) {
             return .allow
         }
-        await UIApplication.shared.open(url)
+        _ = await UIApplication.shared.open(url)
         return .cancel
     }
 
@@ -87,7 +87,10 @@ final class WebModel: NSObject, ObservableObject, WKNavigationDelegate, WKUIDele
     }
 
     func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-        eroare = "Prima deschidere are nevoie de internet; după aceea, aplicația merge și fără. (\(error.localizedDescription))"
+        // o legătură externă (telefon, Hărți) anulată intenționat raportează și ea „eșec”: doar erorile de rețea contează
+        let e = error as NSError
+        guard e.domain == NSURLErrorDomain, e.code != NSURLErrorCancelled else { return }
+        eroare = "Prima deschidere are nevoie de internet; după aceea, aplicația merge și fără. (\(e.localizedDescription))"
     }
 
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
