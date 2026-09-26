@@ -110,6 +110,17 @@ public final class Magazin {
         laSchimbare?()
     }
 
+    /// Starea unei activități (butoanele Efectuată / Anulată; `act-stare` din web). Întoarce mesajul pentru utilizator.
+    @discardableResult
+    public func seteazaStareActivitate(_ id: String, _ stare: String) -> String? {
+        guard let i = activitati.firstIndex(where: { $0.id == id }) else { return nil }
+        var l = activitati
+        l[i].stare = stare
+        l[i].updatedAt = isoMs()
+        seteazaActivitati(l)
+        return "\(titluActivitate(l[i])): \((K.stareActivitate(stare) ?? stare).lowercased())"
+    }
+
     public func seteazaMeta(_ m: Meta) {
         meta = m
         scrieInFundal { try $0.salveazaMeta(m) }

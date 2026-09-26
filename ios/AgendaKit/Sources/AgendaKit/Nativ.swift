@@ -13,6 +13,7 @@ private func nume(_ c: Control) -> String { c.denumire.isEmpty ? "Obiectiv făr�
 public struct CifreZi: Codable, Equatable, Sendable {
     public struct Amenzi: Codable, Equatable, Sendable {
         public var rosu = 0, galben = 0, albastru = 0
+        public init(rosu: Int = 0, galben: Int = 0, albastru: Int = 0) { self.rosu = rosu; self.galben = galben; self.albastru = albastru }
     }
     public var data: String
     public var amenzi = Amenzi()
@@ -20,6 +21,8 @@ public struct CifreZi: Codable, Equatable, Sendable {
     public var amenziActive = 0
     /// amenzi la ANAF sau cu termenul expirat, ASI depășite, încărcare cu ultima zi azi / depășită
     public var urgente = 0
+
+    public init(data: String) { self.data = data }
 
     public var json: JSONValue {
         let n = { (x: Int) in JSONValue.number(Double(x)) }

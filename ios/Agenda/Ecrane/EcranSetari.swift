@@ -23,6 +23,8 @@ struct EcranSetari: View {
 
 /// Conținutul ecranului (fără derulare; folosit și la capturile de verificare)
 struct ContinutSetari: View {
+    /// la capturile de verificare, secțiunea Notificări (care citește starea sistemului) se omite
+    var inCaptura = false
     @Environment(Magazin.self) private var magazin
     @Environment(Interfata.self) private var ui
     @Environment(\.rem) private var rem
@@ -33,6 +35,7 @@ struct ContinutSetari: View {
                 AntetPagina(iconita: "settings", supratitlu: "Date, backup și informații", titlu: "Setări")
                 CardVerificare()
                 sectiuneBackup
+                if !inCaptura { SectiuneNotificari() }
                 sectiuneStocare
                 zonaPericuloasa
                 Text("Agenda inspectorului · v\(K.versiuneAplicatieWeb) · funcționează offline")

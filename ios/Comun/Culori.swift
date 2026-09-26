@@ -52,3 +52,16 @@ extension UIColor {
         )
     }
 }
+
+// Stadiile amenzii (css/app.css → .fs-*), aceleași în ambele teme, și culorile secțiunilor din Panou (--k-*)
+extension Color {
+    static let fsRed = Color(luminos: 0xc62a1f, intunecat: 0xc62a1f)
+    static let fsYellow = Color(luminos: 0xf2b705, intunecat: 0xf2b705)
+    static let fsYellowInk = Color(luminos: 0x1d1500, intunecat: 0x1d1500)
+    static let fsBlue = Color(luminos: 0x1f63c9, intunecat: 0x1f63c9)
+    static let fsGreen = Color(luminos: 0x11793f, intunecat: 0x11793f)
+    static let kFines = Color(luminos: 0x0d9488, intunecat: 0x2dd4bf)
+    static let kFinesSoft = Color(luminos: 0xccfbf1, intunecat: 0x0f302c)
+    static let kInc = Color(luminos: 0x475569, intunecat: 0xa5b4c8)
+    static let kIncSoft = Color(luminos: 0xe2e8f0, intunecat: 0x1e293b)
+}

@@ -13,6 +13,8 @@ Reproducere 1 la 1 a aplicației web din acest repo. Specificația: `docs/nativ/
 | `AgendaKit/` | Logica pură, fără UI (pachet Swift): portează `js/model.js`, `js/dates.js`, `js/activitati.js` și `tests/nativ/referinta.mjs` cu aceleași nume |
 | `Config/` | Entitlements și Info.plist-ul widgetului |
 | `Diferential/` | Verificarea încrucișată web ↔ Swift (`genereaza.mjs`, rulat de `teste.sh`) |
+| `Agenda/Nativ/` | Adăugirile native: sincronizarea cu widgeturile, notificările (programare, butoane), cifra de pe iconiță |
+| `Comun/Widgeturi/` | Vederile widgeturilor (în codul comun: aplicația le desenează și la capturile de verificare) |
 
 Datele comune (`docs/nativ/date/`: catalog, ghid, sărbători, stilurile fișei) intră în aplicație direct din folderul lor, fără copii. Excepție: pictograma, copiată în `Agenda/Assets.xcassets/AppIcon.appiconset/` (un catalog de resurse cere fișierul înăuntru); dacă se schimbă `docs/nativ/date/icon-1024.png`, se copiază din nou.
 
@@ -60,6 +62,21 @@ xcrun devicectl device process launch --terminate-existing --device <UDID> ro.cu
 xcrun devicectl device copy from --device <UDID> --domain-type appDataContainer --domain-identifier ro.cucuta.agenda --source Documents/capturi/setari-luminos.png --destination setari.png
 ```
 
+## Widgeturile și notificările
+
+- **Datele:** la fiecare schimbare (și la fiecare deschidere), aplicația calculează pentru 21 de zile cifrele Panoului (`cifreZi`) și sarcinile (`sarciniZi`) și le scrie în grupul comun (`Library/Application Support/widget.json`); widgetul face câte o intrare pe zi, deci se schimbă singur la miezul nopții.
+- **„Cifre”** (specificația §5): cerc, dreptunghi, rând, mic, mediu, mare (+ termenele următoare, „depășit” la cele trecute).
+- **„Sarcini”** (decizia utilizatorului): rând, dreptunghi, mic (3), mediu (5), mare (până la 10, pe grupe), foarte mare (iPad: trei coloane, cu mesajul fiecărui termen). Aceleași elemente și texte ca secțiunile Panoului; ordinea după urgență = aceeași regulă ca cifra de pe iconiță (`sarciniDupaUrgenta`). Widgetul arată câte rânduri încap (`ViewThatFits`) și „+N” pentru rest; pastilele de stadiu nu se scurtează niciodată.
+- **Notificările** (`planNotificari`): cele din referință (`notificari`, verificate pe vectori) + rezumatul zilei (zilele lucrătoare, ora aleasă, implicit 07:45) + actualizări fără mesaj ale cifrei de pe iconiță în zilele în care se schimbă fără altă notificare; cel mult 60 (4 locuri pentru cele amânate). Categoriile se opresc din Setări → Notificări (preferință a dispozitivului, nu intră în backup).
+- **Butoanele:** „Amână 1 oră”, „Amână până mâine” (mâine la 08:00; copia rămâne la reprogramări), la activități și „Efectuată” (marchează activitatea efectuată, ca butonul din web). Verificate pe iPad (27.09.2026).
+
+## Unelte de verificare (doar în versiunea de dezvoltare)
+
+- `ios/Depanare-captura.sh <UDID> <folder>`: capturile ecranelor și ale tuturor widgeturilor, în ambele teme, cu datele demonstrative (datele utilizatorului nu se ating).
+- Pornire cu `-proba-notificari`: două notificări de probă (activitatea de probă nu există); butoanele apăsate se notează în `Documents/depanare/actiuni.log`. La pornirea obișnuită, urmele probei se șterg.
+- `Documents/depanare/notificari.json`: notificările programate după ultima sincronizare (id, ora, permisiunea, cele livrate).
+- Atenție: aplicația instalată din Xcode e versiunea de dezvoltare; uneltele de mai sus nu apar în interfață (doar cu argumente la pornire).
+
 ## Compilare și instalare pe iPad (din Terminal)
 
 ```
@@ -97,11 +114,12 @@ xcrun devicectl device process launch --device <UDID> ro.cucuta.agenda
 - [x] **1. Proiectul** (26.09.2026): aplicație + widget, semnate cu contul gratuit, instalate pe iPad Air 11" (iPadOS 27). App Groups acceptat; proba de legătură (`Library/Application Support/proba.json` în grupul comun) scrisă de aplicație pe iPad. Ecranul e temporar (`EcranPornire`), la fel widgetul de probă.
 - [x] **2. Modelul, catalogul, logica pură** (26.09.2026): `AgendaKit` portează js/dates.js, js/model.js (fără UI), js/activitati.js (fără HTML) și tests/nativ/referinta.mjs, cu aceleași nume de funcții. **65 de teste, toate trec:** 22 pe vectori (date, sărbători 2024–2040, termene, sume, normalizare, setul demonstrativ întreg fără HTML, widgeturi și notificări; fișierele JSON se rescriu identic, octet cu octet) + 43 portate din tests/model.test.js. Verificat și invers: o greșeală introdusă intenționat pică testele.
 - [x] **3. Stocarea, backupul, datele demonstrative** (27.09.2026): salvarea pe disc, export / import (Combină / Înlocuiește tot) compatibil cu web, datele demonstrative (identice cu web), ecranul Setări (Backup, Stocare, Zonă periculoasă) + caseta temporară de verificare. **82 de teste** (inclusiv verificarea încrucișată pe 4 seturi aleatoare, ~570 de controale). De făcut de utilizator: importul backupului real și compararea cifrelor cu Panoul web.
+- [x] **3b. Widgeturile și notificările** (27.09.2026, adus înainte la cererea utilizatorului): „Cifre” și „Sarcini” în toate mărimile, notificări cu rezumatul zilei, butoane, setări pe categorii, cifra de pe iconiță. 87 de teste. Verificat pe iPad cu datele reale (widgeturi pe ecranul principal, 14 notificări programate la ora corectă, butoanele Amână / Efectuată).
 - [ ] 4. Panoul, Obiectivele, Istoricul, pagina obiectivului
 - [ ] 5. Editorul controlului
 - [ ] 6. Calendarul, activitățile, raportul lunii
 - [ ] 7. Fișa, Text PV, tipărirea și partajarea
 - [ ] 8. Setările, Ghidul, mărimea textului, temele
-- [ ] 9. Widgeturile și notificările
+- [x] 9. Widgeturile și notificările (făcute ca 3b; atingerea widgetului va deschide Panoul după etapa 4)
 - [ ] 10. iPhone
 - [ ] 11. Auditul final

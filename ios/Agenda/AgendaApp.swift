@@ -4,6 +4,7 @@ import AgendaKit
 
 @main
 struct AgendaApp: App {
+    @UIApplicationDelegateAdaptor(DelegatNotificari.self) private var delegat
     @Environment(\.scenePhase) private var scenePhase
     @State private var magazin: Magazin
     @State private var ui = Interfata()
@@ -15,6 +16,9 @@ struct AgendaApp: App {
         let m = Magazin(depozit: .implicit())
         m.incarca()
         _magazin = State(initialValue: m)
+        // widgeturi, notificări, iconiță: după fiecare schimbare de date
+        Sincronizare.shared.magazin = m
+        m.laSchimbare = { Sincronizare.shared.planifica() }
     }
 
     var body: some Scene {
@@ -29,8 +33,16 @@ struct AgendaApp: App {
         .onChange(of: scenePhase, initial: true) { _, faza in
             switch faza {
             case .active:
-                scrieProbaGrup()
+                Task {
+                    await Notificari.cerePermisiunea()
+                    await Sincronizare.shared.acum()
+                }
                 #if DEBUG
+                if ProcessInfo.processInfo.arguments.contains("-proba-notificari") {
+                    Task { await Notificari.proba() }
+                } else {
+                    Task { await Notificari.curataProba() }
+                }
                 if Capturi.activ {
                     let latime = UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first?.screen.bounds.width ?? 1180
                     Capturi.ruleaza(latime: latime)
@@ -40,11 +52,5 @@ struct AgendaApp: App {
             default: break
             }
         }
-    }
-
-    /// Etapa 1: proba de legătură cu widgetul (grupul comun); înlocuită de cifrele reale după etapa 3.
-    private func scrieProbaGrup() {
-        try? GrupComun.scrieProba(.init(scrisLa: .now, versiune: K.versiuneAplicatieWeb))
-        WidgetCenter.shared.reloadAllTimelines()
     }
 }
