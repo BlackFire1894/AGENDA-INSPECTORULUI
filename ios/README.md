@@ -7,11 +7,12 @@ Reproducere 1 la 1 a aplicației web din acest repo. Specificația: `docs/nativ/
 | Folder | Ce conține |
 |---|---|
 | `Agenda.xcodeproj` | Proiectul Xcode (grupuri sincronizate cu folderele: un fișier nou dintr-un folder intră singur în țintă) |
-| `Agenda/` | Aplicația (SwiftUI) |
+| `Agenda/` | Aplicația (SwiftUI): `UI/` (sistemul vizual din css/app.css: rem, carduri, butoane, ferestre, mesaje), `Ecrane/`, `Depanare/` (capturi, doar în versiunea de dezvoltare) |
 | `AgendaWidget/` | Extensia WidgetKit |
 | `Comun/` | Cod de interfață comun aplicației și widgetului (culorile din `css/app.css`) |
 | `AgendaKit/` | Logica pură, fără UI (pachet Swift): portează `js/model.js`, `js/dates.js`, `js/activitati.js` și `tests/nativ/referinta.mjs` cu aceleași nume |
 | `Config/` | Entitlements și Info.plist-ul widgetului |
+| `Diferential/` | Verificarea încrucișată web ↔ Swift (`genereaza.mjs`, rulat de `teste.sh`) |
 
 Datele comune (`docs/nativ/date/`: catalog, ghid, sărbători, stilurile fișei) intră în aplicație direct din folderul lor, fără copii. Excepție: pictograma, copiată în `Agenda/Assets.xcassets/AppIcon.appiconset/` (un catalog de resurse cere fișierul înăuntru); dacă se schimbă `docs/nativ/date/icon-1024.png`, se copiază din nou.
 
@@ -31,13 +32,33 @@ Datele comune (`docs/nativ/date/`: catalog, ghid, sărbători, stilurile fișei)
 
 ## Testele
 
-Testele pe vectori rulează pe Mac, fără simulator:
+Rulează pe Mac, fără simulator (în jur de un minut):
 
 ```
 ios/teste.sh
 ```
 
+- vectorii din docs/nativ/vectori/ (rezultatele exacte ale aplicației web);
+- testele aplicației web (tests/model.test.js), portate;
+- **verificarea încrucișată:** `Diferential/genereaza.mjs` creează ~140 de controale aleatoare (amenzi în weekend și de sărbători, ASI, încărcare, liste înghețate vechi, adăposturi, nereguli vechi, date din versiuni vechi) și le trece prin **codul web**; `DiferentialTests` refac totul în Swift și cer rezultate identice, câmp cu câmp și mesaj cu mesaj. Cere Node.js; altă sămânță: `SAMANTA=123 ios/teste.sh`.
+- Verificat și invers: o greșeală introdusă intenționat (un mesaj, o regulă, pragul roșu al încărcării) pică testele.
+
 Folderul de build e în `~/Library/Caches/AgendaKit-build`: în `~/Documents`, `codesign` refuză pachetul de teste („resource fork, Finder information, or similar detritus not allowed”).
+
+## Salvarea datelor
+
+- `Application Support/Agenda/` din containerul aplicației: `controale/<id>.json` (câte un fișier pe control, același JSON ca în backup), `activitati.json`, `meta.json` (ultimul backup, sărbătorile verificate). Scriere atomică, cu o scurtă pauză după tastare (ca `touch()` din web).
+- Un fișier pe control (nu un singur `controls.json`): un control are ~40 KB, deci o atingere nu rescrie toate controalele.
+- Backupul: `exportBackup` / `pregatesteImport` / `combina` (AgendaKit/Backup.swift), același format și nume de fișier ca în web.
+
+## Capturi de verificare (versiunea de dezvoltare)
+
+Pornită cu `-captura`, aplicația desenează ecranele întregi (fără derulare), cu datele demonstrative într-un folder temporar (datele utilizatorului nu se ating), în ambele teme, în `Documents/capturi/`:
+
+```
+xcrun devicectl device process launch --terminate-existing --device <UDID> ro.cucuta.agenda -- -captura
+xcrun devicectl device copy from --device <UDID> --domain-type appDataContainer --domain-identifier ro.cucuta.agenda --source Documents/capturi/setari-luminos.png --destination setari.png
+```
 
 ## Compilare și instalare pe iPad (din Terminal)
 
@@ -75,7 +96,7 @@ xcrun devicectl device process launch --device <UDID> ro.cucuta.agenda
 
 - [x] **1. Proiectul** (26.09.2026): aplicație + widget, semnate cu contul gratuit, instalate pe iPad Air 11" (iPadOS 27). App Groups acceptat; proba de legătură (`Library/Application Support/proba.json` în grupul comun) scrisă de aplicație pe iPad. Ecranul e temporar (`EcranPornire`), la fel widgetul de probă.
 - [x] **2. Modelul, catalogul, logica pură** (26.09.2026): `AgendaKit` portează js/dates.js, js/model.js (fără UI), js/activitati.js (fără HTML) și tests/nativ/referinta.mjs, cu aceleași nume de funcții. **65 de teste, toate trec:** 22 pe vectori (date, sărbători 2024–2040, termene, sume, normalizare, setul demonstrativ întreg fără HTML, widgeturi și notificări; fișierele JSON se rescriu identic, octet cu octet) + 43 portate din tests/model.test.js. Verificat și invers: o greșeală introdusă intenționat pică testele.
-- [ ] 3. Stocarea, backupul, datele demonstrative
+- [x] **3. Stocarea, backupul, datele demonstrative** (27.09.2026): salvarea pe disc, export / import (Combină / Înlocuiește tot) compatibil cu web, datele demonstrative (identice cu web), ecranul Setări (Backup, Stocare, Zonă periculoasă) + caseta temporară de verificare. **82 de teste** (inclusiv verificarea încrucișată pe 4 seturi aleatoare, ~570 de controale). De făcut de utilizator: importul backupului real și compararea cifrelor cu Panoul web.
 - [ ] 4. Panoul, Obiectivele, Istoricul, pagina obiectivului
 - [ ] 5. Editorul controlului
 - [ ] 6. Calendarul, activitățile, raportul lunii
