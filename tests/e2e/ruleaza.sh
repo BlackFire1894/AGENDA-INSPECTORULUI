@@ -18,4 +18,6 @@ for t in activitati libere libere2 sigiliu filtre ordine adaposturi telefon v114
 done
 for m in sintetic demo; do echo "== oracol $m: $(timeout 500 node oracol.cjs "$m" 2>&1 | grep -E '^ok=|^FAIL' | tr '\n' ' ')"; done
 echo "== reguli: $(timeout 200 node reguli.cjs 2>&1 | tr '\n' ' ')"
+# totalul, ca un eșec din mijlocul listei să nu treacă neobservat
+echo "== TOTAL: $(cat "$OUT"/*.txt | grep -c '^ok:') ok, $(cat "$OUT"/*.txt | grep -c '^FAIL') FAIL (fără oracol și reguli, raportate mai sus)"
 echo "Rezultate și capturi: $OUT"

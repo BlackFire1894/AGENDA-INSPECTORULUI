@@ -67,7 +67,7 @@ const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0
     await p.click('#hist-list .ctl-row'); await p.waitForTimeout(300);
     await p.goto(`http://localhost:8080/#/fisa/${p.url().split('/')[5]}`); await p.waitForTimeout(300);
     const fl = await p.locator('.fisa-doc').textContent();
-    ok(fl.includes('Planuri și SVSU') && fl.includes('Protecție civilă') && /Adăpost de protecție civilă:\s*NU/.test(fl), 'fișa localitate: Planuri, PC, adăpost');
+    ok(fl.includes('Planuri și SVSU') && fl.includes('Protecție civilă') && /Adăposturi de protecție civilă:\s*NU/.test(fl), 'fișa localitate: Planuri, PC, adăpost');
     await ctx.close();
   }
   console.log(errs.length ? 'ERRORS:\n' + errs.join('\n') : 'no page errors');
