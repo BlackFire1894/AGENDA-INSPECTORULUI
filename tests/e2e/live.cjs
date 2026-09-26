@@ -128,7 +128,7 @@ const DAY = 86400000;
   ok(/backup-2027-02-02_\d\d-\d\d\.json$/.test(dl.suggestedFilename()), `fișier backup cu data tabletei: ${dl.suggestedFilename()}`);
   const path = `${S}/live-backup.json`; await dl.saveAs(path);
   const data = JSON.parse(require('fs').readFileSync(path, 'utf8'));
-  ok(data.controls.length === 2 && data.schema === 10, 'backup: 2 controale, schema 10');
+  ok(data.controls.length === 2 && data.schema === 11, 'backup: 2 controale, schema 11');
   await p.click('#main [data-act="wipe"]'); await p.click('.modal [data-r="1"]'); await p.waitForTimeout(300);
   await p.goto('http://localhost:8080/#/setari'); await p.setInputFiles('[data-import]', path); await p.waitForTimeout(200);
   await p.click('[data-mode="replace"]'); await p.waitForTimeout(300);
