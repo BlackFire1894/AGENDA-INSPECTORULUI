@@ -25,3 +25,16 @@ La final: versiunea nativă = v1.X.Y; commit + PR; raport scurt pentru mine.
 
 ### Pornirea (baza: aplicația web v1.23.0)
 Aplicația nativă se construiește de la zero, după `docs/nativ/PROMPT.md`. Nu e nevoie de un prompt de actualizare separat. Baza este v1.23.0: telefon, adăposturi PC, filtre, sigiliu, zile libere, plan lunar.
+
+### v1.23.1 — culoarea categoriei „Organizare protecție civilă” (28.09.2026)
+Aplicată deja în aplicația nativă, în același PR (lucrul s-a făcut din chatul nativ). Promptul rămâne pentru istoric:
+
+```
+Actualizare la versiunea web v1.23.1. Rulează `git pull` pe main.
+Ce s-a schimbat: categoria „pcorg” (Organizare protecție civilă) are culoarea --cat-pcorg: #0284c7 (css/app.css); înainte nu avea culoare (fără bandă). Versiunea: js/version.js, sw.js.
+Date comune regenerate: docs/nativ/date/catalog.json și ghid.json (doar versiuneAplicatieWeb = 1.23.1).
+Vectori regenerați: niciunul schimbat.
+Ce ai de făcut în Swift: 1) culoareCategorie("pcorg") = 0x0284c7 (Agenda/Editor/ComponenteEditor.swift); 2) testele.
+Criterii de acceptare: testele 100%; în tabul Protecție civilă al unei Localități, bara și banda rândurilor „Organizare protecție civilă” sunt albastru-cer, ca în web; versiunea din Setări = 1.23.1.
+La final: commit + PR; raport scurt.
+```

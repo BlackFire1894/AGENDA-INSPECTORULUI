@@ -3,7 +3,7 @@
 Memoria proiectului: ce face aplicația, de ce arată și funcționează așa, ce s-a decis și ce s-a respins.
 **Se citește la începutul oricărei sesiuni de lucru și se completează la fiecare versiune nouă** (regulă în `CLAUDE.md`).
 
-Ultima actualizare: v1.23.0 — 25.09.2026.
+Ultima actualizare: v1.23.1 — 28.09.2026.
 
 ---
 
@@ -71,6 +71,7 @@ Ultima actualizare: v1.23.0 — 25.09.2026.
 | 1.21 | **Panou**: secțiunile cu ceva de rezolvat (amenzi active, ASI, de încărcat, controale neîncheiate, netrecute în PV) urcă primele, sub statistici; cele goale coboară la final; corectat: pe orizontal, pastilele lungi din „De încărcat” intrau sub caseta cu zilele rămase |
 | 1.22 | **Protecție civilă**: categoria nouă „Organizare protecție civilă” (agent de inundații, inspector PC, taxa PC, convenții cu OPEC; schema 11). **Adăposturi de protecție civilă** la Localitate (tabul PC) și la OPEC (tabul Obiectiv + grupul din Nereguli): DA → câte → fiecare cu locație, Conform / Neconform, observații; neconform = neregulă completă; pe bară „3 adăposturi: 2 conforme, 1 neconform”; filtrul „Adăposturi PC” (Istoric, Obiective – ultimul control); în Fișa PDF (tabel) |
 | 1.23 | **Telefon** (`css/telefon.css`, doar sub 600px lățime sau 520px înălțime): bara de jos cu 5 butoane (Setări din Panou), antet și taburi compacte, derulabile, butoanele Conform / Constatat / NEC sub denumire, calendar cu buline, filtrele pe 2 rânduri derulabile, text Mare/Mediu/Mic = 17/16/15px, peisaj cu bare subțiri; textele „tabletă / iPad” devin „telefon” pe telefon. Tableta: capturile identice (verificat pixel cu pixel pe 60 de ecrane; singura diferență: capitolul nou din Ghid) |
+| 1.23.1 | Categoria „Organizare protecție civilă” (tabul Protecție civilă) are culoarea ei: **albastru-cer** (`--cat-pcorg: #0284c7`); până acum rămânea fără bandă colorată. Găsit la auditul aplicației native (aceeași lipsă și acolo). |
 
 ## 4. Ce face aplicația (inventar)
 
@@ -168,6 +169,7 @@ Ultima actualizare: v1.23.0 — 25.09.2026.
 - v1.16: încărcarea (bife în tabul Obiectiv; pastile în Istoric și Obiective; caseta și secțiunea din Panou); etapa a doua ASI.
 - v1.17: recomandarea zilei lucrătoare; verificarea anuală a sărbătorilor legale.
 - v1.18: plan lunar — tipuri fixe + „Altă activitate”; câmpuri tip, dată (interval), oră, descriere, stare, obiectiv, observații; planificatele trecute „de confirmat” în Panou; raport pe ecran + PDF / partajare.
+- v1.23.1: culoarea categoriei „Organizare protecție civilă” — aleasă de utilizator dintre albastru-cer, roșu-rubin (respins: seamănă cu roșul constatărilor) și verde-oliv.
 - v1.23: telefonul — alese de utilizator: 5 butoane jos + Setări în Panou; antet și taburi compacte; calendar cu buline; text puțin mai mic (17/16/15). Testat pe iPhone 12 Pro Max (428×926 portret, 926×428 peisaj) — de aceea condiția e și pe înălțime (peisajul are 926px lățime). Regula: tableta nu se schimbă; foaia pentru telefon nu se aplică pe iPad (cel mai mic iPad are 744px pe latura scurtă). Doar prezența foii schimbă netezirea marginilor cu ≤ 7/255 pe câțiva pixeli (invizibil).
 - **Aplicația nativă — decizia finală (26.09.2026): rescriere completă în Swift (varianta B), într-un chat separat pe MacBook.** Varianta A (înveliș WKWebView + widgeturi, PR #16 inițial) a fost scrisă și apoi retrasă la cererea utilizatorului; codul rămâne în istoricul git. Avertizat: două aplicații de ținut sincronizate, logica de termene scrisă de două ori. Măsuri: datele comune exportate din web (`docs/nativ/date/`: catalog, sărbători, ghid, stilurile fișei) se citesc, nu se transcriu; cazurile de test (`docs/nativ/vectori/`, generate cu `npm run nativ` din codul web, deterministe) trebuie trecute 100% de Swift; la fiecare versiune web, un prompt de actualizare în `docs/nativ/ACTUALIZARI.md`. Pornire: `docs/nativ/PROMPT.md`. Utilizatorul: MacBook Air M2 (8 GB), Xcode 27, iPad Air 11" cu iPadOS 27, iPhone 12 Pro Max cu iOS 27, cont Apple gratuit. Identificatori propuși: `ro.cucuta.agenda`, `ro.cucuta.agenda.widget`, `group.ro.cucuta.agenda`. Planul inițial (pentru varianta A, păstrat ca istoric):
 - v1.22: adăposturi — alese de utilizator: la OPEC în tabul Obiectiv (nu tab PC separat), neconform = neregulă completă (PV, amendă, veche), texte PV „… nestabilit(ă)” / „Lipsă convenții cu OPEC”, filtru în Obiective + Istoric. Decizii proprii: adăpostul e un rând de neregulă (reutilizează PV, amendă, numărători, Text PV, fișa); numerotare A1, A2…; fără NEC pe adăpost; trecerea pe NU / NEC șterge adăposturile după confirmare; adăposturile se preiau la controlul următor cu locația, starea golită.

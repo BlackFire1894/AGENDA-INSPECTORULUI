@@ -549,6 +549,7 @@ func culoareCategorie(_ cat: String) -> Color? {
     case "svsu": return Color(hex: 0x0f766e)
     case "avertizare": return Color(hex: 0xd97706)
     case "pcdotare": return Color(hex: 0x475569)
+    case "pcorg": return Color(hex: 0x0284c7)
     case "custom": return Color(hex: 0x94a3b8)
     case "evacuare": return Color(hex: 0x16a34a)
     case "detectoare": return Color(hex: 0xc026d3)

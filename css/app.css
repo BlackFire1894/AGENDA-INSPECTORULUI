@@ -553,7 +553,7 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
   --cat-docs: #64748b; --cat-stingatoare: #ea580c; --cat-electric: #b45309; --cat-semnalizare: #0d9488;
   --cat-idsai: #9333ea; --cat-hidranti: #2563eb; --cat-desfumare: #db2777; --cat-stingere: #0891b2;
   --cat-pompe: #4f46e5; --cat-planuri: #7c3aed; --cat-svsu: #0f766e; --cat-avertizare: #d97706;
-  --cat-pcdotare: #475569; --cat-custom: #94a3b8;
+  --cat-pcdotare: #475569; --cat-pcorg: #0284c7; --cat-custom: #94a3b8;
 }
 .cat-docs { --cat: var(--cat-docs); } .cat-stingatoare { --cat: var(--cat-stingatoare); }
 .cat-electric { --cat: var(--cat-electric); } .cat-semnalizare { --cat: var(--cat-semnalizare); }
@@ -561,7 +561,7 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .cat-desfumare { --cat: var(--cat-desfumare); } .cat-stingere { --cat: var(--cat-stingere); }
 .cat-pompe { --cat: var(--cat-pompe); } .cat-planuri { --cat: var(--cat-planuri); }
 .cat-svsu { --cat: var(--cat-svsu); } .cat-avertizare { --cat: var(--cat-avertizare); }
-.cat-pcdotare { --cat: var(--cat-pcdotare); } .cat-custom { --cat: var(--cat-custom); }
+.cat-pcdotare { --cat: var(--cat-pcdotare); } .cat-pcorg { --cat: var(--cat-pcorg); } .cat-custom { --cat: var(--cat-custom); }
 .cat-group + .cat-group { margin-top: 1.1111rem; }
 .cat-title {
   width: 100%; text-align: left; min-height: 44px;
