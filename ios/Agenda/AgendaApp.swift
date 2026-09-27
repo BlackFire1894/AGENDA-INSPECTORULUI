@@ -51,6 +51,7 @@ struct AgendaApp: App {
         WindowGroup {
             Carcasa()
                 .modifier(StratInterfata())
+                .overlay { if Blocare.shared.blocat { EcranBlocat(blocare: .shared) } }
                 .modifier(DetecteazaFereastra())
                 .environment(magazin)
                 .environment(ui)
@@ -105,6 +106,7 @@ struct AgendaApp: App {
             switch faza {
             case .active:
                 ziNoua()
+                Blocare.shared.laActivare()
                 #if DEBUG
                 if Self.demo { break }
                 #endif
@@ -125,6 +127,7 @@ struct AgendaApp: App {
                 #endif
             case .background:
                 magazin.asteaptaScrierile()
+                Blocare.shared.laFundal()
                 #if DEBUG
                 if Self.demo { break }
                 #endif

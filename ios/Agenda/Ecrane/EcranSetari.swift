@@ -34,6 +34,7 @@ struct ContinutSetari: View {
                 sectiuneTema
                 sectiuneBackup
                 if !inCaptura { SectiuneNotificari() }
+                if !inCaptura { SectiuneBlocare() }
                 sectiuneStocare
                 sectiuneVersiune
                 sectiuneTermene

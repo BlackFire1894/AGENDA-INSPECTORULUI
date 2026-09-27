@@ -330,6 +330,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Config/Agenda-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Agenda;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Dacă ați pornit blocarea din Setări, aplicația se deblochează cu Face ID.";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Coordonatele construcției se citesc o singură dată, doar când apăsați „Completează coordonatele”. Locația nu este urmărită.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -357,6 +358,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Config/Agenda-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Agenda;
+				INFOPLIST_KEY_NSFaceIDUsageDescription = "Dacă ați pornit blocarea din Setări, aplicația se deblochează cu Face ID.";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Coordonatele construcției se citesc o singură dată, doar când apăsați „Completează coordonatele”. Locația nu este urmărită.";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
