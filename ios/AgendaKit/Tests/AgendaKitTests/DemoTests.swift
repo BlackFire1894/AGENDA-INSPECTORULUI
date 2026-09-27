@@ -132,6 +132,17 @@ final class DemoTests: TestVectori {
         if html != d.str("raportOctombrieHtml") { print(Jetoane.diferenta(html.replacingOccurrences(of: "<", with: " <"), d.str("raportOctombrieHtml").replacingOccurrences(of: "<", with: " <"))) }
     }
 
+    /// Fișa controlului: același HTML și același nume de fișier ca în web
+    func testFisa() {
+        for p in d.arr("perControl").compactMap(\.obiect) {
+            let c = controls.first { $0.id == p.str("id") }!
+            let s = fisaMarkup(c, controls, acum: Mediu.ACUM)
+            XCTAssertEqual(s, p.str("fisaHtml"), "fișa \(c.denumire)")
+            if s != p.str("fisaHtml") { print(Jetoane.diferenta(s.replacingOccurrences(of: "<", with: " <"), p.str("fisaHtml").replacingOccurrences(of: "<", with: " <"))) }
+            XCTAssertEqual(fisaFileName(c), p.str("fisaFisier"))
+        }
+    }
+
     func testWidgeturileSiNotificarile() {
         let s = stareNativa(controls, activitati, MetaNotificari(), AZI, Mediu.ACUM)
         XCTAssertJSON(s.json, d["nativ"].sau, "nativ")

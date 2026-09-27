@@ -110,6 +110,23 @@ final class DiferentialTests: TestVectori {
     private let INTREBARI = ["d", "AG", "G1", "+1", "A1", "stingatoare", "STINGĂTOARE expirate", "hidranti interiori", "hint", "marcarea hidrantilor",
                              "asigurare", "hol", "foc deschis", "2", "cadru tehnic", "evacuare", "etaj"]
 
+    /// Fișa fiecărui control (HTML identic, caracter cu caracter) și numele fișierului
+    func testFisele() {
+        var n = 0
+        for p in d.arr("perControl").compactMap(\.obiect) {
+            guard let w = p["fisa"]?.sir else { continue }
+            let c = controls.first { $0.id == p.str("id") }!
+            let s = fisaMarkup(c, controls, acum: Mediu.ACUM)
+            if s != w {
+                XCTFail("fișa \(c.id)\n\(Jetoane.diferenta(s.replacingOccurrences(of: "<", with: " <"), w.replacingOccurrences(of: "<", with: " <")))")
+                return
+            }
+            XCTAssertEqual(fisaFileName(c), p.str("fisier"), "numele fișei \(c.id)")
+            n += 1
+        }
+        XCTAssertGreaterThan(n, 100)
+    }
+
     func testRandurileNeregulilor() {
         var randuri = 0
         for p in d.arr("perControl").compactMap(\.obiect) {

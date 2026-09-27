@@ -153,8 +153,11 @@ struct AntetEditor: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
             FlexWrap(spatiu: 0.5556 * rem) {
-                Buton(text: "Text PV", iconita: "pv", mare: false) { ses.click("pv-text"); ui.toast("Textul pentru PV vine în etapa 7.", avertizare: true) }
-                Buton(text: "Fișa PDF", iconita: "download", mare: false) { ui.toast("Fișa controlului vine în etapa 7.", avertizare: true) }
+                Buton(text: "Text PV", iconita: "pv", mare: false) {
+                    ses.click("pv-text")
+                    ui.deschide(lata: true, laInchidere: { ses.reimprospateaza() }) { FereastraTextPV(id: c.id) }
+                }
+                Buton(text: "Fișa PDF", iconita: "download", mare: false) { nav.mergi(.fisa(c.id)) }
                 Buton(text: "Istoric", iconita: "history", mare: false) { nav.mergi(.obiectiv(c.objectiveId)) }
                 Buton(text: "Backup", iconita: "upload", mare: false) { ui.exportaBackup(magazin) }
                 Button {

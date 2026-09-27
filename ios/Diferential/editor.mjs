@@ -296,6 +296,7 @@ for (const [si, ales] of alese.entries()) {
     if (ultimMesajCuActiune && actiuneMesaj && r < 0.15) pas = { t: 'mesaj' };
     else if (r < 0.2 && campuri.length) pas = { ...alege(campuri) };
     else if (r < 0.24) pas = { t: 'pauza' };
+    else if (r < 0.27) pas = { t: 'pv' };
     else {
       // întâi tipul acțiunii, apoi butonul: fiecare acțiune de pe ecran e exersată la fel de des
       const tipuri = [...new Set(cl.map((x) => (x.t === 'click' ? x.act : x.t)))];
@@ -326,6 +327,12 @@ for (const [si, ales] of alese.entries()) {
       await eveniment('input', Object.assign(element('ner-search'), { dataset: { sec: tab === 'acte' ? 'acte' : { nereguli: 'ner', planuri: 'plan', pc: 'pc' }[tab] }, value: pas.q }));
     } else if (pas.t === 'pauza') {
       S.checkpoint(c);
+    } else if (pas.t === 'pv') {
+      // Text PV → „Marchează-le trecute în PV”
+      await click('pv-text', {});
+      modalCurent.el('[data-pv="mark"]').l.click();
+      await asteapta();
+      modale = [];
     } else if (pas.t === 'mesaj') {
       const f = actiuneMesaj; actiuneMesaj = null; f();
       await asteapta();

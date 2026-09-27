@@ -10,6 +10,8 @@ enum Ruta: Hashable {
     case control(id: String, tab: String, focus: String?)
     /// Planul lunar („2026-10”)
     case luna(String)
+    /// Fișa controlului
+    case fisa(String)
 
     /// elementul de meniu evidențiat
     var meniu: String {
@@ -20,7 +22,7 @@ enum Ruta: Hashable {
         case .istoric: return "istoric"
         case .setari: return "setari"
         case .ghid: return "ghid"
-        case .control: return ""
+        case .control, .fisa: return ""
         }
     }
 
@@ -77,15 +79,18 @@ final class Navigare {
         if case .control(let id, let tab, let focus) = r {
             laDeschidereControl?(id, tab, focus)
         } else {
-            inapoiLa = r
+            // Fișa se deschide din control: „înapoi” rămâne locul de unde s-a deschis controlul
+            if case .fisa = r {} else { inapoiLa = r }
             if case .control = ruta { laIesireControl?() }
         }
         ruta = r
     }
 
     var meniuActiv: String {
-        if case .control = ruta { return inapoiLa.meniu }
-        return ruta.meniu
+        switch ruta {
+        case .control, .fisa: return inapoiLa.meniu
+        default: return ruta.meniu
+        }
     }
 
     /// `agenda://panou`, `agenda://control/<id>/<tab>/<element>`
@@ -97,6 +102,7 @@ final class Navigare {
         case "istoric": mergi(.istoric)
         case "calendar": mergi(.calendar)
         case "luna" where parti.count > 1: mergi(.luna(parti[1]))
+        case "fisa" where parti.count > 1: mergi(.fisa(parti[1]))
         case "setari": mergi(.setari)
         default: mergi(.panou)
         }

@@ -68,13 +68,16 @@ struct AgendaApp: App {
                             let cs = magazin.controls
                             let c = p.count > 1 && p[1] == "loc" ? cs.first(where: isLocalitate)
                                 : cs.filter { !isLocalitate($0) }.max { a, b in a.nereguli.filter { $0.status == "nok" }.count < b.nereguli.filter { $0.status == "nok" }.count }
-                            if let c { nav.mergi(.control(id: c.id, tab: p.count > 2 ? p[2] : "obiectiv", focus: p.count > 3 ? p[3] : nil)) }
+                            if let c, p.count > 2, p[2] == "fisa" { nav.mergi(.fisa(c.id)) }
+                            else if let c { nav.mergi(.control(id: c.id, tab: p.count > 2 ? p[2] : "obiectiv", focus: p.count > 3 ? p[3] : nil)) }
                         }
                         else { nav.deschide(u) }
                     }
                     // -fereastra activitate / controlnou: fereastra deschisă la pornire
                     if let i = a.firstIndex(of: "-fereastra"), i + 1 < a.count {
-                        if a[i + 1] == "activitate" { ui.activitate(nil, data: todayISO(), magazin: magazin) } else { ui.controlNou() }
+                        if a[i + 1] == "activitate" { ui.activitate(nil, data: todayISO(), magazin: magazin) }
+                        else if a[i + 1] == "pv", case .control(let id, _, _) = nav.ruta { ui.deschide(lata: true) { FereastraTextPV(id: id) } }
+                        else { ui.controlNou() }
                     }
                 }
                 #endif

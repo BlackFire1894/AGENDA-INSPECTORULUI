@@ -23,6 +23,7 @@ const M = await import('../../js/model.js');
 const D = await import('../../js/dates.js');
 const A = await import('../../js/activitati.js');
 const { stareNativa, cifreZi } = await import('../../tests/nativ/referinta.mjs');
+const F = await import('../../js/fisa.js');
 
 const iesire = process.argv[2] || path.join(os.homedir(), 'Library/Caches/AgendaKit-diferential/cazuri.json');
 let s = Number(process.argv[3] || 20260926) >>> 0;
@@ -163,6 +164,8 @@ const perControl = date.map((c) => {
       cautari: INTREBARI.filter((q) => M.matchNeregula(c, n, q)),
     })),
     acte: M.ACTE.map((a) => INTREBARI.filter((q) => M.matchAct(c, a.key, q))),
+    fisa: F.fisaMarkup(c, date, new Date(ACUM)),
+    fisier: F.fisaFileName(c),
     cautare: ['scoala', 'șușani', 'popescu', c.dataInceput, c.dataInceput.slice(0, 7).split('-').reverse().join('.'), c.dataInceput.slice(0, 4), 'xyz'].filter((q) => M.matchControl(c, q)),
   };
 });

@@ -639,6 +639,25 @@ public final class Editor {
         }
     }
 
+    // ───────── Text PV: „Marchează-le trecute în PV” ─────────
+
+    /// Constatările netrecute în PV, din secțiunile active, devin „Trecut în PV” (js/app.js → openPvText, butonul „mark”)
+    public func marcheazaInPV(_ c: inout Control) -> RezultatPas {
+        var r = RezultatPas()
+        let active = sectiuniActive(c)
+        var l = c.nereguli
+        var n = 0
+        for i in l.indices where l[i].status == "nok" && !l[i].inPV && active.contains(secOf(l[i])) {
+            l[i].inPV = true
+            n += 1
+        }
+        guard n > 0 else { return r }
+        c.nereguli = l
+        atinge(&c, acum: true, &r)
+        r.mesaje.append(MesajEditor("\(n) \(n == 1 ? "neregulă marcată" : "nereguli marcate") ca trecute în PV"))
+        return r
+    }
+
     // ───────── acțiunea din mesaj („Vezi”, „Anulează”) ─────────
 
     public func actiuneMesaj(_ a: ActiuneMesaj, _ c: inout Control) -> RezultatPas {

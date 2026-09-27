@@ -88,6 +88,7 @@ struct Ecran: View {
             case .setari: EcranSetari()
             case .calendar: EcranCalendar()
             case .luna(let id): EcranLuna(id: id)
+            case .fisa(let id): EcranFisa(id: id)
             case .ghid: EcranProvizoriu(iconita: "book", supratitlu: "Manualul aplicației", titlu: "Ghidul aplicației", etapa: "Ghidul aplicației vine în etapa 8.")
             case .control(let id, _, _): EcranControl(id: id)
             }

@@ -126,6 +126,12 @@ final class SesiuneEditor {
     /// „Sus”: înapoi la începutul editorului
     func laInceput() { sus += 1 }
 
+    /// După fereastra Text PV: editorul se redesenează (`onClose: rerenderEditor`)
+    func reimprospateaza() { versiune += 1 }
+
+    /// „Marchează-le trecute în PV”
+    func marcheazaInPV() { pas { $0.marcheazaInPV(&$1) } }
+
     /// Taburile și legăturile din editor („Vezi”)
     func mergi(tab: String, focus: String? = nil) {
         guard let c = magazin?.control(editor.controlId) else { return }

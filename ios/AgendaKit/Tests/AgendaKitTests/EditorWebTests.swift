@@ -126,6 +126,9 @@ final class EditorWebTests: TestVectori {
                 ed.cauta(pas.str("q"))
             case "pauza":
                 ed.pauza(c)
+            case "pv":
+                _ = ed.click("pv-text", [:], &c)
+                r = ed.marcheazaInPV(&c)
             case "mesaj":
                 guard let a = ultimaActiune else { XCTFail("\(unde): nicio acțiune în mesaj"); return 1 }
                 r = ed.actiuneMesaj(a, &c)
