@@ -30,6 +30,8 @@ final class Blocare {
         if ProcessInfo.processInfo.arguments.contains("-demo") { blocat = false }
         // -arata-blocarea: ecranul de blocare, fără cererea automată (capturi)
         if ProcessInfo.processInfo.arguments.contains("-arata-blocarea") { blocat = true; cereSingur = false }
+        // -proba-blocarea: blocată, cu cererea automată (se răspunde de pe Mac: devicectl device simulate biometrics)
+        if ProcessInfo.processInfo.arguments.contains("-proba-blocarea") { blocat = true }
         #endif
     }
 
