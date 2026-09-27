@@ -6,6 +6,8 @@ public enum Ceas {
     nonisolated(unsafe) public static var acum: () -> Date = { Date() }
     nonisolated(unsafe) public static var fus: TimeZone = .current
     nonisolated(unsafe) public static var aleator: () -> Double = { Double.random(in: 0..<1) }
+    /// Doar pentru teste: identificatorii noi, dați din afară (reluarea pașilor înregistrați în aplicația web)
+    nonisolated(unsafe) public static var uidFortat: (() -> String)?
 
     static var calendar: Calendar {
         var c = Calendar(identifier: .gregorian)
@@ -25,6 +27,7 @@ public func isoMs(_ d: Date = Ceas.acum()) -> String {
 
 /// `uid()` din js/model.js: momentul în baza 36 + 6 caractere aleatoare.
 public func uid() -> String {
+    if let f = Ceas.uidFortat { return f() }
     let ms = Int64((Ceas.acum().timeIntervalSince1970 * 1000).rounded(.down))
     let cifre = Array("0123456789abcdefghijklmnopqrstuvwxyz")
     var coada = ""

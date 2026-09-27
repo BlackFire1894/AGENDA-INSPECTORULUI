@@ -17,6 +17,12 @@ extension String {
         guard let re = try? NSRegularExpression(pattern: tipar, options: ignoraMajuscule ? [.caseInsensitive] : []) else { return false }
         return re.firstMatch(in: self, range: NSRange(startIndex..., in: self)) != nil
     }
+    /// `s.match(/tipar/)`: grupele primei potriviri (0 = toată potrivirea), nil dacă nu se potrivește
+    func grupeRegex(_ tipar: String) -> [String]? {
+        guard let re = try? NSRegularExpression(pattern: tipar),
+              let m = re.firstMatch(in: self, range: NSRange(startIndex..., in: self)) else { return nil }
+        return (0..<m.numberOfRanges).map { i in Range(m.range(at: i), in: self).map { String(self[$0]) } ?? "" }
+    }
     /// `s.split(/\s+/)` pe un text deja curățat de spații la capete
     var cuvinte: [String] { split(whereSeparator: { $0.isWhitespace }).map(String.init) }
     /// prima literă mică (`l[0].toLowerCase() + l.slice(1)`)
