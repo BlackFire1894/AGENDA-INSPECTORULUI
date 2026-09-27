@@ -93,6 +93,7 @@ final class SesiuneEditor {
 
     /// Butoanele editorului (`data-act`): aceleași acțiuni și date ca în web
     func click(_ act: String, _ d: [String: String] = [:], categorii: [String] = []) {
+        Vibratie.laAtingere(act)
         pas({ $0.click(act, d, &$1, catEcran: categorii) }, reluare: { [weak self] raspuns in
             self?.pas { $0.click(act, d, &$1, raspuns: raspuns, catEcran: categorii) }
         })
