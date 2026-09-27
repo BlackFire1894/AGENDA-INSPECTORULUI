@@ -72,6 +72,10 @@ struct AgendaApp: App {
                         }
                         else { nav.deschide(u) }
                     }
+                    // -fereastra activitate / controlnou: fereastra deschisă la pornire
+                    if let i = a.firstIndex(of: "-fereastra"), i + 1 < a.count {
+                        if a[i + 1] == "activitate" { ui.activitate(nil, data: todayISO(), magazin: magazin) } else { ui.controlNou() }
+                    }
                 }
                 #endif
         }

@@ -148,6 +148,9 @@ struct Fereastra<Continut: View>: View {
     var lata = false
     let inchide: () -> Void
     @ViewBuilder var continut: Continut
+    /// înălțimea conținutului: fereastra are exact atât, cel mult cât încape pe ecran (`max-height: calc(100vh - 3.5556rem)`),
+    /// iar restul se derulează în fereastră
+    @State private var inaltime: CGFloat = 0
 
     var body: some View {
         GeometryReader { g in
@@ -156,12 +159,14 @@ struct Fereastra<Continut: View>: View {
                     .onTapGesture(perform: inchide)
                 ScrollView {
                     continut
+                        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { inaltime = $0 }
                 }
                 .scrollBounceBehavior(.basedOnSize)
-                .frame(width: min((lata ? 40 : 31.1111) * rem, g.size.width - 1.7778 * rem))
-                .fixedSize(horizontal: false, vertical: true)
-                .frame(maxHeight: g.size.height - 3.5556 * rem)
+                .scrollDismissesKeyboard(.interactively)
+                .frame(width: min((lata ? 40 : 31.1111) * rem, g.size.width - 1.7778 * rem),
+                       height: max(1, min(inaltime, g.size.height - 3.5556 * rem)))
                 .background(Color.surface, in: RoundedRectangle(cornerRadius: 1.4444 * rem, style: .continuous))
+                .clipShape(RoundedRectangle(cornerRadius: 1.4444 * rem, style: .continuous))
                 .umbraMare()
             }
             .frame(width: g.size.width, height: g.size.height)
