@@ -100,7 +100,7 @@ struct ContinutObiectiv: View {
             VStack(alignment: .leading, spacing: 0) {
                 if let m = modelObiectiv(magazin.controls, id, azi: todayISO()) {
                     AntetInapoi(supratitlu: "", titlu: m.titlu, eticheta: m.tip, inapoi: { nav.mergi(.obiective) }) {
-                        Buton(text: "Control nou pe acest obiectiv", iconita: "plus", tip: .primar) { ui.controlNou() }
+                        Buton(text: "Control nou pe acest obiectiv", iconita: "plus", tip: .primar) { ui.controlNou(oid: id) }
                     }
                     info(m)
                     Grid(horizontalSpacing: 0.7778 * rem, verticalSpacing: 0.7778 * rem) {

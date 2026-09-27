@@ -51,9 +51,47 @@ enum Capturi {
             }
             }
         }
+        editor(magazin, ui, nav, iesire, lat: lat, vert: vert)
         widgeturi(magazin, iesire)
         try? FileManager.default.removeItem(at: folder)
         try? Data("gata".utf8).write(to: iesire.appendingPathComponent("gata.txt"))
+    }
+
+    /// Editorul: un control OPEC (Obiectiv, Acte, Nereguli) și unul de Localitate (Planuri, PC), pe toată lungimea
+    private static func editor(_ magazin: Magazin, _ ui: Interfata, _ nav: Navigare, _ iesire: URL, lat: CGFloat, vert: CGFloat) {
+        let ses = SesiuneEditor()
+        ses.magazin = magazin
+        ses.ui = ui
+        ses.editor.ui = StareEditor()
+        let opec = magazin.controls.filter { !isLocalitate($0) }.max { a, b in
+            a.nereguli.filter { $0.status == "nok" }.count < b.nereguli.filter { $0.status == "nok" }.count
+        }
+        let loc = magazin.controls.first(where: isLocalitate)
+        var cazuri: [(String, String, String)] = []
+        if let o = opec { cazuri += [("obiectiv", o.id, "obiectiv"), ("acte", o.id, "acte"), ("nereguli", o.id, "nereguli")] }
+        if let l = loc { cazuri += [("loc-obiectiv", l.id, "obiectiv"), ("planuri", l.id, "planuri"), ("pc", l.id, "pc")] }
+        for (nume, id, tab) in cazuri {
+            ses.deschide(id, tab: tab, focus: nil)
+            for (orient, w, cuBara) in [("orizontal", lat - 15.5556 * 18, true), ("vertical", vert, false)] {
+                for (tema, schema) in [("luminos", ColorScheme.light), ("intunecat", ColorScheme.dark)] {
+                    let v = ContinutEditor(id: id)
+                        .modifier(MargineEcran())
+                        .frame(width: w)
+                        .background(Color.bg)
+                        .environment(magazin)
+                        .environment(ui)
+                        .environment(nav)
+                        .environment(ses)
+                        .environment(\.cuBaraLaterala, cuBara)
+                        .environment(\.colorScheme, schema)
+                    let r = ImageRenderer(content: v)
+                    r.scale = 1
+                    if let img = r.uiImage, let png = img.pngData() {
+                        try? png.write(to: iesire.appendingPathComponent("editor-\(nume)-\(orient)-\(tema).png"))
+                    }
+                }
+            }
+        }
     }
 
     /// Widgeturile, la mărimile de pe iPad Air 11" (acasă) și de pe iPhone (ecranul blocat), cu datele demonstrative

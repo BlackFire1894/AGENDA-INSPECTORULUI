@@ -4,16 +4,32 @@ import AgendaKit
 
 @main
 struct AgendaApp: App {
+    #if DEBUG
+    static var demo: Bool { ProcessInfo.processInfo.arguments.contains("-demo") }
+    #endif
     @UIApplicationDelegateAdaptor(DelegatNotificari.self) private var delegat
     @Environment(\.scenePhase) private var scenePhase
     @State private var magazin: Magazin
     @State private var ui = Interfata()
     @State private var nav = Navigare()
+    @State private var ses = SesiuneEditor()
 
     init() {
         // catalogul (docs/nativ/date/catalog.json) trebuie încărcat înaintea oricărui calcul
         guard let c = try? Catalog.dinPachet() else { fatalError("catalog.json lipsește din aplicație") }
         Catalog.incarca(c)
+        #if DEBUG
+        // verificare: -demo = datele demonstrative într-un folder temporar, fără widgeturi și notificări
+        // (datele utilizatorului nu se ating; la pornirea obișnuită totul revine)
+        if Self.demo {
+            let folder = FileManager.default.temporaryDirectory.appendingPathComponent("demo-editor", isDirectory: true)
+            try? FileManager.default.removeItem(at: folder)
+            let m = Magazin(depozit: Depozit(folder: folder))
+            _ = m.incarcaDemo()
+            _magazin = State(initialValue: m)
+            return
+        }
+        #endif
         let m = Magazin(depozit: .implicit())
         m.incarca()
         _magazin = State(initialValue: m)
@@ -30,14 +46,31 @@ struct AgendaApp: App {
                 .environment(magazin)
                 .environment(ui)
                 .environment(nav)
+                .environment(ses)
                 .tint(Color.accent)
+                .onAppear {
+                    // editorul: controlul se deschide înainte de a fi desenat; la ieșire, filtrul și căutarea se golesc
+                    ses.magazin = magazin
+                    ses.ui = ui
+                    nav.laDeschidereControl = { [ses] id, tab, focus in ses.deschide(id, tab: tab, focus: focus) }
+                    nav.laIesireControl = { [ses] in ses.paraseste() }
+                }
                 .onOpenURL { nav.deschide($0) }   // widgeturile: agenda://panou
                 #if DEBUG
                 .onAppear {
                     // verificare: pornire direct pe un ecran (-ruta obiective / istoric / setari / obiectiv:<id>)
                     let a = ProcessInfo.processInfo.arguments
                     if let i = a.firstIndex(of: "-ruta"), i + 1 < a.count, let u = URL(string: "agenda://\(a[i + 1].replacingOccurrences(of: ":", with: "/"))") {
-                        if a[i + 1].hasPrefix("obiectiv:") { nav.mergi(.obiectiv(String(a[i + 1].dropFirst(9)))) } else { nav.deschide(u) }
+                        let p = a[i + 1].split(separator: ":", omittingEmptySubsequences: false).map(String.init)
+                        if p[0] == "obiectiv" { nav.mergi(.obiectiv(p.count > 1 ? p[1] : "")) }
+                        else if p[0] == "demo" {
+                            // -ruta demo:opec|loc:<tab>[:<element>]: un control din datele demonstrative
+                            let cs = magazin.controls
+                            let c = p.count > 1 && p[1] == "loc" ? cs.first(where: isLocalitate)
+                                : cs.filter { !isLocalitate($0) }.max { a, b in a.nereguli.filter { $0.status == "nok" }.count < b.nereguli.filter { $0.status == "nok" }.count }
+                            if let c { nav.mergi(.control(id: c.id, tab: p.count > 2 ? p[2] : "obiectiv", focus: p.count > 3 ? p[3] : nil)) }
+                        }
+                        else { nav.deschide(u) }
                     }
                 }
                 #endif
@@ -45,6 +78,9 @@ struct AgendaApp: App {
         .onChange(of: scenePhase, initial: true) { _, faza in
             switch faza {
             case .active:
+                #if DEBUG
+                if Self.demo { break }
+                #endif
                 Task {
                     await Notificari.cerePermisiunea()
                     await Sincronizare.shared.acum()

@@ -55,6 +55,27 @@ final class EditorWebTests: TestVectori {
         }
     }
 
+    /// Anulează / Refă: cel mult 80 de pași; după anulare, controlul e exact instantaneul (updatedAt, pus din nou, la sfârșit)
+    func testIstoricul() {
+        var c = newControl(denumire: "Test", start: "2026-10-15")
+        let ed = Editor()
+        ed.deschide(c, tab: "obiectiv")
+        let initial = IstoricEditor.instantaneu(c)
+        for i in 0..<85 { _ = ed.input("denumire", "Test \(i)", &c); ed.pauza(c) }
+        XCTAssertEqual(ed.istoric.stare(c.id).anulare, IstoricEditor.LIMITA_PASI)
+        var n = 0
+        while ed.istoric.muta(&c, inapoi: true) { n += 1 }
+        XCTAssertEqual(n, IstoricEditor.LIMITA_PASI)
+        XCTAssertEqual(c.denumire, "Test 4")   // primii 5 pași au ieșit din istoric
+        XCTAssertEqual(c.o.chei.last, "updatedAt")
+        XCTAssertNotEqual(IstoricEditor.instantaneu(c), initial)
+        XCTAssertEqual(ed.istoric.stare(c.id).refacere, IstoricEditor.LIMITA_PASI)
+        // un pas nou golește „Refă”
+        _ = ed.click("end-today", [:], &c)
+        XCTAssertEqual(ed.istoric.stare(c.id).refacere, 0)
+        XCTAssertEqual(ed.istoric.stare(c.id).anulare, 1)
+    }
+
     /// Reia o secvență; întoarce numărul de pași cu diferențe (la prima diferență din secvență se oprește)
     private func reia(_ s: JSObiect, _ toate: [Control], _ nr: inout Int) -> Int {
         var controls = toate

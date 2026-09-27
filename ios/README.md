@@ -17,6 +17,8 @@ Reproducere 1 la 1 a aplicației web din acest repo. Specificația: `docs/nativ/
 | `AgendaKit/Sources/AgendaKit/Ecrane/` | Conținutul ecranelor ca modele fără interfață (`modelPanou`, `modelListaObiective`, `modelIstoric`, `modelObiectiv`, `modelRandControl`, filtrele), verificat cu HTML-ul web |
 | `Agenda/Nativ/` | Adăugirile native: sincronizarea cu widgeturile, notificările (programare, butoane), cifra de pe iconiță |
 | `Comun/Widgeturi/` | Vederile widgeturilor (în codul comun: aplicația le desenează și la capturile de verificare) |
+| `AgendaKit/Sources/AgendaKit/Editor/` | Editorul controlului, fără interfață: acțiunile (`Editor.click` / `input` / `schimbaData`…, aceleași nume și date ca `data-act` din web), Anulează / Refă (`IstoricEditor`), căile de date (`seteazaLaCale`), modelele ecranului (`modelEditor`), fereastra Control nou |
+| `Agenda/Editor/` | Editorul (SwiftUI): antetul, „Ce mai aveți de făcut”, taburile fixe, tabul Obiectiv (construcții, dotări, GRF, GPS, adăposturi), Acte, Nereguli / Planuri / PC (categorii, rânduri, amenzi, ASI, verificări), barele fixe la derulare (`Lipici`), ferestrele, citirea poziției |
 
 Datele comune (`docs/nativ/date/`: catalog, ghid, sărbători, stilurile fișei) intră în aplicație direct din folderul lor, fără copii. Excepție: pictograma, copiată în `Agenda/Assets.xcassets/AppIcon.appiconset/` (un catalog de resurse cere fișierul înăuntru); dacă se schimbă `docs/nativ/date/icon-1024.png`, se copiază din nou.
 
@@ -45,6 +47,7 @@ ios/teste.sh
 - vectorii din docs/nativ/vectori/ (rezultatele exacte ale aplicației web);
 - testele aplicației web (tests/model.test.js), portate;
 - **verificarea încrucișată:** `Diferential/genereaza.mjs` creează ~140 de controale aleatoare (amenzi în weekend și de sărbători, ASI, încărcare, liste înghețate vechi, adăposturi, nereguli vechi, date din versiuni vechi) și le trece prin **codul web**; `DiferentialTests` refac totul în Swift și cer rezultate identice, câmp cu câmp și mesaj cu mesaj. Cere Node.js; altă sămânță: `SAMANTA=123 ios/teste.sh`.
+- **editorul:** `Diferential/editor.mjs` rulează aplicația web originală (js/app.js) într-un DOM simulat și face pași aleatori în editor, pe controale aleatoare: apasă butoanele de pe ecran (toate acțiunile, echilibrat), scrie în câmpuri, caută, schimbă taburile, anulează / reface, confirmă sau renunță la ferestre. După fiecare pas înregistrează controlul, ecranul (ca șir de „jetoane”: texte, pastile, câmpuri cu valoarea lor, butoane apăsate / dezactivate, stări), mesajele, ferestrele, istoricul. `EditorWebTests` reia pașii în Swift și cere același rezultat la fiecare pas (60 × 40 de pași; verificat pe 4 semințe, ~8.600 de pași). La fel fereastra „Control nou” (13 căutări).
 - **ecranele:** `EcraneWebTests` compară conținutul modelelor Swift (texte, pastile cu culoarea lor, filtre cu numărul lor, în ordine) cu HTML-ul generat de `js/views.js` pentru aceleași date: rândul fiecărui control, Obiective și Istoric (7 căutări × 8 combinații de filtre), paginile tuturor obiectivelor, Panoul în 8 zile diferite și fără date.
 - Verificat și invers: o greșeală introdusă intenționat (un mesaj, o regulă, pragul roșu al încărcării) pică testele.
 
@@ -64,6 +67,8 @@ Pornită cu `-captura`, aplicația desenează ecranele întregi (fără derulare
 xcrun devicectl device process launch --terminate-existing --device <UDID> ro.cucuta.agenda -- -captura
 xcrun devicectl device copy from --device <UDID> --domain-type appDataContainer --domain-identifier ro.cucuta.agenda --source Documents/capturi/setari-luminos.png --destination setari.png
 ```
+
+- Pornită cu `-demo`: aplicația lucrează cu datele demonstrative într-un folder temporar, fără widgeturi și notificări (datele utilizatorului nu se ating; la pornirea obișnuită totul revine). Cu `-ruta demo:opec|loc:<tab>[:<element>]` se deschide editorul pe un control demonstrativ (ex. `-ruta demo:opec:nereguli:d`), pentru capturi reale de ecran (`xcrun devicectl device capture screenshot --device <UDID> --destination x.png`). **După verificare, aplicația se repornește fără argumente.**
 
 ## Widgeturile și notificările
 
@@ -123,7 +128,7 @@ xcrun devicectl device process launch --device <UDID> ro.cucuta.agenda
 - [x] **3. Stocarea, backupul, datele demonstrative** (27.09.2026): salvarea pe disc, export / import (Combină / Înlocuiește tot) compatibil cu web, datele demonstrative (identice cu web), ecranul Setări (Backup, Stocare, Zonă periculoasă) + caseta temporară de verificare. **82 de teste** (inclusiv verificarea încrucișată pe 4 seturi aleatoare, ~570 de controale). De făcut de utilizator: importul backupului real și compararea cifrelor cu Panoul web.
 - [x] **3b. Widgeturile și notificările** (27.09.2026, adus înainte la cererea utilizatorului): „Cifre” și „Sarcini” în toate mărimile, notificări cu rezumatul zilei, butoane, setări pe categorii, cifra de pe iconiță. 87 de teste. Verificat pe iPad cu datele reale (widgeturi pe ecranul principal, 14 notificări programate la ora corectă, butoanele Amână / Efectuată).
 - [x] **4. Panoul, Obiectivele, Istoricul, pagina obiectivului** (27.09.2026): cadrul (bara laterală / bara de jos, ceasul, cifrele de pe meniu, Backup rapid), Panoul complet (casetele, secțiunile, activitățile de confirmat cu Efectuată / Anulată, mementoul sărbătorilor), Obiectivele și Istoricul cu căutare (text și dată), tipuri și cele 10 filtre, pagina obiectivului (date, GPS cu hărți, statistici, istoric). 93 de teste. Provizoriu până la etapele următoare: „Control nou” și deschiderea unui control (editorul, etapa 5), „Reprogramează” (etapa 6), Calendarul (etapa 6), Ghidul (etapa 8).
-- [ ] 5. Editorul controlului
+- [x] **5. Editorul controlului** (27.09.2026): fereastra „Control nou” (obiective găsite, date preluate din ultimul control), antetul (Text PV / Fișa: etapa 7), „Ce mai aveți de făcut”, taburile cu progresul, tabul Obiectiv (date, perioada, încheiere cu verificarea omisiunilor, redeschidere, încărcarea după încheiere, construcțiile cu dotări DA / NU / NEC, centrala, GRF / NSI, GPS la cerere, adăposturile), Acte, Nereguli / Planuri și SVSU / Protecție civilă (căutare, filtre, „Restul conform” cu confirmare, categorii restrânse, rânduri restrânse, verificări pe construcție, construcțiile constatării, PV, amendă cu termene, neregulă veche, gravă, sigiliu, ASI, rânduri adăugate), Anulează / Sus / Refă, barele fixe la derulare. **96 de teste**, inclusiv reluarea pas cu pas a editorului web. Verificat pe iPad (ecran întreg și fereastră). Adaptare nativă: fereastra „Activați localizarea” are pașii pentru aplicație (nu pentru Safari) și butonul Setări.
 - [ ] 6. Calendarul, activitățile, raportul lunii
 - [ ] 7. Fișa, Text PV, tipărirea și partajarea
 - [ ] 8. Setările, Ghidul, mărimea textului, temele

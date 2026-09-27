@@ -21,6 +21,12 @@ enum Ruta: Hashable {
         case .control: return ""
         }
     }
+
+    /// identitatea ecranului: controlul rămâne același ecran când se schimbă tabul sau elementul evidențiat
+    var cheie: String {
+        if case .control(let id, _, _) = self { return "control-\(id)" }
+        return "\(self)"
+    }
 }
 
 @MainActor
@@ -39,8 +45,17 @@ final class Navigare {
     var stareIstoric = "ALL"
     var filtreIstoric: [String] = []
 
+    /// editorul: deschiderea unui control (id, tab, element) și ieșirea din control
+    @ObservationIgnored var laDeschidereControl: ((String, String, String?) -> Void)?
+    @ObservationIgnored var laIesireControl: (() -> Void)?
+
     func mergi(_ r: Ruta) {
-        if case .control = r {} else { inapoiLa = r }
+        if case .control(let id, let tab, let focus) = r {
+            laDeschidereControl?(id, tab, focus)
+        } else {
+            inapoiLa = r
+            if case .control = ruta { laIesireControl?() }
+        }
         ruta = r
     }
 
@@ -82,8 +97,14 @@ extension Interfata {
         }
     }
 
-    /// „Control nou”: fereastra de alegere și editorul vin în etapa 5
-    func controlNou() {
-        toast("Controlul nou se creează în editor, care vine în etapa 5.", avertizare: true)
+    /// „Control nou” (`openNewControl({ date, oid })`): pe un obiectiv existent pornește direct, altfel fereastra
+    func controlNou(oid: String? = nil, data: String? = nil) {
+        cerereControlNou = CerereControlNou(oid: oid, data: data)
     }
+}
+
+struct CerereControlNou: Equatable {
+    let id = UUID()
+    let oid: String?
+    let data: String?
 }

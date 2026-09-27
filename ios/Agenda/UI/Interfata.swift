@@ -10,6 +10,9 @@ final class Interfata {
         let id = UUID()
         let text: String
         let avertizare: Bool
+        /// butonul din mesaj („Anulează”, „Vezi”): mesajul stă mai mult pe ecran
+        var actiune: (eticheta: String, fn: () -> Void)? = nil
+        static func == (a: Mesaj, b: Mesaj) -> Bool { a.id == b.id }
     }
 
     struct Confirmare: Identifiable {
@@ -22,19 +25,25 @@ final class Interfata {
     }
 
     private(set) var mesaj: Mesaj?
+    /// „Control nou” cerut (se deschide din Carcasa, care are datele și navigarea)
+    var cerereControlNou: CerereControlNou?
     var confirmare: Confirmare?
     /// fereastra modală deschisă (conținutul ei)
     var modal: AnyView?
 
     @ObservationIgnored private var ascunde: Task<Void, Never>?
 
-    /// `toast(msg, 'ok' | 'warn')`
-    func toast(_ text: String, avertizare: Bool = false) {
-        let m = Mesaj(text: text, avertizare: avertizare)
+    /// distanța mesajului față de marginea de jos și centrul pe orizontală (bara laterală, banda editorului)
+    var mesajJos: CGFloat = 32
+    var mesajStanga: CGFloat = 0
+
+    /// `toast(msg, 'ok' | 'warn', { label, fn })`
+    func toast(_ text: String, avertizare: Bool = false, actiune: (String, () -> Void)? = nil) {
+        let m = Mesaj(text: text, avertizare: avertizare, actiune: actiune.map { (eticheta: $0.0, fn: $0.1) })
         mesaj = m
         ascunde?.cancel()
         ascunde = Task {
-            try? await Task.sleep(nanoseconds: 2_600_000_000)
+            try? await Task.sleep(nanoseconds: actiune == nil ? 2_600_000_000 : 7_000_000_000)
             guard !Task.isCancelled else { return }
             if mesaj == m { mesaj = nil }
         }
@@ -45,8 +54,25 @@ final class Interfata {
         confirmare = Confirmare(titlu: titlu, text: text, ok: ok, pericol: pericol, actiune: actiune)
     }
 
-    func deschide<V: View>(@ViewBuilder _ continut: () -> V) { modal = AnyView(continut()) }
-    func inchide() { modal = nil }
+    func ascundeMesajul() { ascunde?.cancel(); mesaj = nil }
+
+    /// `.modal-wide` (40 rem în loc de 31)
+    private(set) var modalLat = false
+    /// se apelează la închiderea ferestrei (ca `onClose` din web)
+    @ObservationIgnored private var laInchidere: (() -> Void)?
+
+    func deschide<V: View>(lata: Bool = false, laInchidere: (() -> Void)? = nil, @ViewBuilder _ continut: () -> V) {
+        modalLat = lata
+        self.laInchidere = laInchidere
+        modal = AnyView(continut())
+    }
+    func inchide() {
+        guard modal != nil else { return }
+        modal = nil
+        let f = laInchidere
+        laInchidere = nil
+        f?()
+    }
 }
 
 /// Stratul peste ecran: mesajul scurt, fereastra modală, confirmarea
@@ -62,21 +88,36 @@ struct StratInterfata: ViewModifier {
                         Iconita(nume: m.avertizare ? "alert" : "check", marime: 1.3333 * rem)
                             .foregroundStyle(m.avertizare ? Color.yellow : Color(red: 0x6e / 255, green: 0xe7 / 255, blue: 0xa8 / 255))
                         Text(m.text).font(.system(size: rem, weight: .semibold)).foregroundStyle(.white)
+                            .fixedSize(horizontal: false, vertical: true)
+                        if let a = m.actiune {
+                            Button {
+                                ui.ascundeMesajul()
+                                a.fn()
+                            } label: {
+                                Text(a.eticheta).font(.system(size: rem, weight: .heavy)).foregroundStyle(.white)
+                                    .padding(.horizontal, 0.8889 * rem).frame(minHeight: 44)
+                                    .background(Color.white.opacity(0.16), in: RoundedRectangle(cornerRadius: 0.6667 * rem, style: .continuous))
+                            }
+                            .buttonStyle(.plain)
+                            .padding(.leading, 0.4444 * rem)
+                        }
                     }
-                    .padding(.vertical, 0.7778 * rem)
-                    .padding(.horizontal, 1.2222 * rem)
+                    .padding(.vertical, m.actiune == nil ? 0.7778 * rem : 0.3333 * rem)
+                    .padding(.leading, 1.2222 * rem)
+                    .padding(.trailing, m.actiune == nil ? 1.2222 * rem : 0.5556 * rem)
                     .background(Color.ink, in: RoundedRectangle(cornerRadius: rem, style: .continuous))
                     .umbraMare()
-                    .padding(.bottom, 32)
+                    .padding(.bottom, ui.mesajJos)
                     .padding(.horizontal, 0.8889 * rem)
+                    .offset(x: ui.mesajStanga / 2)
                     .transition(.move(edge: .bottom).combined(with: .opacity))
-                    .allowsHitTesting(false)
+                    .allowsHitTesting(m.actiune != nil)
                 }
             }
             .animation(.easeOut(duration: 0.25), value: ui.mesaj)
             .overlay {
                 if let modal = ui.modal {
-                    Fereastra(inchide: { ui.inchide() }) { modal }
+                    Fereastra(lata: ui.modalLat, inchide: { ui.inchide() }) { modal }
                 } else if let c = ui.confirmare {
                     Fereastra(inchide: { ui.confirmare = nil }) {
                         VStack(alignment: .leading, spacing: 0) {
@@ -104,6 +145,7 @@ struct StratInterfata: ViewModifier {
 /// `.modal`: fundal întunecat, caseta centrată; atingerea fundalului închide
 struct Fereastra<Continut: View>: View {
     @Environment(\.rem) private var rem
+    var lata = false
     let inchide: () -> Void
     @ViewBuilder var continut: Continut
 
@@ -116,7 +158,7 @@ struct Fereastra<Continut: View>: View {
                     continut
                 }
                 .scrollBounceBehavior(.basedOnSize)
-                .frame(width: min(31.1111 * rem, g.size.width - 1.7778 * rem))
+                .frame(width: min((lata ? 40 : 31.1111) * rem, g.size.width - 1.7778 * rem))
                 .fixedSize(horizontal: false, vertical: true)
                 .frame(maxHeight: g.size.height - 3.5556 * rem)
                 .background(Color.surface, in: RoundedRectangle(cornerRadius: 1.4444 * rem, style: .continuous))

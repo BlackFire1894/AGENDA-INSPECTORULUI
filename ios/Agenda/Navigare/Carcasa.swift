@@ -15,11 +15,15 @@ extension EnvironmentValues {
 
 struct Carcasa: View {
     @Environment(Navigare.self) private var nav
+    @Environment(Interfata.self) private var ui
+    @Environment(Magazin.self) private var magazin
     @Environment(\.rem) private var rem
+    @State private var inaltimeJos: CGFloat = 0
 
     var body: some View {
         GeometryReader { g in
             let lat = g.size.width + g.safeAreaInsets.leading + g.safeAreaInsets.trailing >= 1000
+            let inControl = if case .control = nav.ruta { true } else { false }
             HStack(spacing: 0) {
                 if lat {
                     BaraLaterala().frame(width: 15.5556 * rem)
@@ -27,12 +31,46 @@ struct Carcasa: View {
                 ZStack(alignment: .bottom) {
                     Ecran()
                         .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    if !lat { BaraJos() }
+                    if !lat {
+                        VStack(spacing: 0) {
+                            if inControl { UnelteEditor() }
+                            BaraJos()
+                        }
+                        .onGeometryChange(for: CGFloat.self) { $0.size.height } action: { inaltimeJos = $0 }
+                    }
                 }
             }
             .environment(\.cuBaraLaterala, lat)
+            .onChange(of: PozitieMesaj(lat: lat, inControl: inControl, jos: inaltimeJos), initial: true) { _, p in
+                // mesajele: deasupra barei de jos (și a benzii Anulează / Sus / Refă), centrate în zona de lucru
+                ui.mesajJos = p.lat ? 32 : p.inControl ? p.jos + 0.6667 * rem : 6.1111 * rem
+                ui.mesajStanga = p.lat ? 15.5556 * rem : 0
+            }
         }
         .background(Color.bg.ignoresSafeArea())
+        .onChange(of: ui.cerereControlNou) { _, c in
+            guard let c else { return }
+            ui.cerereControlNou = nil
+            deschideControlNou(c)
+        }
+    }
+
+    private struct PozitieMesaj: Equatable { let lat: Bool, inControl: Bool, jos: CGFloat }
+
+    /// `openNewControl({ date, oid })` + `startControl(c)`
+    private func deschideControlNou(_ cerere: CerereControlNou) {
+        let start = cerere.data ?? todayISO()
+        let porneste = { (c: Control) in
+            magazin.adaugaControl(c)
+            if case .control = nav.ruta { nav.inapoiLa = .panou } else { nav.inapoiLa = nav.ruta }
+            ui.inchide()
+            nav.mergi(.control(id: c.id, tab: "obiectiv", focus: nil))
+        }
+        if let oid = cerere.oid, let c = controlNouPeObiectiv(magazin.controls, oid, start: start) {
+            porneste(c)
+            return
+        }
+        ui.deschide(lata: true) { FereastraControlNou(start: start, porneste: porneste) }
     }
 }
 
@@ -50,10 +88,10 @@ struct Ecran: View {
             case .setari: EcranSetari()
             case .calendar: EcranProvizoriu(iconita: "calendar", supratitlu: "Plan lunar", titlu: "Calendar", etapa: "Calendarul, activitățile și raportul lunii vin în etapa 6.")
             case .ghid: EcranProvizoriu(iconita: "book", supratitlu: "Manualul aplicației", titlu: "Ghidul aplicației", etapa: "Ghidul aplicației vine în etapa 8.")
-            case .control(let id, _, _): EcranControlProvizoriu(id: id)
+            case .control(let id, _, _): EcranControl(id: id)
             }
         }
-        .id(nav.ruta)   // ecran nou: derularea pornește de sus
+        .id(nav.ruta.cheie)   // ecran nou: derularea pornește de sus
     }
 }
 
@@ -103,6 +141,7 @@ struct BaraLaterala: View {
                     ElementMeniu(iconita: "calendar", text: "Calendar", activ: nav.meniuActiv == "calendar") { nav.mergi(.calendar) }
                     ElementMeniu(iconita: "history", text: "Istoric", sub: neincheiate > 0 ? "\(neincheiate) \(neincheiate == 1 ? "neîncheiat" : "neîncheiate")" : nil, activ: nav.meniuActiv == "istoric") { nav.mergi(.istoric) }
                 }
+                if case .control = nav.ruta { UnelteEditor(lateral: true) }
                 Spacer(minLength: rem)
                 Button { ui.exportaBackup(magazin) } label: {
                     HStack(spacing: 0.7778 * rem) {
@@ -241,35 +280,21 @@ struct EcranProvizoriu: View {
     }
 }
 
-/// Deschiderea unui control: editorul vine în etapa 5
-struct EcranControlProvizoriu: View {
-    @Environment(Magazin.self) private var magazin
-    @Environment(Navigare.self) private var nav
-    @Environment(\.rem) private var rem
-    let id: String
-
-    var body: some View {
-        ScrollView {
-            VStack(alignment: .leading, spacing: 0) {
-                AntetInapoi(supratitlu: "Controlul", titlu: magazin.control(id).map { $0.denumire.isEmpty ? "Obiectiv fără denumire" : $0.denumire } ?? "Control inexistent") { nav.mergi(nav.inapoiLa) }
-                Card { Paragraf(text: "Editorul controlului (taburile Obiectiv, Acte, Nereguli…) vine în etapa 5.") }
-            }
-            .modifier(MargineEcran())
-        }
-    }
-}
-
 /// Marginile paginii (`.main`): sus 1,33 rem, lateral 1,56 rem, jos loc pentru bara de jos; lățime maximă pe vertical
 struct MargineEcran: ViewModifier {
     @Environment(\.rem) private var rem
     @Environment(\.cuBaraLaterala) private var lat
     @Environment(\.inFereastra) private var inFereastra
+    /// în control, pe vertical: loc și pentru banda Anulează / Sus / Refă
+    var inControl = false
+    /// spațiul pentru butoanele ferestrei e pus de ecran (editorul: pe zona derulată)
+    var faraFereastra = false
 
     func body(content: Content) -> some View {
         content
-            .padding(.top, 1.3333 * rem + (inFereastra && !lat ? 1.6667 * rem : 0))
+            .padding(.top, 1.3333 * rem + (inFereastra && !lat && !faraFereastra ? 1.6667 * rem : 0))
             .padding(.horizontal, 1.5556 * rem)
-            .padding(.bottom, lat ? 2.6667 * rem : 6.6667 * rem)
+            .padding(.bottom, lat ? 2.6667 * rem : inControl ? 9.3333 * rem : 6.6667 * rem)
             .frame(maxWidth: lat ? .infinity : 71.1111 * rem, alignment: .leading)
             .frame(maxWidth: .infinity)
     }

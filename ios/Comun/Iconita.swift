@@ -50,12 +50,14 @@ private let ICONS: [String: String] = [
 struct Iconita: View {
     let nume: String
     var marime: CGFloat = 24
+    /// grosimea liniei, în unitățile desenului (24): 2, iar la ✓ / ✗ din butoanele mari 2,8
+    var grosime: CGFloat = 2
 
     var body: some View {
         let (contur, umplere) = TraseeIconite.trasee(nume)
         ZStack {
             umplere.fill(style: FillStyle())
-            contur.stroke(style: StrokeStyle(lineWidth: 2, lineCap: .round, lineJoin: .round))
+            contur.stroke(style: StrokeStyle(lineWidth: grosime, lineCap: .round, lineJoin: .round))
         }
         .frame(width: 24, height: 24)
         .scaleEffect(marime / 24)

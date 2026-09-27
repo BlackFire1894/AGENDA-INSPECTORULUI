@@ -160,7 +160,7 @@ extension AntetPagina where Dreapta == EmptyView {
 }
 
 // ───────── .btn ─────────
-enum TipButon { case primar, ghost, pericol }
+enum TipButon { case primar, ghost, pericol, succes, ghostPericol }
 
 struct StilButon: ButtonStyle {
     @Environment(\.rem) private var rem
@@ -171,12 +171,12 @@ struct StilButon: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
         configuration.label
             .font(.system(size: (mare ? 1 : 0.9444) * rem, weight: .bold))
-            .foregroundStyle(tip == .ghost ? Color.text : Color.white)
+            .foregroundStyle(tip == .ghost ? Color.text : tip == .ghostPericol ? Color.red : Color.white)
             .padding(.horizontal, (mare ? 1.2222 : 1.1111) * rem)
             .frame(minHeight: tinta((mare ? 2.8889 : 2.6667) * rem))
             .background(fundal, in: RoundedRectangle(cornerRadius: 0.7778 * rem, style: .continuous))
             .overlay {
-                if tip == .ghost { RoundedRectangle(cornerRadius: 0.7778 * rem, style: .continuous).strokeBorder(Color.line, lineWidth: 1.5) }
+                if tip == .ghost || tip == .ghostPericol { RoundedRectangle(cornerRadius: 0.7778 * rem, style: .continuous).strokeBorder(Color.line, lineWidth: 1.5) }
             }
             .scaleEffect(configuration.isPressed ? 0.97 : 1)
             .opacity(activ ? 1 : 0.45)
@@ -187,7 +187,8 @@ struct StilButon: ButtonStyle {
         switch tip {
         case .primar: return .accent
         case .pericol: return .red
-        case .ghost: return .surface2
+        case .succes: return .green
+        case .ghost, .ghostPericol: return .surface2
         }
     }
 }
@@ -260,5 +261,78 @@ struct FlowLayout: Layout {
             randInalt = max(randInalt, m.height)
         }
         aseaza()
+    }
+}
+
+// ───────── flex-wrap (CSS) ─────────
+private struct CheieFlex: LayoutValueKey { static let defaultValue: (baza: CGFloat?, creste: Bool, autoStanga: Bool) = (nil, false, false) }
+
+extension View {
+    /// `flex: 1; min-width: …`: elementul pornește de la lățimea minimă și ocupă tot locul rămas pe rând
+    func flexCreste(min: CGFloat) -> some View { layoutValue(key: CheieFlex.self, value: (min, true, false)) }
+    /// `margin-left: auto`: elementul e împins la dreapta rândului
+    func flexDreapta() -> some View { layoutValue(key: CheieFlex.self, value: (nil, false, true)) }
+}
+
+/// `display: flex; flex-wrap: wrap`: elementele trec pe rândul următor când nu încap; pe fiecare rând, locul
+/// rămas merge la elementele care cresc (`flex: 1`) sau înaintea celui cu `margin-left: auto`.
+struct FlexWrap: Layout {
+    var spatiu: CGFloat
+    var spatiuRanduri: CGFloat? = nil
+    var aliniere: VerticalAlignment = .center
+
+    private struct Rand { var elemente: [(i: Int, w: CGFloat)] = []; var latime: CGFloat = 0 }
+
+    private func randuri(_ latime: CGFloat, _ subviews: Subviews) -> [Rand] {
+        var r: [Rand] = [], cur = Rand()
+        for (i, s) in subviews.enumerated() {
+            let f = s[CheieFlex.self]
+            let w = min(latime, f.baza ?? s.sizeThatFits(.unspecified).width)
+            let necesar = cur.elemente.isEmpty ? w : cur.latime + spatiu + w
+            if !cur.elemente.isEmpty && necesar > latime + 0.5 { r.append(cur); cur = Rand() }
+            cur.latime = cur.elemente.isEmpty ? w : cur.latime + spatiu + w
+            cur.elemente.append((i, w))
+        }
+        if !cur.elemente.isEmpty { r.append(cur) }
+        // locul rămas: la cele care cresc, altfel înaintea celui împins la dreapta
+        for k in r.indices {
+            let liber = max(0, latime - r[k].latime)
+            let cresc = r[k].elemente.filter { subviews[$0.i][CheieFlex.self].creste }
+            if !cresc.isEmpty {
+                let plus = liber / CGFloat(cresc.count)
+                for j in r[k].elemente.indices where subviews[r[k].elemente[j].i][CheieFlex.self].creste { r[k].elemente[j].w += plus }
+            }
+        }
+        return r
+    }
+
+    private func inaltime(_ rand: Rand, _ subviews: Subviews) -> CGFloat {
+        rand.elemente.map { subviews[$0.i].sizeThatFits(ProposedViewSize(width: $0.w, height: nil)).height }.max() ?? 0
+    }
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let latime = proposal.width ?? .infinity
+        let r = randuri(latime, subviews)
+        let h = r.map { inaltime($0, subviews) }.reduce(0, +) + CGFloat(max(0, r.count - 1)) * (spatiuRanduri ?? spatiu)
+        let w = latime.isFinite ? latime : (r.map(\.latime).max() ?? 0)
+        return CGSize(width: w, height: h)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        var y = bounds.minY
+        for rand in randuri(bounds.width, subviews) {
+            let h = inaltime(rand, subviews)
+            let liber = max(0, bounds.width - rand.elemente.reduce(-spatiu) { $0 + $1.w + spatiu })
+            var x = bounds.minX
+            for (i, w) in rand.elemente {
+                let s = subviews[i]
+                if s[CheieFlex.self].autoStanga { x += liber }
+                let hs = s.sizeThatFits(ProposedViewSize(width: w, height: nil)).height
+                let dy = aliniere == .top ? 0 : aliniere == .bottom ? h - hs : (h - hs) / 2
+                s.place(at: CGPoint(x: x, y: y + dy), anchor: .topLeading, proposal: ProposedViewSize(width: w, height: hs))
+                x += w + spatiu
+            }
+            y += h + (spatiuRanduri ?? spatiu)
+        }
     }
 }

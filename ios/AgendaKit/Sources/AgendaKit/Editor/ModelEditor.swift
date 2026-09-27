@@ -14,6 +14,11 @@ public struct ModelCamp: Equatable, Sendable {
     public var lat = false
     /// sugestii (datalist): structura, pereții
     public var sugestii: [String] = []
+
+    public init(eticheta: String, cale: String, valoare: String, indiciu: String, unitate: String? = nil, tip: Tip = .text, lat: Bool = false, sugestii: [String] = []) {
+        self.eticheta = eticheta; self.cale = cale; self.valoare = valoare; self.indiciu = indiciu
+        self.unitate = unitate; self.tip = tip; self.lat = lat; self.sugestii = sugestii
+    }
 }
 
 /// `toggle(path, on, label, { level, ic, offLabel })`
@@ -36,6 +41,7 @@ public struct ModelSegment: Equatable, Sendable {
     public let cale: String
     public let optiuni: [(key: String, label: String)]
     public let ales: String
+    public init(cale: String, optiuni: [(key: String, label: String)], ales: String) { self.cale = cale; self.optiuni = optiuni; self.ales = ales }
     public static func == (a: Self, b: Self) -> Bool {
         a.cale == b.cale && a.ales == b.ales && a.optiuni.map(\.key) == b.optiuni.map(\.key) && a.optiuni.map(\.label) == b.optiuni.map(\.label)
     }

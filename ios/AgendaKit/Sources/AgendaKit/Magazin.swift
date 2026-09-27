@@ -69,6 +69,24 @@ public final class Magazin {
         }
     }
 
+    /// Editorul a modificat deja controlul (data modificării, catalogul, adăposturile — ca `touch()`), sau l-a restaurat
+    /// (Anulează / Refă): se păstrează exact așa și se salvează imediat (atingere) sau după o scurtă pauză (text tastat).
+    public func salveaza(_ c: Control, acum: Bool) {
+        if let i = controls.firstIndex(where: { $0.id == c.id }) { controls[i] = c } else { controls.append(c) }
+        inAsteptare[c.id] = c
+        stareSalvare = .salvez
+        temporizator?.cancel()
+        if acum {
+            flush()
+        } else {
+            temporizator = Task { [weak self] in
+                try? await Task.sleep(nanoseconds: 350_000_000)
+                guard !Task.isCancelled else { return }
+                self?.flush()
+            }
+        }
+    }
+
     /// Scrie pe disc tot ce așteaptă
     public func flush() {
         temporizator?.cancel()
