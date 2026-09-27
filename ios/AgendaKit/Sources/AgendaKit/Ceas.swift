@@ -9,7 +9,7 @@ public enum Ceas {
     /// Doar pentru teste: identificatorii noi, dați din afară (reluarea pașilor înregistrați în aplicația web)
     nonisolated(unsafe) public static var uidFortat: (() -> String)?
 
-    static var calendar: Calendar {
+    public static var calendar: Calendar {
         var c = Calendar(identifier: .gregorian)
         c.timeZone = fus
         return c

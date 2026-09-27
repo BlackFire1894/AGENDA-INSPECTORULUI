@@ -3,6 +3,7 @@
 # ios/Depanare-tur.sh <UDID> <folder> [orizontal|vertical] [mărimi] [teme] [ecrane]
 #   ex.: ios/Depanare-tur.sh <UDID> ~/Desktop/tur vertical "mic mare" "light" "panou,calendar"
 # Imaginile: <folder>/<mărime>-<temă>-<orientare>/NN-<ecran>-pK.png (pagină cu pagină, derulat până jos).
+# Argumente de pornire în plus: EXTRA="-expira-peste 30" ios/Depanare-tur.sh …
 # La final, aplicația se repornește normal.
 set -e
 U="$1"; OUT="$2"; OR="${3:-orizontal}"; MARIMI="${4:-mic mediu mare}"; TEME="${5:-light dark}"; DOAR="$6"
@@ -12,7 +13,7 @@ mkdir -p "$OUT"
 for m in $MARIMI; do for t in $TEME; do
   e="$m-$t-$OR"
   if [ -n "$DOAR" ]; then extra="-tur-doar $DOAR"; else extra=""; fi
-  xcrun devicectl device process launch --terminate-existing --device "$U" ro.cucuta.agenda -- -demo -tur "$e" $extra -agenda-font "$m" -agenda-theme "$t" >/dev/null
+  xcrun devicectl device process launch --terminate-existing --device "$U" ro.cucuta.agenda -- -demo -tur "$e" $extra -agenda-font "$m" -agenda-theme "$t" ${EXTRA:-} >/dev/null
   i=0
   until xcrun devicectl device copy from --device "$U" --domain-type appDataContainer --domain-identifier ro.cucuta.agenda \
         --source "Documents/tur/$e/gata.txt" --destination "$OUT/.gata" >/dev/null 2>&1; do

@@ -28,6 +28,7 @@ struct ContinutPanou: View {
             if m.casete == nil {
                 bunVenit
             } else {
+                if let e = Expirare.deAratat(azi: azi) { MementoExpirare(expira: e) }
                 if let s = m.sarbatori { MementoSarbatoriVedere(s: s) }
                 if !m.deConfirmat.isEmpty { deConfirmat(m.deConfirmat) }
                 casete(m.casete!, derulare)

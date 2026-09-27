@@ -106,6 +106,8 @@ xcrun devicectl device process launch --device <UDID> ro.cucuta.agenda
 ## Contul gratuit (Personal Team) — limite
 
 - Aplicația instalată din Xcode se oprește după **7 zile**; se reinstalează (▶︎ sau comenzile de mai sus), datele rămân.
+- **Reinstalarea cu dublu-clic** (decizia utilizatorului, 27.09.2026): `ios/Reinstaleaza-Agenda.command` (scurtătură pe Birou: „Reinstalează Agenda”). Găsește iPad-ul conectat, mută deoparte profilurile vechi ale aplicației (`~/Library/Caches/Agenda-profile-vechi`; altfel Xcode le refolosește și data de expirare nu se mută), compilează versiunea finală (Release, fără uneltele de verificare) din folderul curent, o instalează, o pornește și arată noua dată de expirare. Dacă o etapă eșuează, instalarea de pe iPad rămâne neatinsă. Jurnalul compilării: `~/Library/Caches/Agenda-reinstalare/jurnal.txt`.
+- **Avertizarea din aplicație:** data de expirare se citește din profilul inclus (`embedded.mobileprovision`); cu 2 zile înainte, notificare la 09:00 (categoria „Expirarea instalării”, loc rezervat între cele 60) și mesaj în Panou; în Setări → Actualizări, data până la care e valabilă. Verificare: `-demo -expira-peste <ore>`.
 - Maximum **3 aplicații** instalate așa pe un dispozitiv; maximum 10 identificatori de aplicație noi pe 7 zile (aplicația + widgetul = 2).
 - La prima instalare: Configurări → General → VPN și gestionare dispozitive → aprobați dezvoltatorul.
 - Mod dezvoltator activat pe dispozitiv (Configurări → Confidențialitate și securitate).
@@ -122,11 +124,9 @@ xcrun devicectl device process launch --device <UDID> ro.cucuta.agenda
   - **rezumatul zilei** (nou): dimineața, în zilele lucrătoare, ce mai e de făcut; atingerea deschide Panoul;
   - **butoane în notificare** (nou): „Amână 1 oră” / „Amână până mâine”; la activități, „Efectuată”;
   - **setări pe categorii** (nou): activare pe categorii și ora rezumatului.
+- **27.09.2026 — expirarea la 7 zile:** script de reinstalare cu dublu-clic pe Mac + avertizare în aplicație cu 2 zile înainte.
+- **27.09.2026 — după audit:** notificări configurabile (ASI, încărcare, activități, termene depășite, orele), blocare cu Touch ID (comutator în Setări, la fiecare deschidere / revenire), fotografii la constatări (ascunse implicit, în backup și în Fișă), culoare pentru „Organizare protecție civilă” (albastru-cer, în web și în nativ), vibrație la atingere (doar iPhone: iPad-ul nu are motor de vibrație).
 - **26.09.2026 — după finalizare,** utilizatorul lucrează doar în aplicația nativă. Aplicația web rămâne pe GitHub pentru actualizări (sursa promptelor din docs/nativ/ACTUALIZARI.md). Mutarea datelor: un backup din web, importat o dată în nativ.
-
-## De hotărât înainte de final
-
-- **Expirarea la 7 zile (cont gratuit):** după final, aplicația nativă e singura aplicație de lucru; dacă expiră pe teren, nu se deschide până la reinstalare (datele rămân). Variante propuse (27.09.2026): cont Apple Developer plătit (1 an, TestFlight), reinstalare automată de pe Mac, script cu dublu-clic. Utilizatorul a amânat decizia; până atunci, reinstalare la fiecare sesiune. (Aplicațiile Mac nu au această limită; cele de iPad / iPhone, da.)
 
 ## Stadiul (etapele din SPECIFICATIE.md §6)
 

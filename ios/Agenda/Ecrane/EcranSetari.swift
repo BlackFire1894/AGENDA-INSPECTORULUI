@@ -148,7 +148,11 @@ struct ContinutSetari: View {
         Card {
             TitluSectiune(iconita: "upload", text: "Actualizări")
             RandStare(eticheta: "Versiunea instalată", valoare: K.versiuneAplicatieWeb)
+            if let e = Expirare.data { RandStare(eticheta: "Instalarea e valabilă până", valoare: Expirare.text(e)) }
             Paragraf(text: "Aplicația urmează versiunea aplicației web cu același număr. O versiune nouă se instalează de pe Mac; datele rămân.")
+            if Expirare.data != nil {
+                Paragraf(text: "Instalată de pe Mac cu un cont Apple gratuit, aplicația e valabilă 7 zile. Reinstalați-o înainte să expire: conectați \(dsp("iPad-ul", "telefonul")) la Mac și faceți dublu-clic pe „Reinstalează Agenda” de pe Birou. Cu 2 zile înainte, aplicația vă anunță.")
+            }
         }
     }
 

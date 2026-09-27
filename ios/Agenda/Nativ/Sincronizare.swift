@@ -42,10 +42,11 @@ final class Sincronizare {
         let controls = m.controls, activitati = m.activitati
         let meta = MetaNotificari(lastBackup: m.meta.lastBackup, sarbatoriVerificate: m.meta.sarbatoriVerificate)
         let setari = self.setari
+        let expirare = Expirare.notificare(acum: Ceas.acum())
         let (date, plan, insigna) = await Task.detached(priority: .utility) {
             let azi = todayISO()
             let st = stareNativa(controls, activitati, meta, azi)
-            return (dateWidget(controls, activitati, st), planNotificari(st, setari), st.insigna)
+            return (dateWidget(controls, activitati, st), planNotificari(st, setari, expirare: expirare), st.insigna)
         }.value
         try? GrupComun.scrieWidget(date)
         WidgetCenter.shared.reloadAllTimelines()

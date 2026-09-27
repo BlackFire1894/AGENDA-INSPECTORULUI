@@ -113,6 +113,36 @@ final class WidgetTests: TestVectori {
         }
     }
 
+    /// Expirarea instalării: la 09:00, cu 2 zile înainte de ziua expirării (sau cu una, dacă a trecut); loc rezervat în plan
+    func testExpirarea() {
+        func moment(_ s: String) -> Date {   // „2026-10-03 22:17”, ora României
+            let p = s.split(whereSeparator: { $0 == "-" || $0 == " " || $0 == ":" }).compactMap { Int($0) }
+            return Ceas.calendar.date(from: DateComponents(year: p[0], month: p[1], day: p[2], hour: p[3], minute: p[4]))!
+        }
+        let exp = moment("2026-10-03 22:17")
+        let n = notificareExpirare(exp, acum: moment("2026-09-28 10:00"), dispozitiv: "iPad-ul")!
+        XCTAssertEqual([n.data, n.ora, n.id], ["2026-10-01", "09:00", "agenda-expirare-2026-10-03"])
+        XCTAssertEqual(n.titlu, "Aplicația expiră pe sâmbătă, 3 octombrie 2026")
+        XCTAssertEqual(n.text, "Instalarea de pe Mac e valabilă până la ora 22:17. Conectați iPad-ul la Mac și faceți dublu-clic pe „Reinstalează Agenda” (pe Birou). Datele rămân.")
+        XCTAssertEqual(n.categorie, .expirare)
+        XCTAssertEqual(notificareExpirare(exp, acum: moment("2026-10-01 09:00"), dispozitiv: "iPad-ul")?.data, "2026-10-02")
+        XCTAssertNil(notificareExpirare(exp, acum: moment("2026-10-02 09:30"), dispozitiv: "iPad-ul"))
+        // expiră la 00:01: avertizarea tot cu 2 zile înainte de ziua expirării
+        XCTAssertEqual(notificareExpirare(moment("2026-10-05 00:01"), acum: moment("2026-09-28 10:00"), dispozitiv: "iPad-ul")?.data, "2026-10-03")
+        // în plan: are loc chiar dacă celelalte umplu lista; categoria oprită = fără avertizare
+        for (_, controls, activitati) in seturi() {
+            let st = stareNativa(controls, activitati, MetaNotificari(), Mediu.AZI, Mediu.ACUM)
+            let e = notificareExpirare(moment("2026-12-20 12:00"), acum: Mediu.ACUM, dispozitiv: "iPad-ul")!
+            var setari = SetariNotificari()
+            let plan = planNotificari(st, setari, acum: Mediu.ACUM, expirare: e)
+            XCTAssertLessThanOrEqual(plan.count, MAX_PROGRAMATE)
+            XCTAssertTrue(plan.contains(e))
+            XCTAssertEqual(plan.map { $0.data + $0.ora }, plan.map { $0.data + $0.ora }.sorted())
+            setari.oprite = [.expirare]
+            XCTAssertFalse(planNotificari(st, setari, acum: Mediu.ACUM, expirare: e).contains(e))
+        }
+    }
+
     func testRezumatulZilei() {
         var z = CifreZi(data: "2026-10-15")
         XCTAssertNil(rezumatZi(z))

@@ -4,7 +4,7 @@ import Foundation
 // → notificari, verificate pe vectori), plus rezumatul zilei, alegerea pe categorii și cifra de pe iconiță.
 
 public enum CategorieNotificare: String, Codable, CaseIterable, Sendable {
-    case amenzi, asi, incarcare, activitati, confirmare, backup, sarbatori, rezumat
+    case amenzi, asi, incarcare, activitati, confirmare, backup, sarbatori, rezumat, expirare
 
     /// eticheta din Setări
     public var eticheta: String {
@@ -17,6 +17,7 @@ public enum CategorieNotificare: String, Codable, CaseIterable, Sendable {
         case .backup: return "Backup"
         case .sarbatori: return "Sărbătorile legale"
         case .rezumat: return "Rezumatul zilei"
+        case .expirare: return "Expirarea instalării"
         }
     }
 
@@ -31,6 +32,7 @@ public enum CategorieNotificare: String, Codable, CaseIterable, Sendable {
         case .backup: return "La 7 zile după ultimul backup (17:00)"
         case .sarbatori: return "Verificarea listei pentru anul următor, ca în Panou"
         case .rezumat: return "În zilele lucrătoare, ce mai aveți de făcut"
+        case .expirare: return "Cu 2 zile înainte ca aplicația instalată de pe Mac să expire (09:00)"
         }
     }
 
@@ -93,9 +95,28 @@ public func rezumatZi(_ z: CifreZi) -> (titlu: String, text: String)? {
     return (titlu, p.joined(separator: " · "))
 }
 
+/// Avertizarea de expirare a instalării (cont Apple gratuit: 7 zile): la 09:00, cu 2 zile înainte de ziua expirării
+/// (sau cu o zi înainte, dacă a trecut); nil dacă nu mai e timp. `dispozitiv`: „iPad-ul” / „telefonul”.
+public func notificareExpirare(_ expira: Date, acum: Date, dispozitiv: String) -> NotificarePlanificata? {
+    let zi = todayISO(expira)
+    let ora = Ceas.calendar.dateComponents([.hour, .minute], from: expira)
+    let cand = [addDays(zi, -2), addDays(zi, -1)].first { d in
+        guard let t = Ceas.calendar.date(from: DateComponents(year: Int(d.prefix(4)), month: Int(d.dropFirst(5).prefix(2)), day: Int(d.suffix(2)), hour: 9)) else { return false }
+        return t > acum && t < expira
+    }
+    guard let cand else { return nil }
+    return NotificarePlanificata(
+        id: "agenda-expirare-\(zi)", data: cand, ora: "09:00",
+        titlu: "Aplicația expiră pe \(fmtDateLong(zi))",
+        text: String(format: "Instalarea de pe Mac e valabilă până la ora %02d:%02d. Conectați %@ la Mac și faceți dublu-clic pe „Reinstalează Agenda” (pe Birou). Datele rămân.", ora.hour ?? 0, ora.minute ?? 0, dispozitiv),
+        categorie: .expirare, insigna: nil, activitate: nil)
+}
+
 /// Toate notificările de programat, în ordinea timpului, cel mult `MAX_PROGRAMATE`.
 /// `acum`: momentul programării (notificările de azi trecute de oră nu se mai programează).
-public func planNotificari(_ stare: StareNativa, _ setari: SetariNotificari, acum: Date = Ceas.acum()) -> [NotificarePlanificata] {
+/// `expirare`: avertizarea de expirare a instalării; are loc rezervat, nu e împinsă afară de celelalte.
+public func planNotificari(_ stare: StareNativa, _ setari: SetariNotificari, acum: Date = Ceas.acum(),
+                           expirare: NotificarePlanificata? = nil) -> [NotificarePlanificata] {
     let azi = stare.azi
     let p = Ceas.calendar.dateComponents([.hour, .minute], from: acum)
     let oraAcum = String(format: "%02d:%02d", p.hour ?? 0, p.minute ?? 0)
@@ -128,5 +149,7 @@ public func planNotificari(_ stare: StareNativa, _ setari: SetariNotificari, acu
         out.append(NotificarePlanificata(id: "agenda-insigna-\(z.data)", data: z.data, ora: "00:00", titlu: "", text: "",
                                          categorie: nil, insigna: z.urgente, activitate: nil))
     }
-    return Array(out.sortatStabil { compara($0.data + $0.ora, $1.data + $1.ora) }.prefix(MAX_PROGRAMATE))
+    let exp = setari.activa(.expirare) ? expirare : nil
+    let restul = Array(out.sortatStabil { compara($0.data + $0.ora, $1.data + $1.ora) }.prefix(MAX_PROGRAMATE - (exp == nil ? 0 : 1)))
+    return (restul + [exp].compactMap { $0 }).sortatStabil { compara($0.data + $0.ora, $1.data + $1.ora) }
 }
