@@ -46,7 +46,7 @@ final class Sincronizare {
         let (date, plan, insigna) = await Task.detached(priority: .utility) {
             let azi = todayISO()
             let st = stareNativa(controls, activitati, meta, azi)
-            return (dateWidget(controls, activitati, st), planNotificari(st, setari, expirare: expirare), st.insigna)
+            return (dateWidget(controls, activitati, st), planNotificari(controls, activitati, meta, st, setari, expirare: expirare), st.insigna)
         }.value
         try? GrupComun.scrieWidget(date)
         WidgetCenter.shared.reloadAllTimelines()
@@ -174,6 +174,7 @@ final class DelegatNotificari: NSObject, UNUserNotificationCenterDelegate, UIApp
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil) -> Bool {
         UNUserNotificationCenter.current().delegate = self
         Notificari.inregistreazaCategorii()
+        Fundal.inregistreaza()
         #if DEBUG
         Notificari.jurnal("pornire: delegat setat (\(application.applicationState == .background ? "în fundal" : "în față"))")
         #endif

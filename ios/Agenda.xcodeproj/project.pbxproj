@@ -328,6 +328,7 @@
 				CODE_SIGN_ENTITLEMENTS = Config/Agenda.entitlements;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/Agenda-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Agenda;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Coordonatele construcției se citesc o singură dată, doar când apăsați „Completează coordonatele”. Locația nu este urmărită.";
@@ -354,6 +355,7 @@
 				CODE_SIGN_ENTITLEMENTS = Config/Agenda.entitlements;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "Config/Agenda-Info.plist";
 				INFOPLIST_KEY_CFBundleDisplayName = Agenda;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.productivity";
 				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = "Coordonatele construcției se citesc o singură dată, doar când apăsați „Completează coordonatele”. Locația nu este urmărită.";

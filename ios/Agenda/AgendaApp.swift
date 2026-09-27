@@ -123,7 +123,12 @@ struct AgendaApp: App {
                     Capturi.ruleaza(latime: latime)
                 }
                 #endif
-            case .background: magazin.asteaptaScrierile()
+            case .background:
+                magazin.asteaptaScrierile()
+                #if DEBUG
+                if Self.demo { break }
+                #endif
+                Fundal.programeaza()
             default: break
             }
         }

@@ -83,6 +83,12 @@ enum Tur {
             }
             ui.inchide()
         }
+        for cat in [CategorieNotificare.asi, .incarcare, .amenzi, .activitati] {
+            await pas("f-reguli-\(cat.rawValue)", fereastra: true, inainte: { nav.mergi(.setari) }) {
+                ui.deschide(lata: true) { FereastraReguli(cat: cat) }
+            }
+            ui.inchide()
+        }
         await pas("f-confirmare", fereastra: true, inainte: { nav.mergi(.setari) }) {
             ui.confirma("Ștergeți TOATE datele?", "7 controale și 5 activități vor fi șterse definitiv de pe această tabletă. Operația nu poate fi anulată.", ok: "Șterge tot", pericol: true) {}
         }

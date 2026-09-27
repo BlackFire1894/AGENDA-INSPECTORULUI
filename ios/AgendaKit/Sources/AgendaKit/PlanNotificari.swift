@@ -24,37 +24,73 @@ public enum CategorieNotificare: String, Codable, CaseIterable, Sendable {
     /// când vin, pe scurt (Setări)
     public var detalii: String {
         switch self {
-        case .amenzi: return "La schimbarea stadiului; ziua dinainte și ultima zi pentru ANAF (08:00)"
-        case .asi: return "Ziua dinainte și ultima zi (08:00)"
-        case .incarcare: return "Ziua dinainte și ultima zi (08:00)"
-        case .activitati: return "În dimineața zilei (07:30)"
-        case .confirmare: return "A doua zi după activitate (09:00)"
-        case .backup: return "La 7 zile după ultimul backup (17:00)"
+        case .amenzi: return "La schimbarea stadiului; termenul ANAF, după regulile alese"
+        case .asi: return "După regulile alese"
+        case .incarcare: return "După regulile alese, în zilele lucrătoare"
+        case .activitati: return "În ziua planificată"
+        case .confirmare: return "A doua zi după activitate"
+        case .backup: return "La 7 zile după ultimul backup"
         case .sarbatori: return "Verificarea listei pentru anul următor, ca în Panou"
         case .rezumat: return "În zilele lucrătoare, ce mai aveți de făcut"
         case .expirare: return "Cu 2 zile înainte ca aplicația instalată de pe Mac să expire (09:00)"
         }
     }
 
-    /// categoria unei notificări din referință, după identificator
-    static func dupaId(_ id: String) -> CategorieNotificare? {
-        let reguli: [(String, CategorieNotificare)] = [
-            ("agenda-amenda-", .amenzi), ("agenda-anaf1-", .amenzi), ("agenda-anaf0-", .amenzi),
-            ("agenda-asi1-", .asi), ("agenda-asi0-", .asi), ("agenda-inc1-", .incarcare), ("agenda-inc0-", .incarcare),
-            ("agenda-actconf-", .confirmare), ("agenda-act-", .activitati), ("agenda-backup-", .backup), ("agenda-sarbatori-", .sarbatori),
-        ]
-        return reguli.first { id.hasPrefix($0.0) }?.1
-    }
 }
 
-/// Preferințele de notificare ale acestui dispozitiv (nu intră în backup, ca preferințele din web)
+/// Preferințele de notificare ale acestui dispozitiv (nu intră în backup, ca preferințele din web).
+/// Câmpurile lipsă (preferințe salvate de o versiune mai veche) primesc valorile implicite.
 public struct SetariNotificari: Codable, Equatable, Sendable {
     public var oprite: Set<CategorieNotificare> = []
     /// ora rezumatului zilei, „HH:MM”
     public var oraRezumat = "07:45"
+    /// ora notificărilor zilnice, pe categorii (lipsă = `oreImplicite`)
+    public var ore: [String: String] = [:]
+    /// programul de lucru, pentru „la fiecare N ore”
+    public var programStart = "08:00"
+    public var programSfarsit = "16:00"
+    public var asi = SetariNotificari.implicitASI
+    public var incarcare = SetariNotificari.implicitIncarcare
+    /// amenzile: termenul ANAF
+    public var anaf = SetariNotificari.implicitANAF
+    /// amenzile: notificare în ziua în care se schimbă stadiul (termenul de plată expirat, de trimis la ANAF)
+    public var schimbareStadiu = true
+    /// activitățile cu oră: încă o notificare cu atâtea minute înainte (0 = fără)
+    public var minuteInainte = 30
 
     public init() {}
     public func activa(_ c: CategorieNotificare) -> Bool { !oprite.contains(c) }
+
+    private enum CodingKeys: String, CodingKey {
+        case oprite, oraRezumat, ore, programStart, programSfarsit, asi, incarcare, anaf, schimbareStadiu, minuteInainte
+    }
+    public init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        let i = SetariNotificari()
+        oprite = (try? c.decodeIfPresent([String].self, forKey: .oprite)).flatMap { $0 }.map { Set($0.compactMap(CategorieNotificare.init(rawValue:))) } ?? i.oprite
+        oraRezumat = (try? c.decodeIfPresent(String.self, forKey: .oraRezumat)).flatMap { $0 } ?? i.oraRezumat
+        ore = (try? c.decodeIfPresent([String: String].self, forKey: .ore)).flatMap { $0 } ?? i.ore
+        programStart = (try? c.decodeIfPresent(String.self, forKey: .programStart)).flatMap { $0 } ?? i.programStart
+        programSfarsit = (try? c.decodeIfPresent(String.self, forKey: .programSfarsit)).flatMap { $0 } ?? i.programSfarsit
+        asi = (try? c.decodeIfPresent(RegulaTermen.self, forKey: .asi)).flatMap { $0 } ?? i.asi
+        incarcare = (try? c.decodeIfPresent(RegulaTermen.self, forKey: .incarcare)).flatMap { $0 } ?? i.incarcare
+        anaf = (try? c.decodeIfPresent(RegulaTermen.self, forKey: .anaf)).flatMap { $0 } ?? i.anaf
+        schimbareStadiu = (try? c.decodeIfPresent(Bool.self, forKey: .schimbareStadiu)).flatMap { $0 } ?? i.schimbareStadiu
+        minuteInainte = (try? c.decodeIfPresent(Int.self, forKey: .minuteInainte)).flatMap { $0 } ?? i.minuteInainte
+    }
+    public func encode(to encoder: Encoder) throws {
+        var c = encoder.container(keyedBy: CodingKeys.self)
+        try c.encode(oprite.map(\.rawValue).sorted(), forKey: .oprite)
+        try c.encode(oraRezumat, forKey: .oraRezumat)
+        try c.encode(ore, forKey: .ore)
+        try c.encode(programStart, forKey: .programStart)
+        try c.encode(programSfarsit, forKey: .programSfarsit)
+        try c.encode(asi, forKey: .asi)
+        try c.encode(incarcare, forKey: .incarcare)
+        try c.encode(anaf, forKey: .anaf)
+        try c.encode(schimbareStadiu, forKey: .schimbareStadiu)
+        try c.encode(minuteInainte, forKey: .minuteInainte)
+    }
 }
 
 /// O notificare de programat
@@ -112,30 +148,24 @@ public func notificareExpirare(_ expira: Date, acum: Date, dispozitiv: String) -
         categorie: .expirare, insigna: nil, activitate: nil)
 }
 
-/// Toate notificările de programat, în ordinea timpului, cel mult `MAX_PROGRAMATE`.
+/// Toate notificările de programat, în ordinea timpului, cel mult `MAX_PROGRAMATE`: termenele după regulile alese
+/// (`notificariDupaReguli`), sărbătorile legale (ca în referință), rezumatul zilei, actualizările cifrei de pe iconiță.
 /// `acum`: momentul programării (notificările de azi trecute de oră nu se mai programează).
 /// `expirare`: avertizarea de expirare a instalării; are loc rezervat, nu e împinsă afară de celelalte.
-public func planNotificari(_ stare: StareNativa, _ setari: SetariNotificari, acum: Date = Ceas.acum(),
-                           expirare: NotificarePlanificata? = nil) -> [NotificarePlanificata] {
+public func planNotificari(_ controls: [Control], _ activitati: [Activitate], _ meta: MetaNotificari, _ stare: StareNativa,
+                           _ setari: SetariNotificari, acum: Date = Ceas.acum(), expirare: NotificarePlanificata? = nil) -> [NotificarePlanificata] {
     let azi = stare.azi
     let p = Ceas.calendar.dateComponents([.hour, .minute], from: acum)
     let oraAcum = String(format: "%02d:%02d", p.hour ?? 0, p.minute ?? 0)
     let insigne = Dictionary(stare.zile.map { ($0.data, $0.urgente) }, uniquingKeysWith: { a, _ in a })
     let viitor = { (data: String, ora: String) in data > azi || (data == azi && ora > oraAcum) }
 
-    var out: [NotificarePlanificata] = []
-    for n in stare.notificari {
-        let cat = CategorieNotificare.dupaId(n.id)
-        guard let cat, setari.activa(cat), viitor(n.data, n.ora) else { continue }
-        var act: String?
-        if cat == .activitati || cat == .confirmare {
-            // „agenda-act-<id>-<data>” / „agenda-actconf-<id>-<data>”
-            let fara = n.id.dropFirst(cat == .activitati ? "agenda-act-".count : "agenda-actconf-".count)
-            act = String(fara.dropLast(11))
-        }
-        out.append(NotificarePlanificata(id: n.id, data: n.data, ora: n.ora, titlu: n.titlu, text: n.text, categorie: cat,
-                                         insigna: insigne[n.data], activitate: act))
+    var out = notificariDupaReguli(controls, activitati, meta, azi, setari).filter { viitor($0.data, $0.ora) }
+    if setari.activa(.sarbatori), let n = notificareSarbatori(meta, azi), viitor(n.data, n.ora) {
+        out.append(NotificarePlanificata(id: n.id, data: n.data, ora: n.ora, titlu: n.titlu, text: n.text, categorie: .sarbatori,
+                                         insigna: nil, activitate: nil))
     }
+    for i in out.indices { out[i].insigna = insigne[out[i].data] }
     if setari.activa(.rezumat) {
         for z in stare.zile.prefix(ZILE_REZUMAT) where zinelucratoare(z.data).isEmpty && viitor(z.data, setari.oraRezumat) {
             guard let r = rezumatZi(z) else { continue }

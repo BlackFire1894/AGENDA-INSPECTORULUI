@@ -7,6 +7,8 @@ import AgendaKit
 struct SectiuneNotificari: View {
     @Environment(\.rem) private var rem
     @Environment(\.scenePhase) private var scenePhase
+    @Environment(Interfata.self) private var ui
+    static let cuReguli: Set<CategorieNotificare> = [.amenzi, .asi, .incarcare, .activitati, .confirmare, .backup]
     @State private var setari = Sincronizare.shared.setari
     @State private var permisiune: UNAuthorizationStatus = .notDetermined
     @State private var programate = 0
@@ -25,8 +27,20 @@ struct SectiuneNotificari: View {
                 .padding(.bottom, 0.7778 * rem)
             }
             RandStare(eticheta: "Programate acum", valoare: "\(programate) (cel mult \(MAX_PROGRAMATE))")
+            HStack(spacing: 0.4444 * rem) {
+                Text("Programul de lucru").font(.system(size: 0.9444 * rem, weight: .bold)).foregroundStyle(Color.muted)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                ora(legaturaOra({ setari.programStart }, { setari.programStart = $0; Sincronizare.shared.setari = setari }), "Începutul programului")
+                Text("–").font(.system(size: rem, weight: .bold)).foregroundStyle(Color.muted)
+                ora(legaturaOra({ setari.programSfarsit }, { setari.programSfarsit = $0; Sincronizare.shared.setari = setari }), "Sfârșitul programului")
+            }
+            .frame(minHeight: 44)
+            Text("Pentru notificările „la fiecare N ore” (ASI, încărcare, amenzi).").font(.system(size: 0.8889 * rem)).foregroundStyle(Color.muted)
+                .padding(.bottom, 0.4444 * rem)
             ForEach(CategorieNotificare.allCases, id: \.self) { cat in
-                RandComutator(titlu: cat.eticheta, detalii: cat.detalii, activ: Binding(
+                RandComutator(titlu: cat.eticheta, detalii: detaliiCategorie(cat, setari), reguli: Self.cuReguli.contains(cat) ? {
+                    ui.deschide(lata: true, laInchidere: { setari = Sincronizare.shared.setari }) { FereastraReguli(cat: cat) }
+                } : nil, activ: Binding(
                     get: { setari.activa(cat) },
                     set: { v in
                         if v { setari.oprite.remove(cat) } else { setari.oprite.insert(cat) }
@@ -46,6 +60,10 @@ struct SectiuneNotificari: View {
         }
         .task(id: scenePhase) { await actualizeaza() }
         .onChange(of: setari) { _, _ in Task { try? await Task.sleep(nanoseconds: 1_500_000_000); await actualizeaza() } }
+    }
+
+    private func ora(_ b: Binding<Date>, _ eticheta: String) -> some View {
+        DatePicker(eticheta, selection: b, displayedComponents: .hourAndMinute).labelsHidden().environment(\.locale, Locale(identifier: "ro_RO"))
     }
 
     private var textPermisiune: String {
@@ -80,6 +98,8 @@ struct RandComutator: View {
     @Environment(\.rem) private var rem
     let titlu: String
     let detalii: String
+    /// butonul „Reguli” (Setări → Notificări)
+    var reguli: (() -> Void)? = nil
     @Binding var activ: Bool
 
     var body: some View {
@@ -87,6 +107,9 @@ struct RandComutator: View {
             VStack(alignment: .leading, spacing: 0.1111 * rem) {
                 Text(titlu).font(.system(size: rem, weight: .bold)).foregroundStyle(Color.text)
                 Text(detalii).font(.system(size: 0.8889 * rem)).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
+                if let reguli {
+                    ButonMic(text: "Reguli", actiune: reguli).padding(.top, 0.2222 * rem)
+                }
             }
         }
         .tint(Color.accent)

@@ -164,18 +164,23 @@ func notificari(_ controls: [Control], _ activitati: [Activitate], _ meta: MetaN
             ultim.map { "Ultimul backup: \(fmtDate($0)). Datele există doar pe acest dispozitiv." }
                 ?? "Nu ați făcut încă niciun backup. Datele există doar pe acest dispozitiv.")
     }
-    // sărbătorile legale: ca în Panou — în decembrie pentru anul următor, în ianuarie pentru anul curent
+    if let n = notificareSarbatori(meta, azi) { ev.append(n) }
+    return Array(ev.sortatStabil { compara($0.data + $0.ora, $1.data + $1.ora) }.prefix(MAX_NOTIFICARI))
+}
+
+/// Sărbătorile legale: ca în Panou — în decembrie pentru anul următor, în ianuarie pentru anul curent
+func notificareSarbatori(_ meta: MetaNotificari, _ azi: String) -> Notificare? {
     let y = Int(azi.prefix(4)) ?? 0
     let m = Int(azi.dropFirst(5).prefix(2)) ?? 0
     let verificate = meta.sarbatoriVerificate
     let an: Int? = m == 12 ? y + 1 : m == 1 ? y : nil
-    func sarb(_ a: Int, _ d: String, _ ora: String) {
-        add("sarbatori-\(a)", d, ora, "Sărbătorile legale \(a): verificați lista",
-            "Verificați în Panou lista sărbătorilor legale pentru \(a): termenele țin cont de ele.")
+    func sarb(_ a: Int, _ d: String, _ ora: String) -> Notificare {
+        Notificare(id: "agenda-sarbatori-\(a)-\(d)", data: d, ora: ora, titlu: "Sărbătorile legale \(a): verificați lista",
+                   text: "Verificați în Panou lista sărbătorilor legale pentru \(a): termenele țin cont de ele.")
     }
-    if let an, !verificate.contains(an) { sarb(an, azi, "18:00") }
-    else if an == nil && !verificate.contains(y + 1) { sarb(y + 1, "\(y)-12-01", "09:00") }
-    return Array(ev.sortatStabil { compara($0.data + $0.ora, $1.data + $1.ora) }.prefix(MAX_NOTIFICARI))
+    if let an, !verificate.contains(an) { return sarb(an, azi, "18:00") }
+    if an == nil && !verificate.contains(y + 1) && "\(y)-12-01" >= azi { return sarb(y + 1, "\(y)-12-01", "09:00") }
+    return nil
 }
 
 /// Tot ce primesc widgeturile, notificările și iconița

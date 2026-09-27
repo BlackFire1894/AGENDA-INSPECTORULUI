@@ -83,7 +83,7 @@ final class WidgetTests: TestVectori {
                 var setari = SetariNotificari()
                 let acum = Mediu.ACUM
                 let oraAcum = "09:00"
-                let plan = planNotificari(st, setari, acum: acum)
+                let plan = planNotificari(controls, activitati, meta, st, setari, acum: acum)
                 XCTAssertLessThanOrEqual(plan.count, MAX_PROGRAMATE)
                 XCTAssertEqual(plan.map { $0.data + $0.ora }, plan.map { $0.data + $0.ora }.sorted(), "în ordinea timpului")
                 XCTAssertEqual(Set(plan.map(\.id)).count, plan.count, "identificatori unici")
@@ -99,15 +99,13 @@ final class WidgetTests: TestVectori {
                 for n in plan where n.activitate != nil {
                     XCTAssertTrue(activitati.contains { $0.id == n.activitate }, "activitatea \(n.activitate!)")
                 }
-                // fiecare notificare din referință care încape și e în viitor apare, cu textul neschimbat
-                let dinReferinta = plan.filter { $0.categorie != nil && $0.categorie != .rezumat }
-                for n in dinReferinta {
-                    let r = st.notificari.first { $0.id == n.id }!
-                    XCTAssertEqual([r.titlu, r.text, r.data, r.ora], [n.titlu, n.text, n.data, n.ora])
+                // cifra de pe iconiță: a zilei notificării
+                for n in plan where n.data <= st.zile.last!.data {
+                    XCTAssertEqual(n.insigna, st.zile.first { $0.data == n.data }?.urgente, n.id)
                 }
                 // categoriile oprite nu mai apar
                 setari.oprite = [.amenzi, .rezumat]
-                let filtrat = planNotificari(st, setari, acum: acum)
+                let filtrat = planNotificari(controls, activitati, meta, st, setari, acum: acum)
                 XCTAssertFalse(filtrat.contains { $0.categorie == .amenzi || $0.categorie == .rezumat })
             }
         }
@@ -134,12 +132,12 @@ final class WidgetTests: TestVectori {
             let st = stareNativa(controls, activitati, MetaNotificari(), Mediu.AZI, Mediu.ACUM)
             let e = notificareExpirare(moment("2026-12-20 12:00"), acum: Mediu.ACUM, dispozitiv: "iPad-ul")!
             var setari = SetariNotificari()
-            let plan = planNotificari(st, setari, acum: Mediu.ACUM, expirare: e)
+            let plan = planNotificari(controls, activitati, MetaNotificari(), st, setari, acum: Mediu.ACUM, expirare: e)
             XCTAssertLessThanOrEqual(plan.count, MAX_PROGRAMATE)
             XCTAssertTrue(plan.contains(e))
             XCTAssertEqual(plan.map { $0.data + $0.ora }, plan.map { $0.data + $0.ora }.sorted())
             setari.oprite = [.expirare]
-            XCTAssertFalse(planNotificari(st, setari, acum: Mediu.ACUM, expirare: e).contains(e))
+            XCTAssertFalse(planNotificari(controls, activitati, MetaNotificari(), st, setari, acum: Mediu.ACUM, expirare: e).contains(e))
         }
     }
 
