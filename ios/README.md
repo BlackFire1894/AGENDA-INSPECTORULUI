@@ -13,6 +13,8 @@ Reproducere 1 la 1 a aplicației web din acest repo. Specificația: `docs/nativ/
 | `AgendaKit/` | Logica pură, fără UI (pachet Swift): portează `js/model.js`, `js/dates.js`, `js/activitati.js` și `tests/nativ/referinta.mjs` cu aceleași nume |
 | `Config/` | Entitlements și Info.plist-ul widgetului |
 | `Diferential/` | Verificarea încrucișată web ↔ Swift (`genereaza.mjs`, rulat de `teste.sh`) |
+| `Agenda/Navigare/` | Cadrul: bara laterală (fereastra ≥ 1000 pt), bara de jos (vertical), rutele (`Navigare`) |
+| `AgendaKit/Sources/AgendaKit/Ecrane/` | Conținutul ecranelor ca modele fără interfață (`modelPanou`, `modelListaObiective`, `modelIstoric`, `modelObiectiv`, `modelRandControl`, filtrele), verificat cu HTML-ul web |
 | `Agenda/Nativ/` | Adăugirile native: sincronizarea cu widgeturile, notificările (programare, butoane), cifra de pe iconiță |
 | `Comun/Widgeturi/` | Vederile widgeturilor (în codul comun: aplicația le desenează și la capturile de verificare) |
 
@@ -43,6 +45,7 @@ ios/teste.sh
 - vectorii din docs/nativ/vectori/ (rezultatele exacte ale aplicației web);
 - testele aplicației web (tests/model.test.js), portate;
 - **verificarea încrucișată:** `Diferential/genereaza.mjs` creează ~140 de controale aleatoare (amenzi în weekend și de sărbători, ASI, încărcare, liste înghețate vechi, adăposturi, nereguli vechi, date din versiuni vechi) și le trece prin **codul web**; `DiferentialTests` refac totul în Swift și cer rezultate identice, câmp cu câmp și mesaj cu mesaj. Cere Node.js; altă sămânță: `SAMANTA=123 ios/teste.sh`.
+- **ecranele:** `EcraneWebTests` compară conținutul modelelor Swift (texte, pastile cu culoarea lor, filtre cu numărul lor, în ordine) cu HTML-ul generat de `js/views.js` pentru aceleași date: rândul fiecărui control, Obiective și Istoric (7 căutări × 8 combinații de filtre), paginile tuturor obiectivelor, Panoul în 8 zile diferite și fără date.
 - Verificat și invers: o greșeală introdusă intenționat (un mesaj, o regulă, pragul roșu al încărcării) pică testele.
 
 Folderul de build e în `~/Library/Caches/AgendaKit-build`: în `~/Documents`, `codesign` refuză pachetul de teste („resource fork, Finder information, or similar detritus not allowed”).
@@ -109,13 +112,17 @@ xcrun devicectl device process launch --device <UDID> ro.cucuta.agenda
   - **setări pe categorii** (nou): activare pe categorii și ora rezumatului.
 - **26.09.2026 — după finalizare,** utilizatorul lucrează doar în aplicația nativă. Aplicația web rămâne pe GitHub pentru actualizări (sursa promptelor din docs/nativ/ACTUALIZARI.md). Mutarea datelor: un backup din web, importat o dată în nativ.
 
+## De hotărât înainte de final
+
+- **Expirarea la 7 zile (cont gratuit):** după final, aplicația nativă e singura aplicație de lucru; dacă expiră pe teren, nu se deschide până la reinstalare (datele rămân). Variante propuse (27.09.2026): cont Apple Developer plătit (1 an, TestFlight), reinstalare automată de pe Mac, script cu dublu-clic. Utilizatorul a amânat decizia; până atunci, reinstalare la fiecare sesiune. (Aplicațiile Mac nu au această limită; cele de iPad / iPhone, da.)
+
 ## Stadiul (etapele din SPECIFICATIE.md §6)
 
 - [x] **1. Proiectul** (26.09.2026): aplicație + widget, semnate cu contul gratuit, instalate pe iPad Air 11" (iPadOS 27). App Groups acceptat; proba de legătură (`Library/Application Support/proba.json` în grupul comun) scrisă de aplicație pe iPad. Ecranul e temporar (`EcranPornire`), la fel widgetul de probă.
 - [x] **2. Modelul, catalogul, logica pură** (26.09.2026): `AgendaKit` portează js/dates.js, js/model.js (fără UI), js/activitati.js (fără HTML) și tests/nativ/referinta.mjs, cu aceleași nume de funcții. **65 de teste, toate trec:** 22 pe vectori (date, sărbători 2024–2040, termene, sume, normalizare, setul demonstrativ întreg fără HTML, widgeturi și notificări; fișierele JSON se rescriu identic, octet cu octet) + 43 portate din tests/model.test.js. Verificat și invers: o greșeală introdusă intenționat pică testele.
 - [x] **3. Stocarea, backupul, datele demonstrative** (27.09.2026): salvarea pe disc, export / import (Combină / Înlocuiește tot) compatibil cu web, datele demonstrative (identice cu web), ecranul Setări (Backup, Stocare, Zonă periculoasă) + caseta temporară de verificare. **82 de teste** (inclusiv verificarea încrucișată pe 4 seturi aleatoare, ~570 de controale). De făcut de utilizator: importul backupului real și compararea cifrelor cu Panoul web.
 - [x] **3b. Widgeturile și notificările** (27.09.2026, adus înainte la cererea utilizatorului): „Cifre” și „Sarcini” în toate mărimile, notificări cu rezumatul zilei, butoane, setări pe categorii, cifra de pe iconiță. 87 de teste. Verificat pe iPad cu datele reale (widgeturi pe ecranul principal, 14 notificări programate la ora corectă, butoanele Amână / Efectuată).
-- [ ] 4. Panoul, Obiectivele, Istoricul, pagina obiectivului
+- [x] **4. Panoul, Obiectivele, Istoricul, pagina obiectivului** (27.09.2026): cadrul (bara laterală / bara de jos, ceasul, cifrele de pe meniu, Backup rapid), Panoul complet (casetele, secțiunile, activitățile de confirmat cu Efectuată / Anulată, mementoul sărbătorilor), Obiectivele și Istoricul cu căutare (text și dată), tipuri și cele 10 filtre, pagina obiectivului (date, GPS cu hărți, statistici, istoric). 93 de teste. Provizoriu până la etapele următoare: „Control nou” și deschiderea unui control (editorul, etapa 5), „Reprogramează” (etapa 6), Calendarul (etapa 6), Ghidul (etapa 8).
 - [ ] 5. Editorul controlului
 - [ ] 6. Calendarul, activitățile, raportul lunii
 - [ ] 7. Fișa, Text PV, tipărirea și partajarea

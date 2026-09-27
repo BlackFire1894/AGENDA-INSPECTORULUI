@@ -65,3 +65,10 @@ extension Color {
     static let kInc = Color(luminos: 0x475569, intunecat: 0xa5b4c8)
     static let kIncSoft = Color(luminos: 0xe2e8f0, intunecat: 0x1e293b)
 }
+
+// Neregula veche (css/app.css → --veche)
+extension Color {
+    static let veche = Color(luminos: 0xbe185d, intunecat: 0xf472b6)
+    static let vecheSoft = Color(luminos: 0xfce7f3, intunecat: 0x3b1328)
+    static let vecheInk = Color(luminos: 0x9d174d, intunecat: 0xfbcfe8)
+}

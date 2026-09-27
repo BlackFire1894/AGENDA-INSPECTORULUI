@@ -9,15 +9,7 @@ struct EcranSetari: View {
     @Environment(\.rem) private var rem
 
     var body: some View {
-        ScrollView {
-            ContinutSetari()
-                .padding(.top, 1.3333 * rem)
-                .padding(.horizontal, 1.5556 * rem)
-                .padding(.bottom, 6.6667 * rem)
-                .frame(maxWidth: 71.1111 * rem)
-                .frame(maxWidth: .infinity)
-        }
-        .background(Color.bg.ignoresSafeArea())
+        ScrollView { ContinutSetari().modifier(MargineEcran()) }
     }
 }
 
@@ -26,14 +18,16 @@ struct ContinutSetari: View {
     /// la capturile de verificare, secțiunea Notificări (care citește starea sistemului) se omite
     var inCaptura = false
     @Environment(Magazin.self) private var magazin
+    @Environment(Navigare.self) private var nav
     @Environment(Interfata.self) private var ui
     @Environment(\.rem) private var rem
     @State private var alegeFisier = false
 
     var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                AntetPagina(iconita: "settings", supratitlu: "Date, backup și informații", titlu: "Setări")
-                CardVerificare()
+                AntetPagina(iconita: "settings", supratitlu: "Date, backup și informații", titlu: "Setări") {
+                    Buton(text: "Ghidul aplicației", iconita: "book", tip: .primar) { nav.mergi(.ghid) }
+                }
                 sectiuneBackup
                 if !inCaptura { SectiuneNotificari() }
                 sectiuneStocare
@@ -57,7 +51,7 @@ struct ContinutSetari: View {
             Paragraf(text: "Butonul **Backup rapid** din Panou, din bara laterală și din fiecare control face exact același export ca butonul de aici. Datele sunt salvate **doar pe \(dsp("această tabletă", "acest telefon"))**. Exportă periodic un fișier de backup și salvează-l în **Fișiere → iCloud Drive** (sau alt loc sigur).")
             RandStare(eticheta: "Ultimul backup", valoare: ultimulBackup)
             RandButoane {
-                Buton(text: "Exportă backup", iconita: "download", tip: .primar, actiune: exporta)
+                Buton(text: "Exportă backup", iconita: "download", tip: .primar) { ui.exportaBackup(magazin) }
                 Buton(text: "Importă backup", iconita: "upload") { alegeFisier = true }
             }
         }
@@ -66,17 +60,6 @@ struct ContinutSetari: View {
     private var ultimulBackup: String {
         guard let l = magazin.meta.lastBackup, l.count >= 16 else { return "niciodată" }
         return "\(fmtDateLong(String(l.prefix(10)))), \(l.dropFirst(11).prefix(5))"
-    }
-
-    private func exporta() {
-        let f = magazin.pregatesteExport()
-        Partajare.fisier(nume: f.nume, text: f.text) { r in
-            switch r {
-            case .terminat: ui.toast(magazin.backupExportat())
-            case .anulat: ui.toast("Export anulat", avertizare: true)
-            case .esuat: ui.toast("Exportul a eșuat", avertizare: true)
-            }
-        }
     }
 
     private func citesteBackup(_ url: URL) {
@@ -169,37 +152,5 @@ struct FereastraImport: View {
         let mesaj = magazin.aplicaImport(p, inlocuieste: inlocuieste)
         ui.inchide()
         ui.toast(mesaj)
-    }
-}
-
-/// TEMPORAR (etapa 3): cifrele calculate de aplicația nativă, de comparat cu Panoul aplicației web.
-/// Dispare când apare Panoul (etapa 4).
-struct CardVerificare: View {
-    @Environment(Magazin.self) private var magazin
-    @Environment(\.rem) private var rem
-
-    var body: some View {
-        let azi = todayISO()
-        let z = cifreZi(magazin.controls, magazin.activitati, azi)
-        let achitate = allFines(magazin.controls, azi).filter { $0.st.level == "green" }.count
-        Card {
-            TitluSectiune(iconita: "shield", text: "Verificare (temporar, etapa 3)")
-            Paragraf(text: "Cifrele de mai jos sunt calculate de aplicația nativă din datele de pe \(dsp("această tabletă", "acest telefon")). Comparați-le cu **Panoul** aplicației web, pe aceleași date. Caseta dispare când apare Panoul (etapa 4).")
-            RandStare(eticheta: "Controale", valoare: "\(magazin.controls.count)")
-            RandStare(eticheta: "Activități", valoare: "\(magazin.activitati.count)")
-            RandStare(eticheta: "Amenzi active", valoare: amenzi(z) + (achitate > 0 ? " · + \(achitate) \(achitate == 1 ? "achitată" : "achitate")" : ""))
-            RandStare(eticheta: "Controale neîncheiate", valoare: "\(z.neincheiate)")
-            RandStare(eticheta: "Termene ASI 90 zile", valoare: "\(z.asi)")
-            RandStare(eticheta: "De încărcat", valoare: "\(z.deIncarcat)")
-            RandStare(eticheta: "Netrecute în PV", valoare: "\(z.netrecute)")
-            RandStare(eticheta: "Activități de confirmat", valoare: "\(z.deConfirmat)")
-            RandStare(eticheta: "Grupul comun cu widgetul", valoare: GrupComun.container != nil ? "disponibil" : "indisponibil")
-        }
-    }
-
-    private func amenzi(_ z: CifreZi) -> String {
-        let p = [(z.amenzi.rosu, "de trimis la ANAF"), (z.amenzi.galben, "cu termen de plată expirat"), (z.amenzi.albastru, "în curs")]
-            .filter { $0.0 > 0 }.map { "\($0.0) \($0.1)" }
-        return p.isEmpty ? "\(z.amenziActive)" : "\(z.amenziActive) (\(p.joined(separator: ", ")))"
     }
 }

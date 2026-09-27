@@ -20,23 +20,35 @@ enum Capturi {
         let iesire = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0].appendingPathComponent("capturi", isDirectory: true)
         try? FileManager.default.removeItem(at: iesire)
         try? FileManager.default.createDirectory(at: iesire, withIntermediateDirectories: true)
+        let nav = Navigare()
+        let obiectiv = objectives(magazin.controls).first { $0.controls.count > 1 }?.id ?? ""
         let ecrane: [(String, AnyView)] = [
-            ("setari", AnyView(ContinutSetari())),
+            ("panou", AnyView(ContinutPanou())),
+            ("obiective", AnyView(ContinutObiective())),
+            ("obiectiv", AnyView(ContinutObiectiv(id: obiectiv))),
+            ("istoric", AnyView(ContinutIstoric())),
+            ("setari", AnyView(ContinutSetari(inCaptura: true))),
         ]
+        // orizontal: 1180 − bara laterală (280); vertical: 820 (iPad Air 11")
+        let lat = max(latime, 1180), vert = min(latime, 820)
         for (nume, ecran) in ecrane {
+            for (orient, w, cuBara) in [("orizontal", lat - 15.5556 * 18, true), ("vertical", vert, false)] {
             for (tema, schema) in [("luminos", ColorScheme.light), ("intunecat", ColorScheme.dark)] {
                 let v = ecran
-                    .padding(.top, 1.3333 * 18).padding(.horizontal, 1.5556 * 18).padding(.bottom, 1.3333 * 18)
-                    .frame(width: latime)
+                    .modifier(MargineEcran())
+                    .frame(width: w)
                     .background(Color.bg)
                     .environment(magazin)
                     .environment(ui)
+                    .environment(nav)
+                    .environment(\.cuBaraLaterala, cuBara)
                     .environment(\.colorScheme, schema)
                 let r = ImageRenderer(content: v)
                 r.scale = 2
                 if let img = r.uiImage, let png = img.pngData() {
-                    try? png.write(to: iesire.appendingPathComponent("\(nume)-\(tema).png"))
+                    try? png.write(to: iesire.appendingPathComponent("\(nume)-\(orient)-\(tema).png"))
                 }
+            }
             }
         }
         widgeturi(magazin, iesire)

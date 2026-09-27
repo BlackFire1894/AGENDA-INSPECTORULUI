@@ -131,7 +131,6 @@ struct RandStare: View {
 // ───────── .page-head ─────────
 struct AntetPagina<Dreapta: View>: View {
     @Environment(\.rem) private var rem
-    @Environment(\.inFereastra) private var inFereastra
     let iconita: String
     let supratitlu: String
     let titlu: String
@@ -150,7 +149,6 @@ struct AntetPagina<Dreapta: View>: View {
             Spacer(minLength: 0)
             dreapta
         }
-        .padding(.top, inFereastra ? 1.6667 * rem : 0)   // sub butoanele ferestrei
         .padding(.bottom, 1.2222 * rem)
     }
 }

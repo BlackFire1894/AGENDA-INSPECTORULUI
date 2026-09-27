@@ -9,11 +9,13 @@ import path from 'node:path';
 
 // ceasul fix și identificatorii deterministi, ca în tests/nativ/exporta.mjs
 const ACUM = new Date('2026-10-15T09:00:00+03:00').getTime();
+let ceas = ACUM;   // ecranele web citesc ziua de azi din ceas (Panoul se generează în mai multe zile)
 const DateReal = Date;
 globalThis.Date = class extends DateReal {
-  constructor(...a) { super(...(a.length ? a : [ACUM])); }
-  static now() { return ACUM; }
+  constructor(...a) { super(...(a.length ? a : [ceas])); }
+  static now() { return ceas; }
 };
+globalThis.localStorage = { getItem: () => null, setItem() {}, removeItem() {} };
 let samantaUid = 7;
 Math.random = () => { samantaUid = (samantaUid * 1103515245 + 12345) % 2147483648; return samantaUid / 2147483648; };
 
@@ -199,6 +201,37 @@ const vechi = Array.from({ length: 40 }, (_, i) => {
   return { intrare: c, rezultat: M.normalizeControl(JSON.parse(JSON.stringify(c))) };
 });
 
+// ───────── ecranele web (js/views.js), ca HTML: Panou, Obiective, Istoric, pagina obiectivului, rândul controlului ─────────
+const V = await import('../../js/views.js');
+const S = await import('../../js/state.js');
+S.state.controls = date;
+S.state.activitati = activitati;
+S.state.meta = { lastBackup: null, sarbatoriVerificate: [] };
+const Q = ['', 'scoala', 'Șușani', '2026', date[3].dataInceput.split('-').reverse().join('.'), date[5].dataInceput.slice(0, 7).split('-').reverse().join('.'), 'xyz'];
+const FLT = [[], ['am-red'], ['asi', 'pv'], ['grave'], ['adapost', 'am-green'], ['inc'], ['sigiliu', 'am-yellow'], ['am-blue', 'grave', 'pv']];
+const ecrane = {
+  randuri: date.map((c) => ({ id: c.id, cu: V.controlRow(c), fara: V.controlRow(c, { showName: false }) })),
+  obiective: [], istoric: [],
+  pagini: M.objectives(date).map((o) => ({ id: o.id, html: V.viewObjective(o.id) })),
+  panou: [],
+};
+for (const q of Q) for (const [i, flt] of FLT.entries()) {
+  const tip = ['ALL', 'OPEC', 'LOCALITATE'][i % 3];
+  Object.assign(S.state.ui, { objSearch: q, objTip: tip, objFlt: new Set(flt) });
+  ecrane.obiective.push({ q, tip, flt, html: V.objListHTML() });
+  const st = ['ALL', 'OPEN', 'DONE'][(i + Q.indexOf(q)) % 3];
+  Object.assign(S.state.ui, { histSearch: q, histFilter: st, histFlt: new Set(flt) });
+  ecrane.istoric.push({ q, stare: st, flt, html: V.histListHTML() });
+}
+for (const [i, z] of ['2026-10-15', '2024-03-04', '2025-12-10', '2026-01-08', '2027-06-30', '2028-12-24', '2029-01-02', '2030-08-15'].entries()) {
+  ceas = new DateReal(`${z}T09:00:00+03:00`).getTime();
+  S.state.meta = { lastBackup: null, sarbatoriVerificate: i % 2 ? [Number(z.slice(0, 4)) + 1] : [] };
+  ecrane.panou.push({ azi: z, meta: S.state.meta, html: V.viewDashboard() });
+}
+S.state.controls = [];
+ecrane.panou.push({ azi: '2026-10-15', meta: { lastBackup: null, sarbatoriVerificate: [] }, gol: true, html: V.viewDashboard() });
+ceas = ACUM;
+
 fs.mkdirSync(path.dirname(iesire), { recursive: true });
-fs.writeFileSync(iesire, JSON.stringify({ acum: new Date(ACUM).toISOString(), controls: date, activitati, perControl, global, vechi }));
+fs.writeFileSync(iesire, JSON.stringify({ acum: new Date(ACUM).toISOString(), controls: date, activitati, perControl, global, vechi, ecrane }));
 console.log(`Scris: ${iesire} (${date.length} controale, ${activitati.length} activități, ${fs.statSync(iesire).size} octeți)`);

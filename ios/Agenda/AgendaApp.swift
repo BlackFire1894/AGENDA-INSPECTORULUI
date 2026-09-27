@@ -8,6 +8,7 @@ struct AgendaApp: App {
     @Environment(\.scenePhase) private var scenePhase
     @State private var magazin: Magazin
     @State private var ui = Interfata()
+    @State private var nav = Navigare()
 
     init() {
         // catalogul (docs/nativ/date/catalog.json) trebuie încărcat înaintea oricărui calcul
@@ -23,12 +24,23 @@ struct AgendaApp: App {
 
     var body: some Scene {
         WindowGroup {
-            EcranSetari()
+            Carcasa()
                 .modifier(StratInterfata())
                 .modifier(DetecteazaFereastra())
                 .environment(magazin)
                 .environment(ui)
+                .environment(nav)
                 .tint(Color.accent)
+                .onOpenURL { nav.deschide($0) }   // widgeturile: agenda://panou
+                #if DEBUG
+                .onAppear {
+                    // verificare: pornire direct pe un ecran (-ruta obiective / istoric / setari / obiectiv:<id>)
+                    let a = ProcessInfo.processInfo.arguments
+                    if let i = a.firstIndex(of: "-ruta"), i + 1 < a.count, let u = URL(string: "agenda://\(a[i + 1].replacingOccurrences(of: ":", with: "/"))") {
+                        if a[i + 1].hasPrefix("obiectiv:") { nav.mergi(.obiectiv(String(a[i + 1].dropFirst(9)))) } else { nav.deschide(u) }
+                    }
+                }
+                #endif
         }
         .onChange(of: scenePhase, initial: true) { _, faza in
             switch faza {
