@@ -272,6 +272,15 @@ for (const sel of [...date.slice(0, 40).map((c) => c.dataInceput), ...activitati
   ecrane.calendar.push({ an: +sel.slice(0, 4), luna: +sel.slice(5, 7) - 1, sel, tok: jetoane(V.viewCalendar()) });
 }
 
+// ───────── Ghidul: cuprinsul și capitolele găsite, pentru mai multe căutări ─────────
+ecrane.ghid = ['', 'sigiliu', 'amendă', 'AMENDA anaf', 'gps', 'verificări', 'xyz', 'backup rapid', 'ș', '  control   nou ', 'nec', 'restul conform'].map((q) => {
+  S.state.ui.ghidQuery = q;
+  const h = V.viewGhid();
+  const toc = h.match(/<nav class="m-toc card" aria-label="Cuprins">([\s\S]*?)<\/nav>/)[1].trim();
+  const lista = h.match(/<div id="ghid-list">([\s\S]*)<\/div>$/)[1];
+  return { q, toc, lista };
+});
+
 fs.mkdirSync(path.dirname(iesire), { recursive: true });
 fs.writeFileSync(iesire, JSON.stringify({ acum: new Date(ACUM).toISOString(), controls: date, activitati, perControl, global, vechi, ecrane }));
 console.log(`Scris: ${iesire} (${date.length} controale, ${activitati.length} activități, ${fs.statSync(iesire).size} octeți)`);

@@ -13,6 +13,7 @@ struct AgendaApp: App {
     @State private var ui = Interfata()
     @State private var nav = Navigare()
     @State private var ses = SesiuneEditor()
+    @State private var pref = Preferinte()
 
     init() {
         // catalogul (docs/nativ/date/catalog.json) trebuie încărcat înaintea oricărui calcul
@@ -47,6 +48,9 @@ struct AgendaApp: App {
                 .environment(ui)
                 .environment(nav)
                 .environment(ses)
+                .environment(pref)
+                .environment(\.rem, pref.rem)
+                .onAppear { pref.aplicaTema() }
                 .tint(Color.accent)
                 .onAppear {
                     // editorul: controlul se deschide înainte de a fi desenat; la ieșire, filtrul și căutarea se golesc

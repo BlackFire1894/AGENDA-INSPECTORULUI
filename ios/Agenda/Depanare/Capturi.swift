@@ -42,6 +42,7 @@ enum Capturi {
                     .environment(magazin)
                     .environment(ui)
                     .environment(nav)
+                    .environment(Preferinte())
                     .environment(\.cuBaraLaterala, cuBara)
                     .environment(\.colorScheme, schema)
                 let r = ImageRenderer(content: v)

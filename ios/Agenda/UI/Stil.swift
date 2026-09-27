@@ -223,15 +223,25 @@ struct RandButoane<Continut: View>: View {
     }
 }
 
-/// Așezare pe rânduri (`flex-wrap: wrap`)
+/// Așezare pe rânduri (`flex-wrap: wrap`); un element mai lat decât rândul primește lățimea rândului (textul se rupe)
 struct FlowLayout: Layout {
     var spatiu: CGFloat
+
+    /// mărimea elementului și propunerea cu care se așază (naturală, sau lățimea rândului dacă nu încape)
+    private func masura(_ s: LayoutSubview, _ latime: CGFloat) -> (CGSize, ProposedViewSize) {
+        let m = s.sizeThatFits(.unspecified)
+        if m.width > latime + 0.5, latime.isFinite {
+            let p = ProposedViewSize(width: latime, height: nil)
+            return (s.sizeThatFits(p), p)
+        }
+        return (m, .unspecified)
+    }
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
         let latime = proposal.width ?? .infinity
         var x: CGFloat = 0, y: CGFloat = 0, randInalt: CGFloat = 0, maxX: CGFloat = 0
         for s in subviews {
-            let m = s.sizeThatFits(.unspecified)
+            let (m, _) = masura(s, latime)
             if x > 0 && x + m.width > latime + 0.5 { x = 0; y += randInalt + spatiu; randInalt = 0 }
             x += m.width + spatiu
             maxX = max(maxX, x - spatiu)
@@ -242,21 +252,22 @@ struct FlowLayout: Layout {
 
     func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
         var x = bounds.minX, y = bounds.minY, randInalt: CGFloat = 0
-        var rand: [(LayoutSubview, CGSize)] = []
+        var rand: [(LayoutSubview, CGSize, ProposedViewSize)] = []
         func aseaza() {
             var xx = bounds.minX
-            for (s, m) in rand {
-                s.place(at: CGPoint(x: xx, y: y + (randInalt - m.height) / 2), proposal: ProposedViewSize(m))
+            for (s, m, p) in rand {
+                // mărimea naturală: un text pus exact la lățimea lui ideală se poate rupe din rotunjire
+                s.place(at: CGPoint(x: xx, y: y + (randInalt - m.height) / 2), proposal: p)
                 xx += m.width + spatiu
             }
         }
         for s in subviews {
-            let m = s.sizeThatFits(.unspecified)
+            let (m, p) = masura(s, bounds.width)
             if x > bounds.minX && x + m.width > bounds.maxX + 0.5 {
                 aseaza()
                 x = bounds.minX; y += randInalt + spatiu; randInalt = 0; rand = []
             }
-            rand.append((s, m))
+            rand.append((s, m, p))
             x += m.width + spatiu
             randInalt = max(randInalt, m.height)
         }
@@ -283,17 +294,19 @@ struct FlexWrap: Layout {
     /// `justify-content: space-between`: pe un rând cu mai multe elemente, locul rămas între ele; singur pe rând = la stânga
     var intre = false
 
-    private struct Rand { var elemente: [(i: Int, w: CGFloat)] = []; var latime: CGFloat = 0 }
+    private struct Rand { var elemente: [(i: Int, w: CGFloat, natural: Bool)] = []; var latime: CGFloat = 0 }
 
     private func randuri(_ latime: CGFloat, _ subviews: Subviews) -> [Rand] {
         var r: [Rand] = [], cur = Rand()
         for (i, s) in subviews.enumerated() {
             let f = s[CheieFlex.self]
-            let w = min(latime, f.baza ?? s.sizeThatFits(.unspecified).width)
+            let ideal = s.sizeThatFits(.unspecified).width
+            let w = min(latime, f.baza ?? ideal)
+            let natural = f.baza == nil && !f.creste && ideal <= latime
             let necesar = cur.elemente.isEmpty ? w : cur.latime + spatiu + w
             if !cur.elemente.isEmpty && necesar > latime + 0.5 { r.append(cur); cur = Rand() }
             cur.latime = cur.elemente.isEmpty ? w : cur.latime + spatiu + w
-            cur.elemente.append((i, w))
+            cur.elemente.append((i, w, natural))
         }
         if !cur.elemente.isEmpty { r.append(cur) }
         // locul rămas: la cele care cresc, altfel înaintea celui împins la dreapta
@@ -308,8 +321,12 @@ struct FlexWrap: Layout {
         return r
     }
 
+    private func propunere(_ e: (i: Int, w: CGFloat, natural: Bool)) -> ProposedViewSize {
+        e.natural ? .unspecified : ProposedViewSize(width: e.w, height: nil)
+    }
+
     private func inaltime(_ rand: Rand, _ subviews: Subviews) -> CGFloat {
-        rand.elemente.map { subviews[$0.i].sizeThatFits(ProposedViewSize(width: $0.w, height: nil)).height }.max() ?? 0
+        rand.elemente.map { subviews[$0.i].sizeThatFits(propunere($0)).height }.max() ?? 0
     }
 
     func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
@@ -328,13 +345,13 @@ struct FlexWrap: Layout {
             let pas = intre && rand.elemente.count > 1 && !rand.elemente.contains(where: { subviews[$0.i][CheieFlex.self].autoStanga })
                 ? liber / CGFloat(rand.elemente.count - 1) : 0
             var x = bounds.minX
-            for (i, w) in rand.elemente {
-                let s = subviews[i]
+            for e in rand.elemente {
+                let s = subviews[e.i]
                 if s[CheieFlex.self].autoStanga { x += liber }
-                let hs = s.sizeThatFits(ProposedViewSize(width: w, height: nil)).height
+                let hs = s.sizeThatFits(propunere(e)).height
                 let dy = aliniere == .top ? 0 : aliniere == .bottom ? h - hs : (h - hs) / 2
-                s.place(at: CGPoint(x: x, y: y + dy), anchor: .topLeading, proposal: ProposedViewSize(width: w, height: hs))
-                x += w + spatiu + pas
+                s.place(at: CGPoint(x: x, y: y + dy), anchor: .topLeading, proposal: e.natural ? .unspecified : ProposedViewSize(width: e.w, height: hs))
+                x += e.w + spatiu + pas
             }
             y += h + (spatiuRanduri ?? spatiu)
         }

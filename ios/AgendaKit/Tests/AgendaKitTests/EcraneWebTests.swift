@@ -247,6 +247,18 @@ final class EcraneWebTests: TestVectori {
         XCTAssertEqual(raportFileName(raportLunar([], [], 2026, 8, Mediu.AZI)), "Plan-lunar-2026-09.html")
     }
 
+    /// Ghidul: cuprinsul și capitolele găsite, același HTML ca `viewGhid` din web
+    func testGhidul() throws {
+        let g = try Ghid(data: Docs.date("ghid.json"))
+        XCTAssertEqual(g.capitole.count, 18)
+        let l = d.obj("ecrane").arr("ghid").compactMap(\.obiect)
+        guard !l.isEmpty else { throw XCTSkip("Fișierul verificării încrucișate e vechi (rulați ios/teste.sh)") }
+        for x in l {
+            XCTAssertEqual(g.cuprinsHTML(x.str("q")), x.str("toc"), "cuprinsul pentru „\(x.str("q"))”")
+            XCTAssertEqual(g.listaHTML(x.str("q")), x.str("lista"), "capitolele pentru „\(x.str("q"))”")
+        }
+    }
+
     func testTextele() {
         XCTAssertEqual(hintText(""), "Scrieți numele obiectivului sau o dată: 12.09.2026, 09.2026 sau 2026.")
         XCTAssertEqual(hintText("10.2026"), "Controale din octombrie 2026")

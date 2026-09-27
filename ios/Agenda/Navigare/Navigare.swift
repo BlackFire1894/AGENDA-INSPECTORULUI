@@ -37,6 +37,12 @@ enum Ruta: Hashable {
 @Observable
 final class Navigare {
     var ruta: Ruta = .panou
+    /// ecranul dinainte (Ghidul: „Înapoi”, ca `history.back()`)
+    private(set) var anterioara: Ruta?
+    /// căutarea din Ghid (ține cât e deschisă aplicația)
+    var cautareGhid = ""
+    /// capitolul la care se deschide Ghidul (`#/ghid/<id>`)
+    var ghidCapitol: String?
     /// de unde s-a deschis un control (meniul rămâne evidențiat acolo)
     var inapoiLa: Ruta = .panou
 
@@ -83,6 +89,7 @@ final class Navigare {
             if case .fisa = r {} else { inapoiLa = r }
             if case .control = ruta { laIesireControl?() }
         }
+        if r != ruta { anterioara = ruta }
         ruta = r
     }
 
@@ -104,6 +111,7 @@ final class Navigare {
         case "luna" where parti.count > 1: mergi(.luna(parti[1]))
         case "fisa" where parti.count > 1: mergi(.fisa(parti[1]))
         case "setari": mergi(.setari)
+        case "ghid": ghidCapitol = parti.count > 1 ? parti[1] : nil; mergi(.ghid)
         default: mergi(.panou)
         }
     }

@@ -2,8 +2,8 @@ import SwiftUI
 import UniformTypeIdentifiers
 import AgendaKit
 
-// Setări (js/views.js → viewSettings). Etapa 3: secțiunile Backup, Stocare (date demonstrative) și Zonă periculoasă,
-// cu textele din web. Mărimea textului, tema, actualizările, termenele și sărbătorile legale vin în etapa 8.
+// Setări (js/views.js → viewSettings): mărimea textului, tema, backupul, notificările (adăugire nativă), stocarea,
+// versiunea, regulile termenelor, sărbătorile legale, zona periculoasă — cu textele din web.
 
 struct EcranSetari: View {
     @Environment(\.rem) private var rem
@@ -20,17 +20,24 @@ struct ContinutSetari: View {
     @Environment(Magazin.self) private var magazin
     @Environment(Navigare.self) private var nav
     @Environment(Interfata.self) private var ui
+    @Environment(Preferinte.self) private var pref
     @Environment(\.rem) private var rem
     @State private var alegeFisier = false
+    @State private var anDeschis: Set<Int> = []
 
     var body: some View {
             VStack(alignment: .leading, spacing: 0) {
                 AntetPagina(iconita: "settings", supratitlu: "Date, backup și informații", titlu: "Setări") {
                     Buton(text: "Ghidul aplicației", iconita: "book", tip: .primar) { nav.mergi(.ghid) }
                 }
+                sectiuneMarime
+                sectiuneTema
                 sectiuneBackup
                 if !inCaptura { SectiuneNotificari() }
                 sectiuneStocare
+                sectiuneVersiune
+                sectiuneTermene
+                sectiuneSarbatori
                 zonaPericuloasa
                 Text("Agenda inspectorului · v\(K.versiuneAplicatieWeb) · funcționează offline")
                     .font(.system(size: rem))
@@ -40,6 +47,42 @@ struct ContinutSetari: View {
             }
         .fileImporter(isPresented: $alegeFisier, allowedContentTypes: [.json]) { rezultat in
             if case .success(let url) = rezultat { citesteBackup(url) }
+        }
+    }
+
+    // ───────── Mărimea textului, tema ─────────
+
+    private var sectiuneMarime: some View {
+        Card {
+            TitluSectiune(iconita: "settings", text: "Mărimea textului")
+            Paragraf(text: "Se aplică imediat în toată aplicația: text, butoane, spațieri și iconițe se ajustează împreună.")
+            Grid(horizontalSpacing: 0.6667 * rem) {
+                GridRow {
+                    ForEach(MARIMI_TEXT, id: \.key) { f in
+                        OptiuneMare(ales: pref.marimeText == f.key, eticheta: f.label, indiciu: f.hint) {
+                            Text("Aa").font(.system(size: f.px + 8, weight: .heavy))
+                        } alege: { pref.marimeText = f.key }
+                    }
+                }
+            }
+            .padding(.top, 0.2222 * rem)
+        }
+    }
+
+    private var sectiuneTema: some View {
+        Card {
+            TitluSectiune(iconita: "moon", text: "Tema")
+            Paragraf(text: "**Automat** urmează \(dsp("iPad-ul", "telefonul")) (Setări → Afișaj și luminozitate): luminoasă ziua, întunecată seara, dacă așa e setat. Sau alegeți una fixă.")
+            Grid(horizontalSpacing: 0.6667 * rem) {
+                GridRow {
+                    ForEach(temeAplicatie(), id: \.key) { t in
+                        OptiuneMare(ales: pref.tema == t.key, eticheta: t.label, indiciu: t.hint) {
+                            Iconita(nume: t.ic, marime: 1.7778 * rem)
+                        } alege: { pref.tema = t.key }
+                    }
+                }
+            }
+            .padding(.top, 0.2222 * rem)
         }
     }
 
@@ -99,6 +142,89 @@ struct ContinutSetari: View {
         }
     }
 
+    // ───────── Versiunea, termenele, sărbătorile ─────────
+
+    private var sectiuneVersiune: some View {
+        Card {
+            TitluSectiune(iconita: "upload", text: "Actualizări")
+            RandStare(eticheta: "Versiunea instalată", valoare: K.versiuneAplicatieWeb)
+            Paragraf(text: "Aplicația urmează versiunea aplicației web cu același număr. O versiune nouă se instalează de pe Mac; datele rămân.")
+        }
+    }
+
+    private var sectiuneTermene: some View {
+        Card {
+            TitluSectiune(iconita: "hourglass", text: "Cum se calculează termenele")
+            VStack(alignment: .leading, spacing: 0.5556 * rem) {
+                regula("**Toate termenele** curg de la data de referință + 1 zi, după data și ora \(dsp("tabletei", "telefonului")).")
+                VStack(alignment: .leading, spacing: 0.3333 * rem) {
+                    regula("**Amendă:** data aplicării (implicit data încheierii controlului).")
+                    ForEach([(Color.blue, "zilele 1–15: în curs"), (Color.yellow, "zilele 16–39: termenul de 15 zile expirat"),
+                             (Color.red, "din ziua 40: „Mai aveți 5 zile până să o trimiteți la ANAF” (termen: ziua 45)"),
+                             (Color.green, "achitată, cu dovadă primită")], id: \.1) { c, t in
+                        HStack(spacing: 0.5556 * rem) {
+                            Circle().fill(c).frame(width: 0.6667 * rem, height: 0.6667 * rem)
+                            Text(t).font(.system(size: rem)).foregroundStyle(Color.text).fixedSize(horizontal: false, vertical: true)
+                        }
+                        .padding(.leading, 1.2222 * rem)
+                    }
+                }
+                regula("**ASI:** 90 de zile de la data încheierii controlului; dacă documentația nu a fost prezentată, încă 5 zile calendaristice pentru constatarea pierderii valabilității.")
+                regula("**Încărcarea** în aplicația ISU și a documentului: 3 zile lucrătoare de la data încheierii.")
+                regula("Termenele care cad într-o zi nelucrătoare (weekend sau sărbătoare legală) **nu se mută automat**; aplicația vă avertizează și vă recomandă următoarea zi lucrătoare; verificați prelungirea.")
+            }
+        }
+    }
+
+    private func regula(_ t: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 0.5556 * rem) {
+            Text("•").font(.system(size: rem, weight: .bold))
+            textBogat(t).font(.system(size: rem)).lineSpacing(0.2 * rem).fixedSize(horizontal: false, vertical: true)
+        }
+        .foregroundStyle(Color.text)
+    }
+
+    private var sectiuneSarbatori: some View {
+        let an0 = Int(todayISO().prefix(4)) ?? 2026
+        return Card {
+            TitluSectiune(iconita: "calendar", text: "Sărbători legale")
+            Paragraf(text: "Calculate automat (datele fixe și Paștele ortodox), după art. 139 din Codul muncii. Dacă legea se schimbă, aplicația trebuie actualizată; în decembrie, Panoul vă cere să verificați lista pentru anul următor.")
+            ForEach([an0, an0 + 1], id: \.self) { an in
+                let l = sarbatoriLegale(an).lista.sorted { $0.data < $1.data }
+                let verificata = magazin.meta.sarbatoriVerificate.contains(an)
+                VStack(alignment: .leading, spacing: 0) {
+                    Button { withAnimation { if !anDeschis.insert(an).inserted { anDeschis.remove(an) } } } label: {
+                        HStack(spacing: 0.4444 * rem) {
+                            Iconita(nume: anDeschis.contains(an) ? "chevD" : "chevR", marime: rem)
+                            Text("\(an) — \(l.count) zile\(verificata ? " · verificată" : "")").font(.system(size: rem, weight: .bold))
+                        }
+                        .foregroundStyle(Color.text).frame(minHeight: 44)
+                    }
+                    .buttonStyle(.plain)
+                    if anDeschis.contains(an) {
+                        VStack(alignment: .leading, spacing: 0.2222 * rem) {
+                            ForEach(Array(l.enumerated()), id: \.offset) { _, x in
+                                (Text("•  ") + Text(fmtDateLong(x.data)).bold() + Text(" — \(x.nume)")).font(.system(size: rem)).foregroundStyle(Color.text)
+                                    .fixedSize(horizontal: false, vertical: true)
+                            }
+                        }
+                        .padding(.leading, 0.6667 * rem).padding(.bottom, 0.6667 * rem)
+                        if !verificata {
+                            Buton(text: "Am verificat lista pentru \(an)", iconita: "check", mare: false) {
+                                var m = magazin.meta
+                                if !m.sarbatoriVerificate.contains(an) { m.sarbatoriVerificate.append(an) }
+                                magazin.seteazaMeta(m)
+                                ui.toast("Lista sărbătorilor legale pentru \(an) a fost marcată verificată")
+                            }
+                            .padding(.bottom, 0.6667 * rem)
+                        }
+                    }
+                }
+            }
+        }
+        .id("sarbatori")
+    }
+
     // ───────── Zonă periculoasă ─────────
 
     private var zonaPericuloasa: some View {
@@ -152,5 +278,33 @@ struct FereastraImport: View {
         let mesaj = magazin.aplicaImport(p, inlocuieste: inlocuieste)
         ui.inchide()
         ui.toast(mesaj)
+    }
+}
+
+/// `.font-opt`: o variantă mare (mărimea textului, tema)
+struct OptiuneMare<Mostra: View>: View {
+    @Environment(\.rem) private var rem
+    let ales: Bool
+    let eticheta: String
+    let indiciu: String
+    @ViewBuilder var mostra: Mostra
+    let alege: () -> Void
+
+    var body: some View {
+        Button(action: alege) {
+            VStack(spacing: 0.2222 * rem) {
+                mostra
+                Text(eticheta).font(.system(size: rem, weight: .bold))
+                Text(indiciu).font(.system(size: 0.8333 * rem, weight: .semibold)).foregroundStyle(ales ? Color.accentInk : Color.muted)
+                    .multilineTextAlignment(.center)
+            }
+            .foregroundStyle(ales ? Color.accentInk : Color.text)
+            .padding(0.4444 * rem)
+            .frame(maxWidth: .infinity, minHeight: max(88, 6 * rem))
+            .background(ales ? Color.accentSoft : Color.surface2, in: RoundedRectangle(cornerRadius: rem, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: rem, style: .continuous).strokeBorder(ales ? Color.accent : Color.line, lineWidth: 2.5))
+        }
+        .buttonStyle(ApasareRand())
+        .accessibilityAddTraits(ales ? .isSelected : [])
     }
 }
