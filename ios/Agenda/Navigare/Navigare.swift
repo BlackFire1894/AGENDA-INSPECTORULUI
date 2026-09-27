@@ -8,13 +8,15 @@ import AgendaKit
 enum Ruta: Hashable {
     case panou, obiective, obiectiv(String), calendar, istoric, setari, ghid
     case control(id: String, tab: String, focus: String?)
+    /// Planul lunar („2026-10”)
+    case luna(String)
 
     /// elementul de meniu evidențiat
     var meniu: String {
         switch self {
         case .panou: return "panou"
         case .obiective, .obiectiv: return "obiective"
-        case .calendar: return "calendar"
+        case .calendar, .luna: return "calendar"
         case .istoric: return "istoric"
         case .setari: return "setari"
         case .ghid: return "ghid"
@@ -44,6 +46,28 @@ final class Navigare {
     var cautareIstoric = ""
     var stareIstoric = "ALL"
     var filtreIstoric: [String] = []
+    // Calendar: luna afișată (0–11) și ziua selectată
+    var calAn: Int
+    var calLuna: Int
+    var calSelectat: String
+    /// ultima zi văzută de aplicație (zi nouă: calendarul trece pe azi, dacă era pe ziua de ieri)
+    @ObservationIgnored private var ultimaZi: String
+
+    init() {
+        let azi = todayISO()
+        calAn = Int(azi.prefix(4)) ?? 2026
+        calLuna = (Int(azi.dropFirst(5).prefix(2)) ?? 1) - 1
+        calSelectat = azi
+        ultimaZi = azi
+    }
+
+    /// `dayChanged()` din web
+    func verificaZiua() {
+        let azi = todayISO()
+        guard azi != ultimaZi else { return }
+        if calSelectat == ultimaZi { calAn = Int(azi.prefix(4)) ?? calAn; calLuna = (Int(azi.dropFirst(5).prefix(2)) ?? 1) - 1; calSelectat = azi }
+        ultimaZi = azi
+    }
 
     /// editorul: deschiderea unui control (id, tab, element) și ieșirea din control
     @ObservationIgnored var laDeschidereControl: ((String, String, String?) -> Void)?
@@ -72,6 +96,7 @@ final class Navigare {
         case "obiective": mergi(.obiective)
         case "istoric": mergi(.istoric)
         case "calendar": mergi(.calendar)
+        case "luna" where parti.count > 1: mergi(.luna(parti[1]))
         case "setari": mergi(.setari)
         default: mergi(.panou)
         }

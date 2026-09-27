@@ -86,7 +86,8 @@ struct Ecran: View {
             case .obiectiv(let id): EcranObiectiv(id: id)
             case .istoric: EcranIstoric()
             case .setari: EcranSetari()
-            case .calendar: EcranProvizoriu(iconita: "calendar", supratitlu: "Plan lunar", titlu: "Calendar", etapa: "Calendarul, activitățile și raportul lunii vin în etapa 6.")
+            case .calendar: EcranCalendar()
+            case .luna(let id): EcranLuna(id: id)
             case .ghid: EcranProvizoriu(iconita: "book", supratitlu: "Manualul aplicației", titlu: "Ghidul aplicației", etapa: "Ghidul aplicației vine în etapa 8.")
             case .control(let id, _, _): EcranControl(id: id)
             }
@@ -306,6 +307,8 @@ struct AntetInapoi<Dreapta: View>: View {
     let supratitlu: String
     let titlu: String
     var eticheta: String? = nil
+    /// iconița din fața supratitlului (`.eyebrow`)
+    var iconita: String? = nil
     let inapoi: () -> Void
     @ViewBuilder var dreapta: Dreapta
 
@@ -330,7 +333,11 @@ struct AntetInapoi<Dreapta: View>: View {
                 .accessibilityLabel("Înapoi")
                 VStack(alignment: .leading, spacing: 0.3333 * rem) {
                     if let eticheta { EtichetaTip(text: eticheta) } else {
-                        Text(supratitlu).font(.system(size: 0.8889 * rem, weight: .semibold)).foregroundStyle(Color.muted)
+                        HStack(spacing: 0.4444 * rem) {
+                            if let iconita { Iconita(nume: iconita, marime: 1.1111 * rem) }
+                            Text(supratitlu).font(.system(size: 0.8889 * rem, weight: .semibold))
+                        }
+                        .foregroundStyle(Color.muted)
                     }
                     Text(titlu).font(.system(size: 1.8889 * rem, weight: .heavy)).tracking(-0.015 * 1.8889 * rem).foregroundStyle(Color.text)
                 }

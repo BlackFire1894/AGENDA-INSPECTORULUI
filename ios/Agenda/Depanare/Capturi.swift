@@ -27,6 +27,7 @@ enum Capturi {
             ("obiective", AnyView(ContinutObiective())),
             ("obiectiv", AnyView(ContinutObiectiv(id: obiectiv))),
             ("istoric", AnyView(ContinutIstoric())),
+            ("calendar", AnyView(ContinutCalendar())),
             ("setari", AnyView(ContinutSetari(inCaptura: true))),
         ]
         // orizontal: 1180 − bara laterală (280); vertical: 820 (iPad Air 11")

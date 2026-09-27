@@ -42,11 +42,10 @@ struct TabObiectiv: View {
             .id("sec-perioada")
             if let i = m.incarcare { Incarcare(m: i).id("sec-incarcare") }
             Card {
-                FlexWrap(spatiu: 0.7778 * rem) {
+                FlexWrap(spatiu: 0.7778 * rem, intre: true) {
                     TitluSectiune(iconita: "layers", text: "Construcții").padding(.bottom, -0.7778 * rem)
                     Pasi(numar: m.constructii.count, unitate: m.constructii.count == 1 ? "construcție" : "construcții",
                          minus: { ses.click("constr-dec") }, plus: { ses.click("constr-inc") })
-                        .flexDreapta()
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.bottom, 0.7778 * rem)
@@ -95,7 +94,7 @@ struct TabObiectiv: View {
                     .font(.system(size: 0.8333 * rem, weight: .semibold)).foregroundStyle(Color.red)
                 }
             } else {
-                FlexWrap(spatiu: 0.6667 * rem) {
+                FlexWrap(spatiu: 0.6667 * rem, intre: true) {
                     HStack(spacing: 0.4444 * rem) {
                         Iconita(nume: "clock", marime: 1.3333 * rem)
                         Text("Control în desfășurare").font(.system(size: rem, weight: .bold))
@@ -103,7 +102,6 @@ struct TabObiectiv: View {
                     .foregroundStyle(Color.accent)
                     .padding(.leading, 0.4444 * rem)
                     Buton(text: "Încheie controlul", iconita: "check", tip: .succes) { ses.click("close-control") }
-                        .flexDreapta()
                 }
                 .padding(0.4444 * rem)
                 .frame(maxWidth: .infinity, minHeight: tinta(3.1111 * rem), alignment: .leading)

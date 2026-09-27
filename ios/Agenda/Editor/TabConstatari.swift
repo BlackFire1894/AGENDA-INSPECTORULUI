@@ -98,7 +98,7 @@ struct RanduriAdaugate: View {
 
     var body: some View {
         Card {
-            FlexWrap(spatiu: 0.7778 * rem) {
+            FlexWrap(spatiu: 0.7778 * rem, intre: true) {
                 Button { ses.click("cat-toggle", ["cat": m.cat]) } label: {
                     HStack(spacing: 0.5556 * rem) {
                         Iconita(nume: m.numar == nil ? "plus" : "chevD", marime: 1.4444 * rem).foregroundStyle(Color.accent)
@@ -113,7 +113,6 @@ struct RanduriAdaugate: View {
                 .buttonStyle(.plain)
                 .disabled(m.dezactivat)
                 Buton(text: "Adaugă rând", iconita: "plus", tip: .primar, mare: false) { ses.click("ner-add", ["sec": sec]) }
-                    .flexDreapta()
             }
             .frame(maxWidth: .infinity, alignment: .leading)
             .padding(.bottom, m.restrans ? 0 : 0.7778 * rem)
@@ -228,7 +227,7 @@ struct BaraFiltru: View {
     let sec: String
 
     var body: some View {
-        FlexWrap(spatiu: 0.6667 * rem) {
+        FlexWrap(spatiu: 0.6667 * rem, intre: true) {
             Segment(m: ModelSegment(cale: "", optiuni: filtru.map { ($0.key, $0.text) }, ales: filtru.first(where: \.activ)?.key ?? ""), stil: .filtru) {
                 ses.click("ner-filter", ["val": $0])
             }
@@ -244,7 +243,6 @@ struct BaraFiltru: View {
                     .overlay(RoundedRectangle(cornerRadius: 0.7778 * rem, style: .continuous).strokeBorder(Color.green.mix(with: .line, by: 0.55), lineWidth: 1.5))
                 }
                 .buttonStyle(ApasareRand())
-                .flexDreapta()
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)

@@ -116,13 +116,7 @@ struct ContinutPanou: View {
                 .padding(.bottom, 0.6667 * rem)
             VStack(spacing: 0.5556 * rem) {
                 ForEach(l.map { modelActivitate($0, magazin.controls, confirmare: true) }) { a in
-                    RandActivitate(a: a) { buton in
-                        switch buton {
-                        case "Efectuată": if let t = magazin.seteazaStareActivitate(a.id, "efectuat") { ui.toast(t) }
-                        case "Anulată": if let t = magazin.seteazaStareActivitate(a.id, "anulat") { ui.toast(t) }
-                        default: ui.toast("Reprogramarea se face în Calendar, care vine în etapa 6.", avertizare: true)
-                        }
-                    }
+                    RandActivitate(a: a)
                 }
             }
         }
@@ -420,61 +414,6 @@ struct ElementVedere: View {
         case "blue": return .blueInk
         default: return .text
         }
-    }
-}
-
-/// `.act-item`: o activitate, cu starea și butoanele
-struct RandActivitate: View {
-    @Environment(\.rem) private var rem
-    let a: ModelActivitate
-    let apasa: (String) -> Void
-
-    var body: some View {
-        let culoare = culoareActivitate(a.tip)
-        FlowLayout(spatiu: 0.6667 * rem) {
-            VStack(alignment: .leading, spacing: 0.1111 * rem) {
-                Text(a.tipText.uppercased()).font(.system(size: 0.8333 * rem, weight: .heavy)).tracking(0.03 * 0.8333 * rem).foregroundStyle(culoare)
-                Text(a.titlu).font(.system(size: rem, weight: .bold)).foregroundStyle(Color.text)
-                Text(a.cand).font(.system(size: 0.8889 * rem, weight: .semibold)).foregroundStyle(Color.muted)
-            }
-            .frame(minWidth: 14 * rem, alignment: .leading)
-            HStack(spacing: 0.4444 * rem) {
-                VederePastila(p: a.stare)
-                ForEach(a.butoane, id: \.self) { b in
-                    Button { apasa(b) } label: {
-                        HStack(spacing: 0.2778 * rem) {
-                            Iconita(nume: b == "Efectuată" ? "check" : b == "Anulată" ? "x" : "calendar", marime: rem)
-                            Text(b)
-                        }
-                        .font(.system(size: 0.8333 * rem, weight: .semibold))
-                        .foregroundStyle(b == "Efectuată" ? Color.greenInk : Color.text)
-                        .padding(.horizontal, 0.7778 * rem)
-                        .frame(minHeight: tinta(2.2222 * rem))
-                        .background(Color.surface2, in: Capsule())
-                        .overlay(Capsule().strokeBorder(b == "Efectuată" ? Color.green.opacity(0.45) : Color.line, lineWidth: 1.5))
-                    }
-                    .buttonStyle(.plain)
-                }
-            }
-        }
-        .padding(.vertical, 0.5556 * rem).padding(.horizontal, 0.7778 * rem)
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .background(culoare.opacity(0.08).mix(with: .surface, by: 0), in: RoundedRectangle(cornerRadius: 0.8889 * rem, style: .continuous))
-        .background(Color.surface, in: RoundedRectangle(cornerRadius: 0.8889 * rem, style: .continuous))
-        .overlay(alignment: .leading) { Rectangle().fill(culoare).frame(width: 0.3333 * rem).clipShape(RoundedRectangle(cornerRadius: 2)) }
-    }
-}
-
-/// Culoarea tipului de activitate (css: .act-*)
-func culoareActivitate(_ tip: String) -> Color {
-    switch tip {
-    case "instruire": return Color(luminos: 0x0f766e, intunecat: 0x2dd4bf)
-    case "sedinta": return Color(luminos: 0x1d4ed8, intunecat: 0x7aa2ff)
-    case "birou": return Color(luminos: 0x475569, intunecat: 0xa5b4c8)
-    case "informare": return Color(luminos: 0xbe185d, intunecat: 0xf472b6)
-    case "exercitiu": return Color(luminos: 0xc2410c, intunecat: 0xfb923c)
-    case "concediu": return Color(luminos: 0x15803d, intunecat: 0x4ade80)
-    default: return Color(luminos: 0x6b7280, intunecat: 0x9ca3af)
     }
 }
 

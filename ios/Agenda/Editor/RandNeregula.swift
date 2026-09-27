@@ -353,9 +353,9 @@ struct ConstrSelectVedere: View {
                         .font(.system(size: 0.8333 * rem, weight: .semibold)).foregroundStyle(Color.muted)
                         .padding(.horizontal, 0.4444 * rem).padding(.top, 0.2222 * rem)
                     }
-                    FlexWrap(spatiu: 0.5 * rem) {
+                    FlexWrap(spatiu: 0.5 * rem, intre: true) {
                         Buton(text: "Toate construcțiile", iconita: "check", mare: false) { ses.click("constr-opt-all", ["key": m.key]) }.disabled(m.toate)
-                        Buton(text: "Gata", tip: .primar, mare: false) { ses.click("constr-pick", ["key": m.key]) }.flexDreapta()
+                        Buton(text: "Gata", tip: .primar, mare: false) { ses.click("constr-pick", ["key": m.key]) }
                     }
                     .padding(.top, 0.4444 * rem)
                     .overlay(alignment: .top) { Rectangle().fill(Color.line).frame(height: 1) }

@@ -126,6 +126,10 @@ final class DemoTests: TestVectori {
             ("zile", .array(zileR)),
         ]))
         XCTAssertJSON(j, d["raportOctombrie"].sau, "raportOctombrie")
+        // documentul: același HTML, caracter cu caracter
+        let html = raportMarkup(r, controls, acum: Mediu.ACUM)
+        XCTAssertEqual(html, d.str("raportOctombrieHtml"))
+        if html != d.str("raportOctombrieHtml") { print(Jetoane.diferenta(html.replacingOccurrences(of: "<", with: " <"), d.str("raportOctombrieHtml").replacingOccurrences(of: "<", with: " <"))) }
     }
 
     func testWidgeturileSiNotificarile() {

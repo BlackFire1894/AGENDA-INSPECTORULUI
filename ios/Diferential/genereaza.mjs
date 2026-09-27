@@ -178,7 +178,10 @@ const global = {
   rapoarte: Array.from({ length: 30 }, () => {
     const an = intre(2024, 2030), luna = intre(0, 11), azi = zi();
     const r = A.raportLunar(date, activitati, an, luna, azi);
-    return { an, luna, azi, r: { ...r, controale: r.controale.map((c) => c.id), amenzi: r.amenzi.map((x) => ({ control: x.c.id, key: x.n.key, data: x.data, suma: x.suma })), efectuate: r.efectuate.map((a) => a.id), planificate: r.planificate.map((a) => a.id), anulate: r.anulate.map((a) => a.id), zile: r.zile.map(([z, x]) => [z, { controale: x.controale.map((c) => c.id), activitati: x.activitati.map((a) => a.id) }]) } };
+    // datele întâi: raportMarkup sortează lista amenzilor pe loc
+    const rec = { an, luna, azi, r: { ...r, controale: r.controale.map((c) => c.id), amenzi: r.amenzi.map((x) => ({ control: x.c.id, key: x.n.key, data: x.data, suma: x.suma })), efectuate: r.efectuate.map((a) => a.id), planificate: r.planificate.map((a) => a.id), anulate: r.anulate.map((a) => a.id), zile: r.zile.map(([z, x]) => [z, { controale: x.controale.map((c) => c.id), activitati: x.activitati.map((a) => a.id) }]) } };
+    rec.html = A.raportMarkup(r, date, new Date(ACUM));
+    return rec;
   }),
   activitati: activitati.map((a) => ({ id: a.id, titlu: A.titluActivitate(a), cand: A.cand(a), zile: A.zileActivitate(a) })),
   peZile: zileGlobale.map((d) => ({ d, deConfirmat: A.deConfirmat(activitati, d).map((a) => a.id), inZi: A.activitatiInZi(activitati, d).map((a) => a.id), libera: A.ziLibera(d, '2026-10-15') })),
@@ -231,6 +234,40 @@ for (const [i, z] of ['2026-10-15', '2024-03-04', '2025-12-10', '2026-01-08', '2
 S.state.controls = [];
 ecrane.panou.push({ azi: '2026-10-15', meta: { lastBackup: null, sarbatoriVerificate: [] }, gol: true, html: V.viewDashboard() });
 ceas = ACUM;
+
+// ───────── calendarul: grila, ziua selectată (ca șir de jetoane: texte, pastile, butoane, clasele de stare) ─────────
+const STARE_CAL = /^(out|is-liber|is-today|is-sel|ev-(open|done|act|liber|sarb)|st-(planificat|efectuat|anulat)|act-(instruire|sedinta|birou|informare|exercitiu|concediu|alta)|dot-\w+|item-(blue|green|yellow|red|warn|open))$/;
+const atribut = (a, n) => { const m = a.match(new RegExp(`\\s${n}="([^"]*)"`)); return m ? m[1] : null; };
+const dec = (x) => x.replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&amp;/g, '&');
+function jetoane(html) {
+  let s = html.replace(/<svg[\s\S]*?<\/svg>/g, '');
+  s = s.replace(/<span class="pill ([^"]+)"([^>]*)>([\s\S]*?)<\/span>/g, (m, cls, a, t) => {
+    const l = cls.split(/\s+/);
+    const tip = l.find((x) => x.startsWith('fs-')) || (l.find((x) => x.startsWith('pill-')) || 'pill-?').slice(5);
+    return ` ⟦${tip}|${t.trim()}⟧ `;
+  });
+  s = s.replace(/<(\w+)\b([^>]*)>/g, (m, t, a) => {
+    const cls = (atribut(a, 'class') || '').split(/\s+/).filter(Boolean);
+    const st = cls.filter((x) => STARE_CAL.test(x)).map((x) => `.${x}`).join('');
+    if (t === 'button' || t === 'a') return ` ⟦b${st}⟧ `;
+    return st ? ` ⟦${st}⟧ ` : ' ';
+  });
+  s = dec(s.replace(/<[^>]+>/g, ' '));
+  return s.split(/\s+/).filter(Boolean).join(' ').replace(/\s+([.,;:])/g, '$1');
+}
+S.state.controls = date;
+S.state.activitati = activitati;
+ecrane.calendar = [];
+for (const [y, m, sel] of [[2026, 9, '2026-10-15'], [2026, 9, '2026-10-03'], [2026, 11, '2026-12-25'], [2027, 0, '2027-01-01'], [2025, 4, '2025-05-20'],
+  [2028, 1, '2028-02-29'], [2030, 7, '2030-08-15'], [2024, 2, '2024-03-31'], [2029, 3, '2029-04-16'], [2026, 5, '2026-06-01']]) {
+  Object.assign(S.state.ui, { calYear: y, calMonth: m, calSelected: sel });
+  ecrane.calendar.push({ an: y, luna: m, sel, tok: jetoane(V.viewCalendar()) });
+}
+// și ziua selectată pe controale și pe activități
+for (const sel of [...date.slice(0, 40).map((c) => c.dataInceput), ...activitati.slice(0, 20).map((a) => a.data)]) {
+  Object.assign(S.state.ui, { calYear: +sel.slice(0, 4), calMonth: +sel.slice(5, 7) - 1, calSelected: sel });
+  ecrane.calendar.push({ an: +sel.slice(0, 4), luna: +sel.slice(5, 7) - 1, sel, tok: jetoane(V.viewCalendar()) });
+}
 
 fs.mkdirSync(path.dirname(iesire), { recursive: true });
 fs.writeFileSync(iesire, JSON.stringify({ acum: new Date(ACUM).toISOString(), controls: date, activitati, perControl, global, vechi, ecrane }));

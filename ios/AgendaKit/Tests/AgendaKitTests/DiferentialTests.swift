@@ -183,6 +183,10 @@ final class DiferentialTests: TestVectori {
                 ("libere", .array(r.libere.map(\.json))), ("zileLuna", n(r.zileLuna)), ("lucratoare", n(r.lucratoare)), ("zile", .array(zile)),
             ]))
             compara(j, x["r"], "raportul \(x.int("luna")! + 1)/\(x.int("an")!)")
+            if let w = x["html"]?.sir {
+                let s = raportMarkup(r, controls, acum: Mediu.ACUM)
+                XCTAssertEqual(s, w, "HTML-ul raportului \(x.int("luna")! + 1)/\(x.int("an")!)")
+            }
         }
         for x in g.arr("activitati").compactMap(\.obiect) {
             let a = activitati.first { $0.id == x.str("id") }!

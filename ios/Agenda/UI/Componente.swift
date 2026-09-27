@@ -298,6 +298,8 @@ struct TextNumar: View {
 struct RandControl: View {
     @Environment(\.rem) private var rem
     let m: ModelRandControl
+    /// în panoul zilei (Calendar): fără umbră, pe fundal gri (`.day-panel .ctl-row`)
+    var fara = false
     let deschide: () -> Void
 
     var body: some View {
@@ -329,8 +331,9 @@ struct RandControl: View {
             .padding(.vertical, 0.8889 * rem)
             .padding(.horizontal, rem)
             .frame(minHeight: 4.8889 * rem)
-            .background(Color.surface, in: RoundedRectangle(cornerRadius: 1.1111 * rem, style: .continuous))
-            .umbra()
+            .background(fara ? Color.surface2 : Color.surface, in: RoundedRectangle(cornerRadius: 1.1111 * rem, style: .continuous))
+            .shadow(color: fara ? .clear : Color(red: 18 / 255, green: 24 / 255, blue: 41 / 255).opacity(0.06), radius: 1, y: 1)
+            .shadow(color: fara ? .clear : Color(red: 18 / 255, green: 24 / 255, blue: 41 / 255).opacity(0.06), radius: 10, y: 6)
         }
         .buttonStyle(ApasareRand())
     }

@@ -167,6 +167,86 @@ final class EcraneWebTests: TestVectori {
         }
     }
 
+    // ───────── calendarul ─────────
+
+    func testCalendarul() throws {
+        let l = d.obj("ecrane").arr("calendar").compactMap(\.obiect)
+        guard !l.isEmpty else { throw XCTSkip("Fișierul verificării încrucișate e vechi (rulați ios/teste.sh)") }
+        for x in l {
+            let m = modelCalendar(controls, activitati, an: x.int("an")!, luna: x.int("luna")!, selectat: x.str("sel"), azi: Mediu.AZI)
+            let s = Jetoane.Sir()
+            s.t(m.supratitlu); s.t("\(K.luni[m.luna]) \(m.an)")
+            s.b(); s.t("\(m.an)"); s.t("anul"); s.b()
+            s.b(); s.t(K.luniScurt[m.luna]); s.t("luna"); s.b()
+            s.b(); s.t("Azi"); s.b(); s.t("Plan lunar")
+            for z in ZILE_SCURT { s.t(z) }
+            for c in m.celule {
+                s.b(false, dis: false, (c.inLuna ? [] : ["out"]) + (c.libera ? ["is-liber"] : []) + (c.azi ? ["is-today"] : []) + (c.selectata ? ["is-sel"] : []))
+                s.t("\(c.numar)")
+                for e in c.etichete {
+                    switch e.tip {
+                    case "liber": s.s(["ev-liber"] + (e.sarbatoare ? ["ev-sarb"] : []) + ["st-\(e.stare)"])
+                    case "act": s.s(["ev-act", "act-\(e.tipActivitate)", "st-\(e.stare)"])
+                    default: s.s(["ev-\(e.tip)"])
+                    }
+                    s.t(e.text)
+                }
+                if c.maiMulte > 0 { s.t("+\(c.maiMulte)") }
+                for t in c.termene { s.s(["dot-\(t)"]) }
+            }
+            for (cls, t) in LEGENDA_CALENDAR {
+                if cls.hasPrefix("dot-") { s.s([cls]) }
+                s.t(t)
+            }
+            s.t(legendaLiber(telefon: false))
+            let z = m.zi
+            s.t(z.eticheta); s.t(z.titlu)
+            if let lib = z.libera { if lib.sarbatoare { s.s(["ev-sarb"]) }; s.t(lib.text); s.pill(lib.stare) }
+            if z.controale.isEmpty { s.t("Niciun control în această zi.") }
+            for c in z.controale { s.b(); s.t(rand(modelRandControl(c, controls, Mediu.AZI))) }
+            if !z.termene.isEmpty {
+                s.t("Termene")
+                for t in z.termene { s.b(false, dis: false, ["item-\(t.level)"]); s.t(t.titlu); s.t(t.sub) }
+            }
+            if z.activitati.isEmpty { s.t("Nicio activitate în această zi.") } else {
+                s.t("Activități")
+                for a in z.activitati {
+                    let x = modelActivitate(a, controls)
+                    s.s(["act-\(a.tip)", "st-\(a.stare)"])
+                    s.b(); s.t(x.tipText); s.t(x.titlu); s.t(x.cand); s.pill(x.stare)
+                    for b in x.butoane { s.b(); s.t(b) }
+                }
+            }
+            s.b(); s.t("Control nou în această zi"); s.b(); s.t("Activitate nouă în această zi")
+            XCTAssertEqual(s.text, x.str("tok"), "calendarul \(m.luna + 1)/\(m.an), ziua \(x.str("sel"))")
+            if s.text != x.str("tok") { print(Jetoane.diferenta(s.text, x.str("tok"))); return }
+        }
+    }
+
+    /// Fereastra activității: aceleași verificări și aceeași normalizare ca `openActivitate` din web
+    func testSalvareaActivitatii() {
+        var a = emptyActivitate("2026-10-20", Mediu.AZI)
+        XCTAssertEqual(a.stare, "planificat")
+        XCTAssertEqual(emptyActivitate("2026-10-01", Mediu.AZI).stare, "efectuat")
+        a.data = ""
+        XCTAssertEqual(salveazaActivitate(a).eroare, "Alegeți data activității.")
+        a.data = "2026-10-20"; a.dataSfarsit = "2026-10-19"
+        XCTAssertEqual(salveazaActivitate(a).eroare, "„Până la” nu poate fi înaintea datei de început.")
+        a.dataSfarsit = "2026-10-20"; a.tip = "alta"; a.descriere = "   "
+        XCTAssertEqual(salveazaActivitate(a).eroare, "Scrieți descrierea activității.")
+        a.descriere = "  Vizită  "
+        let r = salveazaActivitate(a)
+        XCTAssertNil(r.eroare)
+        XCTAssertEqual(r.activitate?.descriere, "Vizită")
+        XCTAssertEqual(r.activitate?.dataSfarsit, "")   // aceeași zi: fără „până la”
+        XCTAssertEqual(r.activitate.map(titluActivitate), "Vizită")
+        a.tip = "sedinta"; a.descriere = ""; a.dataSfarsit = "2026-10-22"; a.ora = "09:30"
+        XCTAssertEqual(salveazaActivitate(a).activitate.map(cand), "20.10.2026 – 22.10.2026 (3 zile), ora 09:30")
+        XCTAssertEqual(lunaDeplasata(2026, 0, -1).an, 2025); XCTAssertEqual(lunaDeplasata(2026, 0, -1).luna, 11)
+        XCTAssertEqual(lunaDeplasata(2026, 11, 1).an, 2027); XCTAssertEqual(lunaDeplasata(2026, 11, 1).luna, 0)
+        XCTAssertEqual(raportFileName(raportLunar([], [], 2026, 8, Mediu.AZI)), "Plan-lunar-2026-09.html")
+    }
+
     func testTextele() {
         XCTAssertEqual(hintText(""), "Scrieți numele obiectivului sau o dată: 12.09.2026, 09.2026 sau 2026.")
         XCTAssertEqual(hintText("10.2026"), "Controale din octombrie 2026")

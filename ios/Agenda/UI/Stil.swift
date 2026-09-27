@@ -280,6 +280,8 @@ struct FlexWrap: Layout {
     var spatiu: CGFloat
     var spatiuRanduri: CGFloat? = nil
     var aliniere: VerticalAlignment = .center
+    /// `justify-content: space-between`: pe un rând cu mai multe elemente, locul rămas între ele; singur pe rând = la stânga
+    var intre = false
 
     private struct Rand { var elemente: [(i: Int, w: CGFloat)] = []; var latime: CGFloat = 0 }
 
@@ -323,6 +325,8 @@ struct FlexWrap: Layout {
         for rand in randuri(bounds.width, subviews) {
             let h = inaltime(rand, subviews)
             let liber = max(0, bounds.width - rand.elemente.reduce(-spatiu) { $0 + $1.w + spatiu })
+            let pas = intre && rand.elemente.count > 1 && !rand.elemente.contains(where: { subviews[$0.i][CheieFlex.self].autoStanga })
+                ? liber / CGFloat(rand.elemente.count - 1) : 0
             var x = bounds.minX
             for (i, w) in rand.elemente {
                 let s = subviews[i]
@@ -330,7 +334,7 @@ struct FlexWrap: Layout {
                 let hs = s.sizeThatFits(ProposedViewSize(width: w, height: nil)).height
                 let dy = aliniere == .top ? 0 : aliniere == .bottom ? h - hs : (h - hs) / 2
                 s.place(at: CGPoint(x: x, y: y + dy), anchor: .topLeading, proposal: ProposedViewSize(width: w, height: hs))
-                x += w + spatiu
+                x += w + spatiu + pas
             }
             y += h + (spatiuRanduri ?? spatiu)
         }
