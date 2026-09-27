@@ -15,7 +15,7 @@ struct EcranLuna: View {
     var body: some View {
         let p = id.split(separator: "-").compactMap { Int($0) }
         let an = p.first ?? 2026, luna = (p.count > 1 ? p[1] : 1) - 1
-        let r = raportLunar(magazin.controls, magazin.activitati, an, luna, todayISO())
+        let r = raportLunar(magazin.controls, magazin.activitati, an, luna, aziUI())
         ScrollView {
             VStack(alignment: .leading, spacing: 0) {
                 AntetInapoi(supratitlu: "Tot ce s-a planificat și efectuat în lună", titlu: "Plan lunar", iconita: "calendar", inapoi: { nav.mergi(.calendar) }) {

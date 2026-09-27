@@ -58,11 +58,34 @@ private func seteaza(_ val: inout JSONValue, _ segs: ArraySlice<Substring>, _ v:
     return true
 }
 
-/// Modifică obiectul de la o cale (ex. `n.verificari[kid] = {...}`), pe loc
+/// Modifică pe loc obiectul la care duce calea (fiecare segment e un pas, inclusiv ultimul: „nereguli.@a” = neregula a),
+/// ca `resolvePath(c, path)[0]` din web; dacă un pas lipsește, nu se schimbă nimic
 public func modificaLaCale(_ o: inout JSObiect, _ cale: String, _ f: (inout JSObiect) -> Void) {
-    guard var x = valoareLaCale(o, cale)?.obiect else { return }
-    f(&x)
-    seteazaLaCale(&o, cale, .object(x))
+    if cale.isEmpty { f(&o); return }
+    var radacina = JSONValue.object(o)
+    guard modifica(&radacina, cale.split(separator: ".", omittingEmptySubsequences: false)[...], f), let nou = radacina.obiect else { return }
+    o = nou
+}
+
+private func modifica(_ val: inout JSONValue, _ segs: ArraySlice<Substring>, _ f: (inout JSObiect) -> Void) -> Bool {
+    guard let s = segs.first else {
+        guard case .object(var x) = val else { return false }
+        f(&x)
+        val = .object(x)
+        return true
+    }
+    let rest = segs.dropFirst()
+    if s.first == "#" || s.first == "@" {
+        guard case .array(var l) = val else { return false }
+        let cheie = s.first == "#" ? "id" : "key"
+        guard let i = l.firstIndex(where: { $0.obiect?[cheie] == .string(String(s.dropFirst())) }), modifica(&l[i], rest, f) else { return false }
+        val = .array(l)
+        return true
+    }
+    guard case .object(var o) = val, var copil = o[String(s)], !copil.esteNull, modifica(&copil, rest, f) else { return false }
+    o[String(s)] = copil
+    val = .object(o)
+    return true
 }
 
 // ───────── adresele din aplicație (location.hash) ─────────

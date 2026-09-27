@@ -21,7 +21,7 @@ struct ContinutPanou: View {
     @Environment(\.cuBaraLaterala) private var lat
 
     var body: some View {
-        let azi = todayISO()
+        let azi = aziUI()
         let m = modelPanou(magazin.controls, magazin.activitati, magazin.meta, azi: azi)
         VStack(alignment: .leading, spacing: 0) {
             antet(azi)
@@ -46,12 +46,13 @@ struct ContinutPanou: View {
                 }
                 .foregroundStyle(Color.muted)
                 .padding(.bottom, 0.2222 * rem)
-                Spacer(minLength: 0)
+                .frame(maxWidth: .infinity, alignment: .leading)
                 if !lat {
                     HStack(spacing: 0.5556 * rem) {
                         Buton(text: "Ghidul aplicației", iconita: "book", mare: false) { nav.mergi(.ghid) }
                         if !magazin.controls.isEmpty { backupRapid(azi) }
                     }
+                    .fixedSize(horizontal: true, vertical: false)   // `.dash-head`: butoanele au lățimea lor, eticheta ia restul
                 }
             }
             TimelineView(.everyMinute) { ctx in

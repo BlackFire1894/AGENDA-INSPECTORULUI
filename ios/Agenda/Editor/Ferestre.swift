@@ -50,7 +50,7 @@ struct FereastraRestConform: View {
                                 if r.litera.isEmpty { Iconita(nume: "check", marime: rem).foregroundStyle(Color.green).alignmentGuide(.firstTextBaseline) { $0[.bottom] - 2 } }
                                 else { Text(r.litera).bold().foregroundStyle(Color.accentInk).frame(minWidth: 2 * rem, alignment: .leading) }
                                 Text(r.text).font(.system(size: rem, weight: .semibold)).foregroundStyle(Color.text).fixedSize(horizontal: false, vertical: true)
-                                Spacer(minLength: 0)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             .padding(.vertical, 0.3889 * rem)
                             .overlay(alignment: .bottom) { if i < m.randuri.count - 1 { Rectangle().fill(Color.line).frame(height: 1) } }
@@ -82,7 +82,7 @@ struct FereastraRestConform: View {
                         .frame(width: max(28, 1.5556 * rem), height: max(28, 1.5556 * rem))
                         Text(m.bifa).font(.system(size: rem, weight: .bold)).foregroundStyle(Color.accentInk)
                             .multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
-                        Spacer(minLength: 0)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .padding(.vertical, 0.7778 * rem).padding(.horizontal, 0.8889 * rem)
                     .background(Color.accentSoft, in: RoundedRectangle(cornerRadius: 0.8889 * rem, style: .continuous))
@@ -121,7 +121,7 @@ struct FereastraIncheiere: View {
                             HStack(spacing: 0.5556 * rem) {
                                 Iconita(nume: p.level == "warn" ? "alert" : "chevR", marime: 1.1111 * rem)
                                 Text(p.text).multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
-                                Spacer(minLength: 0)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             .font(.system(size: 0.9444 * rem, weight: .bold))
                             .foregroundStyle(p.level == "warn" ? Color.warnInk : p.level == "grav" ? Color.white : Color.accentInk)

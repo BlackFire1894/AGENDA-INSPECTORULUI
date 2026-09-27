@@ -262,7 +262,7 @@ struct NotaCautare: View {
                 HStack(spacing: 0.5556 * rem) {
                     Iconita(nume: "search", marime: 1.2222 * rem)
                     Text(m.text).font(.system(size: rem, weight: .semibold)).fixedSize(horizontal: false, vertical: true)
-                    Spacer(minLength: 0)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                 }
                 .flexCreste(min: 12 * rem)
                 if m.cautaInToate { Buton(text: "Caută în toate", mare: false) { ses.click("ner-filter", ["val": "ALL"]) } }

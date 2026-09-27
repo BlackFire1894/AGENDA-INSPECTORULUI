@@ -188,7 +188,7 @@ struct Comutator: View {
                 }
                 .frame(width: 1.7778 * rem, height: 1.7778 * rem)
                 Text(m.text).font(.system(size: 0.9444 * rem, weight: .bold)).multilineTextAlignment(.leading)
-                if intins { Spacer(minLength: 0) }
+                    .frame(maxWidth: intins ? .infinity : nil, alignment: .leading)
             }
             .foregroundStyle(m.activ ? Color.white : netrecut ? Color.warnInk : Color.text)
             .padding(.leading, 0.6667 * rem).padding(.trailing, rem)

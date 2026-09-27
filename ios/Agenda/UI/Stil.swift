@@ -119,7 +119,7 @@ struct RandStare: View {
     var body: some View {
         HStack(alignment: .firstTextBaseline, spacing: 0.6667 * rem) {
             Text(eticheta).font(.system(size: 0.9444 * rem, weight: .bold)).foregroundStyle(Color.muted)
-            Spacer(minLength: 0)
+                .frame(maxWidth: .infinity, alignment: .leading)
             Text(valoare).font(.system(size: rem, weight: .bold)).foregroundStyle(Color.text).multilineTextAlignment(.trailing)
         }
         .padding(.vertical, 0.6667 * rem)
@@ -146,7 +146,7 @@ struct AntetPagina<Dreapta: View>: View {
                 .foregroundStyle(Color.muted)
                 Text(titlu).font(.system(size: 1.8889 * rem, weight: .heavy)).tracking(-0.015 * 1.8889 * rem).foregroundStyle(Color.text)
             }
-            Spacer(minLength: 0)
+            .frame(maxWidth: .infinity, alignment: .leading)
             dreapta
         }
         .padding(.bottom, 1.2222 * rem)
@@ -272,6 +272,45 @@ struct FlowLayout: Layout {
             randInalt = max(randInalt, m.height)
         }
         aseaza()
+    }
+}
+
+/// `.page-head` (`display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end`) cu două
+/// elemente: pe același rând dacă încap amândouă cu lățimea lor naturală (primul la stânga, al doilea la dreapta,
+/// aliniate jos); altfel al doilea trece pe rândul următor, la stânga, și se așază în lățimea rândului.
+struct AntetFlex: Layout {
+    var spatiu: CGFloat
+
+    private func peUnRand(_ s: Subviews, _ latime: CGFloat) -> (CGSize, CGSize)? {
+        guard s.count == 2 else { return nil }
+        let a = s[0].sizeThatFits(.unspecified), b = s[1].sizeThatFits(.unspecified)
+        return a.width + spatiu + b.width <= latime + 0.5 ? (a, b) : nil
+    }
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let latime = proposal.width ?? .infinity
+        if let (a, b) = peUnRand(subviews, latime) {
+            return CGSize(width: latime.isFinite ? latime : a.width + spatiu + b.width, height: max(a.height, b.height))
+        }
+        let p = ProposedViewSize(width: latime.isFinite ? latime : nil, height: nil)
+        let m = subviews.map { $0.sizeThatFits(p) }
+        return CGSize(width: latime.isFinite ? latime : (m.map(\.width).max() ?? 0),
+                      height: m.map(\.height).reduce(0, +) + spatiu * CGFloat(max(0, m.count - 1)))
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        if let (a, b) = peUnRand(subviews, bounds.width) {
+            let h = max(a.height, b.height)
+            subviews[0].place(at: CGPoint(x: bounds.minX, y: bounds.minY + h - a.height), proposal: .unspecified)
+            subviews[1].place(at: CGPoint(x: bounds.maxX - b.width, y: bounds.minY + h - b.height), proposal: .unspecified)
+            return
+        }
+        let p = ProposedViewSize(width: bounds.width, height: nil)
+        var y = bounds.minY
+        for s in subviews {
+            s.place(at: CGPoint(x: bounds.minX, y: y), proposal: p)
+            y += s.sizeThatFits(p).height + spatiu
+        }
     }
 }
 

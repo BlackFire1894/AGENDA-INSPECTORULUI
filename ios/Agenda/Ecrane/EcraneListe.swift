@@ -20,7 +20,7 @@ struct ContinutObiective: View {
 
     var body: some View {
         @Bindable var nav = nav
-        let m = modelListaObiective(magazin.controls, q: nav.cautareObiective, tip: nav.tipObiective, filtre: nav.filtreObiective, azi: todayISO())
+        let m = modelListaObiective(magazin.controls, q: nav.cautareObiective, tip: nav.tipObiective, filtre: nav.filtreObiective, azi: aziUI())
             VStack(alignment: .leading, spacing: 0) {
                 AntetPagina(iconita: "building", supratitlu: "Lista obiectivelor controlate", titlu: "Obiective") {
                     Buton(text: "Control nou", iconita: "plus", tip: .primar) { ui.controlNou() }
@@ -98,7 +98,7 @@ struct ContinutObiectiv: View {
 
     var body: some View {
             VStack(alignment: .leading, spacing: 0) {
-                if let m = modelObiectiv(magazin.controls, id, azi: todayISO()) {
+                if let m = modelObiectiv(magazin.controls, id, azi: aziUI()) {
                     AntetInapoi(supratitlu: "", titlu: m.titlu, eticheta: m.tip, inapoi: { nav.mergi(.obiective) }) {
                         Buton(text: "Control nou pe acest obiectiv", iconita: "plus", tip: .primar) { ui.controlNou(oid: id) }
                     }
@@ -219,7 +219,7 @@ struct ContinutIstoric: View {
 
     var body: some View {
         @Bindable var nav = nav
-        let m = modelIstoric(magazin.controls, q: nav.cautareIstoric, stare: nav.stareIstoric, filtre: nav.filtreIstoric, azi: todayISO())
+        let m = modelIstoric(magazin.controls, q: nav.cautareIstoric, stare: nav.stareIstoric, filtre: nav.filtreIstoric, azi: aziUI())
             VStack(alignment: .leading, spacing: 0) {
                 AntetPagina(iconita: "history", supratitlu: "Toate controalele, pe toate obiectivele", titlu: "Istoric controale") {
                     Buton(text: "Control nou", iconita: "plus", tip: .primar) { ui.controlNou() }

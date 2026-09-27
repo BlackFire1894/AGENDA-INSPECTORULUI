@@ -18,7 +18,7 @@ struct EcranControl: View {
     var body: some View {
         if let c = magazin.control(id) {
             let _ = ses.versiune
-            let m = modelEditor(c, magazin.controls, ses.editor, azi: todayISO())
+            let m = modelEditor(c, magazin.controls, ses.editor, azi: aziUI())
             // zona derulată nu intră sub bara de stare / butoanele ferestrei: deasupra taburilor fixe nu se vede conținut
             VStack(spacing: 0) {
             Color.bg.frame(height: 1)
@@ -99,7 +99,7 @@ struct ContinutEditor: View {
     var body: some View {
         if let c = magazin.control(id) {
             let _ = ses.versiune
-            let m = modelEditor(c, magazin.controls, ses.editor, azi: todayISO())
+            let m = modelEditor(c, magazin.controls, ses.editor, azi: aziUI())
             VStack(alignment: .leading, spacing: 0) {
                 AntetEditor(c: c, m: m.antet)
                 TodoEditor(m: m.todo)
@@ -273,7 +273,7 @@ struct ElementTodo: View {
             HStack(spacing: 0.5556 * rem) {
                 Iconita(nume: p.level == "warn" ? "alert" : "chevR", marime: 1.1111 * rem)
                 Text(p.text).multilineTextAlignment(.leading).fixedSize(horizontal: false, vertical: true)
-                Spacer(minLength: 0)
+                    .frame(maxWidth: .infinity, alignment: .leading)
             }
             .font(.system(size: 0.9444 * rem, weight: .bold))
             .foregroundStyle(p.level == "warn" ? Color.warnInk : p.level == "grav" ? Color.white : Color.accentInk)
@@ -331,7 +331,7 @@ struct TaburiEditor: View {
                         .foregroundStyle(t.complet ? Color(hex: t.activ ? 0xdcfce7 : 0x86efac) : Color.white.opacity(t.activ ? 1 : 0.8))
                         .padding(.bottom, 0.2222 * rem)
                 }
-                Spacer(minLength: 0)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .padding(.vertical, (cinci ? 0.5556 : 0.6667) * rem).padding(.horizontal, (cinci ? 0.6667 : 0.8889) * rem)
             .frame(maxWidth: .infinity, minHeight: tinta(4 * rem), alignment: .leading)

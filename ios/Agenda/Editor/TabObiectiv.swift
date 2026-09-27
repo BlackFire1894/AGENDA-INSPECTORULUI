@@ -317,7 +317,7 @@ struct GrfVedere: View {
                         Iconita(nume: "alert", marime: 1.3333 * rem)
                         (Text("Neregulă gravă:").bold() + Text(String(n.dropFirst("Neregulă gravă:".count))))
                             .fixedSize(horizontal: false, vertical: true)
-                        Spacer(minLength: 0)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .flexCreste(min: 14 * rem)
                     Buton(text: "Vezi", mare: false) { ses.mergi(tab: "nereguli", focus: "grav-grfV") }

@@ -76,6 +76,27 @@ final class EditorWebTests: TestVectori {
         XCTAssertEqual(ed.istoric.stare(c.id).anulare, 1)
     }
 
+    /// Bifele care completează data cu ziua de azi (js/app.js → case 'flag'), inclusiv cele de pe rândul însuși
+    /// („nereguli.@a.asiPrezentat”: părintele e neregula); o dată deja completată rămâne
+    func testDataLaBifare() {
+        var c = newControl(denumire: "Test", start: "2026-10-01")
+        let ed = Editor()
+        ed.deschide(c, tab: "nereguli")
+        for (bifa, camp) in [("nereguli.@a.asiPrezentat", "asiDataPrezentare"), ("nereguli.@a.asiPierdere", "asiDataPierdere")] {
+            _ = ed.click("flag", ["path": bifa], &c)
+            XCTAssertEqual(c.neregula("a")?.o.str(camp), Mediu.AZI, bifa)
+        }
+        _ = ed.click("flag", ["path": "nereguli.@b1.amenda.achitata"], &c)
+        XCTAssertEqual(c.neregula("b1")?.amenda.o.str("dataAchitare"), Mediu.AZI)
+        _ = ed.click("flag", ["path": "incarcare.aplicatie"], &c)
+        XCTAssertEqual(c.o.obj("incarcare").str("aplicatieData"), Mediu.AZI)
+        // debifat și bifat din nou: data aleasă între timp nu se schimbă
+        _ = ed.click("flag", ["path": "nereguli.@a.asiPrezentat"], &c)
+        _ = ed.input("nereguli.@a.asiDataPrezentare", "2026-10-02", &c)
+        _ = ed.click("flag", ["path": "nereguli.@a.asiPrezentat"], &c)
+        XCTAssertEqual(c.neregula("a")?.o.str("asiDataPrezentare"), "2026-10-02")
+    }
+
     /// Reia o secvență; întoarce numărul de pași cu diferențe (la prima diferență din secvență se oprește)
     private func reia(_ s: JSObiect, _ toate: [Control], _ nr: inout Int) -> Int {
         var controls = toate

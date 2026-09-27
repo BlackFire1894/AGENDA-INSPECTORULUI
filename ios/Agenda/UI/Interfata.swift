@@ -189,7 +189,7 @@ struct AntetFereastra: View {
                 Text(titlu).font(.system(size: 1.4444 * rem, weight: .heavy))
             }
             .foregroundStyle(Color.text)
-            Spacer(minLength: 0)
+            .frame(maxWidth: .infinity, alignment: .leading)
             Button(action: inchide) {
                 Iconita(nume: "x", marime: 1.3333 * rem)
                     .foregroundStyle(Color.text)

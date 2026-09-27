@@ -88,6 +88,8 @@ xcrun devicectl device copy from --device <UDID> --domain-type appDataContainer 
 - `ios/Depanare-captura.sh <UDID> <folder>`: capturile ecranelor și ale tuturor widgeturilor, în ambele teme, cu datele demonstrative (datele utilizatorului nu se ating).
 - Pornire cu `-proba-notificari`: două notificări de probă (activitatea de probă nu există); butoanele apăsate se notează în `Documents/depanare/actiuni.log`. La pornirea obișnuită, urmele probei se șterg.
 - `Documents/depanare/notificari.json`: notificările programate după ultima sincronizare (id, ora, permisiunea, cele livrate).
+- `ios/Depanare-tur.sh <UDID> <folder> [orizontal|vertical] [mărimi] [teme] [ecrane]`: turul ecranelor pentru auditul vizual. Aplicația (cu `-demo -tur <eticheta>`) trece singură prin toate ecranele și ferestrele, derulează pagină cu pagină și salvează fiecare pagină ca imagine (`<folder>/<mărime>-<temă>-<orientare>/NN-<ecran>-pK.png`); scriptul rotește iPad-ul, aduce imaginile pe Mac și repornește aplicația normal. Ex.: `ios/Depanare-tur.sh <UDID> ~/Desktop/tur vertical "mic" "light dark" "panou,opec-nereguli"`.
+- Pornire cu `-demo -miezul-noptii`: ceasul folosit la calcule pornește azi la 23:59:45 (trecerea în ziua următoare, cu aplicația deschisă).
 - Atenție: aplicația instalată din Xcode e versiunea de dezvoltare; uneltele de mai sus nu apar în interfață (doar cu argumente la pornire).
 
 ## Compilare și instalare pe iPad (din Terminal)
@@ -138,5 +140,8 @@ xcrun devicectl device process launch --device <UDID> ro.cucuta.agenda
 - [x] **7. Fișa, Text PV, tipărirea și partajarea** (27.09.2026): Fișa controlului ca document (Tipărește / PDF, Partajează fișierul), fereastra Text PV (doar netrecute, cu acte, Copiază, Partajează, Marchează-le trecute în PV). Tipărirea: `UIPrintInteractionController` cu un `WKWebView` ascuns; documentele au stilurile din `stiluri-fisa.css`. **100 de teste.** Verificat pe iPad.
 - [x] **8. Setările, Ghidul, mărimea textului, temele** (27.09.2026): mărimea textului (Mic / Mediu / Mare, scalează tot) și tema (Automat / Luminoasă / Întunecată), cu aceleași chei ca în web; versiunea, regulile termenelor, sărbătorile legale (cu „Am verificat lista”); Ghidul (căutare, cuprins, capitole, `#/ghid/<capitol>`) cu HTML-ul și stilurile din web. Adaptare nativă: la „Actualizări”, fără „Verifică acum” (aplicația se actualizează prin reinstalare). Așezarea pe rânduri: elementele își păstrează lățimea naturală (un text nu se mai rupe din rotunjire), iar cele mai late decât rândul se rup ca în web. **101 teste.**
 - [x] 9. Widgeturile și notificările (făcute ca 3b; atingerea widgetului va deschide Panoul după etapa 4)
-- [ ] 10. iPhone
-- [ ] 11. Auditul final
+- [x] **11. Auditul final, pe iPad** (27.09.2026; iPhone-ul rămâne pentru etapa 10):
+  - **calculele:** testele pe 30 de semințe aleatoare (~4.200 de controale și ~72.000 de pași în editor, trecuți prin codul web și prin Swift); o diferență găsită și corectată: bifele „Documentație prezentată” / „Pierderea valabilității constatată” nu completau data cu ziua de azi (calea se termina într-un rând: `nereguli.@a`), acum ca în web, cu test dedicat;
+  - **ziua nouă:** cu aplicația deschisă (sau lăsată în fundal) peste miezul nopții, ecranele își recalculează termenele, calendarul trece pe azi, notificările și widgeturile se reprogramează (ca `tick()` / `dayChanged()` din web, la 15 secunde); verificat pe iPad cu `-miezul-noptii`;
+  - **aspectul:** turul complet (`Depanare-tur.sh`: 22 de ecrane și ferestre, derulate până jos) × 3 mărimi × 2 teme × 2 orientări, comparat cu web; corectate: textele scurte din butoane / taburi care se rupeau deși aveau loc („Acte & evidențe”), antetele cu butoane pe vertical (Panou, Fișa, Planul lunar: butoanele pe rândul titlului doar dacă încap, ca `flex-wrap`); **102 teste.**
+- [ ] 10. iPhone (după decizia utilizatorului: iPhone conectat la Mac sau simulator)

@@ -5,6 +5,28 @@ import AgendaKit
 // Navigarea (js/app.js → parseRoute, updateNav): ecranul curent și starea listelor (căutări, filtre), care
 // țin cât e deschisă aplicația (nu se salvează), ca în web.
 
+/// Ziua curentă, pentru ecrane (`tick()` / `dayChanged()` din web): la o zi nouă, ecranele care au citit `aziUI()`
+/// se redesenează și termenele se recalculează, chiar dacă aplicația a stat deschisă (sau în fundal) peste noapte.
+@MainActor @Observable
+final class Ziua {
+    static let shared = Ziua()
+    private(set) var zi = todayISO()
+
+    /// true dacă ziua s-a schimbat de la ultima verificare
+    @discardableResult func verifica() -> Bool {
+        let t = todayISO()
+        guard t != zi else { return false }
+        zi = t
+        return true
+    }
+}
+
+/// Ziua de azi, citită de un ecran: ecranul se redesenează la schimbarea zilei
+@MainActor func aziUI() -> String {
+    _ = Ziua.shared.zi
+    return todayISO()
+}
+
 enum Ruta: Hashable {
     case panou, obiective, obiectiv(String), calendar, istoric, setari, ghid
     case control(id: String, tab: String, focus: String?)

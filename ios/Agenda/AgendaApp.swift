@@ -1,4 +1,5 @@
 import SwiftUI
+import Combine
 import WidgetKit
 import AgendaKit
 
@@ -14,6 +15,7 @@ struct AgendaApp: App {
     @State private var nav = Navigare()
     @State private var ses = SesiuneEditor()
     @State private var pref = Preferinte()
+    private static let ceas = Timer.publish(every: 15, on: .main, in: .common).autoconnect()
 
     init() {
         // catalogul (docs/nativ/date/catalog.json) trebuie încărcat înaintea oricărui calcul
@@ -23,6 +25,12 @@ struct AgendaApp: App {
         // verificare: -demo = datele demonstrative într-un folder temporar, fără widgeturi și notificări
         // (datele utilizatorului nu se ating; la pornirea obișnuită totul revine)
         if Self.demo {
+            // -miezul-noptii: ceasul aplicației pornește azi la 23:59:45 (verificarea trecerii în ziua următoare)
+            if ProcessInfo.processInfo.arguments.contains("-miezul-noptii"),
+               let tinta = Calendar.current.date(bySettingHour: 23, minute: 59, second: 45, of: Date()) {
+                let decalaj = tinta.timeIntervalSinceNow
+                Ceas.acum = { Date().addingTimeInterval(decalaj) }
+            }
             let folder = FileManager.default.temporaryDirectory.appendingPathComponent("demo-editor", isDirectory: true)
             try? FileManager.default.removeItem(at: folder)
             let m = Magazin(depozit: Depozit(folder: folder))
@@ -60,6 +68,9 @@ struct AgendaApp: App {
                     nav.laIesireControl = { [ses] in ses.paraseste() }
                 }
                 .onOpenURL { nav.deschide($0) }   // widgeturile: agenda://panou
+                // zi nouă (web: tick() la 15 secunde): ecranele se recalculează, calendarul trece pe azi
+                .onReceive(Self.ceas) { _ in ziNoua() }
+                .onReceive(NotificationCenter.default.publisher(for: UIApplication.significantTimeChangeNotification)) { _ in ziNoua() }
                 #if DEBUG
                 .onAppear {
                     // verificare: pornire direct pe un ecran (-ruta obiective / istoric / setari / obiectiv:<id>)
@@ -77,6 +88,10 @@ struct AgendaApp: App {
                         }
                         else { nav.deschide(u) }
                     }
+                    // -tur <eticheta>: turul ecranelor pentru auditul vizual (doar cu -demo)
+                    if Self.demo, let e = Tur.eticheta {
+                        Task { await Tur.ruleaza(e, nav: nav, ui: ui, ses: ses, magazin: magazin) }
+                    }
                     // -fereastra activitate / controlnou: fereastra deschisă la pornire
                     if let i = a.firstIndex(of: "-fereastra"), i + 1 < a.count {
                         if a[i + 1] == "activitate" { ui.activitate(nil, data: todayISO(), magazin: magazin) }
@@ -89,6 +104,7 @@ struct AgendaApp: App {
         .onChange(of: scenePhase, initial: true) { _, faza in
             switch faza {
             case .active:
+                ziNoua()
                 #if DEBUG
                 if Self.demo { break }
                 #endif
@@ -111,5 +127,11 @@ struct AgendaApp: App {
             default: break
             }
         }
+    }
+
+    /// `dayChanged()` din web; la o zi nouă se reprogramează și notificările, widgeturile, cifra de pe iconiță
+    private func ziNoua() {
+        nav.verificaZiua()
+        if Ziua.shared.verifica() { Sincronizare.shared.planifica() }
     }
 }

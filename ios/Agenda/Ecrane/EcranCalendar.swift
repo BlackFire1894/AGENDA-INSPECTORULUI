@@ -29,7 +29,7 @@ struct ContinutCalendar: View {
     var laZi: () -> Void = {}
 
     var body: some View {
-        let azi = todayISO()
+        let azi = aziUI()
         let m = modelCalendar(magazin.controls, magazin.activitati, an: nav.calAn, luna: nav.calLuna, selectat: nav.calSelectat, azi: azi)
         VStack(alignment: .leading, spacing: 0) {
             FlexWrap(spatiu: 0.8889 * rem, aliniere: .bottom, intre: true) {
@@ -292,7 +292,7 @@ struct PanouZi: View {
             } else {
                 VStack(spacing: 0.7778 * rem) {
                     ForEach(z.controale, id: \.id) { c in
-                        RandControl(m: modelRandControl(c, magazin.controls, todayISO()), fara: true) { nav.mergi(.control(id: c.id, tab: "obiectiv", focus: nil)) }
+                        RandControl(m: modelRandControl(c, magazin.controls, aziUI()), fara: true) { nav.mergi(.control(id: c.id, tab: "obiectiv", focus: nil)) }
                     }
                 }
             }

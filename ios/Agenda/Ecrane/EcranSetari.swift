@@ -185,7 +185,7 @@ struct ContinutSetari: View {
     }
 
     private var sectiuneSarbatori: some View {
-        let an0 = Int(todayISO().prefix(4)) ?? 2026
+        let an0 = Int(aziUI().prefix(4)) ?? 2026
         return Card {
             TitluSectiune(iconita: "calendar", text: "Sărbători legale")
             Paragraf(text: "Calculate automat (datele fixe și Paștele ortodox), după art. 139 din Codul muncii. Dacă legea se schimbă, aplicația trebuie actualizată; în decembrie, Panoul vă cere să verificați lista pentru anul următor.")

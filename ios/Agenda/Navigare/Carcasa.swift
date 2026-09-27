@@ -106,7 +106,7 @@ struct BaraLaterala: View {
     @Environment(\.inFereastra) private var inFereastra
 
     var body: some View {
-        let azi = todayISO()
+        let azi = aziUI()
         let (urgente, neincheiate) = cifreMeniu(magazin.controls, azi: azi)
         let vechi = backupIsStale(magazin.controls, magazin.meta, azi: azi)
         ScrollView {
@@ -152,7 +152,7 @@ struct BaraLaterala: View {
                             Text("Backup rapid").font(.system(size: 1.0556 * rem, weight: .bold))
                             Text(backupAgeText(magazin.meta, azi: azi)).font(.system(size: 0.8889 * rem, weight: .semibold))
                         }
-                        Spacer(minLength: 0)
+                        .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .foregroundStyle(vechi ? Color.white : Color.white.opacity(0.85))
                     .padding(.horizontal, 0.8889 * rem).padding(.vertical, 0.2222 * rem)
@@ -193,7 +193,7 @@ struct ElementMeniu: View {
                             .foregroundStyle(subRosu ? Color(red: 1, green: 0xb4 / 255, blue: 0xab / 255) : Color(red: 0xc9 / 255, green: 0xbd / 255, blue: 1))
                     }
                 }
-                Spacer(minLength: 0)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .foregroundStyle(activ ? Color.white : Color.white.opacity(0.78))
             .padding(.horizontal, 0.8889 * rem)
@@ -217,7 +217,7 @@ struct BaraJos: View {
     @Environment(\.rem) private var rem
 
     var body: some View {
-        let (urgente, neincheiate) = cifreMeniu(magazin.controls, azi: todayISO())
+        let (urgente, neincheiate) = cifreMeniu(magazin.controls, azi: aziUI())
         HStack(spacing: 0) {
             buton("home", "Panou", "panou", bulina: urgente, rosu: true) { nav.mergi(.panou) }
             buton("building", "Obiective", "obiective") { nav.mergi(.obiective) }
@@ -315,11 +315,8 @@ struct AntetInapoi<Dreapta: View>: View {
 
     var body: some View {
         // css: .page-head (titlul în stânga, butoanele în dreapta; pe rândul următor dacă nu încap)
-        ViewThatFits(in: .horizontal) {
-            HStack(alignment: .bottom, spacing: 0.8889 * rem) { stanga; Spacer(minLength: 0); dreapta }
-            VStack(alignment: .leading, spacing: 0.8889 * rem) { stanga; dreapta }
-        }
-        .padding(.bottom, 1.2222 * rem)
+        AntetFlex(spatiu: 0.8889 * rem) { stanga; dreapta }
+            .padding(.bottom, 1.2222 * rem)
     }
 
     private var stanga: some View {

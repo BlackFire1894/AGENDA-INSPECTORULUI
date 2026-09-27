@@ -256,7 +256,7 @@ struct VerificareVedere: View {
                     HStack(spacing: 0.3333 * rem) {
                         Iconita(nume: "building", marime: 1.1111 * rem).foregroundStyle(Color.muted)
                         Text(r.nume).font(.system(size: rem, weight: .bold)).foregroundStyle(Color.text).fixedSize(horizontal: false, vertical: true)
-                        Spacer(minLength: 0)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .flexCreste(min: lat ? 9 * rem : 10_000)
                     CampData(valoare: r.data, eticheta: "Data ultimei verificări – \(r.nume)", avertizare: r.expirata, latimeFixa: 12.2222 * rem) {
@@ -283,7 +283,7 @@ struct VerificareVedere: View {
                         Iconita(nume: "alert", marime: 1.2222 * rem)
                         textIntre(p.text, "Verificare expirată: ", ". Constatați neregula?")
                             .fixedSize(horizontal: false, vertical: true)
-                        Spacer(minLength: 0)
+                            .frame(maxWidth: .infinity, alignment: .leading)
                     }
                     .flexCreste(min: 12 * rem)
                     Buton(text: p.buton, iconita: "x", mare: false) { ses.click("verif-nok", ["key": m.key]) }
@@ -336,7 +336,7 @@ struct ConstrSelectVedere: View {
                                 }
                                 .frame(width: 1.5556 * rem, height: 1.5556 * rem)
                                 Text(o.text).font(.system(size: rem, weight: .semibold)).foregroundStyle(Color.text)
-                                Spacer(minLength: 0)
+                                    .frame(maxWidth: .infinity, alignment: .leading)
                             }
                             .padding(.horizontal, 0.6667 * rem)
                             .frame(minHeight: tinta(2.6667 * rem))
