@@ -17,6 +17,8 @@
 .f-cat { font-size: 8pt; color: #666; }
 .f-dot { font-size: 9.5pt; }
 .f-small { font-size: 9pt; color: #444; }
+.f-intreb { list-style: none; padding-left: 0; margin: 0; }
+.f-intreb li { margin: 2pt 0; }
 .f-foot { margin-top: 16pt; padding-top: 6pt; border-top: 0.75pt solid #c9cfdc; font-size: 8.5pt; color: #666; }
 .fisa-doc * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 .fisa-doc .f-list { margin: 0 0 6pt; padding-left: 14pt; }

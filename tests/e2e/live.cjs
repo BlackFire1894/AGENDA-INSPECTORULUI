@@ -41,13 +41,13 @@ const DAY = 86400000;
   await p.click('#ner-d .nok-btn'); await p.waitForTimeout(150);
   await p.click('#ner-d .constr-sel-btn'); await p.click('#ner-d .constr-opt:has-text("2. Restaurant")'); await p.click('#ner-d .constr-opt:has-text("1.")'); await p.click('#ner-d .constr-pick [data-act="constr-pick"]'); await p.waitForTimeout(150);
   await p.click('#ner-d [data-path$=".amenda.aplicata"]'); await p.waitForTimeout(150);
-  await p.fill('#ner-d [data-bind$=".amenda.serieNr"]', 'CJ 0045678'); await p.fill('#ner-d [data-bind$=".amenda.suma"]', '2000');
+  await p.fill('#ner-d [data-bind$=".amenda.suma"]', '2000');
   await p.click('#ner-d [data-path$=".inPV"]'); await p.waitForTimeout(150);
   await p.click('[data-act="rest-ok"]'); await p.click('#bulk-ok'); await p.click('.modal [data-r="1"]'); await p.waitForTimeout(300);
   // încheiere: verificarea arată G1 netrecut în PV
   await p.click('.ed-tab >> nth=0'); await p.waitForTimeout(200);
   await p.click('[data-act="close-control"]'); await p.waitForTimeout(300);
-  ok((await p.locator('.modal').innerText()).includes('netrecută în PV'), 'încheiere: semnalează G1 netrecut în PV');
+  ok((await p.locator('.modal').innerText()).includes('2 constatări netrecute în PV'), 'încheiere: semnalează G1 și ao (actul lipsă) netrecute în PV');
   ok(/Coordonate GPS necompletate: .*Restaurant/.test(await p.locator('.modal').innerText()), 'încheiere: semnalează construcțiile fără coordonate');
   await p.keyboard.press('Escape'); await p.click('.modal-backdrop').catch(() => {}); await p.waitForTimeout(200);
   for (let i = 0; i < await p.locator('.constr').count(); i++) {
@@ -58,6 +58,7 @@ const DAY = 86400000;
   await p.click('[data-act="close-control"]'); await p.waitForTimeout(300);
   await p.click('.modal .todo-item'); await p.waitForTimeout(500);
   await p.click('#ner-lipsa-hidInt [data-path$=".inPV"]'); await p.waitForTimeout(150);
+  await p.click('#ner-ao [data-path$=".inPV"]'); await p.waitForTimeout(150);
   await p.click('.ed-tab >> nth=0'); await p.click('[data-act="close-control"]'); await p.waitForTimeout(300);
   ok(await p.inputValue('[data-bind="dataIncheiere"]') === '2026-10-05', 'încheiat: 05.10.2026');
   // v1.16: după încheiere mai rămâne încărcarea (aplicația ISU + documentul), 3 zile lucrătoare
@@ -68,7 +69,7 @@ const DAY = 86400000;
   // Text PV cu date live
   await p.click('[data-act="pv-text"]'); await p.waitForTimeout(200);
   const pv = await p.locator('.pv-text').inputValue();
-  ok(/Lipsă hidranți interiori – construcția: Corp principal/.test(pv) && /Stingătoare expirate – construcția: Restaurant \(sancționat cu amendă Seria CJ nr\. 0045678\)/.test(pv) && /Exerciții efectuate/.test(pv), 'Text PV live: G1, amendă cu serie, construcție, act lipsă');
+  ok(/Lipsă hidranți interiori – construcția: Corp principal/.test(pv) && /Stingătoare expirate – construcția: Restaurant \(sancționat cu amendă\)/.test(pv) && /Exerciții efectuate/.test(pv), 'Text PV live: G1, amendă, construcție, act lipsă');
   await p.keyboard.press('Escape');
 
   // ── persistență: reîncărcare
@@ -80,7 +81,7 @@ const DAY = 86400000;
   await p.goto('http://localhost:8080/#/panou'); await p.waitForTimeout(300);
   let fine = await p.locator('#sec-fines .item').innerText();
   ok(/În curs/.test(fine) && /Mai sunt 15 zile din termenul de plată \(20\.10\.2026\)/.test(fine), 'ziua 0: albastru, 15 zile, termen 20.10');
-  ok(/Seria CJ nr\. 0045678/.test(fine) && /Restaurant/.test(fine), 'Panou: serie și construcție');
+  ok(!/Seria/.test(fine) && /Restaurant/.test(fine), 'Panou: construcția, fără serie');
 
   // ── timpul trece: ceasul tabletei avansează, aplicația reacționează singură (fără reîncărcare)
   await p.clock.fastForward(16 * DAY); await p.waitForTimeout(400);
@@ -89,8 +90,8 @@ const DAY = 86400000;
   ok(/Termen 15 zile expirat/.test(fine) && /expirat de 1 zi/.test(fine), 'ziua 16: galben, „expirat de 1 zi”');
   await p.clock.fastForward(24 * DAY); await p.waitForTimeout(400);   // ziua 40 = 14.11.2026, sâmbătă
   fine = await p.locator('#sec-fines .item').innerText();
-  ok(/Trimite la ANAF/.test(fine) && /Mai aveți 5 zile până să o trimiteți la ANAF/.test(fine), 'ziua 40: roșu, „Mai aveți 5 zile … ANAF”');
-  ok(/Termenul ANAF \(19\.11\.2026\)/.test(fine) === false, 'ANAF 19.11.2026 e joi — fără avertizare de zi nelucrătoare');
+  ok(/Trimite la ANAF \/ Taxe și impozite/.test(fine) && /Mai aveți 5 zile până să o trimiteți la ANAF \/ Taxe și impozite/.test(fine), 'ziua 40: roșu, „Mai aveți 5 zile … ANAF”');
+  ok(/Termenul ANAF \/ Taxe și impozite \(19\.11\.2026\)/.test(fine) === false, 'ANAF 19.11.2026 e joi — fără avertizare de zi nelucrătoare');
   // achitare → verde
   await p.goto(`http://localhost:8080/#/control/${id1}/nereguli/d`); await p.waitForTimeout(400);
   await p.click('#ner-d [data-path$=".amenda.achitata"]'); await p.waitForTimeout(200);
@@ -111,10 +112,10 @@ const DAY = 86400000;
   ok(await p.inputValue('[data-bind="administrator"]') === 'Ana Pop' && await p.locator('.constr').count() === 2, 'control 2: datele și construcțiile preluate');
   await p.click('.ed-tab >> nth=2'); await p.waitForTimeout(300);
   ok(await p.locator('#ner-lipsa-hidInt').count() === 1, 'control 2: hidranți tot pe NU → G1 apare din nou');
-  await p.click('#ner-d .nok-btn'); await p.waitForTimeout(200);
-  ok(await p.locator('#ner-d .pill-veche').count() === 1 && (await p.locator('#ner-d .veche-note').innerText()).includes('05.10.2026'), 'neregulă veche detectată automat din controlul live anterior');
-  await p.click('#ner-lipsa-hidInt .nok-btn'); await p.waitForTimeout(200);
-  ok(await p.locator('#ner-lipsa-hidInt .pill-veche').count() === 1, 'G1: neregulă veche (și la controlul trecut)');
+  // v1.25: constatările controlului anterior vin deja „Constatat” și sunt „Neregulă veche”; PV, amenda nu se preiau
+  ok(await p.locator('#ner-d.is-nok').count() === 1 && await p.locator('#ner-d .pill-veche').count() === 1 && (await p.locator('#ner-d .veche-note').innerText()).includes('05.10.2026'), 'control 2: d vine constatat, neregulă veche (controlul live anterior)');
+  ok(await p.locator('#ner-d [data-path$=".inPV"].on').count() === 0 && await p.locator('#ner-d .fine-box').count() === 0, 'control 2: PV și amenda nu se preiau');
+  ok(await p.locator('#ner-lipsa-hidInt.is-nok').count() === 1 && await p.locator('#ner-lipsa-hidInt .pill-veche').count() === 1, 'G1: vine constatat, neregulă veche (și la controlul trecut)');
 
   // ── Calendar: controlul de azi și termenele
   await p.goto('http://localhost:8080/#/calendar'); await p.waitForTimeout(300);
@@ -128,18 +129,18 @@ const DAY = 86400000;
   ok(/backup-2027-02-02_\d\d-\d\d\.json$/.test(dl.suggestedFilename()), `fișier backup cu data tabletei: ${dl.suggestedFilename()}`);
   const path = `${S}/live-backup.json`; await dl.saveAs(path);
   const data = JSON.parse(require('fs').readFileSync(path, 'utf8'));
-  ok(data.controls.length === 2 && data.schema === 11, 'backup: 2 controale, schema 11');
+  ok(data.controls.length === 2 && data.schema === 12, 'backup: 2 controale, schema 12');
   await p.click('#main [data-act="wipe"]'); await p.click('.modal [data-r="1"]'); await p.waitForTimeout(300);
   await p.goto('http://localhost:8080/#/setari'); await p.setInputFiles('[data-import]', path); await p.waitForTimeout(200);
   await p.click('[data-mode="replace"]'); await p.waitForTimeout(300);
   await p.goto(`http://localhost:8080/#/control/${id1}/nereguli/d`); await p.waitForTimeout(400);
-  ok(await p.inputValue('#ner-d [data-bind$=".amenda.serieNr"]') === 'CJ 0045678' && /Construcția\s+Restaurant/.test(await p.locator('#ner-d .constr-sel-btn').innerText()), 'după import: amenda și construcția intacte');
+  ok(await p.inputValue('#ner-d [data-bind$=".amenda.suma"]') === '2000' && /Construcția\s+Restaurant/.test(await p.locator('#ner-d .constr-sel-btn').innerText()), 'după import: amenda și construcția intacte');
   await p.goto(`http://localhost:8080/#/control/${id2}/nereguli`); await p.waitForTimeout(300);
   ok(await p.locator('#ner-d .pill-veche').count() === 1, 'după import: neregula veche tot detectată');
   // ── Fișa live
   await p.goto(`http://localhost:8080/#/fisa/${id1}`); await p.waitForTimeout(300);
   const f = await p.locator('.fisa-doc').textContent();
-  ok(f.includes('Hotel Carpați') && f.includes('Seria CJ nr. 0045678') && f.includes('Lipsă hidranți interiori') && f.includes('Restaurant'), 'fișa cu datele live');
+  ok(f.includes('Hotel Carpați') && f.includes('Amendă') && !f.includes('Seria') && f.includes('Lipsă hidranți interiori') && f.includes('Restaurant'), 'fișa cu datele live');
   console.log(errs.length ? 'ERRORS:\n' + errs.join('\n') : 'no page errors');
   await b.close();
 })();

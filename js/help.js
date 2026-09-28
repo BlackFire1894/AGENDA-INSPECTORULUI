@@ -50,7 +50,7 @@ export const MANUAL = [
       ] },
       { h: 'Ce înseamnă numerele de pe meniu' },
       { ul: [
-        'La <b>Panou</b>: câte <b>amenzi urgente</b> aveți, adică amenzi cu termenul de plată expirat sau de trimis la ANAF. Pe orizontal scrie „2 amenzi urgente”; pe vertical apare doar numărul, pe o bulină roșie.',
+        'La <b>Panou</b>: câte <b>amenzi urgente</b> aveți, adică amenzi cu termenul de plată expirat sau de trimis la ANAF / Taxe și impozite. Pe orizontal scrie „2 amenzi urgente”; pe vertical apare doar numărul, pe o bulină roșie.',
         'La <b>Istoric</b>: câte controale sunt <b>neîncheiate</b>. Pe orizontal scrie „2 neîncheiate”; pe vertical apare doar numărul.',
       ] },
       { h: 'Pe telefon' },
@@ -69,7 +69,7 @@ export const MANUAL = [
     blocks: [
       { p: 'Culorile au același înțeles în toată aplicația. Lângă fiecare culoare există mereu și un text, deci nu trebuie să le rețineți pe dinafară.' },
       { ul: [
-        `${P('Roșu', 'red')} — constatat, neregulă gravă, termen ANAF sau ASI: cere acțiune.`,
+        `${P('Roșu', 'red')} — constatat, neregulă gravă, termen ANAF / Taxe și impozite sau ASI: cere acțiune.`,
         `${P('Portocaliu', 'warn')} — de completat: act lipsă, constatare netrecută în PV, rânduri necompletate.`,
         `${P('Galben', 'yellow')} — amendă cu termenul de plată expirat.`,
         `${P('Albastru', 'blue')} — termen în curs (amendă în termenul de plată) sau o informație.`,
@@ -86,7 +86,7 @@ export const MANUAL = [
       { h: 'Cele cinci casete' },
       { p: 'Fiecare casetă are o culoare; secțiunea ei de mai jos are aceeași culoare. Atingeți o casetă ca să ajungeți la secțiunea ei.' },
       { ul: [
-        '<span class="m-k k-fines"></span><b>Amenzi active</b> (verde-albastru): câte amenzi nu sunt încă achitate. Dedesubt scrie câte sunt de trimis la ANAF, câte au termenul de plată expirat și câte sunt în curs. Amenzile achitate apar separat („+ 1 achitată”) și nu intră în total.',
+        '<span class="m-k k-fines"></span><b>Amenzi active</b> (verde-albastru): câte amenzi nu sunt încă achitate. Dedesubt scrie câte sunt de trimis la ANAF / Taxe și impozite, câte au termenul de plată expirat și câte sunt în curs. Amenzile achitate apar separat („+ 1 achitată”) și nu intră în total.',
         '<span class="m-k k-open"></span><b>Controale neîncheiate</b> (violet): controalele care nu au încă dată de încheiere. Dedesubt: data celui mai vechi dintre ele.',
         '<span class="m-k k-asi"></span><b>Termene ASI 90 zile</b> (albastru): termenele de prezentare a documentației ASI care au început să curgă. Dedesubt: cel mai apropiat termen. Termenele din controalele încă neîncheiate nu au început; ele apar separat, ca „neîncepute”.',
         '<span class="m-k k-inc"></span><b>De încărcat</b> (gri-albastru): controalele încheiate care nu sunt încă încărcate în aplicația ISU sau nu au documentul încărcat. Dedesubt: câte au ultima zi azi sau termenul depășit.',
@@ -95,7 +95,7 @@ export const MANUAL = [
       { h: 'Listele de sub casete' },
       { p: 'Listele care au ceva de rezolvat apar primele, imediat sub casete; cele goale („Nicio amendă activă”, „Toate controalele sunt încheiate” etc.) coboară la final. Între cele cu conținut, ordinea rămâne: Amenzi, Termene ASI, De încărcat, Controale neîncheiate, Netrecute în PV.' },
       { ul: [
-        `<b>Amenzi</b>: fiecare amendă, cu stadiul ei scris pe o pastilă colorată — ${F('blue', 'În curs')} ${F('yellow', 'Termen 15 zile expirat')} ${F('red', 'Trimite la ANAF')} ${F('green', 'Achitată')} —, suma și un mesaj care spune exact câte zile mai sunt (vedeți „Amenzile și termenele”).`,
+        `<b>Amenzi</b>: fiecare amendă, cu stadiul ei scris pe o pastilă colorată — ${F('blue', 'În curs')} ${F('yellow', 'Termen 15 zile expirat')} ${F('red', 'Trimite la ANAF / Taxe și impozite')} ${F('green', 'Achitată')} —, suma și un mesaj care spune exact câte zile mai sunt (vedeți „Amenzile și termenele”).`,
         '<b>Termene ASI</b>: câte zile au rămas sau cu câte zile a fost depășit termenul. După cele 90 de zile, rândul arată a doua etapă — „Constatarea pierderii valabilității” — cu cele 5 zile ale ei.',
         `<b>De încărcat în aplicație</b>: fiecare control încheiat neîncărcat, cu ce lipsește (${P('Document neîncărcat', 'red')}), termenul și câte zile lucrătoare au rămas. Portocaliu cât mai sunt zile; roșu în ultima zi și după termen.`,
         `<b>Controale neîncheiate</b>: de când sunt deschise (${P('început azi', 'open')}, ${P('de 3 zile', 'open')}); la cele programate pentru o zi viitoare, peste câte zile încep; dacă ați aplicat sigiliu, și ${P(`${icon('lock')}Sigiliu aplicat · 2 criterii`, 'red')}.`,
@@ -111,7 +111,8 @@ export const MANUAL = [
     blocks: [
       { ol: [
         `Apăsați ${B('plus', 'Control nou', 'm-prim')} și scrieți denumirea obiectivului. Sub câmp apar obiectivele deja controlate care au un nume asemănător.`,
-        'Dacă alegeți un obiectiv existent, controlul nou preia din ultimul control: datele de contact, adresa, localitatea, construcțiile (cu dotările, GRF/NSI, anul construirii și coordonatele GPS) și datele ultimelor verificări. Actele și neregulile pornesc de la zero.',
+        'Dacă alegeți un obiectiv existent, controlul nou preia <b>tot</b> din controlul imediat anterior: datele obiectivului (administrator, persoana participantă, contact, adresă, observațiile generale), sarcinile „De întrebat” nerezolvate, construcțiile (dotările, centralele, GRF/NSI, coordonatele GPS), adăposturile, observațiile actelor și <b>constatările</b>, cu observațiile și construcțiile lor, marcate „Neregulă veche”.',
+        'Pornesc de la zero: data controlului și data încheierii, <b>datele verificărilor instalațiilor</b> (loc pentru datele noi), starea actelor, trecerea în PV, amenzile, sigiliile, termenul ASI și rândurile Conform / NEC.',
         'Alegeți tipul: <b>OPEC / Instituție</b> (taburile Obiectiv, Acte, Nereguli) sau <b>Localitate</b> (în plus: Planuri și SVSU, Protecție civilă).',
         'Data începerii este, implicit, ziua de azi; o puteți schimba.',
       ] },
@@ -132,7 +133,7 @@ export const MANUAL = [
         [B('trash', '', 'm-icon m-danger'), 'Șterge controlul (vă cere confirmarea).'],
       ] },
       { h: '„Ce mai aveți de făcut”' },
-      { p: 'Bara de sub antet vă arată pasul următor, de exemplu „14 acte neverificate”, „Nereguli: 17 nereguli neverificate”, „1 constatare netrecută în PV”, „Amendă fără seria / nr.” sau „Verificare expirată”. Atingeți-l și aplicația vă duce exact acolo. <b>Toate (N)</b> deschide lista completă. Neregulile grave încă nemarcate apar primele, pe roșu.' },
+      { p: 'Bara de sub antet vă arată pasul următor, de exemplu „14 acte neverificate”, „Nereguli: 17 nereguli neverificate”, „1 constatare netrecută în PV”, „Amendă fără suma”, „Verificare expirată” sau o sarcină „De întrebat: …” încă nebifată. Atingeți-l și aplicația vă duce exact acolo. <b>Toate (N)</b> deschide lista completă. Neregulile grave încă nemarcate apar primele, pe roșu.' },
       { h: 'Taburile' },
       { p: 'Controlul are trei taburi: Obiectiv, Acte, Nereguli. La localități are cinci: în plus, Planuri și SVSU și Protecție civilă. Tabul în care lucrați este violet. Fiecare tab arată, scris:' },
       { ul: [
@@ -154,7 +155,11 @@ export const MANUAL = [
     id: 'obiectiv', ic: 'building', title: 'Tabul Obiectiv: obiectivul, construcțiile, dotările',
     blocks: [
       { h: 'Datele obiectivului' },
-      { p: 'Tipul, denumirea, administratorul, telefonul, emailul, adresa și localitatea. Ulterior, în Obiective, puteți căuta și după adresă sau localitate.' },
+      { p: 'Tipul, denumirea, administratorul, <b>persoana participantă</b> (cine a participat la control din partea obiectivului), telefonul, emailul, adresa și localitatea. Ulterior, în Obiective, puteți căuta și după adresă sau localitate.' },
+      { h: 'De întrebat până la finalizarea controlului' },
+      { p: `Sarcinile, întrebările sau verificările de făcut până la încheiere — de exemplu, ceva văzut în teren care cere mai târziu verificarea unor documente. ${B('plus', 'Adaugă')} pune un rând nou; bifați-l când l-ați rezolvat. Cele nebifate apar în „Ce mai aveți de făcut” și în fereastra dinaintea încheierii, iar la controlul următor se preiau.` },
+      { h: 'Observații generale' },
+      { p: 'Un câmp liber, pentru orice notițe despre obiectiv sau despre control. Apare în Fișa controlului și se preia la controlul următor.' },
       { h: 'Perioada controlului' },
       { p: 'Data începerii și butonul <b>Încheie controlul</b> (vedeți capitolul „La final”).' },
       { h: 'Încărcare după încheiere' },
@@ -162,14 +167,18 @@ export const MANUAL = [
       { h: 'Adăposturi de protecție civilă (OPEC / Instituție)' },
       { p: `La OPEC / Instituție, sub construcții. ${ADP} Cele neconforme apar și în tabul Nereguli, în grupul „Adăposturi de protecție civilă”. (La Localitate, adăposturile sunt în tabul Protecție civilă.)` },
       { h: 'Construcțiile' },
-      { p: 'Numărul construcțiilor se schimbă cu − și +. Fiecare construcție se deschide și se strânge din antetul ei. Antetul arată pe scurt: dotările completate, suprafața, regimul de înălțime, GRF/NSI, „GPS ✓” și avertizările (instalații lipsă, GRF/NSI V peste parter). Pentru fiecare construcție completați:' },
+      { p: `Numărul construcțiilor se schimbă cu − și +. Fiecare construcție se deschide și se strânge din antetul ei. Antetul arată pe scurt: dotările completate, suprafața, regimul de înălțime, GRF/NSI, „GPS ✓” și avertizările (instalații lipsă, GRF/NSI V peste parter). Săgețile ${B('up', '', 'm-icon')} din antet mută construcția mai sus sau mai jos în listă. Pentru fiecare construcție completați:` },
       { ul: [
         '<b>Datele</b>: suprafața desfășurată, regimul de înălțime (ex. S+P+2E), numărul de angajați, anul construirii, structura de rezistență, materialul pereților.',
         '<b>GRF / NSI</b>: I, II, III, IV, V sau „Nu e necesar” — gradul de rezistență la foc (P118/1999) sau nivelul de stabilitate la incendiu (P118-1/2025).',
         `<b>Coordonatele GPS</b>: stați lângă construcție și apăsați ${B('locate', 'Completează coordonatele', 'm-prim')}. Poziția se citește o singură dată, doar când apăsați; aplicația nu vă urmărește. Apar precizia (± metri), ora, legături spre Google Maps și Hărți Apple, Copiază și Actualizează. Dacă localizarea e oprită, aplicația vă arată pașii de activare.`,
+        `<b>Coordonatele scrise de mână</b>: ${B('pin', 'Introdu coordonatele')} primește latitudinea și longitudinea („44.426800, 26.102500”) sau formatul din aplicația Busolă a telefonului (44°25′36″ N 26°6′9″ E), care le arată și fără internet. ${dsp('Un iPad fără cartelă SIM nu are GPS: pe teren, fără rețele Wi-Fi în jur, nu își poate afla poziția, iar aplicația vă propune această variantă.', 'Folosiți-o când în interior nu e semnal.')}`,
+        '<b>Aceleași coordonate ca la prima construcție</b> (de la a doua construcție): copiază o dată coordonatele primei construcții; bifa arată că sunt identice. Atinsă din nou, golește coordonatele.',
       ] },
       { h: 'Dotări și instalații' },
-      { p: `Pe fiecare rând alegeți ${B('', 'DA')}, ${B('', 'NU')} sau ${B('', 'NEC')} (nu este cazul); câteva rânduri au doar DA și NU. La centrala termică alegeți tipul (SOLID, GAZOS, ELECTRIC) sau NU ARE. La ASI și AVIZ, pe DA, apare câmpul pentru numărul autorizației, respectiv al avizului.` },
+      { p: `Pe fiecare rând alegeți ${B('', 'DA')}, ${B('', 'NU')} sau ${B('', 'NEC')} (nu este cazul); câteva rânduri au doar DA și NU (de exemplu <b>Ascensor</b>, care nu generează neregulă). La ASI și AVIZ, pe DA, apare câmpul pentru numărul autorizației, respectiv al avizului.` },
+      { p: 'La <b>Centrală termică</b> alegeți tipul (SOLID, GAZOS, ELECTRIC) — primul tip ales declară CT 1 —, iar cu − și + câte centrale are construcția (CT 2, CT 3…), fiecare cu tipul ei; sau NU ARE. Verificarea CT (b3) se cere apoi pe fiecare centrală, iar la neregulile camerei CT puteți alege centrala.' },
+      { p: 'Rândul <b>Iluminat Hint</b> are și NEC; nu mai apare când la Hidranți interiori ați ales NU sau NEC.' },
       { p: `<b>Observațiile</b>: câmpul apare doar când are text. Atingeți ${B('plus', 'Obs.')} ca să-l deschideți; poate avea mai multe rânduri (Enter) și crește în jos. Dacă îl lăsați gol, se strânge la loc.` },
       { note: 'Dotările contează: ele decid ce nereguli vi se cer în tabul Nereguli și declanșează singure neregulile grave (vedeți capitolul următor).' },
     ],
@@ -183,9 +192,10 @@ export const MANUAL = [
         `<b>NU la o instalație necesară</b> (hidranți interiori sau exteriori, sprinklere, drencere, instalații speciale, IDSAI, detectori autonomi, EXIT, desfumare, ignifugare, rezervă de apă, stație de pompe): apare o <b>neregulă gravă</b>, notată ${P('G1', 'red')}–${P('G12', 'red')}. Ea stă primul rând în Nereguli și e semnalată cu o alertă și butonul „Vezi”. Dacă instalația nu e necesară, alegeți NEC, nu NU.`,
         '<b>GRF/NSI V</b> la o construcție cu regim de înălțime peste parter (P+1, P+2E, S+P+1, P+M…): apare neregula gravă <b>G13</b>, iar construcția primește o notă roșie.',
         '<b>NU la ASI</b>: „Construcția funcționează fără ASI” (ah) apare constatată. <b>NU la AVIZ</b>: „Lucrări … fără aviz” (ai). <b>NU la Iluminat Hint</b>: „Lipsă iluminat Hint” (am). Aceste nereguli preiau construcțiile cu NU și observațiile din fișă. Dacă reveniți la DA sau NEC, neregula se retrage — cu excepția cazului în care ați lucrat pe ea (PV, amendă, observații): atunci rămâne, iar aplicația vă anunță.',
+        '<b>Acte „Lipsă”</b> (tabul Acte): „Controale proprii” și „Analiza semestrială” lipsă apar ca nereguli separate (ap, aq); celelalte acte lipsă, împreună, ca „Nu a prezentat acte de autoritate / evidențe” (ao), cu lista actelor în observații. Se retrag la fel, dacă actele devin Prezentat.',
         '<b>Meniul de construcții</b> al unei nereguli de instalație arată doar construcțiile care au instalația pe DA.',
-        `<b>Neregula veche</b>: dacă aceeași neregulă a fost constatată la un control anterior al obiectivului, apare automat ${P(`${icon('history')}Neregulă veche`, 'veche')}. O puteți bifa și manual.`,
-        '<b>Controlul următor</b> pe același obiectiv preia construcțiile, dotările, coordonatele și datele verificărilor.',
+        `<b>Neregula veche</b>: dacă aceeași neregulă a fost constatată la controlul <b>imediat anterior</b> al obiectivului, apare automat ${P(`${icon('history')}Neregulă veche`, 'veche')}. Controalele mai vechi nu se iau în calcul. O puteți bifa și manual.`,
+        '<b>Controlul următor</b> pe același obiectiv preia tot, iar constatările vin deja constatate (vedeți „Începerea unui control”).',
         '<b>Controalele încheiate</b> își păstrează lista de nereguli din ziua încheierii: rândurile adăugate în versiuni ulterioare ale aplicației nu apar la ele. Un control redeschis primește lista actuală.',
       ] },
     ],
@@ -196,7 +206,7 @@ export const MANUAL = [
       { p: 'Aici marcați actele de autoritate și evidențele. Pentru fiecare act alegeți:' },
       { btns: [
         [B('check', 'Prezentat', 'm-ok'), 'Actul a fost prezentat.'],
-        [B('x', 'Lipsă', 'm-nok'), 'Actul lipsește; apare în Text PV și în fișă.'],
+        [B('x', 'Lipsă', 'm-nok'), 'Actul lipsește și devine neregulă în tabul Nereguli (vedeți „Ce se completează singur”); apare în Text PV și în fișă.'],
         [NEC, 'Nu este cazul (de exemplu, contractul de transmitere a unui bun, dacă nu există).'],
       ] },
       { p: 'Butoanele stau pe bara fiecărui act, lângă denumire. La Prezentat sau NEC actul se strânge singur; la Lipsă, câmpul de observații se deschide singur.' },
@@ -235,9 +245,9 @@ export const MANUAL = [
       { p: `După ce apăsați ${NOK}, rândul rămâne deschis pentru detalii:` },
       { ul: [
         '<b>Observațiile</b> sunt deja deschise, fără să pornească tastatura; scrieți doar dacă e nevoie.',
-        `<b>Construcțiile</b>: din meniul ${B('building', 'Construcția Corp A', 'm-flat')} bifați una sau mai multe construcții (sau „Toate construcțiile”), apoi „Gata”.`,
+        `<b>Construcțiile</b>: din meniul ${B('building', 'Construcția Corp A', 'm-flat')} bifați una sau mai multe construcții (sau „Toate construcțiile”), apoi „Gata”. La neregulile camerei CT, într-o construcție cu mai multe centrale alegeți și centralele (CT 1, CT 2…); fără alegere, sunt toate.`,
         '<b>Trecut în procesul-verbal</b>: bifați după ce ați scris neregula în PV.',
-        '<b>Sancționat cu amendă</b>: completați seria și numărul într-un singur câmp (de exemplu „DB 0012345”), data aplicării (implicit, data încheierii controlului) și suma. Când primiți dovada plății, bifați <b>Achitată – dovadă primită</b> și data ei.',
+        '<b>Sancționat cu amendă</b>: completați data aplicării (implicit, data încheierii controlului) și suma. Când primiți dovada plății, bifați <b>Achitată – dovadă primită</b> și data ei.',
         '<b>Neregulă veche</b>: bifați-o dacă aplicația nu a găsit-o singură în controalele anterioare.',
         '<b>Sigiliu</b> (doar la neregulile grave): bifați dacă neregula este criteriu (temei) pentru sigiliul aplicat. Sigiliul se aplică pe construcție: mai multe nereguli bifate în aceeași construcție înseamnă un singur sigiliu, cu mai multe criterii; în construcții diferite, câte un sigiliu pe fiecare. O neregulă constatată în mai multe construcții înseamnă sigiliu în fiecare dintre ele.',
         'La neregula „a” (documentație ASI): <b>Termen de prezentare 90 de zile</b> și, când primiți documentația, <b>Documentație prezentată</b>, cu data.',
@@ -256,7 +266,7 @@ export const MANUAL = [
     blocks: [
       { p: 'Verificările periodice sunt rânduri separate, în categoria „Documentație și verificări”. Fiecare are o perioadă de valabilitate:' },
       { ul: [
-        '<b>b1</b> instalații electrice — 12 luni; <b>b2</b> împământare (IPT) — 12 sau 24 de luni, la alegere pentru fiecare construcție; <b>b3</b> centrală termică — 24 de luni. Acestea se cer la <b>toate</b> construcțiile.',
+        '<b>b1</b> instalații electrice — 12 luni; <b>b2</b> împământare (IPT) — 12 sau 24 de luni, la alegere pentru fiecare construcție; <b>b3</b> centrală termică — 24 de luni, pe <b>fiecare centrală</b> (construcțiile cu „NU ARE” nu au rând). Acestea se cer la <b>toate</b> construcțiile.',
         '<b>c1</b> IDSAI — 12 luni; <b>c2</b> hidranți interiori — 6 luni; <b>c3</b> hidranți exteriori — 6 luni; <b>c4</b> desfumare, <b>c5</b> sprinklere, <b>c6</b> drencere, <b>c7</b> instalații speciale — câte 12 luni. Acestea se cer doar la construcțiile care au instalația pe DA.',
       ] },
       { h: 'Cum lucrați' },
@@ -265,7 +275,8 @@ export const MANUAL = [
         '✓ „valabilă până la 10.06.2027” — verificarea este în termen (inclusiv în ultima zi);',
         '⚠ „expirată — era valabilă până la 10.06.2026” — termenul a trecut înainte de începerea controlului.',
       ] },
-      { p: `Pentru o verificare expirată apar o avertizare, un rând în „Ce mai aveți de făcut” și butonul ${B('x', 'Constatat pentru aceasta')}. Decizia vă aparține: aplicația nu constată singură. Datele verificărilor apar în Text PV și în fișă și se preiau la controlul următor al obiectivului.` },
+      { p: 'De la al doilea rând, <b>Aceeași dată ca la …</b> copiază o dată data (și periodicitatea) primului rând; bifa arată că sunt identice.' },
+      { p: `Pentru o verificare expirată apar o avertizare, un rând în „Ce mai aveți de făcut” și butonul ${B('x', 'Constatat pentru aceasta')}. Decizia vă aparține: aplicația nu constată singură. Datele verificărilor apar în Text PV și în fișă; la controlul următor pornesc goale, pentru datele noi.` },
     ],
   },
   {
@@ -275,7 +286,7 @@ export const MANUAL = [
       { ul: [
         `${F('blue', 'În curs')} — zilele 0–15: amenda este în termenul de plată de 15 zile;`,
         `${F('yellow', 'Termen 15 zile expirat')} — zilele 16–39: termenul de plată a trecut;`,
-        `${F('red', 'Trimite la ANAF')} — din ziua 40: mai sunt cel mult 5 zile până la termenul de trimitere la ANAF, care este ziua 45;`,
+        `${F('red', 'Trimite la ANAF / Taxe și impozite')} — din ziua 40: mai sunt cel mult 5 zile până la termenul de trimitere la ANAF / Taxe și impozite, care este ziua 45;`,
         `${F('green', 'Achitată')} — ați bifat „Achitată – dovadă primită”.`,
       ] },
       { h: 'Exemplu' },
@@ -283,7 +294,7 @@ export const MANUAL = [
       { ul: [
         '5–20 octombrie: <b>În curs</b>; 20 octombrie este ultima zi de plată;',
         '21 octombrie – 13 noiembrie: <b>Termen 15 zile expirat</b>;',
-        'din 14 noiembrie: <b>Trimite la ANAF</b> („Mai aveți 5 zile…”); 19 noiembrie este ultima zi pentru trimiterea la ANAF.',
+        'din 14 noiembrie: <b>Trimite la ANAF / Taxe și impozite</b> („Mai aveți 5 zile…”); 19 noiembrie este ultima zi pentru trimiterea la ANAF / Taxe și impozite.',
       ] },
       { h: 'Termenul ASI' },
       { p: 'Dacă la neregula „a” bifați „Termen de prezentare 90 de zile”, termenul este de 90 de zile de la data încheierii controlului. De exemplu, pentru un control încheiat pe 5 octombrie 2026, termenul este 3 ianuarie 2027.' },
@@ -300,8 +311,8 @@ export const MANUAL = [
     id: 'final', ic: 'pv', title: 'La final: Text PV, Fișa PDF, încheierea',
     blocks: [
       { btns: [
-        [B('pv', 'Text PV'), 'Textul constatărilor, gata de copiat în procesul-verbal: fiecare constatare cu construcțiile, datele verificărilor, observațiile, amenda, „neregulă veche” și „sigiliu aplicat”, apoi actele lipsă. Rândurile NEC nu apar. Puteți alege „Doar cele netrecute în PV” și „Include actele lipsă”. Butoane: Copiază, Partajează, Marchează-le trecute în PV.'],
-        [B('download', 'Fișa PDF'), 'Fișa completă a controlului: datele, construcțiile (GRF/NSI, anul, GPS, dotările, nr. ASI / aviz), actele, constatările, amenzile, verificările. Apăsați „Tipărește / PDF”, apoi, în fereastra de tipărire, Partajare → Salvează în Fișiere. Dacă tipărirea nu pornește, folosiți „Partajează fișierul”.'],
+        [B('pv', 'Text PV'), 'Textul constatărilor, gata de copiat în procesul-verbal: fiecare constatare cu construcțiile, datele verificărilor, observațiile, amenda, „neregulă veche” și „sigiliu aplicat”; actele lipsă sunt printre constatări (ao, ap, aq). Rândurile NEC nu apar. Puteți alege „Doar cele netrecute în PV” și „Include actele lipsă”. Butoane: Copiază, Partajează, Marchează-le trecute în PV.'],
+        [B('download', 'Fișa PDF'), 'Fișa completă a controlului: datele (cu persoana participantă), sarcinile „De întrebat” și observațiile generale, construcțiile (GRF/NSI, anul, GPS, dotările, centralele, nr. ASI / aviz), actele, constatările, amenzile, verificările. Apăsați „Tipărește / PDF”, apoi, în fereastra de tipărire, Partajare → Salvează în Fișiere. Dacă tipărirea nu pornește, folosiți „Partajează fișierul”.'],
         [B('check', 'Încheie controlul', 'm-ok'), 'În tabul Obiectiv. Aplicația vă arată întâi ce ați omis, cu acces direct la fiecare lucru; apoi puteți „Încheia oricum”. Data încheierii pornește termenele amenzilor și termenul ASI.'],
       ] },
       { p: 'Un control încheiat se poate redeschide cu <b>Redeschide</b>, lângă data încheierii.' },
@@ -312,11 +323,11 @@ export const MANUAL = [
     blocks: [
       { ul: [
         '<b>Obiective</b>: lista obiectivelor controlate. Căutați după nume, localitate, adresă sau dată (12.09.2026, 09.2026 sau 2026; butonul „Dată” deschide un calendar) și filtrați după tip și după <b>filtrele</b> de mai jos. Cardul arată, la toate controalele obiectivului, amenzile pe stadii, ASI în curs, netrecutele în PV și încărcarea, iar pentru <b>ultimul control</b> neregulile grave și sigiliul. Atingeți un obiectiv ca să vedeți datele lui, coordonatele GPS ale construcțiilor, istoricul controalelor și butonul „Control nou pe acest obiectiv”.',
-        '<b>Istoric</b>: toate controalele, grupate pe luni, cu căutare după obiectiv, administrator sau dată și cu filtrele În desfășurare / Încheiate și filtrele de mai jos. Fiecare control arată, scris: numărul de nereguli (cele grave primele), adăposturile („3 adăposturi: 2 conforme, 1 neconform”), sigiliul („Sigiliu aplicat · 2 criterii” sau, la construcții diferite, „2 sigilii (2 construcții) · 3 criterii”), câte nu sunt trecute în PV, amenzile cu stadiul lor, termenul ASI și încărcarea — „Neîncărcat în aplicație”, „Document neîncărcat” cu termenul, sau „Încărcat în aplicație · document încărcat”. La fel pe pagina fiecărui obiectiv; în lista Obiective, cardul arată câte controale sunt neîncărcate și sigiliul aplicat la ultimul control.',
-        '<b>Calendar</b>: anul și luna se schimbă separat. În fiecare zi vedeți controalele (violet = în desfășurare, albastru închis = încheiat), activitățile (în culoarea tipului lor), zilele libere (fundal gri: weekend și sărbători legale) și bulinele termenelor (albastru = termen de plată, roșu = termen ANAF sau ASI, portocaliu = termen de încărcare). Atingeți o zi ca să vedeți lista completă și butoanele „Control nou în această zi” și „Activitate nouă în această zi” (vedeți „Planul lunar”).',
+        '<b>Istoric</b>: toate controalele, grupate pe luni, cu căutare după obiectiv, administrator, persoana participantă sau dată și cu filtrele În desfășurare / Încheiate și filtrele de mai jos. Fiecare control arată, scris: numărul de nereguli (cele grave primele), adăposturile („3 adăposturi: 2 conforme, 1 neconform”), sigiliul („Sigiliu aplicat · 2 criterii” sau, la construcții diferite, „2 sigilii (2 construcții) · 3 criterii”), câte nu sunt trecute în PV, amenzile cu stadiul lor, termenul ASI și încărcarea — „Neîncărcat în aplicație”, „Document neîncărcat” cu termenul, sau „Încărcat în aplicație · document încărcat”. La fel pe pagina fiecărui obiectiv; în lista Obiective, cardul arată câte controale sunt neîncărcate și sigiliul aplicat la ultimul control.',
+        '<b>Calendar</b>: anul și luna se schimbă separat. În fiecare zi vedeți controalele (violet = în desfășurare, albastru închis = încheiat), activitățile (în culoarea tipului lor), zilele libere (fundal gri: weekend și sărbători legale) și bulinele termenelor (albastru = termen de plată, roșu = termen ANAF / Taxe și impozite sau ASI, portocaliu = termen de încărcare). Atingeți o zi ca să vedeți lista completă și butoanele „Control nou în această zi” și „Activitate nouă în această zi” (vedeți „Planul lunar”).',
       ] },
       { h: 'Filtrele din Istoric și Obiective' },
-      { p: `Sub căutare, un rând de butoane: ${B('fine', 'Amendă în curs')} ${B('fine', 'Termen 15 zile expirat')} ${B('fine', 'Trimite la ANAF')} ${B('fine', 'Amendă achitată')} ${B('hourglass', 'ASI în curs')} ${B('upload', 'De încărcat')} ${B('pv', 'Netrecute în PV')} ${B('alert', 'Nereguli grave')} ${B('lock', 'Sigiliu aplicat')} ${B('shield', 'Adăposturi PC')}. Fiecare arată câte rezultate ați avea dacă îl atingeți; butonul cu 0 e inactiv. Puteți activa mai multe deodată: rămân doar cele care le îndeplinesc pe <b>toate</b> (de exemplu, Netrecute în PV + Trimite la ANAF). Deasupra listei scrie ce filtre sunt active; ${B('x', 'Șterge filtrele')} le anulează. Filtrele se combină cu căutarea și cu În desfășurare / Încheiate (sau tipul obiectivului).` },
+      { p: `Sub căutare, un rând de butoane: ${B('fine', 'Amendă în curs')} ${B('fine', 'Termen 15 zile expirat')} ${B('fine', 'Trimite la ANAF / Taxe și impozite')} ${B('fine', 'Amendă achitată')} ${B('hourglass', 'ASI în curs')} ${B('upload', 'De încărcat')} ${B('pv', 'Netrecute în PV')} ${B('alert', 'Nereguli grave')} ${B('lock', 'Sigiliu aplicat')} ${B('shield', 'Adăposturi PC')}. Fiecare arată câte rezultate ați avea dacă îl atingeți; butonul cu 0 e inactiv. Puteți activa mai multe deodată: rămân doar cele care le îndeplinesc pe <b>toate</b> (de exemplu, Netrecute în PV + Trimite la ANAF). Deasupra listei scrie ce filtre sunt active; ${B('x', 'Șterge filtrele')} le anulează. Filtrele se combină cu căutarea și cu În desfășurare / Încheiate (sau tipul obiectivului).` },
       { p: 'În <b>Obiective</b>, amenzile, ASI, încărcarea și PV se caută la <b>oricare</b> control al obiectivului (sunt lucruri încă deschise); neregulile grave, sigiliul și adăposturile, doar la <b>ultimul control</b> (starea actuală a obiectivului).' },
     ],
   },

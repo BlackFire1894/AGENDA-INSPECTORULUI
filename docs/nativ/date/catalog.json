@@ -1,6 +1,6 @@
 {
- "versiuneAplicatieWeb": "1.23.0",
- "schema": 11,
+ "versiuneAplicatieWeb": "1.25.0",
+ "schema": 12,
  "termene": {
   "TERMEN_PLATA": 15,
   "PRAG_ROSU": 40,
@@ -215,7 +215,8 @@
    "label": "Iluminat Hint",
    "opts": [
     "DA",
-    "NU"
+    "NU",
+    "NEC"
    ]
   },
   {
@@ -230,6 +231,15 @@
     "DA",
     "NU"
    ]
+  },
+  {
+   "key": "ascensor",
+   "label": "Ascensor",
+   "opts": [
+    "DA",
+    "NU"
+   ],
+   "din": 12
   }
  ],
  "centralaTipuri": [
@@ -245,6 +255,11 @@
   {
    "key": "lfd",
    "label": "Dispoziție LFD"
+  },
+  {
+   "key": "fumat",
+   "label": "Dispoziție de reglementare a fumatului",
+   "din": 12
   },
   {
    "key": "instruire",
@@ -495,6 +510,30 @@
    "sec": "ner"
   },
   {
+   "key": "ao",
+   "din": 12,
+   "cat": "docs",
+   "label": "Nu a prezentat acte de autoritate / evidențe",
+   "autoActe": "grup",
+   "sec": "ner"
+  },
+  {
+   "key": "ap",
+   "din": 12,
+   "cat": "docs",
+   "label": "Lipsă controale proprii",
+   "autoActe": "controale",
+   "sec": "ner"
+  },
+  {
+   "key": "aq",
+   "din": 12,
+   "cat": "docs",
+   "label": "Lipsă analiză semestrială",
+   "autoActe": "analiza",
+   "sec": "ner"
+  },
+  {
    "key": "b1",
    "din": 9,
    "cat": "docs",
@@ -520,6 +559,7 @@
    "cat": "docs",
    "label": "Nu a prezentat / nu are verificare CT (centrală termică)",
    "verif": 24,
+   "perCT": true,
    "sec": "ner"
   },
   {
@@ -654,6 +694,7 @@
    "req": [
     "centrala"
    ],
+   "perCT": true,
    "sec": "ner"
   },
   {
@@ -663,6 +704,7 @@
    "req": [
     "centrala"
    ],
+   "perCT": true,
    "sec": "ner"
   },
   {
@@ -672,6 +714,13 @@
    "req": [
     "idsai"
    ],
+   "sec": "ner"
+  },
+  {
+   "key": "an",
+   "din": 12,
+   "cat": "electric",
+   "label": "Chepengul / ușa de acces în pod nu este RF 30 / 45 minute",
    "sec": "ner"
   },
   {

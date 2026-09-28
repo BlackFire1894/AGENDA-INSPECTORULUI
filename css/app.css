@@ -553,7 +553,7 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
   --cat-docs: #64748b; --cat-stingatoare: #ea580c; --cat-electric: #b45309; --cat-semnalizare: #0d9488;
   --cat-idsai: #9333ea; --cat-hidranti: #2563eb; --cat-desfumare: #db2777; --cat-stingere: #0891b2;
   --cat-pompe: #4f46e5; --cat-planuri: #7c3aed; --cat-svsu: #0f766e; --cat-avertizare: #d97706;
-  --cat-pcdotare: #475569; --cat-custom: #94a3b8;
+  --cat-pcdotare: #475569; --cat-pcorg: #0284c7; --cat-custom: #94a3b8;
 }
 .cat-docs { --cat: var(--cat-docs); } .cat-stingatoare { --cat: var(--cat-stingatoare); }
 .cat-electric { --cat: var(--cat-electric); } .cat-semnalizare { --cat: var(--cat-semnalizare); }
@@ -561,7 +561,7 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .cat-desfumare { --cat: var(--cat-desfumare); } .cat-stingere { --cat: var(--cat-stingere); }
 .cat-pompe { --cat: var(--cat-pompe); } .cat-planuri { --cat: var(--cat-planuri); }
 .cat-svsu { --cat: var(--cat-svsu); } .cat-avertizare { --cat: var(--cat-avertizare); }
-.cat-pcdotare { --cat: var(--cat-pcdotare); } .cat-custom { --cat: var(--cat-custom); }
+.cat-pcdotare { --cat: var(--cat-pcdotare); } .cat-pcorg { --cat: var(--cat-pcorg); } .cat-custom { --cat: var(--cat-custom); }
 .cat-group + .cat-group { margin-top: 1.1111rem; }
 .cat-title {
   width: 100%; text-align: left; min-height: 44px;
@@ -1325,3 +1325,39 @@ details.paid summary { cursor: pointer; font-weight: 700; color: var(--green-ink
 .ner-row .row-label + .adp-loc { margin-top: 0.2222rem; }
 .flt-btn.flt-pc { --f: var(--k-inc, var(--accent)); }
 
+
+/* v1.25 – „De întrebat până la finalizarea controlului”, observații generale */
+.intreb-list { display: flex; flex-direction: column; gap: 0.4444rem; margin-bottom: 0.6667rem; }
+.intreb-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 0.5556rem; align-items: start; }
+.intreb-bifa { width: max(44px, 2.6667rem); height: max(44px, 2.6667rem); display: grid; place-items: center; border-radius: 0.6667rem; background: transparent; }
+.intreb-bifa .cbox { width: 1.6667rem; height: 1.6667rem; border-radius: 0.4444rem; border: 2px solid var(--line-strong); background: var(--surface); display: grid; place-items: center; }
+.intreb-bifa.on .cbox { background: var(--green); border-color: var(--green); }
+.intreb-bifa.on .cbox .ic { color: #fff; width: 1.1111rem; height: 1.1111rem; }
+.intreb-txt, .obs-gen {
+  display: block; min-height: max(44px, 2.6667rem); border: 1.5px solid var(--line); border-radius: 0.6667rem; background: var(--surface);
+  padding: 0.5556rem 0.7778rem; font-size: max(16px, 1rem); line-height: 1.4; outline: 0; min-width: 0; width: 100%;
+  resize: none; overflow: hidden; overflow-wrap: anywhere; white-space: pre-wrap; color: var(--text);
+}
+.obs-gen { min-height: max(88px, 5.5556rem); }
+.intreb-txt:focus, .obs-gen:focus { border-color: var(--accent); }
+.intreb-row.is-gata .intreb-txt { color: var(--muted); text-decoration: line-through; }
+
+/* v1.25 – ordinea construcțiilor, centralele termice pe număr, „ca la prima construcție”, coordonate introduse manual */
+.constr-ord { display: inline-flex; gap: 0.2222rem; }
+.constr-ord .icon-btn:disabled { opacity: .35; }
+.constr-ord .rot { transform: rotate(180deg); }
+.dot-ct .ct-head { display: flex; align-items: center; gap: 0.5556rem; flex-wrap: wrap; }
+.stepper.sm .step-btn { width: max(44px, 2.6667rem); height: max(44px, 2.4444rem); font-size: 1.3333rem; }
+.stepper.sm .step-val { min-width: 4.8889rem; }
+.stepper.sm .step-val b { font-size: 1.1667rem; }
+.step-val.is-empty b { color: var(--muted); }
+.dot-ct .ct-row { grid-column: 2 / -1; display: flex; align-items: center; gap: 0.5556rem; flex-wrap: wrap; }
+.ct-nr { font-weight: 800; font-size: 0.8889rem; color: var(--muted); min-width: 2.6667rem; }
+.ct-row.is-nou .ct-nr { opacity: 0.55; }
+.ct-pick { display: flex; align-items: center; gap: 0.3333rem 0.4444rem; flex-wrap: wrap; padding: 0.2222rem 0 0.4444rem 2.8889rem; }
+.ct-pick .lbl { font-size: 0.8333rem; }
+.ct-pick .hint { font-size: 0.7778rem; }
+.gps-ca, .vf-ca { margin-top: 0.4444rem; }
+.vf-ca { flex-basis: 100%; }
+.gps-q.q-manual { color: var(--accent-ink); font-weight: 750; }
+.gps-empty .btn-ghost { min-height: max(44px, 2.8889rem); }

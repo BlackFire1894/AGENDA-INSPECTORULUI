@@ -48,7 +48,7 @@ function termeneUrmatoare(controls, azi) {
       const st = fineStatus(c, n, azi);
       if (!st.anafPana) continue;
       const data = st.level === 'blue' ? st.plataPana : st.anafPana;
-      out.push({ data, nivel: st.level, titlu: st.level === 'blue' ? 'Plata amenzii' : 'Trimitere la ANAF', text: `${nume(c)} · ${neregulaLetter(c, n)}` });
+      out.push({ data, nivel: st.level, titlu: st.level === 'blue' ? 'Plata amenzii' : 'Trimitere la ANAF / Taxe și impozite', text: `${nume(c)} · ${neregulaLetter(c, n)}` });
     }
     const a = asiDeadline(c, azi);
     if (a && !a.resolved && !a.pending) out.push({ data: a.faza === 'pierdere' ? a.termenPierdere : a.deadline, nivel: 'red', titlu: a.faza === 'pierdere' ? 'ASI: pierderea valabilității' : 'ASI 90 de zile', text: nume(c) });
@@ -71,10 +71,10 @@ function notificari(controls, activitati, meta, azi) {
       for (const d of zile) {
         const st = fineStatus(c, n, d);
         if (st.level !== prev && st.anafPana) {
-          add(`amenda-${c.id}-${n.key}`, d, '08:00', st.level === 'yellow' ? 'Amendă: termenul de plată a expirat' : st.level === 'red' ? 'Amendă: de trimis la ANAF' : 'Amendă', `${cine}. ${st.msg}`);
+          add(`amenda-${c.id}-${n.key}`, d, '08:00', st.level === 'yellow' ? 'Amendă: termenul de plată a expirat' : st.level === 'red' ? 'Amendă: de trimis la ANAF / Taxe și impozite' : 'Amendă', `${cine}. ${st.msg}`);
         }
-        if (st.anafPana && d === addDays(st.anafPana, -1)) add(`anaf1-${c.id}-${n.key}`, d, '08:00', 'Amendă: mâine e ultima zi pentru ANAF', `${cine}. Termen: ${fmtDate(st.anafPana)}`);
-        if (st.anafPana && d === st.anafPana) add(`anaf0-${c.id}-${n.key}`, d, '08:00', 'Amendă: azi e ultima zi pentru ANAF', `${cine}. ${st.msg}`);
+        if (st.anafPana && d === addDays(st.anafPana, -1)) add(`anaf1-${c.id}-${n.key}`, d, '08:00', 'Amendă: mâine e ultima zi pentru ANAF / Taxe și impozite', `${cine}. Termen: ${fmtDate(st.anafPana)}`);
+        if (st.anafPana && d === st.anafPana) add(`anaf0-${c.id}-${n.key}`, d, '08:00', 'Amendă: azi e ultima zi pentru ANAF / Taxe și impozite', `${cine}. ${st.msg}`);
         prev = st.level;
       }
     }

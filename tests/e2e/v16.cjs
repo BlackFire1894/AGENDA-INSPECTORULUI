@@ -16,7 +16,7 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
     ok(/Completați denumirea/.test(first), `bara „Ce mai ai de făcut”: ${first}`);
     await p.click('.todo-more'); await p.waitForTimeout(200);
     const all = await p.locator('.todo-list .todo-item').allInnerTexts();
-    ok(all.length === 5 && /acte neverificate/.test(all[1]) && /Nereguli: 15 nereguli neverificate/.test(all[2]) && /Coordonate GPS necompletate: Construcția 1/.test(all[3]) && /nu este încheiat/.test(all[4]), `lista completă: ${all.join(' | ')}`);
+    ok(all.length === 5 && /acte neverificate/.test(all[1]) && /Nereguli: 16 nereguli neverificate/.test(all[2]) && /Coordonate GPS necompletate: Construcția 1/.test(all[3]) && /nu este încheiat/.test(all[4]), `lista completă: ${all.join(' | ')}`);
     await p.fill('[data-bind="denumire"]', 'Liceul Test'); await p.waitForTimeout(500);
     ok(!/denumirea/.test(await p.locator('#ed-todo').innerText()), 'bara se actualizează la tastare');
     // du-mă la acte
@@ -25,10 +25,10 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
     // restul prezentate + anulare
     await p.click('.check-row >> nth=1 >> .nok-btn'); await p.waitForTimeout(200);
     await p.click('[data-act="rest-ok"]'); await p.waitForTimeout(200);
-    ok((await p.locator('.modal h2').innerText()).includes('13 acte'), 'confirmare: 13 acte (unul e deja Lipsă)');
-    ok(await p.locator('.bulk-list li').count() === 13 && await p.locator('.modal [data-r="1"]').isDisabled(), 'lista: 13 acte; butonul inactiv până la bifă');
+    ok((await p.locator('.modal h2').innerText()).includes('14 acte'), 'confirmare: 14 acte (unul e deja Lipsă)');
+    ok(await p.locator('.bulk-list li').count() === 14 && await p.locator('.modal [data-r="1"]').isDisabled(), 'lista: 14 acte; butonul inactiv până la bifă');
     await p.click('#bulk-ok'); await p.click('.modal [data-r="1"]'); await p.waitForTimeout(300);
-    ok(await p.locator('.check-row.is-ok').count() === 13 && await p.locator('.check-row.is-nok').count() === 1, 'Restul prezentate: 13 ✓, „Lipsă” neatins');
+    ok(await p.locator('.check-row.is-ok').count() === 14 && await p.locator('.check-row.is-nok').count() === 1, 'Restul prezentate: 14 ✓, „Lipsă” neatins');
     await p.click('.toast-btn'); await p.waitForTimeout(300);
     ok(await p.locator('.check-row.is-ok').count() === 0 && await p.locator('.check-row.is-nok').count() === 1, 'Anulează → revine exact la starea anterioară');
     await p.click('[data-act="rest-ok"]'); await p.click('#bulk-ok'); await p.click('.modal [data-r="1"]'); await p.waitForTimeout(300);
@@ -36,17 +36,18 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
     await p.click('.ed-tab >> nth=2'); await p.waitForTimeout(300);
     await p.click('#ner-d .nok-btn'); await p.waitForTimeout(200);
     await p.click('[data-act="rest-ok"]'); await p.click('#bulk-ok'); await p.click('.modal [data-r="1"]'); await p.waitForTimeout(300);
-    ok(await p.locator('.ner-row.is-ok').count() === 14 && await p.locator('#ner-d.is-nok').count() === 1, 'Nereguli: restul conform (14), d rămâne constatat');
+    ok(await p.locator('.ner-row.is-ok').count() === 15 && await p.locator('#ner-d.is-nok').count() === 1 && await p.locator('#ner-ao.is-nok').count() === 1, 'Nereguli: restul conform (15); d și ao (actul lipsă, v1.25) rămân constatate');
     ok(await p.locator('.btn-rest').count() === 0, 'butonul dispare când nu mai e nimic de bifat');
     // bara arată acum PV
     const now = await p.locator('.todo .todo-item >> nth=0').innerText();
-    ok(/netrecută în PV/.test(now), `pasul următor: ${now}`);
+    ok(/2 constatări netrecute în PV/.test(now), `pasul următor: ${now}`);
     // încheiere cu omisiuni
     await p.click('.ed-tab >> nth=0'); await p.waitForTimeout(200);
     await p.click('[data-act="close-control"]'); await p.waitForTimeout(300);
-    ok((await p.locator('.modal').innerText()).includes('netrecută în PV'), 'verificare la încheiere: arată omisiunea');
+    ok((await p.locator('.modal').innerText()).includes('netrecute în PV'), 'verificare la încheiere: arată omisiunea');
     await p.click('.modal .todo-item'); await p.waitForTimeout(600);
-    ok(/\/nereguli\/d$/.test(p.url()) && await p.locator('.modal').count() === 0, 'din verificare → direct la neregulă');
+    ok(/\/nereguli\/ao$/.test(p.url()) && await p.locator('.modal').count() === 0, 'din verificare → direct la prima neregulă netrecută (ao)');
+    await p.click('#ner-ao [data-path$=".inPV"]'); await p.waitForTimeout(200);
     await p.click('#ner-d [data-path$=".inPV"]'); await p.waitForTimeout(200);
     await p.click('.ed-tab >> nth=0'); await p.waitForTimeout(200);
     await p.click('button:has-text("Completează coordonatele")'); await p.waitForTimeout(500);

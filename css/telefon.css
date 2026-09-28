@@ -136,3 +136,7 @@ h1 { font-size: 1.5556rem; }
 /* Fișa: caracteristicile construcției pe două coloane, nu un tabel lat */
 .fisa-doc .f-kv, .fisa-doc .f-kv tbody { display: block; overflow: visible; }
 .fisa-doc .f-kv tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+/* v1.25 – centralele termice și alegerea lor la constatare */
+.dot-ct .ct-row { grid-column: 1 / -1; }
+.ct-pick { padding-left: 0; }

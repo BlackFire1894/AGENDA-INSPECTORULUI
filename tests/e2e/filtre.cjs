@@ -16,7 +16,7 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
     const btns = p.locator('#flt-hist .flt-btn:not(.flt-clear)');
     ok(await btns.count() === 10, `${vw}: Istoric: 10 filtre`);
     // fiecare filtru, singur: numărul de pe buton = rezultatele = rândurile care au pastila corespunzătoare
-    const semn = { 'am-blue': /În curs/, 'am-yellow': /Termen 15 zile expirat/, 'am-red': /Trimite la ANAF/, 'am-green': /Achitat/, asi: /ASI(?!.*neînceput)/, inc: /Încărcare:/, pv: /netrecut[ăe] în PV/, grave: /grav[ăe]/, sigiliu: /[Ss]igili/, adapost: /adăpost/ };
+    const semn = { 'am-blue': /În curs/, 'am-yellow': /Termen 15 zile expirat/, 'am-red': /Trimite la ANAF \/ Taxe și impozite/, 'am-green': /Achitat/, asi: /ASI(?!.*neînceput)/, inc: /Încărcare:/, pv: /netrecut[ăe] în PV/, grave: /grav[ăe]/, sigiliu: /[Ss]igili/, adapost: /adăpost/ };
     for (const k of Object.keys(semn)) {
       const btn = p.locator(`#flt-hist [data-val="${k}"]`);
       const n = +(await btn.locator('b').innerText());
@@ -33,8 +33,8 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
     if (nAm) {
       await p.click('#flt-hist [data-val="am-red"]'); await p.waitForTimeout(150);
       const rows = await p.locator('#hist-list .ctl-row .chips').allInnerTexts();
-      ok(rows.length === nAm && rows.every((r) => /netrecut[ăe] în PV/.test(r) && /Trimite la ANAF/.test(r)), `${vw}: PV + ANAF → ${nAm}, ambele condiții`);
-      ok(/filtre: Netrecute în PV \+ Trimite la ANAF/.test(await p.locator('.count').innerText()), `${vw}: numărul spune ce filtre sunt active`);
+      ok(rows.length === nAm && rows.every((r) => /netrecut[ăe] în PV/.test(r) && /Trimite la ANAF \/ Taxe și impozite/.test(r)), `${vw}: PV + ANAF → ${nAm}, ambele condiții`);
+      ok(/filtre: Netrecute în PV \+ Trimite la ANAF \/ Taxe și impozite/.test(await p.locator('.count').innerText()), `${vw}: numărul spune ce filtre sunt active`);
     }
     await p.screenshot({ path: `${S}/filtre-istoric-${vw}.png` });
     await p.click('#flt-hist .flt-clear'); await p.waitForTimeout(150);
@@ -52,7 +52,7 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
         grave: ob.filter((o) => grave(o.last)).map((o) => o.denumire).sort(),
       };
     });
-    const semnOb = { 'am-blue': /În curs/, 'am-yellow': /Termen 15 zile expirat/, 'am-red': /Trimite la ANAF/, 'am-green': /achitat/, asi: /ASI în curs/, inc: /neîncărcat/, pv: /în PV/, grave: /La ultimul control: \d+ nereg\S+ grav/, sigiliu: /sigiliu/, adapost: /adăpost/ };
+    const semnOb = { 'am-blue': /În curs/, 'am-yellow': /Termen 15 zile expirat/, 'am-red': /Trimite la ANAF \/ Taxe și impozite/, 'am-green': /achitat/, asi: /ASI în curs/, inc: /neîncărcat/, pv: /în PV/, grave: /La ultimul control: \d+ nereg\S+ grav/, sigiliu: /sigiliu/, adapost: /adăpost/ };
     for (const k of Object.keys(semnOb)) {
       const btn = p.locator(`#flt-obj [data-val="${k}"]`);
       const n = +(await btn.locator('b').innerText());
