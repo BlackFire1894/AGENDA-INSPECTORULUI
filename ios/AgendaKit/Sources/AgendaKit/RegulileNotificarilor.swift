@@ -101,7 +101,7 @@ public func detaliiCategorie(_ c: CategorieNotificare, _ s: SetariNotificari) ->
     case .asi: return "Ora \(o): " + descriereRegula(s.asi, s)
     case .incarcare: return "Ora \(o), în zilele lucrătoare: " + descriereRegula(s.incarcare, s, lucratoare: true)
     case .amenzi:
-        return "Ora \(o): " + ([s.schimbareStadiu ? "la schimbarea stadiului" : nil].compactMap { $0 } + ["ANAF: " + descriereRegula(s.anaf, s)]).joined(separator: " · ")
+        return "Ora \(o): " + ([s.schimbareStadiu ? "la schimbarea stadiului" : nil].compactMap { $0 } + ["ANAF / Taxe și impozite: " + descriereRegula(s.anaf, s)]).joined(separator: " · ")
     case .activitati:
         return "În ziua planificată, la \(o)" + (s.minuteInainte > 0 ? " · cu \(plural(s.minuteInainte, "minut", "minute")) înainte de oră" : "")
     case .confirmare: return "A doua zi după activitate, la \(o)"
@@ -152,7 +152,7 @@ public func notificariDupaReguli(_ controls: [Control], _ activitati: [Activitat
                 while d <= min(anaf, capat) {
                     let st = fineStatus(c, n, d)
                     if st.level != prev {
-                        let titlu = st.level == "yellow" ? "Amendă: termenul de plată a expirat" : st.level == "red" ? "Amendă: de trimis la ANAF" : "Amendă"
+                        let titlu = st.level == "yellow" ? "Amendă: termenul de plată a expirat" : st.level == "red" ? "Amendă: de trimis la ANAF / Taxe și impozite" : "Amendă"
                         add("amenda-\(c.id)-\(n.key)", d, s.ora(.amenzi), .amenzi, titlu, "\(cine). \(st.msg)")
                     }
                     prev = st.level
@@ -163,15 +163,15 @@ public func notificariDupaReguli(_ controls: [Control], _ activitati: [Activitat
             while d <= min(anaf, capat) {
                 let r = diffDays(d, anaf)
                 for o in ore(s.anaf, r, .amenzi) ?? [] {
-                    let titlu = r == 0 ? "Amendă: azi e ultima zi pentru ANAF" : r == 1 ? "Amendă: mâine e ultima zi pentru ANAF"
-                        : "Amendă: mai sunt \(zile(r)) pentru ANAF"
+                    let titlu = r == 0 ? "Amendă: azi e ultima zi pentru ANAF / Taxe și impozite" : r == 1 ? "Amendă: mâine e ultima zi pentru ANAF / Taxe și impozite"
+                        : "Amendă: mai sunt \(zile(r)) pentru ANAF / Taxe și impozite"
                     add("anaf-\(c.id)-\(n.key)", d, o, .amenzi, titlu, r == 0 ? "\(cine). \(fineStatus(c, n, d).msg)" : "\(cine). Termen: \(fmtDate(anaf))")
                 }
                 d = addDays(d, 1)
             }
             if s.anaf.depasite {
                 for d in lucratoare(max(azi, addDays(anaf, 1)), peste14) {
-                    add("anaf-dep-\(c.id)-\(n.key)", d, s.ora(.amenzi), .amenzi, "Amendă: termenul ANAF a trecut", "\(cine). \(fineStatus(c, n, d).msg)")
+                    add("anaf-dep-\(c.id)-\(n.key)", d, s.ora(.amenzi), .amenzi, "Amendă: termenul ANAF / Taxe și impozite a trecut", "\(cine). \(fineStatus(c, n, d).msg)")
                 }
             }
         }

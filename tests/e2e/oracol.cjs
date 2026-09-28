@@ -30,9 +30,9 @@ function amenda(c, n) {
   if (e <= 15) { const l = 15 - e; return { lv: 'blue', left: l, plata, anaf, msg: l === 0 ? 'Astăzi este ultima zi de plată' : `${l === 1 ? 'Mai este 1 zi' : `Mai sunt ${zile(l)}`} din termenul de plată (${fmt(plata)})` }; }
   if (e <= 39) return { lv: 'yellow', left: 45 - e, plata, anaf, msg: `Termenul de plată a expirat de ${zile(e - 15)} (${fmt(plata)})` };
   const l = 45 - e;
-  return { lv: 'red', left: l, plata, anaf, msg: l > 0 ? `Mai aveți ${zile(l)} până să o trimiteți la ANAF; consultați calculatorul de termene` : l === 0 ? 'Astăzi este ultima zi pentru trimiterea la ANAF; consultați calculatorul de termene' : `Termenul de trimitere la ANAF (${fmt(anaf)}) a fost depășit cu ${zile(-l)}` };
+  return { lv: 'red', left: l, plata, anaf, msg: l > 0 ? `Mai aveți ${zile(l)} până să o trimiteți la ANAF / Taxe și impozite; consultați calculatorul de termene` : l === 0 ? 'Astăzi este ultima zi pentru trimiterea la ANAF / Taxe și impozite; consultați calculatorul de termene' : `Termenul de trimitere la ANAF / Taxe și impozite (${fmt(anaf)}) a fost depășit cu ${zile(-l)}` };
 }
-const LABEL = { blue: 'În curs', yellow: 'Termen 15 zile expirat', red: 'Trimite la ANAF', green: 'Achitată' };
+const LABEL = { blue: 'În curs', yellow: 'Termen 15 zile expirat', red: 'Trimite la ANAF / Taxe și impozite', green: 'Achitată' };
 let fines = [];
 function asi(c) {
   const n = c.nereguli.find((x) => x.key === 'a' && !x.custom);
@@ -90,7 +90,7 @@ const cnt = (lv) => fines.filter((f) => f.s.lv === lv).length;
   eq(await p.locator('.kpi-asi .kpi-num').innerText(), String(asiAct.length), 'Panou: Termene ASI (active)');
   eq(await p.locator('.kpi-pv .kpi-num').innerText(), String(netrec.length), 'Panou: Netrecute în PV');
   const leg = (await p.locator('.kpi-fines .kpi-legend > span').allInnerTexts()).map((s) => s.replace(/\s+/g, ' ').trim());
-  const expLeg = [[cnt('red'), 'de trimis la ANAF'], [cnt('yellow'), 'cu termen de plată expirat'], [cnt('blue'), 'în curs']].filter(([n]) => n).map(([n, t]) => `${n} ${t}`);
+  const expLeg = [[cnt('red'), 'de trimis la ANAF / Taxe și impozite'], [cnt('yellow'), 'cu termen de plată expirat'], [cnt('blue'), 'în curs']].filter(([n]) => n).map(([n, t]) => `${n} ${t}`);
   eq(leg.join(' | '), expLeg.join(' | '), 'Panou: legenda amenzilor');
   ok(leg.reduce((s, x) => s + parseInt(x, 10), 0) === active.length, 'Panou: legenda însumează totalul');
   eq((await p.locator('.kpi-fines .kpi-foot').innerText()).trim(), cnt('green') ? `+ ${cnt('green')} ${cnt('green') === 1 ? 'achitată' : 'achitate'} (nu intră în total)` : '', 'Panou: achitate');

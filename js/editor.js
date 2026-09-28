@@ -886,7 +886,7 @@ function neregulaDetail(c, n, path) {
       </div>
       ${fs.plataPana && !a.achitata ? `<div class="fine-timeline">
         <span class="${fs.level === 'blue' ? 'cur' : 'past'}"><i class="dot dot-blue"></i>Plată până la <b>${fmtDate(fs.plataPana)}</b>${fs.plataNelucr ? ` <em class="nelucr">(${esc(fs.plataNelucr)} → ${esc(fmtDate(nextWorkingDay(fs.plataPana)))})</em>` : ''}</span>
-        <span class="${fs.level === 'red' ? 'cur' : ''}"><i class="dot dot-red"></i>ANAF până la <b>${fmtDate(fs.anafPana)}</b>${fs.anafNelucr ? ` <em class="nelucr">(${esc(fs.anafNelucr)} → ${esc(fmtDate(nextWorkingDay(fs.anafPana)))})</em>` : ''}</span>
+        <span class="${fs.level === 'red' ? 'cur' : ''}"><i class="dot dot-red"></i>ANAF / Taxe și impozite până la <b>${fmtDate(fs.anafPana)}</b>${fs.anafNelucr ? ` <em class="nelucr">(${esc(fs.anafNelucr)} → ${esc(fmtDate(nextWorkingDay(fs.anafPana)))})</em>` : ''}</span>
       </div>` : ''}
       ${fs.nelucr && !a.achitata ? `<div class="nelucr-warn">${icon('alert')}<span>${esc(fs.nelucr)}</span></div>` : ''}
     </div>`;

@@ -594,7 +594,7 @@ const maiSunt = (n) => (n === 1 ? 'Mai este 1 zi' : `Mai sunt ${zile(n)}`);
 //   green  = achitată, dovadă primită
 //   blue   = în curs (în termenul de 15 zile)
 //   yellow = termenul de 15 zile a expirat
-//   red    = au trecut 25 de zile după cele 15 inițiale → mai sunt ≤ 5 zile până la ANAF
+//   red    = au trecut 25 de zile după cele 15 inițiale → mai sunt ≤ 5 zile până la ANAF / Taxe și impozite
 export function fineStatus(control, n, today = todayISO()) {
   const a = n.amenda || {};
   if (a.achitata) {
@@ -627,17 +627,17 @@ export function fineStatus(control, n, today = todayISO()) {
     const over = elapsed - TERMEN_PLATA;
     return {
       level: 'yellow', label: 'Termen 15 zile expirat', elapsed, plataPana, anafPana, plataNelucr, anafNelucr, daysLeft: leftAnaf,
-      nelucr: anafNelucr ? nelucrNota('Termenul ANAF', anafPana, anafNelucr) : '',
+      nelucr: anafNelucr ? nelucrNota('Termenul ANAF / Taxe și impozite', anafPana, anafNelucr) : '',
       msg: `Termenul de plată a expirat de ${zile(over)} (${fmtDate(plataPana)})`,
     };
   }
   let msg;
-  if (leftAnaf > 0) msg = `Mai aveți ${zile(leftAnaf)} până să o trimiteți la ANAF; consultați calculatorul de termene`;
-  else if (leftAnaf === 0) msg = 'Astăzi este ultima zi pentru trimiterea la ANAF; consultați calculatorul de termene';
-  else msg = `Termenul de trimitere la ANAF (${fmtDate(anafPana)}) a fost depășit cu ${zile(-leftAnaf)}`;
+  if (leftAnaf > 0) msg = `Mai aveți ${zile(leftAnaf)} până să o trimiteți la ANAF / Taxe și impozite; consultați calculatorul de termene`;
+  else if (leftAnaf === 0) msg = 'Astăzi este ultima zi pentru trimiterea la ANAF / Taxe și impozite; consultați calculatorul de termene';
+  else msg = `Termenul de trimitere la ANAF / Taxe și impozite (${fmtDate(anafPana)}) a fost depășit cu ${zile(-leftAnaf)}`;
   return {
-    level: 'red', label: 'Trimite la ANAF', elapsed, plataPana, anafPana, plataNelucr, anafNelucr, daysLeft: leftAnaf, msg,
-    nelucr: anafNelucr && leftAnaf >= 0 ? nelucrNota('Termenul ANAF', anafPana, anafNelucr) : '',
+    level: 'red', label: 'Trimite la ANAF / Taxe și impozite', elapsed, plataPana, anafPana, plataNelucr, anafNelucr, daysLeft: leftAnaf, msg,
+    nelucr: anafNelucr && leftAnaf >= 0 ? nelucrNota('Termenul ANAF / Taxe și impozite', anafPana, anafNelucr) : '',
   };
 }
 

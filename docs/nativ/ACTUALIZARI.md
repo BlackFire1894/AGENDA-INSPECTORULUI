@@ -38,3 +38,15 @@ Ce ai de făcut în Swift: 1) culoareCategorie("pcorg") = 0x0284c7 (Agenda/Edito
 Criterii de acceptare: testele 100%; în tabul Protecție civilă al unei Localități, bara și banda rândurilor „Organizare protecție civilă” sunt albastru-cer, ca în web; versiunea din Setări = 1.23.1.
 La final: commit + PR; raport scurt.
 ```
+
+### v1.24.0 — „ANAF / Taxe și impozite” (28.09.2026)
+Aplicată deja în aplicația nativă, în același PR. Promptul rămâne pentru istoric:
+
+```
+Actualizare la versiunea web v1.24.0. Rulează `git pull` pe main.
+Ce s-a schimbat: textul „ANAF” devine „ANAF / Taxe și impozite” peste tot (js/model.js: eticheta și mesajele fineStatus, nelucrNota; js/views.js: LEVEL_LABEL, filtrul am-red, legenda Panoului „de trimis la …”, „+25 zile: trimite la …”, mementoul sărbătorilor, termenul din calendar, legenda calendarului „termen ANAF / Taxe și impozite sau ASI”, regulile din Setări; js/editor.js: „… până la”; js/help.js: Ghidul; tests/nativ/referinta.mjs: titlurile notificărilor și ale widgetului). Regulile de calcul nu se schimbă.
+Date comune regenerate: docs/nativ/date/catalog.json, ghid.json. Vectori regenerați: termene.json, demo.json (mesajele).
+Ce ai de făcut în Swift: aceleași texte în Termene.swift, Liste.swift, Panou.swift, Calendar.swift, ModelEditor.swift, Nativ.swift, RegulileNotificarilor.swift, PlanNotificari.swift, EcranSetari.swift, ReguliNotificari.swift; testele portate (ModelTests, NotificariTests).
+Criterii de acceptare: testele 100% (vectori, verificarea încrucișată, ghidul); pastila roșie a amenzii nu se taie (Panou, Istoric, Obiective, editor, filtre), la toate mărimile și orientările.
+La final: commit + PR; raport scurt.
+```

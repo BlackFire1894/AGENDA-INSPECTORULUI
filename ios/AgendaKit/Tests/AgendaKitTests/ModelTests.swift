@@ -65,7 +65,7 @@ final class ModelTests: TestVectori {
         XCTAssertEqual(fineStatus(c, n, "2026-10-10").level, "yellow")
         let st = fineStatus(c, n, "2026-10-11")
         XCTAssertEqual(st.level, "red"); XCTAssertEqual(st.daysLeft, 5)
-        XCTAssertTrue(st.msg.contains("Mai aveți 5 zile până să o trimiteți la ANAF; consultați calculatorul de termene"))
+        XCTAssertTrue(st.msg.contains("Mai aveți 5 zile până să o trimiteți la ANAF / Taxe și impozite; consultați calculatorul de termene"))
         XCTAssertEqual(st.anafPana, "2026-10-16")
         XCTAssertTrue(fineStatus(c, n, "2026-10-20").msg.contains("depășit cu 4 zile"))
         let (v, kv) = withFine("2026-09-01", [("achitata", true)])

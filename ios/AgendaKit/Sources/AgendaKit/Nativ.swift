@@ -78,7 +78,7 @@ func termeneUrmatoare(_ controls: [Control], _ azi: String) -> [TermenUrmator] {
             let st = fineStatus(c, n, azi)
             guard let anaf = st.anafPana, !anaf.isEmpty else { continue }
             let data = st.level == "blue" ? (st.plataPana ?? "") : anaf
-            out.append(TermenUrmator(data: data, nivel: st.level, titlu: st.level == "blue" ? "Plata amenzii" : "Trimitere la ANAF",
+            out.append(TermenUrmator(data: data, nivel: st.level, titlu: st.level == "blue" ? "Plata amenzii" : "Trimitere la ANAF / Taxe și impozite",
                                      text: "\(nume(c)) · \(neregulaLetter(c, n))"))
         }
         if let a = asiDeadline(c, azi), a.resolved != true, a.pending != true {
@@ -124,14 +124,14 @@ func notificari(_ controls: [Control], _ activitati: [Activitate], _ meta: MetaN
                 let st = fineStatus(c, n, d)
                 let anaf = st.anafPana ?? ""
                 if st.level != prev && !anaf.isEmpty {
-                    let titlu = st.level == "yellow" ? "Amendă: termenul de plată a expirat" : st.level == "red" ? "Amendă: de trimis la ANAF" : "Amendă"
+                    let titlu = st.level == "yellow" ? "Amendă: termenul de plată a expirat" : st.level == "red" ? "Amendă: de trimis la ANAF / Taxe și impozite" : "Amendă"
                     add("amenda-\(c.id)-\(n.key)", d, "08:00", titlu, "\(cine). \(st.msg)")
                 }
                 if !anaf.isEmpty && d == addDays(anaf, -1) {
-                    add("anaf1-\(c.id)-\(n.key)", d, "08:00", "Amendă: mâine e ultima zi pentru ANAF", "\(cine). Termen: \(fmtDate(anaf))")
+                    add("anaf1-\(c.id)-\(n.key)", d, "08:00", "Amendă: mâine e ultima zi pentru ANAF / Taxe și impozite", "\(cine). Termen: \(fmtDate(anaf))")
                 }
                 if !anaf.isEmpty && d == anaf {
-                    add("anaf0-\(c.id)-\(n.key)", d, "08:00", "Amendă: azi e ultima zi pentru ANAF", "\(cine). \(st.msg)")
+                    add("anaf0-\(c.id)-\(n.key)", d, "08:00", "Amendă: azi e ultima zi pentru ANAF / Taxe și impozite", "\(cine). \(st.msg)")
                 }
                 prev = st.level
             }

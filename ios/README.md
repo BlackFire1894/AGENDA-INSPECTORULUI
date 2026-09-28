@@ -134,6 +134,7 @@ xcrun devicectl device process launch --device <UDID> ro.cucuta.agenda
   - **rezumatul zilei** (nou): dimineața, în zilele lucrătoare, ce mai e de făcut; atingerea deschide Panoul;
   - **butoane în notificare** (nou): „Amână 1 oră” / „Amână până mâine”; la activități, „Efectuată”;
   - **setări pe categorii** (nou): activare pe categorii și ora rezumatului.
+- **28.09.2026 — „ANAF / Taxe și impozite”** în locul lui „ANAF”, peste tot (web 1.24.0 + nativ). **Ferestrele înguste** (Stage Manager, sub ~700 pt): aspectul compact de telefon, odată cu etapa 10.
 - **27.09.2026 — expirarea la 7 zile:** script de reinstalare cu dublu-clic pe Mac + avertizare în aplicație cu 2 zile înainte.
 - **27.09.2026 — după audit:** notificări configurabile (ASI, încărcare, activități, termene depășite, orele), blocare cu Touch ID (comutator în Setări, la fiecare deschidere / revenire), fotografii la constatări (ascunse implicit, în backup și în Fișă), culoare pentru „Organizare protecție civilă” (albastru-cer, în web și în nativ), vibrație la atingere (doar iPhone: iPad-ul nu are motor de vibrație).
 - **26.09.2026 — după finalizare,** utilizatorul lucrează doar în aplicația nativă. Aplicația web rămâne pe GitHub pentru actualizări (sursa promptelor din docs/nativ/ACTUALIZARI.md). Mutarea datelor: un backup din web, importat o dată în nativ.

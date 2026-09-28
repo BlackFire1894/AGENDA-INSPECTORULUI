@@ -89,8 +89,8 @@ const DAY = 86400000;
   ok(/Termen 15 zile expirat/.test(fine) && /expirat de 1 zi/.test(fine), 'ziua 16: galben, „expirat de 1 zi”');
   await p.clock.fastForward(24 * DAY); await p.waitForTimeout(400);   // ziua 40 = 14.11.2026, sâmbătă
   fine = await p.locator('#sec-fines .item').innerText();
-  ok(/Trimite la ANAF/.test(fine) && /Mai aveți 5 zile până să o trimiteți la ANAF/.test(fine), 'ziua 40: roșu, „Mai aveți 5 zile … ANAF”');
-  ok(/Termenul ANAF \(19\.11\.2026\)/.test(fine) === false, 'ANAF 19.11.2026 e joi — fără avertizare de zi nelucrătoare');
+  ok(/Trimite la ANAF \/ Taxe și impozite/.test(fine) && /Mai aveți 5 zile până să o trimiteți la ANAF \/ Taxe și impozite/.test(fine), 'ziua 40: roșu, „Mai aveți 5 zile … ANAF”');
+  ok(/Termenul ANAF \/ Taxe și impozite \(19\.11\.2026\)/.test(fine) === false, 'ANAF 19.11.2026 e joi — fără avertizare de zi nelucrătoare');
   // achitare → verde
   await p.goto(`http://localhost:8080/#/control/${id1}/nereguli/d`); await p.waitForTimeout(400);
   await p.click('#ner-d [data-path$=".amenda.achitata"]'); await p.waitForTimeout(200);

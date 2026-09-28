@@ -52,7 +52,7 @@ test('amenda: roșu după 25 de zile peste cele 15 → „Mai aveți 5 zile”',
   const st = fineStatus(c, n, '2026-10-11'); // ziua 40
   assert.equal(st.level, 'red');
   assert.equal(st.daysLeft, 5);
-  assert.match(st.msg, /Mai aveți 5 zile până să o trimiteți la ANAF; consultați calculatorul de termene/);
+  assert.match(st.msg, /Mai aveți 5 zile până să o trimiteți la ANAF \/ Taxe și impozite; consultați calculatorul de termene/);
   assert.equal(st.anafPana, '2026-10-16');
   assert.match(fineStatus(c, n, '2026-10-20').msg, /depășit cu 4 zile/);
 });

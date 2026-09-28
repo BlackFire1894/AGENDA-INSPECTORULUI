@@ -165,7 +165,7 @@ struct ContinutSetari: View {
                 VStack(alignment: .leading, spacing: 0.3333 * rem) {
                     regula("**Amendă:** data aplicării (implicit data încheierii controlului).")
                     ForEach([(Color.blue, "zilele 1–15: în curs"), (Color.yellow, "zilele 16–39: termenul de 15 zile expirat"),
-                             (Color.red, "din ziua 40: „Mai aveți 5 zile până să o trimiteți la ANAF” (termen: ziua 45)"),
+                             (Color.red, "din ziua 40: „Mai aveți 5 zile până să o trimiteți la ANAF / Taxe și impozite” (termen: ziua 45)"),
                              (Color.green, "achitată, cu dovadă primită")], id: \.1) { c, t in
                         HStack(spacing: 0.5556 * rem) {
                             Circle().fill(c).frame(width: 0.6667 * rem, height: 0.6667 * rem)

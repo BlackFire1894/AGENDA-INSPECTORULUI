@@ -56,7 +56,7 @@ enum Tur {
         }
         if let o = opec { await pas("fisa", asteapta: 3) { nav.mergi(.fisa(o.id)) } }
         // fotografiile: două imagini de probă pe rândul „d”, arătate, apoi Fișa cu anexa (la final)
-        if let o = opec, doar?.contains("foto") == true {
+        if let o = opec, doar == nil || doar!.contains("foto") {
             await pas("foto-rand", inainte: { nav.mergi(.control(id: o.id, tab: "nereguli", focus: "d")) }) {
                 ses.adaugaFotografii("d", [imagineProba(.systemOrange, "1"), imagineProba(.systemTeal, "2")])
                 ses.comutaFotografii("d")

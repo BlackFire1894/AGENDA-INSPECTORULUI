@@ -24,7 +24,7 @@ public enum CategorieNotificare: String, Codable, CaseIterable, Sendable {
     /// când vin, pe scurt (Setări)
     public var detalii: String {
         switch self {
-        case .amenzi: return "La schimbarea stadiului; termenul ANAF, după regulile alese"
+        case .amenzi: return "La schimbarea stadiului; termenul ANAF / Taxe și impozite, după regulile alese"
         case .asi: return "După regulile alese"
         case .incarcare: return "După regulile alese, în zilele lucrătoare"
         case .activitati: return "În ziua planificată"

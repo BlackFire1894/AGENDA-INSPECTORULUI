@@ -75,15 +75,15 @@ public func fineStatus(_ c: Control, _ n: Neregula, _ today: String = todayISO()
         let over = elapsed - K.TERMEN_PLATA
         return StadiuAmenda(level: "yellow", label: "Termen 15 zile expirat", msg: "Termenul de plată a expirat de \(zile(over)) (\(fmtDate(plataPana)))",
                             elapsed: elapsed, plataPana: plataPana, anafPana: anafPana, plataNelucr: plataNelucr, anafNelucr: anafNelucr,
-                            daysLeft: leftAnaf, nelucr: anafNelucr.isEmpty ? "" : nelucrNota("Termenul ANAF", anafPana, anafNelucr))
+                            daysLeft: leftAnaf, nelucr: anafNelucr.isEmpty ? "" : nelucrNota("Termenul ANAF / Taxe și impozite", anafPana, anafNelucr))
     }
     let msg: String
-    if leftAnaf > 0 { msg = "Mai aveți \(zile(leftAnaf)) până să o trimiteți la ANAF; consultați calculatorul de termene" }
-    else if leftAnaf == 0 { msg = "Astăzi este ultima zi pentru trimiterea la ANAF; consultați calculatorul de termene" }
-    else { msg = "Termenul de trimitere la ANAF (\(fmtDate(anafPana))) a fost depășit cu \(zile(-leftAnaf))" }
-    return StadiuAmenda(level: "red", label: "Trimite la ANAF", msg: msg, elapsed: elapsed, plataPana: plataPana, anafPana: anafPana,
+    if leftAnaf > 0 { msg = "Mai aveți \(zile(leftAnaf)) până să o trimiteți la ANAF / Taxe și impozite; consultați calculatorul de termene" }
+    else if leftAnaf == 0 { msg = "Astăzi este ultima zi pentru trimiterea la ANAF / Taxe și impozite; consultați calculatorul de termene" }
+    else { msg = "Termenul de trimitere la ANAF / Taxe și impozite (\(fmtDate(anafPana))) a fost depășit cu \(zile(-leftAnaf))" }
+    return StadiuAmenda(level: "red", label: "Trimite la ANAF / Taxe și impozite", msg: msg, elapsed: elapsed, plataPana: plataPana, anafPana: anafPana,
                         plataNelucr: plataNelucr, anafNelucr: anafNelucr, daysLeft: leftAnaf,
-                        nelucr: !anafNelucr.isEmpty && leftAnaf >= 0 ? nelucrNota("Termenul ANAF", anafPana, anafNelucr) : "")
+                        nelucr: !anafNelucr.isEmpty && leftAnaf >= 0 ? nelucrNota("Termenul ANAF / Taxe și impozite", anafPana, anafNelucr) : "")
 }
 
 /// Termenul ASI (neregula „a”): 90 de zile de la încheiere, apoi 5 zile pentru constatarea pierderii valabilității.

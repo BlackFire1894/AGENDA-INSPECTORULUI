@@ -33,7 +33,7 @@ export function currentFont() {
 }
 
 // aceleași denumiri ca pastilele din Panou (fineStatus)
-const LEVEL_LABEL = { blue: 'În curs', yellow: 'Termen 15 zile expirat', red: 'Trimite la ANAF', green: 'Achitată' };
+const LEVEL_LABEL = { blue: 'În curs', yellow: 'Termen 15 zile expirat', red: 'Trimite la ANAF / Taxe și impozite', green: 'Achitată' };
 
 export function money(v) {
   const n = parseSuma(v);
@@ -59,7 +59,7 @@ const graveCount = (c) => c.nereguli.filter((n) => isGrav(n) && n.status !== 'ok
 const FILTRE = [
   { key: 'am-blue', label: 'Amendă în curs', ic: 'fine', lv: 'blue', test: (c, st) => st.fines.some((f) => f.st.level === 'blue') },
   { key: 'am-yellow', label: 'Termen 15 zile expirat', ic: 'fine', lv: 'yellow', test: (c, st) => st.fines.some((f) => f.st.level === 'yellow') },
-  { key: 'am-red', label: 'Trimite la ANAF', ic: 'fine', lv: 'red', test: (c, st) => st.fines.some((f) => f.st.level === 'red') },
+  { key: 'am-red', label: 'Trimite la ANAF / Taxe și impozite', ic: 'fine', lv: 'red', test: (c, st) => st.fines.some((f) => f.st.level === 'red') },
   { key: 'am-green', label: 'Amendă achitată', ic: 'fine', lv: 'green', test: (c, st) => st.fines.some((f) => f.st.level === 'green') },
   { key: 'asi', label: 'ASI în curs', ic: 'hourglass', lv: 'red', test: (c, st) => !!st.asi && !st.asi.resolved && !st.asi.pending },
   { key: 'inc', label: 'De încărcat', ic: 'upload', lv: 'warn', test: (c, st) => !!st.incarcare && !st.incarcare.gata },
@@ -205,7 +205,7 @@ export function viewDashboard() {
       <span class="kpi-label">Amenzi active</span>
       ${active.length ? `<span class="kpi-bar">${['red', 'yellow', 'blue'].map((l) => `<span class="seg seg-${l}" style="flex:${cnt[l]}"></span>`).join('')}</span>` : ''}
       <span class="kpi-legend">${[
-        ['red', cnt.red, 'de trimis la ANAF'],
+        ['red', cnt.red, 'de trimis la ANAF / Taxe și impozite'],
         ['yellow', cnt.yellow, 'cu termen de plată expirat'],
         ['blue', cnt.blue, 'în curs'],
       ].filter(([, n]) => n).map(([l, n, t]) => `<span><i class="dot dot-${l}"></i><b>${n}</b> ${t}</span>`).join('')}</span>
@@ -253,7 +253,7 @@ export function viewDashboard() {
     <div class="legend">
       <span><i class="dot dot-blue"></i>în curs (≤ 15 zile)</span>
       <span><i class="dot dot-yellow"></i>termen de 15 zile expirat</span>
-      <span><i class="dot dot-red"></i>+25 zile: trimite la ANAF</span>
+      <span><i class="dot dot-red"></i>+25 zile: trimite la ANAF / Taxe și impozite</span>
       <span><i class="dot dot-green"></i>achitată cu dovadă</span>
     </div>
     ${active.length ? `<div class="items">${active.map(fineItem).join('')}</div>` : '<p class="muted pad">Nicio amendă activă.</p>'}
@@ -378,7 +378,7 @@ function sarbatoriReminder(t) {
   if (!an) return '';
   return `<section class="card hol-rem">
     <h2 class="sec-title">${icon('calendar')} Sărbătorile legale pentru ${an}: verificați lista</h2>
-    <p>Termenele (plată, ANAF, ASI, încărcare) țin cont de zilele nelucrătoare. Aplicația calculează singură sărbătorile legale pentru ${an}, după art. 139 din Codul muncii. Verificați dacă legea s-a schimbat față de lista de mai jos; dacă da, cereți actualizarea aplicației.</p>
+    <p>Termenele (plată, ANAF / Taxe și impozite, ASI, încărcare) țin cont de zilele nelucrătoare. Aplicația calculează singură sărbătorile legale pentru ${an}, după art. 139 din Codul muncii. Verificați dacă legea s-a schimbat față de lista de mai jos; dacă da, cereți actualizarea aplicației.</p>
     <details><summary>Lista pentru ${an} (${sarbatoriLegale(an).size} zile)</summary>${listaSarbatori(an)}</details>
     <div class="row-gap"><button class="btn btn-primary btn-lg" data-act="sarbatori-ok" data-an="${an}">${icon('check')} Am verificat lista pentru ${an}</button></div>
   </section>`;
@@ -562,7 +562,7 @@ function calendarData(from, to) {
       const st = fineStatus(c, n, t);
       if (st.level === 'green' || !st.plataPana) continue;
       if (st.plataPana >= from && st.plataPana <= to) get(st.plataPana).deadlines.push({ kind: 'plata', level: 'blue', c, n, text: 'Termen plată amendă (15 zile)' });
-      if (st.anafPana >= from && st.anafPana <= to) get(st.anafPana).deadlines.push({ kind: 'anaf', level: 'red', c, n, text: 'Termen trimitere la ANAF' });
+      if (st.anafPana >= from && st.anafPana <= to) get(st.anafPana).deadlines.push({ kind: 'anaf', level: 'red', c, n, text: 'Termen trimitere la ANAF / Taxe și impozite' });
     }
     const a = asiDeadline(c, t);
     if (a && a.deadline && !a.resolved && a.deadline >= from && a.deadline <= to) {
@@ -658,7 +658,7 @@ export function viewCalendar() {
           <span><i class="sw sw-open"></i>control în desfășurare</span>
           <span><i class="sw sw-done"></i>control încheiat</span>
           <span><i class="dot dot-blue"></i>termen plată amendă</span>
-          <span><i class="dot dot-red"></i>termen ANAF / ASI</span>
+          <span><i class="dot dot-red"></i>termen ANAF / Taxe și impozite sau ASI</span>
           <span><i class="dot dot-warn"></i>termen încărcare</span>
           <span><i class="sw sw-act"></i>activitate (culoarea tipului)</span>
           <span><i class="sw sw-liber"></i>${dsp('zi liberă „Liber”: weekend / sărbătoare legală (✓ = efectuată)', 'zi liberă (fundal gri): weekend / sărbătoare legală')}</span>
@@ -757,7 +757,7 @@ export function viewSettings(persisted) {
       <li><b>Amendă:</b> data aplicării (implicit data încheierii controlului).
         <span class="rule-row"><i class="dot dot-blue"></i> zilele 1–15: în curs</span>
         <span class="rule-row"><i class="dot dot-yellow"></i> zilele 16–39: termenul de 15 zile expirat</span>
-        <span class="rule-row"><i class="dot dot-red"></i> din ziua 40: „Mai aveți 5 zile până să o trimiteți la ANAF” (termen: ziua 45)</span>
+        <span class="rule-row"><i class="dot dot-red"></i> din ziua 40: „Mai aveți 5 zile până să o trimiteți la ANAF / Taxe și impozite” (termen: ziua 45)</span>
         <span class="rule-row"><i class="dot dot-green"></i> achitată, cu dovadă primită</span></li>
       <li><b>ASI:</b> 90 de zile de la data încheierii controlului; dacă documentația nu a fost prezentată, încă 5 zile calendaristice pentru constatarea pierderii valabilității.</li>
       <li><b>Încărcarea</b> în aplicația ISU și a documentului: 3 zile lucrătoare de la data încheierii.</li>

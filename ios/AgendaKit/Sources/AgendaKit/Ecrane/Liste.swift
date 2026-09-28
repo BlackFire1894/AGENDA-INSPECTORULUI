@@ -15,7 +15,7 @@ public struct PastilaUI: Equatable, Sendable, Hashable {
 }
 
 /// aceleași denumiri ca pastilele din Panou (fineStatus)
-public let LEVEL_LABEL = ["blue": "În curs", "yellow": "Termen 15 zile expirat", "red": "Trimite la ANAF", "green": "Achitată"]
+public let LEVEL_LABEL = ["blue": "În curs", "yellow": "Termen 15 zile expirat", "red": "Trimite la ANAF / Taxe și impozite", "green": "Achitată"]
 
 /// `money(v)`: suma scrisă de inspector, în lei („2.500 lei”), sau "" dacă nu e o sumă
 public func money(_ v: String) -> String { parseSuma(v).map(lei) ?? "" }
@@ -55,7 +55,7 @@ public struct Filtru: Sendable {
 public let FILTRE: [Filtru] = [
     Filtru(key: "am-blue", label: "Amendă în curs", iconita: "fine", nivel: "blue", ultim: false) { _, st in st.fines.contains { $0.st.level == "blue" } },
     Filtru(key: "am-yellow", label: "Termen 15 zile expirat", iconita: "fine", nivel: "yellow", ultim: false) { _, st in st.fines.contains { $0.st.level == "yellow" } },
-    Filtru(key: "am-red", label: "Trimite la ANAF", iconita: "fine", nivel: "red", ultim: false) { _, st in st.fines.contains { $0.st.level == "red" } },
+    Filtru(key: "am-red", label: "Trimite la ANAF / Taxe și impozite", iconita: "fine", nivel: "red", ultim: false) { _, st in st.fines.contains { $0.st.level == "red" } },
     Filtru(key: "am-green", label: "Amendă achitată", iconita: "fine", nivel: "green", ultim: false) { _, st in st.fines.contains { $0.st.level == "green" } },
     Filtru(key: "asi", label: "ASI în curs", iconita: "hourglass", nivel: "red", ultim: false) { _, st in st.asi.map { $0.resolved != true && $0.pending != true } ?? false },
     Filtru(key: "inc", label: "De încărcat", iconita: "upload", nivel: "warn", ultim: false) { _, st in st.incarcare.map { !$0.gata } ?? false },

@@ -50,8 +50,8 @@ struct FereastraReguli: View {
                         ora: legaturaOra({ s.ora(cat) }, { s.seteazaOra(cat, $0) }))
                     .separat()
                 if cat == .amenzi {
-                    comutator("La schimbarea stadiului", "Termenul de plată expirat; de trimis la ANAF", $s.schimbareStadiu)
-                    Eticheta(text: "TERMENUL ANAF")
+                    comutator("La schimbarea stadiului", "Termenul de plată expirat; de trimis la ANAF / Taxe și impozite", $s.schimbareStadiu)
+                    Eticheta(text: "TERMENUL ANAF / TAXE ȘI IMPOZITE")
                 }
                 if let r = regula {
                     trepte(r)

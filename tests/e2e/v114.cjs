@@ -24,7 +24,7 @@ const INFORMAL = /Ce mai ai de|Ștergi |Mai ai \d|\bconsultă\b|verifică prelun
     ok(head.kpiMax < (port ? 270 : 380), `Panou: casete KPI (${Math.round(head.kpiMax)}px)`);
     ok(head.fines < (port ? 780 : 520), `Panou: secțiunea Amenzi (y=${Math.round(head.fines)})`);
     const leg = (await p.locator('.kpi-fines .kpi-legend').innerText()).replace(/\s+/g, ' ');
-    ok(/de trimis la ANAF/.test(leg) && /cu termen de plată expirat/.test(leg) && /în curs/.test(leg), `Panou: legenda amenzilor în cuvinte: ${leg}`);
+    ok(/de trimis la ANAF \/ Taxe și impozite/.test(leg) && /cu termen de plată expirat/.test(leg) && /în curs/.test(leg), `Panou: legenda amenzilor în cuvinte: ${leg}`);
     ok(port ? await p.locator('.dash-actions .guide-btn').isVisible() : await p.locator('.dash-actions').isHidden(), port ? 'vertical: Ghidul aplicației sus în Panou' : 'orizontal: Ghid / Backup doar în bara laterală');
     // stadiile amenzilor: aceeași pastilă (contur + punct) pentru toate
     // stadiile: aceeași pastilă, plină (fundal colorat, nu transparent)

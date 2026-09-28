@@ -40,7 +40,7 @@ public func calendarData(_ controls: [Control], _ from: String, _ to: String, az
                 map[pp, default: ZiCalendar()].deadlines.append(TermenCalendar(kind: "plata", level: "blue", c: c, n: n, text: "Termen plată amendă (15 zile)", tab: tab, focus: n.key))
             }
             if let ap = st.anafPana, ap >= from && ap <= to {
-                map[ap, default: ZiCalendar()].deadlines.append(TermenCalendar(kind: "anaf", level: "red", c: c, n: n, text: "Termen trimitere la ANAF", tab: tab, focus: n.key))
+                map[ap, default: ZiCalendar()].deadlines.append(TermenCalendar(kind: "anaf", level: "red", c: c, n: n, text: "Termen trimitere la ANAF / Taxe și impozite", tab: tab, focus: n.key))
             }
         }
         let a = asiDeadline(c, t)
@@ -111,7 +111,7 @@ public let ZILE_SCURT = ["Lu", "Ma", "Mi", "Jo", "Vi", "Sâ", "Du"]
 
 public let LEGENDA_CALENDAR: [(String, String)] = [
     ("sw-open", "control în desfășurare"), ("sw-done", "control încheiat"), ("dot-blue", "termen plată amendă"),
-    ("dot-red", "termen ANAF / ASI"), ("dot-warn", "termen încărcare"), ("sw-act", "activitate (culoarea tipului)"),
+    ("dot-red", "termen ANAF / Taxe și impozite sau ASI"), ("dot-warn", "termen încărcare"), ("sw-act", "activitate (culoarea tipului)"),
 ]
 /// ultima intrare din legendă, după dispozitiv (`dsp` din web)
 public func legendaLiber(telefon: Bool) -> String {

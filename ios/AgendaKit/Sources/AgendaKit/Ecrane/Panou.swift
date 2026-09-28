@@ -106,7 +106,7 @@ public func mementoSarbatori(_ t: String, _ verificate: [Int]) -> MementoSarbato
     let l = sarbatoriLegale(an).lista.sorted { $0.data < $1.data }
     return MementoSarbatori(
         an: an, titlu: "Sărbătorile legale pentru \(an): verificați lista",
-        text: "Termenele (plată, ANAF, ASI, încărcare) țin cont de zilele nelucrătoare. Aplicația calculează singură sărbătorile legale pentru \(an), după art. 139 din Codul muncii. Verificați dacă legea s-a schimbat față de lista de mai jos; dacă da, cereți actualizarea aplicației.",
+        text: "Termenele (plată, ANAF / Taxe și impozite, ASI, încărcare) țin cont de zilele nelucrătoare. Aplicația calculează singură sărbătorile legale pentru \(an), după art. 139 din Codul muncii. Verificați dacă legea s-a schimbat față de lista de mai jos; dacă da, cereți actualizarea aplicației.",
         rezumat: "Lista pentru \(an) (\(l.count) zile)", lista: l.map { (fmtDateLong($0.data), $0.nume) }, buton: "Am verificat lista pentru \(an)")
 }
 
@@ -140,7 +140,7 @@ public func modelPanou(_ cs: [Control], _ activitati: [Activitate], _ meta: Meta
     let casete = [
         CasetaPanou(sectiune: .amenzi, iconita: "fine", numar: active.count, eticheta: "Amenzi active",
                     bara: active.isEmpty ? nil : [("red", cnt["red"]!), ("yellow", cnt["yellow"]!), ("blue", cnt["blue"]!)],
-                    legenda: [("red", cnt["red"]!, "de trimis la ANAF"), ("yellow", cnt["yellow"]!, "cu termen de plată expirat"), ("blue", cnt["blue"]!, "în curs")].filter { $0.1 > 0 },
+                    legenda: [("red", cnt["red"]!, "de trimis la ANAF / Taxe și impozite"), ("yellow", cnt["yellow"]!, "cu termen de plată expirat"), ("blue", cnt["blue"]!, "în curs")].filter { $0.1 > 0 },
                     subsol: [g > 0 ? "+ \(g) \(g == 1 ? "achitată" : "achitate") (nu intră în total)" : active.isEmpty ? "nicio amendă activă" : ""].filter { !$0.isEmpty }),
         CasetaPanou(sectiune: .neincheiate, iconita: "clock", numar: open.count, eticheta: "Controale neîncheiate", bara: nil, legenda: [],
                     subsol: [open.isEmpty ? "toate sunt încheiate" : "cel mai vechi: \(fmtDate(open.last!.dataInceput))"]),
@@ -221,7 +221,7 @@ public func cifreMeniu(_ controls: [Control], azi: String) -> (urgente: Int, nei
 
 /// Legenda secțiunii Amenzi: (culoare, text)
 public let LEGENDA_AMENZI: [(String, String)] = [
-    ("blue", "în curs (≤ 15 zile)"), ("yellow", "termen de 15 zile expirat"), ("red", "+25 zile: trimite la ANAF"), ("green", "achitată cu dovadă"),
+    ("blue", "în curs (≤ 15 zile)"), ("yellow", "termen de 15 zile expirat"), ("red", "+25 zile: trimite la ANAF / Taxe și impozite"), ("green", "achitată cu dovadă"),
 ]
 public let TEXT_DE_CONFIRMAT = "Ziua lor a trecut și sunt încă planificate: marcați-le efectuate, reprogramați-le sau anulați-le. Raportul lunar numără doar activitățile efectuate."
 

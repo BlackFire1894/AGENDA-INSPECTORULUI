@@ -42,7 +42,7 @@ final class NotificariTests: TestVectori {
         XCTAssertEqual(detaliiCategorie(.asi, s), "Ora 08:00: la fiecare 30 de zile · zilnic în ultimele 5 zile · la fiecare 3 ore în ultimele 2 zile (08:00–16:00) · zilnic după termen, până la rezolvare")
         XCTAssertEqual(detaliiCategorie(.incarcare, s), "Ora 08:00, în zilele lucrătoare: zilnic · la fiecare 3 ore în ultimele 2 zile lucrătoare (08:00–16:00) · la fiecare 2 ore în ultima zi (08:00–16:00) · zilnic după termen, până la rezolvare")
         XCTAssertEqual(detaliiCategorie(.activitati, s), "În ziua planificată, la 08:00 · cu 30 de minute înainte de oră")
-        XCTAssertEqual(detaliiCategorie(.amenzi, s), "Ora 08:00: la schimbarea stadiului · ANAF: zilnic în ultimele 2 zile · zilnic după termen, până la rezolvare")
+        XCTAssertEqual(detaliiCategorie(.amenzi, s), "Ora 08:00: la schimbarea stadiului · ANAF / Taxe și impozite: zilnic în ultimele 2 zile · zilnic după termen, până la rezolvare")
     }
 
     /// ASI: 90 de zile de la 01.10.2026 → 30.12.2026; pierderea valabilității: 5 zile → 04.01.2027

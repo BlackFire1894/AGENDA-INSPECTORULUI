@@ -50,7 +50,7 @@ export const MANUAL = [
       ] },
       { h: 'Ce înseamnă numerele de pe meniu' },
       { ul: [
-        'La <b>Panou</b>: câte <b>amenzi urgente</b> aveți, adică amenzi cu termenul de plată expirat sau de trimis la ANAF. Pe orizontal scrie „2 amenzi urgente”; pe vertical apare doar numărul, pe o bulină roșie.',
+        'La <b>Panou</b>: câte <b>amenzi urgente</b> aveți, adică amenzi cu termenul de plată expirat sau de trimis la ANAF / Taxe și impozite. Pe orizontal scrie „2 amenzi urgente”; pe vertical apare doar numărul, pe o bulină roșie.',
         'La <b>Istoric</b>: câte controale sunt <b>neîncheiate</b>. Pe orizontal scrie „2 neîncheiate”; pe vertical apare doar numărul.',
       ] },
       { h: 'Pe telefon' },
@@ -69,7 +69,7 @@ export const MANUAL = [
     blocks: [
       { p: 'Culorile au același înțeles în toată aplicația. Lângă fiecare culoare există mereu și un text, deci nu trebuie să le rețineți pe dinafară.' },
       { ul: [
-        `${P('Roșu', 'red')} — constatat, neregulă gravă, termen ANAF sau ASI: cere acțiune.`,
+        `${P('Roșu', 'red')} — constatat, neregulă gravă, termen ANAF / Taxe și impozite sau ASI: cere acțiune.`,
         `${P('Portocaliu', 'warn')} — de completat: act lipsă, constatare netrecută în PV, rânduri necompletate.`,
         `${P('Galben', 'yellow')} — amendă cu termenul de plată expirat.`,
         `${P('Albastru', 'blue')} — termen în curs (amendă în termenul de plată) sau o informație.`,
@@ -86,7 +86,7 @@ export const MANUAL = [
       { h: 'Cele cinci casete' },
       { p: 'Fiecare casetă are o culoare; secțiunea ei de mai jos are aceeași culoare. Atingeți o casetă ca să ajungeți la secțiunea ei.' },
       { ul: [
-        '<span class="m-k k-fines"></span><b>Amenzi active</b> (verde-albastru): câte amenzi nu sunt încă achitate. Dedesubt scrie câte sunt de trimis la ANAF, câte au termenul de plată expirat și câte sunt în curs. Amenzile achitate apar separat („+ 1 achitată”) și nu intră în total.',
+        '<span class="m-k k-fines"></span><b>Amenzi active</b> (verde-albastru): câte amenzi nu sunt încă achitate. Dedesubt scrie câte sunt de trimis la ANAF / Taxe și impozite, câte au termenul de plată expirat și câte sunt în curs. Amenzile achitate apar separat („+ 1 achitată”) și nu intră în total.',
         '<span class="m-k k-open"></span><b>Controale neîncheiate</b> (violet): controalele care nu au încă dată de încheiere. Dedesubt: data celui mai vechi dintre ele.',
         '<span class="m-k k-asi"></span><b>Termene ASI 90 zile</b> (albastru): termenele de prezentare a documentației ASI care au început să curgă. Dedesubt: cel mai apropiat termen. Termenele din controalele încă neîncheiate nu au început; ele apar separat, ca „neîncepute”.',
         '<span class="m-k k-inc"></span><b>De încărcat</b> (gri-albastru): controalele încheiate care nu sunt încă încărcate în aplicația ISU sau nu au documentul încărcat. Dedesubt: câte au ultima zi azi sau termenul depășit.',
@@ -95,7 +95,7 @@ export const MANUAL = [
       { h: 'Listele de sub casete' },
       { p: 'Listele care au ceva de rezolvat apar primele, imediat sub casete; cele goale („Nicio amendă activă”, „Toate controalele sunt încheiate” etc.) coboară la final. Între cele cu conținut, ordinea rămâne: Amenzi, Termene ASI, De încărcat, Controale neîncheiate, Netrecute în PV.' },
       { ul: [
-        `<b>Amenzi</b>: fiecare amendă, cu stadiul ei scris pe o pastilă colorată — ${F('blue', 'În curs')} ${F('yellow', 'Termen 15 zile expirat')} ${F('red', 'Trimite la ANAF')} ${F('green', 'Achitată')} —, suma și un mesaj care spune exact câte zile mai sunt (vedeți „Amenzile și termenele”).`,
+        `<b>Amenzi</b>: fiecare amendă, cu stadiul ei scris pe o pastilă colorată — ${F('blue', 'În curs')} ${F('yellow', 'Termen 15 zile expirat')} ${F('red', 'Trimite la ANAF / Taxe și impozite')} ${F('green', 'Achitată')} —, suma și un mesaj care spune exact câte zile mai sunt (vedeți „Amenzile și termenele”).`,
         '<b>Termene ASI</b>: câte zile au rămas sau cu câte zile a fost depășit termenul. După cele 90 de zile, rândul arată a doua etapă — „Constatarea pierderii valabilității” — cu cele 5 zile ale ei.',
         `<b>De încărcat în aplicație</b>: fiecare control încheiat neîncărcat, cu ce lipsește (${P('Document neîncărcat', 'red')}), termenul și câte zile lucrătoare au rămas. Portocaliu cât mai sunt zile; roșu în ultima zi și după termen.`,
         `<b>Controale neîncheiate</b>: de când sunt deschise (${P('început azi', 'open')}, ${P('de 3 zile', 'open')}); la cele programate pentru o zi viitoare, peste câte zile încep; dacă ați aplicat sigiliu, și ${P(`${icon('lock')}Sigiliu aplicat · 2 criterii`, 'red')}.`,
@@ -275,7 +275,7 @@ export const MANUAL = [
       { ul: [
         `${F('blue', 'În curs')} — zilele 0–15: amenda este în termenul de plată de 15 zile;`,
         `${F('yellow', 'Termen 15 zile expirat')} — zilele 16–39: termenul de plată a trecut;`,
-        `${F('red', 'Trimite la ANAF')} — din ziua 40: mai sunt cel mult 5 zile până la termenul de trimitere la ANAF, care este ziua 45;`,
+        `${F('red', 'Trimite la ANAF / Taxe și impozite')} — din ziua 40: mai sunt cel mult 5 zile până la termenul de trimitere la ANAF / Taxe și impozite, care este ziua 45;`,
         `${F('green', 'Achitată')} — ați bifat „Achitată – dovadă primită”.`,
       ] },
       { h: 'Exemplu' },
@@ -283,7 +283,7 @@ export const MANUAL = [
       { ul: [
         '5–20 octombrie: <b>În curs</b>; 20 octombrie este ultima zi de plată;',
         '21 octombrie – 13 noiembrie: <b>Termen 15 zile expirat</b>;',
-        'din 14 noiembrie: <b>Trimite la ANAF</b> („Mai aveți 5 zile…”); 19 noiembrie este ultima zi pentru trimiterea la ANAF.',
+        'din 14 noiembrie: <b>Trimite la ANAF / Taxe și impozite</b> („Mai aveți 5 zile…”); 19 noiembrie este ultima zi pentru trimiterea la ANAF / Taxe și impozite.',
       ] },
       { h: 'Termenul ASI' },
       { p: 'Dacă la neregula „a” bifați „Termen de prezentare 90 de zile”, termenul este de 90 de zile de la data încheierii controlului. De exemplu, pentru un control încheiat pe 5 octombrie 2026, termenul este 3 ianuarie 2027.' },
@@ -313,10 +313,10 @@ export const MANUAL = [
       { ul: [
         '<b>Obiective</b>: lista obiectivelor controlate. Căutați după nume, localitate, adresă sau dată (12.09.2026, 09.2026 sau 2026; butonul „Dată” deschide un calendar) și filtrați după tip și după <b>filtrele</b> de mai jos. Cardul arată, la toate controalele obiectivului, amenzile pe stadii, ASI în curs, netrecutele în PV și încărcarea, iar pentru <b>ultimul control</b> neregulile grave și sigiliul. Atingeți un obiectiv ca să vedeți datele lui, coordonatele GPS ale construcțiilor, istoricul controalelor și butonul „Control nou pe acest obiectiv”.',
         '<b>Istoric</b>: toate controalele, grupate pe luni, cu căutare după obiectiv, administrator sau dată și cu filtrele În desfășurare / Încheiate și filtrele de mai jos. Fiecare control arată, scris: numărul de nereguli (cele grave primele), adăposturile („3 adăposturi: 2 conforme, 1 neconform”), sigiliul („Sigiliu aplicat · 2 criterii” sau, la construcții diferite, „2 sigilii (2 construcții) · 3 criterii”), câte nu sunt trecute în PV, amenzile cu stadiul lor, termenul ASI și încărcarea — „Neîncărcat în aplicație”, „Document neîncărcat” cu termenul, sau „Încărcat în aplicație · document încărcat”. La fel pe pagina fiecărui obiectiv; în lista Obiective, cardul arată câte controale sunt neîncărcate și sigiliul aplicat la ultimul control.',
-        '<b>Calendar</b>: anul și luna se schimbă separat. În fiecare zi vedeți controalele (violet = în desfășurare, albastru închis = încheiat), activitățile (în culoarea tipului lor), zilele libere (fundal gri: weekend și sărbători legale) și bulinele termenelor (albastru = termen de plată, roșu = termen ANAF sau ASI, portocaliu = termen de încărcare). Atingeți o zi ca să vedeți lista completă și butoanele „Control nou în această zi” și „Activitate nouă în această zi” (vedeți „Planul lunar”).',
+        '<b>Calendar</b>: anul și luna se schimbă separat. În fiecare zi vedeți controalele (violet = în desfășurare, albastru închis = încheiat), activitățile (în culoarea tipului lor), zilele libere (fundal gri: weekend și sărbători legale) și bulinele termenelor (albastru = termen de plată, roșu = termen ANAF / Taxe și impozite sau ASI, portocaliu = termen de încărcare). Atingeți o zi ca să vedeți lista completă și butoanele „Control nou în această zi” și „Activitate nouă în această zi” (vedeți „Planul lunar”).',
       ] },
       { h: 'Filtrele din Istoric și Obiective' },
-      { p: `Sub căutare, un rând de butoane: ${B('fine', 'Amendă în curs')} ${B('fine', 'Termen 15 zile expirat')} ${B('fine', 'Trimite la ANAF')} ${B('fine', 'Amendă achitată')} ${B('hourglass', 'ASI în curs')} ${B('upload', 'De încărcat')} ${B('pv', 'Netrecute în PV')} ${B('alert', 'Nereguli grave')} ${B('lock', 'Sigiliu aplicat')} ${B('shield', 'Adăposturi PC')}. Fiecare arată câte rezultate ați avea dacă îl atingeți; butonul cu 0 e inactiv. Puteți activa mai multe deodată: rămân doar cele care le îndeplinesc pe <b>toate</b> (de exemplu, Netrecute în PV + Trimite la ANAF). Deasupra listei scrie ce filtre sunt active; ${B('x', 'Șterge filtrele')} le anulează. Filtrele se combină cu căutarea și cu În desfășurare / Încheiate (sau tipul obiectivului).` },
+      { p: `Sub căutare, un rând de butoane: ${B('fine', 'Amendă în curs')} ${B('fine', 'Termen 15 zile expirat')} ${B('fine', 'Trimite la ANAF / Taxe și impozite')} ${B('fine', 'Amendă achitată')} ${B('hourglass', 'ASI în curs')} ${B('upload', 'De încărcat')} ${B('pv', 'Netrecute în PV')} ${B('alert', 'Nereguli grave')} ${B('lock', 'Sigiliu aplicat')} ${B('shield', 'Adăposturi PC')}. Fiecare arată câte rezultate ați avea dacă îl atingeți; butonul cu 0 e inactiv. Puteți activa mai multe deodată: rămân doar cele care le îndeplinesc pe <b>toate</b> (de exemplu, Netrecute în PV + Trimite la ANAF). Deasupra listei scrie ce filtre sunt active; ${B('x', 'Șterge filtrele')} le anulează. Filtrele se combină cu căutarea și cu În desfășurare / Încheiate (sau tipul obiectivului).` },
       { p: 'În <b>Obiective</b>, amenzile, ASI, încărcarea și PV se caută la <b>oricare</b> control al obiectivului (sunt lucruri încă deschise); neregulile grave, sigiliul și adăposturile, doar la <b>ultimul control</b> (starea actuală a obiectivului).' },
     ],
   },

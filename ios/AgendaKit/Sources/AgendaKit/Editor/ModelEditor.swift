@@ -1007,7 +1007,7 @@ func modelDetaliu(_ c: Control, _ n: Neregula, _ path: String, _ vi: InfoVeche, 
             plata = .init(stare: fs.level == "blue" ? "cur" : "past", text: "Plată până la", data: fmtDate(pp),
                           nelucr: fs.plataNelucr.flatMap { $0.isEmpty ? nil : "(\($0) → \(fmtDate(nextWorkingDay(pp))))" })
             let ap = fs.anafPana ?? ""
-            anaf = .init(stare: fs.level == "red" ? "cur" : "", text: "ANAF până la", data: fmtDate(ap),
+            anaf = .init(stare: fs.level == "red" ? "cur" : "", text: "ANAF / Taxe și impozite până la", data: fmtDate(ap),
                          nelucr: fs.anafNelucr.flatMap { $0.isEmpty ? nil : "(\($0) → \(fmtDate(nextWorkingDay(ap))))" })
         }
         box = ModelAmenda(
