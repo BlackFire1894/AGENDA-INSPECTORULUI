@@ -25,7 +25,9 @@ try: d = json.load(open(sys.argv[1]))["result"]["devices"]
 except Exception: d = []
 for x in d:
     c, h = x.get("connectionProperties", {}), x.get("hardwareProperties", {})
-    if c.get("pairingState") == "paired" and c.get("tunnelState") == "connected" and h.get("deviceType") in ("iPad", "iPhone"):
+    # conectat prin cablu (legătura se deschide singură la instalare, chiar dacă acum e „disconnected”)
+    if c.get("pairingState") == "paired" and (c.get("tunnelState") == "connected" or c.get("transportType") == "wired") \
+       and h.get("deviceType") in ("iPad", "iPhone"):
         print(h.get("udid")); break
 PY
 )
