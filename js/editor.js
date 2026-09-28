@@ -6,7 +6,7 @@ import {
   controlStats, secStats, fineStatus, fineDate, asiDeadline, incarcareStatus, isIncheiat, neregulaLabel, neregulaLetter,
   neregulaCat, secOf, isApplicable, isLocalitate, constructiiOf, constructiiNume, matchNeregula, fold, vecheInfo, todoList,
   LIPSA_DOTARI, isGrav, constructiiDeclansate, GRF_NIVELURI, grfVPesteParter, sablon, fmtCoord, googleMapsUrl, appleMapsUrl, gpsQuality,
-  constructiiEligibile, isVerificare, verifStare, verifExpirate, ascunsaDeDotari, matchAct,
+  constructiiEligibile, isVerificare, verifStare, verifExpirate, ascunsaDeDotari, matchAct, verifReferinta,
   adaposturi, adaposturiStats, adaposturiText,
   acteOf, dotariVizibile, centraleOf, unitatiCT, verifUnitati, perCT, centraleAlese, gpsEgal,
 } from './model.js';
@@ -162,19 +162,21 @@ export function grfBlock(c, k, p = `constructii.#${k.id}`) {
 
 // Data ultimei verificări, pe fiecare construcție relevantă; expirarea se calculează față de data controlului
 // La verificarea CT (v1.25): câte un rând pe fiecare centrală termică. De la al doilea rând: „Aceeași dată ca la …”
-// copiază data (și periodicitatea) primului rând; bifa arată că sunt egale.
+// copiază data (și periodicitatea) rândului de referință (CT 2, CT 3… → CT 1 al construcției lor; restul → primul rând);
+// bifa arată că sunt egale.
 function verifBlock(c, n) {
   const t = sablon(n.key);
   const list = verifUnitati(c, n);
   const exp = verifExpirate(c, n);
-  const prima = list[0] ? verifStare(c, n, list[0]) : null;
-  const rows = list.map((u, i) => {
+  const rows = list.map((u) => {
     const s = verifStare(c, n, u);
+    const ref = verifReferinta(list, u);
+    const prima = ref ? verifStare(c, n, ref) : null;
     const stare = s.stare === 'lipsa' ? '<span class="vf-st vf-lipsa">fără dată</span>'
       : s.stare === 'expirata' ? `<span class="vf-st vf-exp">${icon('alert')} expirată — era valabilă până la ${esc(fmtDate(s.expira))}</span>`
         : `<span class="vf-st vf-ok">${icon('check')} valabilă până la ${esc(fmtDate(s.expira))}</span>`;
-    const ca = i > 0 && prima?.data ? `<button type="button" class="toggle vf-ca ${s.data === prima.data && s.luni === prima.luni ? 'on t-accent' : ''}" data-act="verif-ca-prima" data-key="${esc(n.key)}" data-id="${esc(u.id)}" aria-pressed="${s.data === prima.data && s.luni === prima.luni}">
-        <span class="tg-box">${s.data === prima.data && s.luni === prima.luni ? icon('check') : ''}</span><span>Aceeași dată ca la ${esc(list[0].denumire)}</span></button>` : '';
+    const ca = prima?.data ? `<button type="button" class="toggle vf-ca ${s.data === prima.data && s.luni === prima.luni ? 'on t-accent' : ''}" data-act="verif-ca-prima" data-key="${esc(n.key)}" data-id="${esc(u.id)}" aria-pressed="${s.data === prima.data && s.luni === prima.luni}">
+        <span class="tg-box">${s.data === prima.data && s.luni === prima.luni ? icon('check') : ''}</span><span>Aceeași dată ca la ${esc(ref.denumire)}</span></button>` : '';
     return `<div class="vf-row ${s.stare === 'expirata' ? 'is-exp' : ''}">
       <span class="vf-name">${icon('building')} ${esc(u.denumire)}</span>
       <span class="inp-wrap vf-date"><input type="date" data-verif="${esc(n.key)}|${esc(u.id)}|data" value="${esc(s.data)}" aria-label="Data ultimei verificări – ${esc(u.denumire)}"></span>

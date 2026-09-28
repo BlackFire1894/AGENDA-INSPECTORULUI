@@ -275,7 +275,7 @@ export const MANUAL = [
         '✓ „valabilă până la 10.06.2027” — verificarea este în termen (inclusiv în ultima zi);',
         '⚠ „expirată — era valabilă până la 10.06.2026” — termenul a trecut înainte de începerea controlului.',
       ] },
-      { p: 'De la al doilea rând, <b>Aceeași dată ca la …</b> copiază o dată data (și periodicitatea) primului rând; bifa arată că sunt identice.' },
+      { p: 'De la al doilea rând, <b>Aceeași dată ca la …</b> copiază o dată data (și periodicitatea): la verificarea CT, CT 2, CT 3… de la CT 1 al aceleiași construcții, iar CT 1 al celorlalte construcții de la primul rând (Construcția 1 – CT 1); la celelalte verificări, de la primul rând. Bifa arată că sunt identice.' },
       { p: `Pentru o verificare expirată apar o avertizare, un rând în „Ce mai aveți de făcut” și butonul ${B('x', 'Constatat pentru aceasta')}. Decizia vă aparține: aplicația nu constată singură. Datele verificărilor apar în Text PV și în fișă; la controlul următor pornesc goale, pentru datele noi.` },
     ],
   },

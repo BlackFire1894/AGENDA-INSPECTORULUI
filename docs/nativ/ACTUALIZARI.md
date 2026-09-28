@@ -73,3 +73,15 @@ Ce ai de făcut în Swift: portarea funcțiilor de mai sus (AgendaKit: Creare, N
 Criterii de acceptare: ios/teste.sh 100% (vectori, verificarea încrucișată pe mai multe semințe, editorul pas cu pas); turul vizual pe iPad (orizontal și vertical); datele utilizatorului neatinse (doar migrarea cerută, la controalele în desfășurare).
 La final: commit + PR; raport scurt.
 ```
+
+### v1.25.1 — „Aceeași dată ca la …” pe construcție (28.09.2026)
+Aplicată deja în aplicația nativă, în același PR. Promptul rămâne pentru istoric:
+
+```
+Actualizare la versiunea web v1.25.1. Rulează `git pull` pe main.
+Ce s-a schimbat: js/model.js → verifReferinta(list, u): CT 2, CT 3… se raportează la CT 1 al aceleiași construcții, restul rândurilor (construcțiile, CT 1 al fiecărei construcții) la primul rând; js/editor.js (verifBlock: butonul „Aceeași dată ca la <referință>”, doar dacă referința are dată), js/app.js (verif-ca-prima copiază de la referință), js/help.js. Versiunea: js/version.js, sw.js.
+Date comune regenerate: catalog.json, ghid.json. Vectori: neschimbați.
+Ce ai de făcut în Swift: verifReferinta (Nereguli.swift), Editor.swift (verif-ca-prima), ModelEditor.swift (modelVerificare), testul în ModelTests.
+Criterii de acceptare: ios/teste.sh 100%; la b3 cu 2 construcții a câte 2 centrale: CT 2 al Construcției 2 arată „Aceeași dată ca la Construcția 2 – CT 1”.
+La final: commit + PR; raport scurt.
+```

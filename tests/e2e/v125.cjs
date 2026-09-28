@@ -67,6 +67,11 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
     await cen().locator('[data-act="ct-count"][data-val="1"]').click(); await w();
     ok(await cen().locator('.ct-row').count() === 2 && /CT 1[\s\S]*CT 2/.test(await cen().innerText()), `${W}: 2 centrale termice (CT 1, CT 2)`);
     await cen().locator('.ct-row').nth(1).locator('[data-val="SOLID"]').click(); await w();
+    // a doua construcție: 2 centrale (pentru „Aceeași dată” pe construcție)
+    const cen2 = () => p.locator('.constr').nth(1).locator('.dot-ct');
+    await cen2().locator('.ct-row.is-nou [data-val="GAZOS"]').click(); await w();
+    await cen2().locator('[data-act="ct-count"][data-val="1"]').click(); await w();
+    ok(await cen2().locator('.ct-row').count() === 2, `${W}: Construcția 2: 2 centrale`);
     await p.addStyleTag({ content: '.edit-tools,.tabbar,.ed-tabs{display:none!important}' });
     await p.locator('.constr').first().screenshot({ path: `${S}/v125-constructie-${W}.png` });
 
@@ -87,6 +92,14 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
     await d0.fill('2025-03-01'); await d0.dispatchEvent('change'); await w();
     await p.locator('#ner-b3 [data-act="verif-ca-prima"]').first().click(); await w();
     ok(await p.locator('#ner-b3 .vf-row input').nth(1).inputValue() === '2025-03-01', `${W}: „Aceeași dată ca la …” copiază data`);
+    // v1.25.1: CT 2 al Construcției 2 se raportează la CT 1 al Construcției 2; CT 1 al ei, la primul rând
+    ok(await p.locator('#ner-b3 [data-act="verif-ca-prima"]').count() === 2, `${W}: fără data CT 1 al Construcției 2, CT 2 al ei nu are încă butonul`);
+    const d2 = p.locator('#ner-b3 .vf-row input').nth(2);
+    await d2.fill('2025-06-10'); await d2.dispatchEvent('change'); await w();
+    const ca = await p.locator('#ner-b3 [data-act="verif-ca-prima"]').allInnerTexts();
+    ok(ca.length === 3 && /Construcția 1 – CT 1/.test(ca[0]) && /Construcția 1 – CT 1/.test(ca[1]) && /Construcția 2 – CT 1/.test(ca[2]), `${W}: referința pe construcție: ${ca.join(' | ')}`);
+    await p.locator('#ner-b3 [data-act="verif-ca-prima"]').nth(2).click(); await w();
+    ok(await p.locator('#ner-b3 .vf-row input').nth(3).inputValue() === '2025-06-10', `${W}: CT 2 al Construcției 2 copiază data CT 1 al Construcției 2`);
     // amenda fără seria
     await p.locator('#ner-d .nok-btn').click(); await w();
     await p.locator('#ner-d [data-path$=".amenda.aplicata"]').click(); await w();

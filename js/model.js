@@ -1189,6 +1189,14 @@ export function verifUnitati(c, n) {
   });
 }
 
+// „Aceeași dată ca la …” (v1.25.1, regula utilizatorului): CT 2, CT 3… copiază de la CT 1 al construcției lor;
+// celelalte rânduri (construcțiile, CT 1 al fiecărei construcții) de la primul rând. Primul rând: null.
+export function verifReferinta(list, u) {
+  if (!list.length || u === list[0]) return null;
+  if (u.ct && u.nr > 1) return list.find((x) => x.ct && x.k === u.k && x.nr === 1) || list[0];
+  return list[0];
+}
+
 // Starea verificării unei unități (construcție sau centrală), față de data controlului (data începerii).
 // Prima centrală a unei construcții preia data scrisă pe construcție înainte de v1.25.
 export function verifStare(c, n, u) {
