@@ -37,6 +37,12 @@ public struct Control: ObiectJS {
     public var email: String { get { s("email") } set { s("email", newValue) } }
     public var adresa: String { get { s("adresa") } set { s("adresa", newValue) } }
     public var localitate: String { get { s("localitate") } set { s("localitate", newValue) } }
+    /// v1.25: persoana care a participat la control din partea obiectivului
+    public var persoanaParticipanta: String { get { s("persoanaParticipanta") } set { s("persoanaParticipanta", newValue) } }
+    /// v1.25: notițe libere despre obiectiv / control
+    public var observatiiGenerale: String { get { s("observatiiGenerale") } set { s("observatiiGenerale", newValue) } }
+    /// v1.25: „De întrebat până la finalizarea controlului”
+    public var deIntrebat: [Intrebare] { get { lista("deIntrebat") } set { lista("deIntrebat", newValue) } }
     public var dataInceput: String { get { s("dataInceput") } set { s("dataInceput", newValue) } }
     public var dataIncheiere: String { get { s("dataIncheiere") } set { s("dataIncheiere", newValue) } }
     public var createdAt: String { get { s("createdAt") } set { s("createdAt", newValue) } }
@@ -99,7 +105,26 @@ public struct Gps: ObiectJS {
     public var lat: Double { o["lat"]?.numarJSValoare ?? .nan }
     public var lon: Double { o["lon"]?.numarJSValoare ?? .nan }
     public var acc: Double { o["acc"]?.numarJSValoare ?? .nan }
+    /// v1.25: coordonatele introduse de mână nu au precizie (`acc: null`)
+    public var faraPrecizie: Bool { o["acc"] == nil || o["acc"]!.esteNull }
     public var la: String { s("la") }
+}
+
+/// „De întrebat până la finalizarea controlului”: `{ id, text, gata }`
+public struct Intrebare: ObiectJS {
+    public var o: JSObiect
+    public init(_ o: JSObiect) { self.o = o }
+    public var id: String { get { s("id") } set { s("id", newValue) } }
+    public var text: String { get { s("text") } set { s("text", newValue) } }
+    public var gata: Bool { get { b("gata") } set { b("gata", newValue) } }
+}
+
+/// O centrală termică a construcției (v1.25): `{ id, tipuri }`
+public struct Centrala: ObiectJS {
+    public var o: JSObiect
+    public init(_ o: JSObiect) { self.o = o }
+    public var id: String { get { s("id") } set { s("id", newValue) } }
+    public var tipuri: [String] { get { o.strs("tipuri") } set { o["tipuri"] = JSONValue(newValue) } }
 }
 
 /// `dotari[cheie]`: `{ v, obs, nr? }`, iar la centrală `{ tipuri, nuAre, obs }`
@@ -111,6 +136,8 @@ public struct Dotare: ObiectJS {
     public var nr: String { get { s("nr") } set { s("nr", newValue) } }
     public var tipuri: [String] { get { o.strs("tipuri") } set { o["tipuri"] = JSONValue(newValue) } }
     public var nuAre: Bool { get { b("nuAre") } set { b("nuAre", newValue) } }
+    /// la centrală (v1.25): centralele construcției
+    public var ct: [Centrala] { get { lista("ct") } set { lista("ct", newValue) } }
 }
 
 /// `{ v: "" | "DA" | "NU" | "NEC", obs }` (adăposturi PC)
@@ -154,6 +181,11 @@ public struct Neregula: ObiectJS {
     public var obs: String { get { s("obs") } set { s("obs", newValue) } }
     public var inPV: Bool { get { b("inPV") } set { b("inPV", newValue) } }
     public var constructieIds: [String] { get { o.strs("constructieIds") } set { o["constructieIds"] = JSONValue(newValue) } }
+    /// v1.25, la rândurile pe centrală termică: centralele alese („<idConstrucție>:<idCentrală>”); nil = cheia lipsește
+    public var ctIds: [String]? {
+        get { o["ctIds"]?.lista == nil ? nil : o.strs("ctIds") }
+        set { o["ctIds"] = newValue.map { JSONValue($0) } }
+    }
     public var vecheManual: Bool { get { b("vecheManual") } set { b("vecheManual", newValue) } }
     public var grav: Bool { get { b("grav") } set { b("grav", newValue) } }
     public var sigiliu: Bool { get { b("sigiliu") } set { b("sigiliu", newValue) } }

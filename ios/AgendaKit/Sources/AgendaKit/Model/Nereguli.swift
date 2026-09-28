@@ -21,6 +21,8 @@ public func grfVPesteParter(_ k: Constructie) -> Bool { k.grf == "V" && pestePar
 /// cele cu NU la dotare; altfel, prima construcție (care are instalația).
 public func constructiiOf(_ c: Control, _ n: Neregula) -> [Constructie] {
     let list = c.constructii
+    // actele lipsă (ao / ap / aq) țin de obiectiv, nu de o construcție
+    if !n.custom, sablon(n.key)?.autoActe != nil { return [] }
     let ids = Set(n.constructieIds)
     let alese = list.filter { ids.contains($0.id) }
     if !alese.isEmpty { return alese }
@@ -37,8 +39,13 @@ func numeConstructie(_ c: Control, _ k: Constructie) -> String {
     let i = c.constructii.firstIndex { $0.id == k.id } ?? -1
     return "Construcția \(i + 1)"
 }
+/// La rândurile pe centrală termică, centralele alese apar cu numărul lor („Corp A – CT 2”)
 public func constructiiNume(_ c: Control, _ n: Neregula) -> String {
-    constructiiOf(c, n).map { numeConstructie(c, $0) }.joined(separator: ", ")
+    let ct = centraleAlese(c, n)
+    return constructiiOf(c, n).map { k in
+        let u = ct.filter { $0.k.id == k.id }
+        return u.isEmpty ? numeConstructie(c, k) : u.map(\.denumire).joined(separator: ", ")
+    }.joined(separator: ", ")
 }
 
 /// Construcțiile care declanșează o neregulă gravă (NU la dotare sau GRF/NSI V peste parter); nil = nu e gravă
@@ -50,15 +57,41 @@ public func constructiiDeclansate(_ c: Control, _ t: RandSablon) -> [Constructie
 
 /// Construcțiile care au NU la o dotare (instalație necesară, lipsă)
 public func constructiiCuNU(_ c: Control, _ key: String) -> [Constructie] {
-    c.constructii.filter { $0.dotare(key)?.v == "NU" }
+    c.constructii.filter { valDotare(c, $0, key) == "NU" }
 }
+
+// ───────── Dotările afișate (v1.25) ─────────
+// „Iluminat Hint” nu se mai completează când construcția nu are hidranți interiori (NU / NEC); valoarea rămasă
+// salvată nu mai contează. Regula nu se aplică la controalele încheiate înainte de v1.25 (lista lor înghețată).
+
+public func ilumHintAscuns(_ c: Control, _ k: Constructie) -> Bool {
+    catalogOf(c) >= 12 && ["NU", "NEC"].contains(k.dotare("hidInt")?.o["v"]?.sir ?? "")
+}
+public func dotareAscunsa(_ c: Control, _ k: Constructie, _ d: DotareSablon) -> Bool {
+    if (d.din ?? 0) != 0 && !inCatalog(c, din: d.din) { return true }
+    return d.key == "ilumHint" && ilumHintAscuns(c, k)
+}
+public func dotariVizibile(_ c: Control, _ k: Constructie) -> [DotareSablon] { K.dotari.filter { !dotareAscunsa(c, k, $0) } }
+
+/// Valoarea unei dotări DA / NU / NEC, ținând cont de rândurile ascunse
+public func valDotare(_ c: Control, _ k: Constructie, _ key: String) -> String {
+    if key == "ilumHint" && ilumHintAscuns(c, k) { return "" }
+    return k.dotare(key)?.v ?? ""
+}
+/// Are construcția centrală termică: cel puțin o centrală declarată (sau, în date vechi, un tip bifat)
+public func areCentrala(_ k: Constructie) -> Bool {
+    guard let v = k.dotare("centrala") else { return false }
+    return !(v.o["ct"]?.lista ?? []).isEmpty || !(v.o["tipuri"]?.lista ?? []).isEmpty
+}
+/// Centralele construcției
+public func centraleOf(_ k: Constructie) -> [Centrala] { k.dotare("centrala")?.ct ?? [] }
 
 /// Construcțiile relevante pentru un rând: cele cu DA la instalația cerută, altfel toate.
 public func constructiiEligibile(_ c: Control, _ n: Neregula) -> [Constructie] {
     let list = c.constructii
     guard !n.custom, let t = sablon(n.key), let req = t.req, !t.grav else { return list }
     let cu = list.filter { k in
-        req.contains { r in r == "centrala" ? !(k.dotare("centrala")?.tipuri.isEmpty ?? true) : k.dotare(r)?.v == "DA" }
+        req.contains { r in r == "centrala" ? areCentrala(k) : valDotare(c, k, r) == "DA" }
     }
     return cu.isEmpty ? list : cu
 }
@@ -167,10 +200,7 @@ public func activeNereguli(_ c: Control) -> [Neregula] {
 
 /// Are obiectivul dotarea respectivă bifată DA în cel puțin o construcție?
 public func hasDotare(_ c: Control, _ key: String) -> Bool {
-    c.constructii.contains { k in
-        guard let v = k.dotare(key) else { return false }
-        return key == "centrala" ? !v.tipuri.isEmpty : v.v == "DA"
-    }
+    c.constructii.contains { k in key == "centrala" ? areCentrala(k) : valDotare(c, k, key) == "DA" }
 }
 
 /// Neregulile de instalații apar doar dacă instalația există; un rând completat rămâne mereu vizibil.
@@ -180,6 +210,7 @@ public func isApplicable(_ c: Control, _ n: Neregula) -> Bool {
     let t = sablon(n.key)
     if let t, !inCatalog(c, t) { return false }
     if let t, t.doarLaNU { return !constructiiCuNU(c, t.autoNU ?? "").isEmpty }
+    if let t, t.autoActe != nil { return !acteLipsa(c, t).isEmpty }
     if let t, let decl = constructiiDeclansate(c, t) { return !decl.isEmpty }
     guard let req = t?.req else { return true }
     return req.contains { hasDotare(c, $0) }
@@ -189,7 +220,7 @@ public func isApplicable(_ c: Control, _ n: Neregula) -> Bool {
 public func ascunsaDeDotari(_ c: Control, _ n: Neregula) -> Bool {
     if n.custom || isApplicable(c, n) { return false }
     guard let t = sablon(n.key) else { return false }
-    return !t.grav && inCatalog(c, t) && !t.doarLaNU
+    return !t.grav && inCatalog(c, t) && !t.doarLaNU && t.autoActe == nil
 }
 
 // ───────── Verificări pe instalații ─────────
@@ -204,10 +235,60 @@ public struct StareVerificare: Equatable, Sendable {
     public let stare: String
 }
 
-/// Starea verificării unei construcții, față de data începerii controlului.
-public func verifStare(_ c: Control, _ n: Neregula, _ k: Constructie) -> StareVerificare {
+// ───────── Rândurile pe centrală termică (v1.25: b3, g, h) ─────────
+// Controalele încheiate înainte de v1.25 rămân pe construcție.
+
+public func perCT(_ c: Control, _ n: Neregula) -> Bool { !n.custom && (sablon(n.key)?.perCT ?? false) && catalogOf(c) >= 12 }
+
+/// O unitate de verificare / constatare: o construcție sau o centrală a ei. `id` = cheia din `n.verificari`
+/// („<construcție>” sau „<construcție>:<centrală>”).
+public struct UnitateVerif: Equatable, Sendable {
+    public let id: String
+    public let k: Constructie
+    public let ct: Centrala?
+    /// numărul centralei (1…), 0 la construcție
+    public let nr: Int
+    public let denumire: String
+}
+
+/// Centralele unei construcții, ca unități: „<construcție> – CT 2”
+public func unitatiCT(_ c: Control, _ k: Constructie) -> [UnitateVerif] {
+    let nume = numeConstructie(c, k)
+    return centraleOf(k).enumerated().map { i, x in
+        UnitateVerif(id: "\(k.id):\(x.id)", k: k, ct: x, nr: i + 1, denumire: "\(nume) – CT \(i + 1)")
+    }
+}
+
+/// Centralele alese la o constatare, pe construcțiile ei (alese explicit în `ctIds`); [] = construcțiile întregi
+public func centraleAlese(_ c: Control, _ n: Neregula) -> [UnitateVerif] {
+    guard perCT(c, n), let l = n.ctIds, !l.isEmpty else { return [] }
+    let ids = Set(l)
+    return constructiiOf(c, n).flatMap { k in unitatiCT(c, k).filter { ids.contains($0.id) } }
+}
+
+/// Unitățile de verificare ale unui rând: construcțiile relevante; la verificarea CT, fiecare centrală
+/// (construcția cu „NU ARE” nu are rând; cea fără centrale declarate rămâne pe construcție).
+public func verifUnitati(_ c: Control, _ n: Neregula) -> [UnitateVerif] {
+    let list = constructiiEligibile(c, n)
+    func cons(_ k: Constructie) -> UnitateVerif {
+        UnitateVerif(id: k.id, k: k, ct: nil, nr: 0, denumire: k.denumire.isEmpty ? "Construcție" : k.denumire)
+    }
+    if !perCT(c, n) { return list.map(cons) }
+    return list.flatMap { k -> [UnitateVerif] in
+        let u = unitatiCT(c, k)
+        if !u.isEmpty { return u }
+        return k.dotare("centrala")?.nuAre == true ? [] : [cons(k)]
+    }
+}
+
+/// Starea verificării unei unități (construcție sau centrală), față de data începerii controlului.
+/// Prima centrală a unei construcții preia data scrisă pe construcție înainte de v1.25.
+public func verifStare(_ c: Control, _ n: Neregula, _ u: UnitateVerif) -> StareVerificare {
     let t = sablon(n.key)
-    let v = n.verificare(k.id)
+    let m = n.verificari
+    let x = m[u.id].flatMap { $0.truthy ? $0 : nil }
+        ?? (u.ct != nil && u.nr == 1 ? m[u.k.id].flatMap { $0.truthy ? $0 : nil } : nil)
+    let v = Verificare(x?.obiect ?? JSObiect())
     let luniV = v.luni
     let luni: Int
     if let alegeri = t?.verifAlegeri, luniV.isFinite, luniV == luniV.rounded(), alegeri.contains(Int(luniV)) {
@@ -221,19 +302,36 @@ public func verifStare(_ c: Control, _ n: Neregula, _ k: Constructie) -> StareVe
     return StareVerificare(data: v.data, luni: luni, expira: expira, stare: expira < ref ? "expirata" : "valabila")
 }
 
-public func verifExpirate(_ c: Control, _ n: Neregula) -> [Constructie] {
-    isVerificare(n) ? constructiiEligibile(c, n).filter { verifStare(c, n, $0).stare == "expirata" } : []
+/// Starea verificării pe construcție (unitatea construcției întregi)
+public func verifStare(_ c: Control, _ n: Neregula, _ k: Constructie) -> StareVerificare {
+    verifStare(c, n, UnitateVerif(id: k.id, k: k, ct: nil, nr: 0, denumire: k.denumire))
 }
 
-/// Textul pentru PV / fișă: datele ultimei verificări la construcțiile alese
+public func verifExpirate(_ c: Control, _ n: Neregula) -> [UnitateVerif] {
+    isVerificare(n) ? verifUnitati(c, n).filter { verifStare(c, n, $0).stare == "expirata" } : []
+}
+
+/// Unitățile constatării (PV / fișă): la rândurile pe CT, centralele alese sau toate centralele construcțiilor alese
+func unitatiConstatare(_ c: Control, _ n: Neregula) -> [UnitateVerif] {
+    if !perCT(c, n) {
+        return constructiiOf(c, n).map { UnitateVerif(id: $0.id, k: $0, ct: nil, nr: 0, denumire: $0.denumire.isEmpty ? "construcție" : $0.denumire) }
+    }
+    let alese = centraleAlese(c, n)
+    if !alese.isEmpty { return alese }
+    let ks = Set(constructiiOf(c, n).map(\.id))
+    return verifUnitati(c, n).filter { ks.contains($0.k.id) }
+}
+
+/// Textul pentru PV / fișă: datele ultimei verificări la construcțiile (centralele) alese
 public func verifText(_ c: Control, _ n: Neregula) -> String {
     guard isVerificare(n) else { return "" }
-    let multe = c.constructii.count > 1
-    return constructiiOf(c, n).map { k in
-        let s = verifStare(c, n, k)
+    let unit = unitatiConstatare(c, n)
+    let multe = c.constructii.count > 1 || unit.contains { $0.ct != nil }
+    return unit.map { u in
+        let s = verifStare(c, n, u)
         let cum = s.stare == "lipsa" ? "fără verificare prezentată"
             : "ultima verificare \(fmtDate(s.data))\(s.stare == "expirata" ? ", expirată (era valabilă până la \(fmtDate(s.expira ?? "")))" : "")"
-        return multe ? "\(k.denumire.isEmpty ? "construcție" : k.denumire): \(cum)" : cum
+        return multe ? "\(u.denumire): \(cum)" : cum
     }.joined(separator: "; ")
 }
 
@@ -248,5 +346,57 @@ public func appleMapsUrl(_ g: Gps, _ label: String = "") -> String {
     let q = (label.isEmpty ? fmtCoord(g) : label).addingPercentEncoding(withAllowedCharacters: permise) ?? ""
     return "https://maps.apple.com/?ll=\(fix6(g.lat)),\(fix6(g.lon))&q=\(q)"
 }
-/// Precizia: sub 30 m bună, până la 100 m acceptabilă, peste 100 m slabă
-public func gpsQuality(_ acc: Double) -> String { acc <= 30 ? "buna" : acc <= 100 ? "medie" : "slaba" }
+/// Precizia: sub 30 m bună, până la 100 m acceptabilă, peste 100 m slabă; coordonatele introduse de mână nu au precizie
+public func gpsQuality(_ acc: Double?) -> String {
+    guard let acc else { return "manual" }
+    return acc <= 30 ? "buna" : acc <= 100 ? "medie" : "slaba"
+}
+public func gpsQuality(_ g: Gps) -> String { gpsQuality(g.faraPrecizie ? nil : g.acc) }
+
+/// Aceleași coordonate (construcțiile 2… „ca la prima construcție”)
+public func gpsEgal(_ a: Gps?, _ b: Gps?) -> Bool {
+    guard let a, let b, let la = a.o["lat"], let lb = b.o["lat"], let oa = a.o["lon"], let ob = b.o["lon"] else { return false }
+    return la == lb && oa == ob
+}
+
+/// Coordonate scrise de mână: „44.426800, 26.102500”, „44,4268 26,1025”, „44°25′36″ N 26°6′9″ E” (Busola de pe iPhone).
+/// Întoarce (lat, lon) cu 6 zecimale, sau nil.
+public func parseCoord(_ text: String) -> (lat: Double, lon: Double)? {
+    let s = text.trimJS
+        .inlocuiesteRegex("[’′‘]", "'").inlocuiesteRegex("[”″“]", "\"").replacingOccurrences(of: "º", with: "°")
+    if s.isEmpty { return nil }
+    var lat = Double.nan, lon = Double.nan
+    // `Number(x.replace(',', '.'))`: doar prima virgulă
+    func nr(_ x: String?) -> Double {
+        let t = x ?? "0"
+        return Double(t.range(of: ",").map { t.replacingCharacters(in: $0, with: ".") } ?? t) ?? .nan
+    }
+    if s.contains("°") {
+        guard let re = try? NSRegularExpression(pattern: "(-?\\d+(?:[.,]\\d+)?)\\s*°\\s*(?:(\\d+(?:[.,]\\d+)?)\\s*'\\s*)?(?:(\\d+(?:[.,]\\d+)?)\\s*(?:\"|'')\\s*)?([NSEWV])?", options: [.caseInsensitive]) else { return nil }
+        let ns = s as NSString
+        let p: [(v: Double, emisfera: String)] = re.matches(in: s, range: NSRange(location: 0, length: ns.length)).map { m in
+            func g(_ i: Int) -> String? { m.range(at: i).location == NSNotFound ? nil : ns.substring(with: m.range(at: i)) }
+            let gr = nr(g(1)), mi = nr(g(2)), se = nr(g(3))
+            let v = abs(gr) + mi / 60 + se / 3600
+            let em = (g(4) ?? "").uppercased()
+            let neg = gr < 0 || ["S", "W", "V"].contains(em)
+            return (neg ? -v : v, em)
+        }
+        if p.count != 2 { return nil }
+        // ordinea: latitudinea (N / S) întâi; „E 26° N 44°” se întoarce
+        if ["E", "W", "V"].contains(p[0].emisfera) || ["N", "S"].contains(p[1].emisfera) {
+            (lat, lon) = (p[1].v, p[0].v)
+        } else {
+            (lat, lon) = (p[0].v, p[1].v)
+        }
+    } else {
+        guard let m = s.grupeRegex("^(-?\\d{1,3}[.,]\\d+)(\\s*[,;\\s]\\s*)(-?\\d{1,3}[.,]\\d+)$"), m.count >= 4 else { return nil }
+        // cu virgulă zecimală, separatorul trebuie să fie spațiu sau „;” („44,4268,26,1025” e ambiguu)
+        if (m[1].contains(",") || m[3].contains(",")) && !m[2].potrivesteRegex("[;\\s]") { return nil }
+        (lat, lon) = (nr(m[1]), nr(m[3]))
+    }
+    if !lat.isFinite || !lon.isFinite || abs(lat) > 90 || abs(lon) > 180 { return nil }
+    // Math.round din JS (jumătățile în sus)
+    func r6(_ x: Double) -> Double { (x * 1e6 + 0.5).rounded(.down) / 1e6 }
+    return (r6(lat), r6(lon))
+}

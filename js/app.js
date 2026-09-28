@@ -6,7 +6,7 @@ import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
   fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat, pvText, sectiuniActive, secOf,
   todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality, constructiiOf, schimbare, grfVPesteParter, constructiiEligibile, verifExpirate, ascunsaDeDotari, neregulaLetter, neregulaLabel, AUTO_NU, syncAutoNU,
-  adaposturi, emptyAdapost,
+  adaposturi, emptyAdapost, acteOf, syncAutoActe, gpsEgal, parseCoord, verifUnitati, verifStare, CENTRALA_TIPURI,
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
@@ -267,6 +267,8 @@ document.addEventListener('input', (e) => {
     setPath(c, el.dataset.bind, el.value);
     const mObs = el.dataset.bind.match(/\.dotari\.(\w+)\.obs$/);
     if (mObs && AUTO_NU[mObs[1]]) syncAutoNU(c, mObs[1], { obsOnly: true });
+    // observațiile unui act lipsă intră în observațiile neregulii lui (ao / ap / aq)
+    if (/^acte\.\w+\.obs$/.test(el.dataset.bind)) syncAutoActe(c, { obsOnly: true });
     touch(c);
     if (el.tagName === 'TEXTAREA') autosize(el);
     refreshTodoSoon(c);
@@ -500,7 +502,7 @@ document.addEventListener('click', async (e) => {
     }
     case 'rows-collapse': case 'rows-expand': {
       if (el.dataset.sec === 'acte') {
-        for (const a of ACTE) {
+        for (const a of acteOf(c)) {
           const k = `${c.id}|act:${a.key}`;
           if (act === 'rows-expand') state.ui.rowCollapsed.delete(k); else if (c.acte[a.key].status) state.ui.rowCollapsed.add(k);
         }
@@ -518,13 +520,27 @@ document.addEventListener('click', async (e) => {
       n.verificari[el.dataset.id] = { ...(n.verificari[el.dataset.id] || {}), luni: Number(el.dataset.val) };
       break;
     }
+    case 'verif-ca-prima': {
+      // aceeași dată (și periodicitate) ca la primul rând de verificare; din nou = se golește
+      const n = c.nereguli.find((x) => x.key === el.dataset.key);
+      const list = n ? verifUnitati(c, n) : [];
+      const u = list.find((x) => x.id === el.dataset.id);
+      if (!u || !list[0]) return;
+      const p = verifStare(c, n, list[0]);
+      const s = verifStare(c, n, u);
+      // periodicitatea se copiază doar unde se alege (b2: 12 / 24 de luni)
+      n.verificari[u.id] = s.data === p.data && s.luni === p.luni ? { ...(n.verificari[u.id] || {}), data: '' }
+        : { ...(n.verificari[u.id] || {}), data: p.data, ...(sablon(n.key)?.verifAlegeri ? { luni: p.luni } : {}) };
+      break;
+    }
     case 'verif-nok': {
-      // „tu decizi”: constată neregula pentru construcțiile cu verificarea expirată
+      // „tu decizi”: constată neregula pentru construcțiile (centralele) cu verificarea expirată
       const n = c.nereguli.find((x) => x.key === el.dataset.key);
       if (!n) return;
       const exp = verifExpirate(c, n);
       n.status = 'nok';
-      n.constructieIds = exp.map((k) => k.id);
+      n.constructieIds = [...new Set(exp.map((u) => u.k?.id || u.id))];
+      if (exp.some((u) => u.ct)) n.ctIds = exp.filter((u) => u.ct).map((u) => u.id); else delete n.ctIds;
       touch(c, true); rerenderEditor();
       toast(`${n.key}: constatat pentru ${exp.map((k) => k.denumire).join(', ')}`, 'ok', {
         label: 'Anulează', fn: () => { if (historyMove(c, 'undo')) rerenderEditor(); },
@@ -550,7 +566,24 @@ document.addEventListener('click', async (e) => {
         const [k] = resolvePath(c, el.dataset.path);   // părintele lui „grf” = construcția
         if (grfVPesteParter(k)) { touch(c, true); rerenderEditor(); gravGrfToast(c, k); return; }
       }
+      // act lipsă → neregulile ao / ap / aq se constată (sau se retrag) automat
+      if (/^acte\.\w+\.status$/.test(el.dataset.path)) {
+        const r = syncAutoActe(c);
+        if (r.length) {
+          touch(c, true); rerenderEditor();
+          const { key, r: rez } = r[0];
+          const lbl = neregulaLabel(c.nereguli.find((x) => x.key === key));
+          const vezi = { label: 'Vezi', fn: () => { location.hash = `#/control/${c.id}/nereguli/${key}`; } };
+          if (rez === 'added') toast(`Neregulă trecută automat (${key}): ${lbl}`, 'warn', vezi);
+          else if (rez === 'updated') toast(`Neregula ${key} actualizată din tabul Acte`, 'ok', vezi);
+          else if (rez === 'removed') toast(`Neregula ${key} a fost retrasă (niciun act „Lipsă”)`);
+          else if (rez === 'kept') toast(`Neregula ${key} rămâne constatată: are date completate. Verificați-o.`, 'warn', vezi);
+          return;
+        }
+      }
       const mDot = el.dataset.path.match(/\.dotari\.(\w+)\.v$/);
+      // fără hidranți interiori (NU / NEC), iluminatul Hint nu se mai verifică: „Lipsă iluminat Hint” se recalculează
+      if (mDot?.[1] === 'hidInt') syncAutoNU(c, 'ilumHint');
       // NU la ASI / AVIZ → neregula ah / ai se constată automat, cu observațiile din dotări
       if (mDot && AUTO_NU[mDot[1]]) {
         const r = syncAutoNU(c, mDot[1]);
@@ -600,10 +633,44 @@ document.addEventListener('click', async (e) => {
     }
     case 'centrala': {
       const obj = getPath(c, el.dataset.path);
-      if (el.dataset.val === 'NU_ARE') { obj.nuAre = !obj.nuAre; if (obj.nuAre) obj.tipuri = []; } else {
+      obj.ct = obj.ct || [];
+      if (el.dataset.val === 'NU_ARE') { obj.nuAre = !obj.nuAre; if (obj.nuAre) { obj.tipuri = []; obj.ct = []; } } else if (el.dataset.ct) {
+        // tipul unei centrale (CT 1, CT 2…); `tipuri` = toate tipurile construcției
+        const x = obj.ct.find((y) => y.id === el.dataset.ct);
+        if (!x) return;
         obj.nuAre = false;
-        obj.tipuri = obj.tipuri.includes(el.dataset.val) ? obj.tipuri.filter((t) => t !== el.dataset.val) : [...obj.tipuri, el.dataset.val];
+        x.tipuri = x.tipuri.includes(el.dataset.val) ? x.tipuri.filter((t) => t !== el.dataset.val) : [...x.tipuri, el.dataset.val];
+        obj.tipuri = CENTRALA_TIPURI.filter((t) => obj.ct.some((y) => y.tipuri.includes(t)));
+      } else {
+        // nicio centrală declarată: tipul ales creează CT 1
+        obj.nuAre = false;
+        obj.ct.push({ id: `ct${uid()}`, tipuri: [el.dataset.val] });
+        obj.tipuri = CENTRALA_TIPURI.filter((t) => obj.ct.some((y) => y.tipuri.includes(t)));
       }
+      break;
+    }
+    case 'ct-count': {
+      // câte centrale termice are construcția; ultima se șterge (cu confirmare, dacă are tipul completat)
+      const obj = getPath(c, el.dataset.path);
+      obj.ct = obj.ct || [];
+      if (el.dataset.val === '1') { obj.nuAre = false; obj.ct.push({ id: `ct${uid()}`, tipuri: [] }); } else {
+        const x = obj.ct[obj.ct.length - 1];
+        if (!x) return;
+        if (x.tipuri.length && !await confirmDialog({ title: `Ștergeți CT ${obj.ct.length}?`, text: `Centrala termică ${obj.ct.length} (${x.tipuri.join(', ')}) se elimină din această construcție.`, ok: 'Șterge', danger: true })) return;
+        obj.ct.pop();
+      }
+      obj.tipuri = CENTRALA_TIPURI.filter((t) => obj.ct.some((y) => y.tipuri.includes(t)));
+      break;
+    }
+    case 'ct-opt': {
+      // centralele constatării (rândurile pe CT); nicio centrală aleasă = construcțiile întregi
+      const n = c.nereguli.find((x) => x.key === el.dataset.key);
+      if (!n) return;
+      const ids = new Set(n.ctIds || []);
+      if (!ids.delete(el.dataset.id)) ids.add(el.dataset.id);
+      const valid = constructiiOf(c, n).flatMap((k) => (k.dotari?.centrala?.ct || []).map((x) => `${k.id}:${x.id}`));
+      n.ctIds = valid.filter((u) => ids.has(u));
+      if (!n.ctIds.length) delete n.ctIds;
       break;
     }
     case 'start-today': c.dataInceput = today(); break;
@@ -621,6 +688,13 @@ document.addEventListener('click', async (e) => {
       const ok = await confirmDialog({ title: 'Ștergeți construcția?', text: `„${k.denumire || 'Construcție'}” și toate datele ei vor fi șterse din acest control.`, ok: 'Șterge', danger: true });
       if (!ok) return;
       c.constructii = c.constructii.filter((x) => x !== k);
+      break;
+    }
+    case 'constr-up': case 'constr-down': {
+      const i = c.constructii.findIndex((x) => x.id === el.dataset.id);
+      const j = act === 'constr-up' ? i - 1 : i + 1;
+      if (i < 0 || j < 0 || j >= c.constructii.length) return;
+      [c.constructii[i], c.constructii[j]] = [c.constructii[j], c.constructii[i]];
       break;
     }
     case 'constr-toggle': {
@@ -655,6 +729,20 @@ document.addEventListener('click', async (e) => {
       return;
     }
     case 'pv-text': openPvText(c); return;
+    case 'intreb-add': {
+      const x = { id: `q${uid()}`, text: '', gata: false };
+      c.deIntrebat = [...(c.deIntrebat || []), x];
+      touch(c, true); rerenderEditor();
+      document.querySelector(`#intreb-${CSS.escape(x.id)} textarea`)?.focus();
+      return;
+    }
+    case 'intreb-del': {
+      const x = (c.deIntrebat || []).find((y) => y.id === el.dataset.id);
+      if (!x) return;
+      if (String(x.text || '').trim() && !await confirmDialog({ title: 'Ștergeți sarcina?', text: `„${String(x.text).trim()}” se elimină din listă.`, ok: 'Șterge', danger: true })) return;
+      c.deIntrebat = c.deIntrebat.filter((y) => y !== x);
+      break;
+    }
     case 'todo-toggle': state.ui.todoOpen = !state.ui.todoOpen; rerenderEditor(); return;
     case 'todo-go': {
       closeModal();
@@ -664,6 +752,15 @@ document.addEventListener('click', async (e) => {
     }
     case 'rest-ok': restConform(c, el.dataset.sec); return;
     case 'gps-get': { const k = c.constructii.find((x) => x.id === el.dataset.id); if (k) getGps(c, k); return; }
+    case 'gps-ca-prima': {
+      // aceleași coordonate ca la prima construcție (copiate o dată); din nou = se golesc
+      const k = c.constructii.find((x) => x.id === el.dataset.id);
+      const p = c.constructii[0];
+      if (!k || k === p || !p?.gps) return;
+      k.gps = gpsEgal(k.gps, p.gps) ? null : { ...p.gps };
+      break;
+    }
+    case 'gps-manual': { const k = c.constructii.find((x) => x.id === el.dataset.id); if (k) gpsManual(c, k); return; }
     case 'gps-copy': {
       const k = c.constructii.find((x) => x.id === el.dataset.id);
       if (!k?.gps) return;
@@ -850,13 +947,57 @@ function getGps(c, k) {
     toast(q === 'slaba' ? `Coordonate preluate, dar precizie slabă (± ${Math.round(acc)} m)` : `Coordonate preluate (± ${Math.round(acc)} m)`, q === 'slaba' ? 'warn' : 'ok');
   }, (err) => {
     done();
-    // 1 = permisiune refuzată, 2 = Localizarea iPad-ului oprită / fără poziție: ambele se rezolvă din Setări.
-    if (err.code === 3) {
-      toast('Nu s-a găsit semnal la timp. Ieșiți în aer liber sau lângă o fereastră și încercați din nou.', 'warn');
-      return;
-    }
-    gpsActivatePrompt(c, k);
+    // 1 = permisiune refuzată / Localizarea oprită: pașii din Setări; 2 = fără poziție, 3 = timp depășit
+    if (err.code === 1) { gpsActivatePrompt(c, k); return; }
+    gpsFaraPozitie(c, k, err.code === 3);
   }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
+}
+
+// Poziția nu s-a putut afla: iPad-ul fără SIM nu are GPS (se orientează doar după rețelele Wi-Fi din jur, pe care
+// pe teren nu le găsește); telefonul are GPS, dar în interior semnalul poate lipsi. Variantele, cu introducerea de mână.
+function gpsFaraPozitie(c, k, timp) {
+  const m = openModal(`<div class="modal-head"><h2>${icon('locate')} ${timp ? 'Nu s-a găsit semnal la timp' : 'Poziția nu a putut fi aflată'}</h2><button class="icon-btn big" data-act="modal-close" aria-label="Închide">${icon('x')}</button></div>
+    <div class="modal-body">
+      <p class="lead">${dsp('Un iPad fără cartelă SIM nu are GPS: își află poziția doar după rețelele Wi-Fi din jur, pe care pe teren de obicei nu le găsește. Hotspotul telefonului îi dă internet, nu și poziția.', 'Telefonul are GPS, dar în interior semnalul poate lipsi.')}</p>
+      <ol class="gps-steps">
+        <li><b>Introduceți coordonatele de mână</b>, de ex. din aplicația Busolă a telefonului (le arată și fără internet).</li>
+        ${dsp('<li>Un <b>receptor GPS prin Bluetooth</b> (ex. Garmin GLO 2, Bad Elf): iPad-ul îl folosește automat.</li><li>Încercați din nou lângă o clădire cu rețele Wi-Fi.</li>', '<li>Ieșiți în aer liber sau lângă o fereastră și încercați din nou.</li>')}
+      </ol>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-lg" id="gps-retry">${icon('locate')} Încearcă din nou</button>
+      <button class="btn btn-primary btn-lg" id="gps-man-open">${icon('pin')} Introdu coordonatele</button>
+    </div>`);
+  m.querySelector('#gps-retry').addEventListener('click', () => { closeModal(); getGps(c, k); });
+  m.querySelector('#gps-man-open').addEventListener('click', () => { closeModal(); gpsManual(c, k); });
+}
+
+// Coordonatele scrise de mână (sau lipite): „44.426800, 26.102500” sau formatul Busolei (44°25′36″ N 26°6′9″ E)
+function gpsManual(c, k) {
+  const m = openModal(`<div class="modal-head"><h2>${icon('pin')} Introduceți coordonatele</h2><button class="icon-btn big" data-act="modal-close" aria-label="Închide">${icon('x')}</button></div>
+    <div class="modal-body">
+      <p class="lead">${esc(k.denumire || 'Construcția')}: latitudinea și longitudinea, în grade.</p>
+      <label class="field"><span class="lbl">Coordonate</span><span class="inp-wrap"><input id="gps-man" value="${k.gps ? esc(fmtCoord(k.gps)) : ''}" placeholder="ex: 44.426800, 26.102500" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done"></span></label>
+      <p class="hint">Se acceptă și formatul din aplicația Busolă a telefonului (44°25′36″ N 26°6′9″ E), care arată coordonatele și fără internet.</p>
+      <p class="field-err" id="gps-man-err" hidden>${icon('alert')} Coordonate nerecunoscute. Scrieți latitudinea și longitudinea, ex: 44.426800, 26.102500.</p>
+    </div>
+    <div class="modal-foot">
+      <button class="btn btn-ghost btn-lg" data-act="modal-close">Renunță</button>
+      <button class="btn btn-primary btn-lg" id="gps-man-ok">${icon('check')} Salvează</button>
+    </div>`);
+  const inp = m.querySelector('#gps-man');
+  const save = () => {
+    const p = parseCoord(inp.value);
+    if (!p) { m.querySelector('#gps-man-err').hidden = false; return; }
+    k.gps = { lat: p.lat, lon: p.lon, acc: null, la: new Date().toISOString(), manual: true };
+    touch(c, true);
+    closeModal();
+    rerenderEditor();
+    toast('Coordonate salvate (introduse manual)', 'ok');
+  };
+  m.querySelector('#gps-man-ok').addEventListener('click', save);
+  inp.addEventListener('keydown', (e) => { if (e.key === 'Enter') save(); });
+  setTimeout(() => inp.focus(), 50);
 }
 
 // Localizarea e oprită sau refuzată. O aplicație web nu poate deschide Setările iPad-ului și nici nu poate porni
@@ -887,7 +1028,7 @@ function gpsActivatePrompt(c, k) {
 async function restConform(c, sec) {
   let rows, items;
   if (sec === 'acte') {
-    const acte = ACTE.filter((a) => !c.acte[a.key]?.status);
+    const acte = acteOf(c).filter((a) => !c.acte[a.key]?.status);
     rows = acte.map((a) => c.acte[a.key]);
     items = acte.map((a) => ['', a.label]);
   } else {

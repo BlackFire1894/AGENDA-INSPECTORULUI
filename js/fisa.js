@@ -1,10 +1,10 @@
 // Fișa controlului: rezumat complet, tipăribil (PDF din dialogul de tipărire) sau partajabil ca fișier.
 import { fmtDate, fmtDateLong, todayISO, isISO } from './dates.js';
 import {
-  DOTARI, ACTE, SECTIUNI, CATEGORII, sectiuniActive, secOf, neregulaLetter, neregulaCat,
-  constructiiNume, amendaSerieNr, fineStatus, asiDeadline, vecheInfo, isIncheiat, controlStats, isLocalitate, constatareLabel,
-  sablon, isGrav, isApplicable, fmtCoord, isVerificare, verifStare, constructiiEligibile, grfText, grfVPesteParter, googleMapsUrl,
-  parseSuma, adaposturi, adaposturiStats, adaposturiText,
+  SECTIUNI, CATEGORII, sectiuniActive, secOf, neregulaLetter, neregulaCat,
+  constructiiNume, fineStatus, asiDeadline, vecheInfo, isIncheiat, controlStats, isLocalitate, constatareLabel,
+  sablon, isGrav, isApplicable, fmtCoord, isVerificare, verifStare, verifUnitati, grfText, grfVPesteParter, googleMapsUrl,
+  parseSuma, adaposturi, adaposturiStats, adaposturiText, acteOf, dotariVizibile,
 } from './model.js';
 import { esc } from './ui.js';
 
@@ -35,6 +35,7 @@ export function fisaMarkup(c, controls, now = new Date()) {
       <span><b>Tip:</b> ${c.tip === 'LOCALITATE' ? 'Localitate' : 'OPEC / Instituție'}</span>
       <span><b>Perioada:</b> ${esc(perioada)}</span>
       ${c.administrator ? `<span><b>Administrator:</b> ${esc(c.administrator)}</span>` : ''}
+      ${c.persoanaParticipanta ? `<span><b>Persoană participantă:</b> ${esc(c.persoanaParticipanta)}</span>` : ''}
       ${c.telefon ? `<span><b>Telefon:</b> ${esc(c.telefon)}</span>` : ''}
       ${c.email ? `<span><b>Email:</b> ${esc(c.email)}</span>` : ''}
       ${c.adresa || c.localitate ? `<span><b>Adresă:</b> ${esc([c.adresa, c.localitate].filter(Boolean).join(', '))}</span>` : ''}
@@ -48,17 +49,31 @@ export function fisaMarkup(c, controls, now = new Date()) {
     </div>
   </header>`);
 
+  // „De întrebat până la finalizarea controlului” și observațiile generale (v1.25)
+  const intreb = (c.deIntrebat || []).filter((x) => String(x.text || '').trim());
+  if (intreb.length) {
+    h.push(`<section><h2>De întrebat până la finalizarea controlului</h2><ul class="f-intreb">
+      ${intreb.map((x) => `<li class="${x.gata ? '' : 'f-nok'}">${x.gata ? '✓' : '☐'} ${obs(x.text)}${x.gata ? '' : ' <b>(nerezolvat)</b>'}</li>`).join('')}
+    </ul></section>`);
+  }
+  if (String(c.observatiiGenerale || '').trim()) h.push(`<section><h2>Observații generale</h2><p>${obs(c.observatiiGenerale)}</p></section>`);
+
   // Construcții
   h.push(`<section><h2>Construcții (${c.constructii.length})</h2>`);
   c.constructii.forEach((k, i) => {
     const by = { DA: [], NU: [], NEC: [] };
-    for (const d of DOTARI) {
+    const vis = dotariVizibile(c, k);
+    for (const d of vis) {
       if (d.centrala) continue;
       const v = k.dotari[d.key]?.v;
       if (by[v]) by[v].push(d.label);
     }
-    const ct = k.dotari.centrala;
-    const centrala = ct?.nuAre ? 'nu are' : (ct?.tipuri || []).join(', ');
+    // o centrală: tipurile ei (ca până acum); mai multe: fiecare, cu numărul ei
+    const cen = k.dotari.centrala;
+    const cts = cen?.ct || [];
+    const centrala = cen?.nuAre ? 'nu are'
+      : cts.length > 1 ? cts.map((x, j) => `CT ${j + 1}${x.tipuri.length ? `: ${x.tipuri.join(', ')}` : ''}`).join('; ')
+        : (cts[0]?.tipuri || cen?.tipuri || []).join(', ');
     h.push(`<div class="f-constr">
       <h3>${i + 1}. ${esc(k.denumire || `Construcția ${i + 1}`)}</h3>
       <table class="f-kv"><tr>
@@ -70,11 +85,11 @@ export function fisaMarkup(c, controls, now = new Date()) {
         <td><b>Structură</b><br>${esc(k.structura) || '—'}</td>
         <td><b>Pereți</b><br>${esc(k.materialPereti) || '—'}</td>
       </tr></table>
-      <p class="f-dot"><b>Coordonate GPS:</b> ${k.gps ? `<a href="${esc(googleMapsUrl(k.gps))}">${esc(fmtCoord(k.gps))}</a> (± ${Math.round(k.gps.acc)} m)` : 'necompletate'}</p>
+      <p class="f-dot"><b>Coordonate GPS:</b> ${k.gps ? `<a href="${esc(googleMapsUrl(k.gps))}">${esc(fmtCoord(k.gps))}</a> (${k.gps.acc == null ? 'introduse manual' : `± ${Math.round(k.gps.acc)} m`})` : 'necompletate'}</p>
       ${['asi', 'aviz'].filter((d) => k.dotari[d]?.v === 'DA' && k.dotari[d].nr?.trim()).map((d) => `<p class="f-dot"><b>${d === 'asi' ? 'Nr. autorizație (ASI)' : 'Nr. aviz'}:</b> ${esc(k.dotari[d].nr)}</p>`).join('')}
       <p class="f-dot"><b>DA:</b> ${esc(by.DA.join(', ')) || '—'}${centrala ? ` · <b>Centrală termică:</b> ${esc(centrala)}` : ''}</p>
       <p class="f-dot"><b>NU:</b> ${esc(by.NU.join(', ')) || '—'} · <b>NEC:</b> ${esc(by.NEC.join(', ')) || '—'}</p>
-      ${DOTARI.filter((d) => k.dotari[d.key]?.obs?.trim()).map((d) => `<p class="f-dot f-small"><b>${esc(d.label)}:</b> ${obs(k.dotari[d.key].obs)}</p>`).join('')}
+      ${vis.filter((d) => k.dotari[d.key]?.obs?.trim()).map((d) => `<p class="f-dot f-small"><b>${esc(d.label)}:</b> ${obs(k.dotari[d.key].obs)}</p>`).join('')}
     </div>`);
   });
   h.push('</section>');
@@ -84,7 +99,7 @@ export function fisaMarkup(c, controls, now = new Date()) {
   // Acte
   h.push(`<section><h2>Acte de autoritate și evidențe</h2><table class="f-table">
     <thead><tr><th>#</th><th>Act / evidență</th><th>Situație</th><th>Observații</th></tr></thead><tbody>
-    ${ACTE.map((a, i) => { const v = c.acte[a.key] || {}; return `<tr class="${v.status === 'nok' ? 'f-nok' : ''}">
+    ${acteOf(c).map((a, i) => { const v = c.acte[a.key] || {}; return `<tr class="${v.status === 'nok' ? 'f-nok' : ''}">
       <td>${i + 1}</td><td>${esc(a.label)}</td><td>${v.status === 'ok' ? 'Prezentat' : v.status === 'nok' ? 'Lipsă' : v.status === 'nec' ? 'NEC (nu este cazul)' : '—'}</td><td>${obs(v.obs)}</td></tr>`; }).join('')}
   </tbody></table></section>`);
 
@@ -105,9 +120,9 @@ export function fisaMarkup(c, controls, now = new Date()) {
         const det = [];
         if (obs(n.obs)) det.push(obs(n.obs));
         if (isVerificare(n) && n.status !== 'nec') {
-          const vs = constructiiEligibile(c, n).map((k) => {
-            const s = verifStare(c, n, k);
-            return `${multe ? `${esc(k.denumire)}: ` : ''}${s.stare === 'lipsa' ? 'fără dată' : `${fmtDate(s.data)} (${s.luni} luni)${s.stare === 'expirata' ? ` — <b>expirată (era valabilă până la ${fmtDate(s.expira)})</b>` : ''}`}`;
+          const vs = verifUnitati(c, n).map((u) => {
+            const s = verifStare(c, n, u);
+            return `${multe || u.ct ? `${esc(u.denumire)}: ` : ''}${s.stare === 'lipsa' ? 'fără dată' : `${fmtDate(s.data)} (${s.luni} luni)${s.stare === 'expirata' ? ` — <b>expirată (era valabilă până la ${fmtDate(s.expira)})</b>` : ''}`}`;
           });
           if (vs.length) det.push(`<b>Ultima verificare:</b> ${vs.join('; ')}`);
         }
@@ -116,7 +131,7 @@ export function fisaMarkup(c, controls, now = new Date()) {
         if (vi.veche) det.push(`<b>Neregulă veche</b>${vi.auto ? ` (și la controlul din ${fmtDate(vi.auto.dataInceput)})` : ''}`);
         if (n.status === 'nok' && n.amenda?.aplicata) {
           const fs = fineStatus(c, n, today);
-          det.push(`<b>Amendă</b>${amendaSerieNr(n.amenda) ? ` ${esc(amendaSerieNr(n.amenda))}` : ''}${money(n.amenda.suma) ? `, ${money(n.amenda.suma)}` : ''} — ${esc(fs.label)}`);
+          det.push(`<b>Amendă</b>${money(n.amenda.suma) ? `, ${money(n.amenda.suma)}` : ''} — ${esc(fs.label)}`);
         }
         if (sec === 'ner' && n.key === 'a' && !n.custom) {
           const d = asiDeadline(c, today);
@@ -176,6 +191,8 @@ export const FISA_CSS = `
 .f-cat { font-size: 8pt; color: #666; }
 .f-dot { font-size: 9.5pt; }
 .f-small { font-size: 9pt; color: #444; }
+.f-intreb { list-style: none; padding-left: 0; margin: 0; }
+.f-intreb li { margin: 2pt 0; }
 .f-foot { margin-top: 16pt; padding-top: 6pt; border-top: 0.75pt solid #c9cfdc; font-size: 8.5pt; color: #666; }
 .fisa-doc * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
 `;

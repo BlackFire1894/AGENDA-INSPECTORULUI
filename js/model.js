@@ -6,7 +6,7 @@ import {
   addWorkingDays, workingDaysBetween, nextWorkingDay, fmtDateLong,
 } from './dates.js';
 
-export const SCHEMA_VERSION = 11; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS · 7: mai multe construcții pe neregulă, GRF/NSI pe construcție · 8: nereguli ah, ai · 9: verificări defalcate cu date pe construcție, NEC, aj/ak, an construire, nr. ASI/aviz · 10: lista înghețată la încheiere (catalog), seria și nr. amenzii într-un câmp · 11: organizare protecție civilă (agent inundații, inspector PC, taxă, convenții OPEC)
+export const SCHEMA_VERSION = 12; // 2: Planuri/SVSU și PC · 3: construcția neregulii, seria/nr. amenzii, acte exerciții · 4: neregulă veche · 5: nereguli noi, detectori autonomi, nereguli grave (NU la dotări) · 6: adresă, localitate, GPS · 7: mai multe construcții pe neregulă, GRF/NSI pe construcție · 8: nereguli ah, ai · 9: verificări defalcate cu date pe construcție, NEC, aj/ak, an construire, nr. ASI/aviz · 10: lista înghețată la încheiere (catalog), seria și nr. amenzii într-un câmp · 11: organizare protecție civilă (agent inundații, inspector PC, taxă, convenții OPEC) · 12: acte lipsă → nereguli (ao, ap, aq), act „fumat”, chepeng / ușă pod (an), ascensor, NEC la iluminat Hint, CT pe număr, participant, observații generale, „De întrebat”
 
 export const TIP_OBIECTIV = [
   { key: 'OPEC', label: 'OPEC / Instituție' },
@@ -34,15 +34,20 @@ export const DOTARI = [
   { key: 'statiePompe', label: 'Stație de pompe', opts: DNN },
   { key: 'fotovoltaice', label: 'Panouri fotovoltaice', opts: DN },
   { key: 'acumulatori', label: 'Acumulatori', opts: DN },
-  { key: 'ilumHint', label: 'Iluminat Hint', opts: DN },
+  // NEC din v1.25; rândul nu apare când la Hidranți interiori e NU sau NEC (`ilumHintAscuns`)
+  { key: 'ilumHint', label: 'Iluminat Hint', opts: DNN },
+  // centrala: câte centrale are construcția (`ct`), fiecare cu tipurile ei; „NU ARE”
   { key: 'centrala', label: 'Centrală termică', centrala: true },
   { key: 'ipt', label: 'IPT', opts: DN },
+  // `din`: dotarea apare doar în controalele deschise și în cele încheiate după această versiune (ca rândurile de nereguli)
+  { key: 'ascensor', label: 'Ascensor', opts: DN, din: 12 },   // fără neregulă
 ];
 export const CENTRALA_TIPURI = ['SOLID', 'GAZOS', 'ELECTRIC'];
 
 export const ACTE = [
   { key: 'ctpsi', label: 'Dispoziție CTPSI / RESP' },
   { key: 'lfd', label: 'Dispoziție LFD' },
+  { key: 'fumat', label: 'Dispoziție de reglementare a fumatului', din: 12 },
   { key: 'instruire', label: 'Dispoziție instruire' },
   { key: 'organizare', label: 'Dispoziție organizarea apărării împotriva incendiilor' },
   { key: 'comisie', label: 'Comisie PSI' },
@@ -97,11 +102,17 @@ export const NEREGULI = [
   { key: 'ah', din: 8, cat: 'docs', label: 'Construcția funcționează fără ASI (autorizație de securitate la incendiu)', autoNU: 'asi' },
   { key: 'ai', din: 8, cat: 'docs', label: 'Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz', autoNU: 'aviz' },
   { key: 'a', cat: 'docs', label: 'Nu a prezentat documentație ASI', asi: true },
+  // Acte lipsă (tabul Acte) → constatate automat, vizibile doar cât timp lipsesc: controalele proprii și analiza
+  // semestrială separat, restul actelor într-o singură neregulă (lista lor în observații)
+  { key: 'ao', din: 12, cat: 'docs', label: 'Nu a prezentat acte de autoritate / evidențe', autoActe: 'grup' },
+  { key: 'ap', din: 12, cat: 'docs', label: 'Lipsă controale proprii', autoActe: 'controale' },
+  { key: 'aq', din: 12, cat: 'docs', label: 'Lipsă analiză semestrială', autoActe: 'analiza' },
   // Verificări, defalcate pe instalație; data ultimei verificări se completează pe fiecare construcție.
   // `verif`: perioada de valabilitate în luni (b2: la alegere 12 / 24, pe construcție). b1–b3: toate construcțiile.
+  // `perCT`: din v1.25, pe fiecare centrală termică a construcției (verificarea și construcțiile constatării)
   { key: 'b1', din: 9, cat: 'docs', label: 'Nu a prezentat / nu are verificare instalații electrice', verif: 12 },
   { key: 'b2', din: 9, cat: 'docs', label: 'Nu a prezentat / nu are verificare împământare (IPT)', verif: 12, verifAlegeri: [12, 24] },
-  { key: 'b3', din: 9, cat: 'docs', label: 'Nu a prezentat / nu are verificare CT (centrală termică)', verif: 24 },
+  { key: 'b3', din: 9, cat: 'docs', label: 'Nu a prezentat / nu are verificare CT (centrală termică)', verif: 24, perCT: true },
   { key: 'c1', din: 9, cat: 'docs', label: 'Nu a prezentat / nu are verificare IDSAI', req: ['idsai'], verif: 12 },
   { key: 'c2', din: 9, cat: 'docs', label: 'Nu a prezentat / nu are verificare hidranți interiori', req: ['hidInt'], verif: 6 },
   { key: 'c3', din: 9, cat: 'docs', label: 'Nu a prezentat / nu are verificare hidranți exteriori', req: ['hidExt'], verif: 6 },
@@ -116,9 +127,10 @@ export const NEREGULI = [
   { key: 'e', cat: 'stingatoare', label: 'Stingătoare neconforme' },
   { key: 'al', din: 9, cat: 'stingatoare', label: 'Stingătoare insuficiente / lipsă' },
   { key: 'f', cat: 'electric', label: 'Instalații electrice exploatate incorect' },
-  { key: 'g', cat: 'electric', label: 'Perete / planșeu / perete + planșeu cameră CT – 90 minute', req: ['centrala'] },
-  { key: 'h', cat: 'electric', label: 'Ușă RF 15 minute cameră CT', req: ['centrala'] },
+  { key: 'g', cat: 'electric', label: 'Perete / planșeu / perete + planșeu cameră CT – 90 minute', req: ['centrala'], perCT: true },
+  { key: 'h', cat: 'electric', label: 'Ușă RF 15 minute cameră CT', req: ['centrala'], perCT: true },
   { key: 'i', cat: 'electric', label: 'Ușă RF 60 minute cameră IDSAI', req: ['idsai'] },
+  { key: 'an', din: 12, cat: 'electric', label: 'Chepengul / ușa de acces în pod nu este RF 30 / 45 minute' },
   { key: 'j', cat: 'semnalizare', label: 'EXIT defect', req: ['exit'] },
   { key: 'aj', din: 9, cat: 'semnalizare', label: 'EXIT incomplet', req: ['exit'] },
   { key: 'k', cat: 'semnalizare', label: 'Iluminat Hint defect', req: ['ilumHint'] },
@@ -231,13 +243,16 @@ export function uid() {
 export function emptyConstructie(nr = 1) {
   const dotari = {};
   for (const d of DOTARI) {
-    dotari[d.key] = d.centrala ? { tipuri: [], nuAre: false, obs: '' } : { v: '', obs: '', ...(d.nr ? { nr: '' } : {}) };
+    // centrala: `ct` = centralele construcției ({ id, tipuri }), `tipuri` = toate tipurile lor (compatibilitate)
+    dotari[d.key] = d.centrala ? { tipuri: [], nuAre: false, obs: '', ct: [] } : { v: '', obs: '', ...(d.nr ? { nr: '' } : {}) };
   }
   return {
     id: uid(), denumire: `Construcția ${nr}`, suprafata: '', regimInaltime: '', nrAngajati: '', anConstruire: '',
     structura: '', materialPereti: '', dotari,
     grf: '',     // GRF/NSI: 'I'…'V' sau 'NN' (nu e necesar); '' = necompletat
-    gps: null,   // { lat, lon, acc (m), la (ISO) } — coordonatele construcției, preluate la cerere cu „Completează coordonatele”
+    // { lat, lon, acc (m), la (ISO) } — coordonatele construcției, preluate la cerere cu „Completează coordonatele”;
+    // introduse de mână: { lat, lon, acc: null, la, manual: true }
+    gps: null,
   };
 }
 
@@ -272,6 +287,9 @@ export function newControl({ objectiveId, tip = 'OPEC', denumire = '', start } =
     denumire,
     administrator: '', telefon: '', email: '',
     adresa: '', localitate: '',
+    persoanaParticipanta: '',   // persoana care a participat la control din partea obiectivului
+    observatiiGenerale: '',     // notițe libere despre obiectiv / control
+    deIntrebat: [],             // „De întrebat până la finalizarea controlului”: [{ id, text, gata }]
     dataInceput: today,
     dataIncheiere: '',
     constructii: [emptyConstructie(1)],
@@ -283,28 +301,42 @@ export function newControl({ objectiveId, tip = 'OPEC', denumire = '', start } =
   };
 }
 
-// Control nou pe un obiectiv existent: preia datele de identificare și construcțiile
-// (caracteristici + dotări) din ultimul control; actele și neregulile pornesc de la zero.
+// Control nou pe un obiectiv existent (v1.25, regula utilizatorului): se preia tot din controlul imediat anterior —
+// datele obiectivului, construcțiile (caracteristici, dotări, centrale, GPS), adăposturile, observațiile actelor,
+// sarcinile „De întrebat” nerezolvate și constatările (cu observațiile și construcțiile lor; devin „neregulă veche”).
+// Pornesc de la zero: perioada, datele verificărilor, starea actelor, încărcarea, PV, amenzile, sigiliile, termenul ASI
+// și rândurile Conform / NEC.
 export function controlFromPrevious(prev, start) {
   const c = newControl({ objectiveId: prev.objectiveId, tip: prev.tip, denumire: prev.denumire, start });
-  c.administrator = prev.administrator;
-  c.telefon = prev.telefon;
-  c.email = prev.email;
-  c.adresa = prev.adresa || '';
-  c.localitate = prev.localitate || '';
+  for (const f of ['administrator', 'telefon', 'email', 'adresa', 'localitate', 'persoanaParticipanta', 'observatiiGenerale']) c[f] = prev[f] || '';
+  c.deIntrebat = (prev.deIntrebat || []).filter((x) => !x.gata && String(x.text || '').trim()).map((x) => ({ id: x.id, text: x.text, gata: false }));
   const idNou = new Map();
   c.constructii = JSON.parse(JSON.stringify(prev.constructii || [])).map((k) => { const id = uid(); idNou.set(k.id, id); return { ...k, id }; });
   if (!c.constructii.length) c.constructii = [emptyConstructie(1)];
-  // datele ultimelor verificări rămân valabile de la un control la altul (se actualizează la nevoie)
-  for (const n of c.nereguli) {
-    const p = isVerificare(n) && (prev.nereguli || []).find((x) => x.key === n.key);
-    if (!p?.verificari) continue;
-    for (const [kid, v] of Object.entries(p.verificari)) if (idNou.has(kid)) n.verificari[idNou.get(kid)] = { ...v };
-  }
+  for (const a of ACTE) { const o = prev.acte?.[a.key]?.obs; if (o && c.acte[a.key]) c.acte[a.key].obs = o; }
   if (prev.adapostPC) c.adapostPC = { ...prev.adapostPC };
-  // adăposturile rămân (aceeași cheie și locație, ca „neregulă veche” să se recunoască); starea se verifică din nou
-  if (c.adapostPC.v === 'DA') for (const a of adaposturi(prev)) c.nereguli.push({ ...emptyAdapost(c, a.key), locatie: a.locatie || '' });
-  for (const dot of Object.keys(AUTO_NU)) syncAutoNU(c, dot);   // NU la ASI / AVIZ moștenit → neregula apare din start
+  // o constatare preluată: starea, observațiile și construcțiile (fără PV, amendă, sigiliu, termen ASI, verificări)
+  const kid = (id) => idNou.get(id);
+  const constatare = (p) => {
+    const o = { status: 'nok', obs: p.obs || '', obsAuto: p.obsAuto || '', auto: !!p.auto, constructieIds: (p.constructieIds || []).filter(kid).map(kid) };
+    const ct = (p.ctIds || []).map((u) => u.split(':')).filter(([k]) => kid(k)).map(([k, x]) => `${kid(k)}:${x}`);
+    if (ct.length) o.ctIds = ct;
+    return o;
+  };
+  for (const p of prev.nereguli || []) {
+    // adăposturile rămân (aceeași cheie și locație, ca „neregulă veche” să se recunoască); cele conforme se verifică din nou
+    if (p.adapost) {
+      if (c.adapostPC.v === 'DA') c.nereguli.push({ ...emptyAdapost(c, p.key), locatie: p.locatie || '', ...(p.status === 'nok' ? constatare(p) : {}) });
+      continue;
+    }
+    if (p.status !== 'nok') continue;
+    if (p.custom) { c.nereguli.push({ ...emptyNeregula(p.key, true, secOf(p)), label: p.label || '', grav: !!p.grav, ...constatare(p) }); continue; }
+    const t = sablon(p.key);
+    const n = c.nereguli.find((x) => x.key === p.key);
+    if (t && n && inCatalog(c, t)) Object.assign(n, constatare(p));
+  }
+  for (const dot of Object.keys(AUTO_NU)) syncAutoNU(c, dot);   // NU la ASI / AVIZ / iluminat Hint moștenit
+  syncAutoActe(c);   // actele pornesc necompletate: neregulile lor apar din nou când actele sunt bifate „Lipsă”
   return c;
 }
 
@@ -349,6 +381,52 @@ export function syncAutoNU(c, dot, { obsOnly = false } = {}) {
   return null;
 }
 
+// ───────── Acte lipsă (tabul Acte) → neregulile ao / ap / aq, completate automat (v1.25) ─────────
+// Controalele proprii și analiza semestrială au neregula lor; celelalte acte lipsă intră toate în „ao”.
+export const AUTO_ACTE = ['ao', 'ap', 'aq'];
+const ACTE_SEPARATE = ['controale', 'analiza'];
+// Actele din lista controlului (un act adăugat după încheiere nu apare la controalele încheiate)
+export const acteOf = (c) => ACTE.filter((a) => inCatalog(c, a));
+export function acteLipsa(c, t) {
+  return acteOf(c).filter((a) => c.acte?.[a.key]?.status === 'nok'
+    && (t.autoActe === 'grup' ? !ACTE_SEPARATE.includes(a.key) : a.key === t.autoActe));
+}
+function obsDinActe(c, list, grup) {
+  return list.map((a) => {
+    const o = String(c.acte[a.key].obs || '').trim().replace(/\s*\n\s*/g, '; ');
+    return grup ? `${a.label}${o ? `: ${o}` : ''}` : o;
+  }).filter(Boolean).join('\n');
+}
+// Aduce neregulile actelor în acord cu tabul Acte, cu aceleași reguli ca `syncAutoNU` (o neregulă lucrată nu se șterge).
+// Întoarce [{ key, r }] pentru rândurile schimbate ('added' | 'updated' | 'removed' | 'kept').
+export function syncAutoActe(c, { obsOnly = false } = {}) {
+  const out = [];
+  for (const key of AUTO_ACTE) {
+    const t = sablon(key);
+    const n = c.nereguli.find((x) => x.key === key && !x.custom);
+    if (!t || !n || !inCatalog(c, t)) continue;
+    const list = acteLipsa(c, t);
+    const obs = obsDinActe(c, list, t.autoActe === 'grup');
+    const obsProprii = !!(n.obs && n.obs.trim() && n.obs !== (n.obsAuto || ''));
+    let r = null;
+    if (obsOnly) {
+      if (list.length && n.auto && n.status === 'nok' && !obsProprii && n.obs !== obs) { n.obs = obs; n.obsAuto = obs; r = 'updated'; }
+    } else if (list.length) {
+      r = n.status !== 'nok' ? 'added' : (n.auto && (obsProprii || n.obs === obs) ? null : 'updated');
+      n.status = 'nok';
+      n.auto = true;
+      if (!obsProprii) { n.obs = obs; n.obsAuto = obs; }
+    } else if (n.auto && n.status === 'nok') {
+      const lucrata = obsProprii || n.inPV || n.amenda?.aplicata || n.sigiliu || n.vecheManual;
+      n.auto = false;
+      if (lucrata) r = 'kept';
+      else { Object.assign(n, { status: '', obs: '', obsAuto: '', constructieIds: [] }); r = 'removed'; }
+    }
+    if (r) out.push({ key, r });
+  }
+  return out;
+}
+
 // Completează câmpurile lipsă (date importate sau versiuni vechi).
 export function normalizeControl(c) {
   const base = newControl({ objectiveId: c.objectiveId, start: c.dataInceput });
@@ -371,8 +449,16 @@ export function normalizeControl(c) {
     const e = emptyConstructie(i + 1);
     const dotari = { ...e.dotari };
     for (const [key, v] of Object.entries(k.dotari || {})) dotari[key] = { ...(e.dotari[key] || {}), ...v };
+    // până la v1.24: centrala fără număr → o singură centrală, cu tipurile bifate
+    const cen = dotari.centrala;
+    const src = k.dotari?.centrala?.ct;
+    if (!Array.isArray(src) || (!src.length && (cen.tipuri || []).length)) cen.ct = (cen.tipuri || []).length ? [{ id: 'ct1', tipuri: [...cen.tipuri] }] : [];
+    else cen.ct = cen.ct.filter((x) => x && typeof x === 'object').map((x, j) => ({ ...x, id: String(x.id || `ct${j + 1}`), tipuri: Array.isArray(x.tipuri) ? x.tipuri : [] }));
     return { ...e, ...k, dotari };
   });
+  // „De întrebat până la finalizarea controlului”: [{ id, text, gata }]
+  out.deIntrebat = (Array.isArray(c.deIntrebat) ? c.deIntrebat : []).filter((x) => x && typeof x === 'object')
+    .map((x, i) => ({ ...x, id: String(x.id || `q${i + 1}`), text: String(x.text ?? ''), gata: !!x.gata }));
   // Coordonatele stăteau pe control, nu pe construcție, într-o versiune de probă: se mută la prima construcție.
   if (out.gps && !out.constructii[0].gps) out.constructii[0] = { ...out.constructii[0], gps: out.gps };
   delete out.gps;
@@ -380,7 +466,19 @@ export function normalizeControl(c) {
   out.incarcare = { ...base.incarcare, ...(c.incarcare || {}) };
   out.schema = c.schema || 1;
   if (isIncheiat(out) && !out.catalog) out.catalog = out.schema;
+  migreazaDeschis(out);
   return out;
+}
+
+// v1.25: controalele în desfășurare (și cele redeschise) din versiunile vechi primesc noile reguli o singură dată —
+// actele lipsă devin nereguli (ao / ap / aq); fără hidranți interiori, „Lipsă iluminat Hint” se retrage (dacă nu a
+// fost lucrată). Cele încheiate nu se ating. Întoarce true dacă s-a aplicat.
+export function migreazaDeschis(c) {
+  if (isIncheiat(c) || !((c.schema || 1) < 12)) return false;
+  syncAutoActe(c);
+  syncAutoNU(c, 'ilumHint');
+  c.schema = 12;
+  return true;
 }
 
 export const isIncheiat = (c) => isISO(c.dataIncheiere);
@@ -395,15 +493,19 @@ export function inCatalog(c, t) {
   return (t.din || 1) <= v && !(t.retrasDin && v >= t.retrasDin);
 }
 // Se apelează la fiecare salvare: încheierea fixează lista, redeschiderea o eliberează.
+// Un control încheiat într-o versiune veche și redeschis primește acum noile reguli (`migreazaDeschis`).
 export function fixeazaCatalog(c) {
   if (isIncheiat(c) && !c.catalog) c.catalog = SCHEMA_VERSION;
   else if (!isIncheiat(c) && c.catalog) delete c.catalog;
+  migreazaDeschis(c);
 }
 
 // Construcțiile în care s-a făcut constatarea, în ordinea din tabul Obiectiv. Neales nimic (sau alese
 // doar construcții șterse între timp): la neregulile grave, cele cu NU la dotare; altfel, prima construcție.
 export function constructiiOf(c, n) {
   const list = c.constructii || [];
+  // actele lipsă (ao / ap / aq) țin de obiectiv, nu de o construcție
+  if (n && !n.custom && sablon(n.key)?.autoActe) return [];
   const ids = new Set(n.constructieIds || []);
   const alese = list.filter((k) => ids.has(k.id));
   if (alese.length) return alese;
@@ -414,7 +516,14 @@ export function constructiiOf(c, n) {
   return elig.length ? [elig[0]] : [];
 }
 export const constructieOf = (c, n) => constructiiOf(c, n)[0] || null;
-export const constructiiNume = (c, n) => constructiiOf(c, n).map((k) => k.denumire || `Construcția ${c.constructii.indexOf(k) + 1}`).join(', ');
+// La rândurile pe centrală termică, centralele alese apar cu numărul lor („Corp A – CT 2”)
+export function constructiiNume(c, n) {
+  const ct = centraleAlese(c, n);
+  return constructiiOf(c, n).map((k) => {
+    const u = ct.filter((x) => x.k === k);
+    return u.length ? u.map((x) => x.denumire).join(', ') : k.denumire || `Construcția ${c.constructii.indexOf(k) + 1}`;
+  }).join(', ');
+}
 
 // Construcțiile care declanșează o neregulă gravă (NU la dotare sau GRF/NSI V peste parter); null = nu e gravă
 export function constructiiDeclansate(c, t) {
@@ -425,8 +534,30 @@ export function constructiiDeclansate(c, t) {
 
 // Construcțiile care au NU la o dotare (instalație necesară, lipsă)
 export function constructiiCuNU(c, key) {
-  return (c.constructii || []).filter((k) => k.dotari?.[key]?.v === 'NU');
+  return (c.constructii || []).filter((k) => valDotare(c, k, key) === 'NU');
 }
+
+// ───────── Dotările afișate (v1.25) ─────────
+// „Iluminat Hint” nu se mai completează când construcția nu are hidranți interiori (NU / NEC); valoarea rămasă
+// salvată nu mai contează. Regula nu se aplică la controalele încheiate înainte de v1.25 (lista lor înghețată).
+export const ilumHintAscuns = (c, k) => catalogOf(c) >= 12 && ['NU', 'NEC'].includes(k?.dotari?.hidInt?.v);
+export function dotareAscunsa(c, k, d) {
+  if (d.din && !inCatalog(c, d)) return true;
+  return d.key === 'ilumHint' && ilumHintAscuns(c, k);
+}
+export const dotariVizibile = (c, k) => DOTARI.filter((d) => !dotareAscunsa(c, k, d));
+// Valoarea unei dotări DA / NU / NEC, ținând cont de rândurile ascunse
+export function valDotare(c, k, key) {
+  if (key === 'ilumHint' && ilumHintAscuns(c, k)) return '';
+  return k?.dotari?.[key]?.v;
+}
+// Are construcția centrală termică: cel puțin o centrală declarată (sau, în date vechi, un tip bifat)
+export function areCentrala(k) {
+  const v = k?.dotari?.centrala;
+  return !!v && ((v.ct || []).length > 0 || (v.tipuri || []).length > 0);
+}
+// Centralele construcției: [{ id, tipuri }]
+export const centraleOf = (k) => k?.dotari?.centrala?.ct || [];
 
 // „Seria AB nr. 123456” (gol dacă nu s-a completat nimic)
 export function amendaSerieNr(a) {
@@ -531,11 +662,7 @@ export function activeNereguli(c) {
 
 // Are obiectivul dotarea respectivă bifată DA în cel puțin o construcție?
 export function hasDotare(c, key) {
-  return (c.constructii || []).some((k) => {
-    const v = k.dotari?.[key];
-    if (!v) return false;
-    return key === 'centrala' ? (v.tipuri || []).length > 0 : v.v === 'DA';
-  });
+  return (c.constructii || []).some((k) => (key === 'centrala' ? areCentrala(k) : valDotare(c, k, key) === 'DA'));
 }
 
 // Neregulile de instalații apar doar dacă instalația există (DA la dotări).
@@ -546,18 +673,19 @@ export function isApplicable(c, n) {
   const t = sablon(n.key);
   if (t && !inCatalog(c, t)) return false;
   if (t?.doarLaNU) return constructiiCuNU(c, t.autoNU).length > 0;
+  if (t?.autoActe) return acteLipsa(c, t).length > 0;
   const decl = constructiiDeclansate(c, t);
   if (decl) return decl.length > 0;
   return !t?.req || t.req.some((k) => hasDotare(c, k));
 }
 
 // Rânduri ascunse doar pentru că instalația nu e bifată DA: „Arată toate” le poate afișa.
-// Nu intră aici: neregulile grave, rândurile din afara listei controlului (retrase / apărute după încheiere)
-// și „Lipsă iluminat Hint” (există doar la NU).
+// Nu intră aici: neregulile grave, rândurile din afara listei controlului (retrase / apărute după încheiere),
+// „Lipsă iluminat Hint” (există doar la NU) și neregulile actelor lipsă (există doar la „Lipsă” în tabul Acte).
 export function ascunsaDeDotari(c, n) {
   if (n.custom || isApplicable(c, n)) return false;
   const t = sablon(n.key);
-  return !!t && !t.grav && inCatalog(c, t) && !t.doarLaNU;
+  return !!t && !t.grav && inCatalog(c, t) && !t.doarLaNU && !t.autoActe;
 }
 
 // Statistici pentru o secțiune (tab)
@@ -701,12 +829,13 @@ export const LIPSA_INCARCARE = { aplicatie: 'neîncărcat în aplicație', docum
 export function controlStats(c, today = todayISO()) {
   const rows = activeNereguli(c);
   const nok = rows.filter((n) => n.status === 'nok');
-  const acteDone = ACTE.filter((a) => c.acte[a.key]?.status).length;
-  const acteNok = ACTE.filter((a) => c.acte[a.key]?.status === 'nok').length;
+  const acte = acteOf(c);
+  const acteDone = acte.filter((a) => c.acte[a.key]?.status).length;
+  const acteNok = acte.filter((a) => c.acte[a.key]?.status === 'nok').length;
   const nereguliChecked = rows.filter((n) => n.status).length;
   const fines = nok.filter((n) => n.amenda?.aplicata).map((n) => ({ n, st: fineStatus(c, n, today) }));
   return {
-    acteDone, acteTotal: ACTE.length, acteNok,
+    acteDone, acteTotal: acte.length, acteNok,
     nereguliChecked, nereguliTotal: rows.filter((n) => isApplicable(c, n)).length,
     constatate: nok.length,
     netrecute: nok.filter((n) => !n.inPV).length,
@@ -762,7 +891,7 @@ export function matchControl(c, query) {
     const [s, e] = controlRange(c);
     return rangesOverlap(s, e, a, b);
   }
-  const hay = fold([c.denumire, c.administrator, c.telefon, c.email, c.adresa, c.localitate].join(' '));
+  const hay = fold([c.denumire, c.administrator, c.telefon, c.email, c.adresa, c.localitate, c.persoanaParticipanta].join(' '));
   return fold(q).split(/\s+/).every((w) => hay.includes(w));
 }
 
@@ -801,10 +930,11 @@ const potriviri = (hay, q) => q.split(/\s+/).every((w) => hay.includes(w));
 export function matchAct(c, key, query) {
   const q = fold(query).trim();
   if (!q) return true;
-  const i = ACTE.findIndex((a) => a.key === key);
+  const acte = acteOf(c);
+  const i = acte.findIndex((a) => a.key === key);
   if (q === String(i + 1)) return true;
   if (q.length < 3 && !/\s/.test(q)) return false;
-  return potriviri(cuGlosar([ACTE[i]?.label, c.acte[key]?.obs].join(' ')), q);
+  return potriviri(cuGlosar([acte[i]?.label, c.acte[key]?.obs].join(' ')), q);
 }
 
 export function matchNeregula(c, n, query) {
@@ -854,11 +984,10 @@ export function controaleAnterioare(controls, c) {
       && ((x.dataInceput || '') < (c.dataInceput || '') || (x.dataInceput === c.dataInceput && (x.createdAt || '') < (c.createdAt || ''))))
     .sort(byStartDesc);
 }
+// Referința e doar controlul imediat anterior (v1.25, regula utilizatorului): nu se cumulează controalele mai vechi.
 export function constatareAnterioara(controls, c, n) {
-  for (const prev of controaleAnterioare(controls, c)) {
-    if (prev.nereguli.some((m) => m.status === 'nok' && sameRow(m, n))) return prev;
-  }
-  return null;
+  const prev = controaleAnterioare(controls, c)[0];
+  return prev && prev.nereguli.some((m) => m.status === 'nok' && sameRow(m, n)) ? prev : null;
 }
 // { veche, auto: control anterior | null, manual }
 export function vecheInfo(controls, c, n) {
@@ -876,7 +1005,9 @@ export function pvText(c, controls = [], { doarNetrecute = false, cuActe = true 
   let nr = 0;
   const multe = (c.constructii || []).length > 1;
   for (const sec of sectiuniActive(c)) {
-    const rows = c.nereguli.filter((n) => secOf(n) === sec && n.status === 'nok' && (!doarNetrecute || !n.inPV));
+    // fără „cu acte”: nici neregulile actelor lipsă (ao, ap, aq)
+    const rows = c.nereguli.filter((n) => secOf(n) === sec && n.status === 'nok' && (!doarNetrecute || !n.inPV)
+      && (cuActe || n.custom || !sablon(n.key)?.autoActe));
     if (!rows.length) continue;
     lines.push('', `${SECTIUNI[sec].label}:`);
     for (const n of rows) {
@@ -890,13 +1021,14 @@ export function pvText(c, controls = [], { doarNetrecute = false, cuActe = true 
       if (n.custom && n.grav) extra.push('neregulă gravă');
       if (isGrav(n) && n.sigiliu) extra.push('sigiliu aplicat');
       if (vecheInfo(controls, c, n).veche) extra.push('neregulă veche');
-      if (n.amenda?.aplicata) extra.push(`sancționat cu amendă${amendaSerieNr(n.amenda) ? ` ${amendaSerieNr(n.amenda)}` : ''}`);
+      if (n.amenda?.aplicata) extra.push('sancționat cu amendă');
       if (extra.length) t += ` (${extra.join('; ')})`;
       lines.push(t);
     }
   }
-  if (cuActe) {
-    const lipsa = ACTE.filter((a) => c.acte[a.key]?.status === 'nok');
+  // din v1.25 actele lipsă sunt nereguli (ao, ap, aq), deja în listă; controalele încheiate înainte le au separat
+  if (cuActe && !inCatalog(c, sablon('ao'))) {
+    const lipsa = acteOf(c).filter((a) => c.acte[a.key]?.status === 'nok');
     if (lipsa.length) {
       lines.push('', 'Acte de autoritate și evidențe lipsă:');
       lipsa.forEach((a) => {
@@ -917,7 +1049,7 @@ export function todoList(c, { includeClose = true } = {}) {
   const tabOf = (sec) => SECTIUNI[sec].tab;
   if (!String(c.denumire || '').trim()) out.push({ id: 'denumire', level: 'todo', text: 'Completați denumirea obiectivului', tab: 'obiectiv', focus: 'sec-date' });
 
-  const acteTodo = ACTE.filter((a) => !c.acte[a.key]?.status);
+  const acteTodo = acteOf(c).filter((a) => !c.acte[a.key]?.status);
   if (acteTodo.length) {
     out.push({ id: 'acte', level: 'todo', text: `${acteTodo.length} ${acteTodo.length === 1 ? 'act neverificat' : 'acte neverificate'}`, tab: 'acte', focus: `act-${acteTodo[0].key}` });
   }
@@ -950,10 +1082,11 @@ export function todoList(c, { includeClose = true } = {}) {
     out.push({ id: 'pv', level: 'warn', text: `${netrec.length} ${netrec.length === 1 ? 'constatare netrecută' : 'constatări netrecute'} în PV`, tab: tabOf(secOf(netrec[0])), focus: netrec[0].key });
   }
   for (const n of active.filter((x) => x.status === 'nok' && x.amenda?.aplicata)) {
-    const lipsa = [];
-    if (!amendaSerieNr(n.amenda)) lipsa.push('seria / nr.');
-    if (!String(n.amenda.suma || '').trim()) lipsa.push('suma');
-    if (lipsa.length) out.push({ id: `fine-${n.key}`, level: 'warn', text: `Amendă fără ${lipsa.join(' și ')}: ${constatareLabel(n)}`, tab: tabOf(secOf(n)), focus: n.key });
+    if (!String(n.amenda.suma || '').trim()) out.push({ id: `fine-${n.key}`, level: 'warn', text: `Amendă fără suma: ${constatareLabel(n)}`, tab: tabOf(secOf(n)), focus: n.key });
+  }
+  // „De întrebat până la finalizarea controlului”: fiecare sarcină nerezolvată, cu textul ei
+  for (const x of (c.deIntrebat || []).filter((q) => !q.gata && String(q.text || '').trim())) {
+    out.push({ id: `intreb-${x.id}`, level: 'warn', text: `De întrebat: ${String(x.text).trim().replace(/\s*\n\s*/g, '; ')}`, tab: 'obiectiv', focus: 'sec-intrebari' });
   }
   const faraGps = (c.constructii || []).filter((k) => !k.gps);
   if (faraGps.length) {
@@ -982,8 +1115,39 @@ export function todoList(c, { includeClose = true } = {}) {
 export const fmtCoord = (g) => (g ? `${g.lat.toFixed(6)}, ${g.lon.toFixed(6)}` : '');
 export const googleMapsUrl = (g) => `https://www.google.com/maps/search/?api=1&query=${g.lat.toFixed(6)},${g.lon.toFixed(6)}`;
 export const appleMapsUrl = (g, label = '') => `https://maps.apple.com/?ll=${g.lat.toFixed(6)},${g.lon.toFixed(6)}&q=${encodeURIComponent(label || fmtCoord(g))}`;
-// Precizia: sub 30 m bună, până la 100 m acceptabilă, peste 100 m slabă (de regulă în interior sau fără GPS)
-export const gpsQuality = (acc) => (acc <= 30 ? 'buna' : acc <= 100 ? 'medie' : 'slaba');
+// Precizia: sub 30 m bună, până la 100 m acceptabilă, peste 100 m slabă (de regulă în interior sau fără GPS);
+// coordonatele introduse de mână nu au precizie
+export const gpsQuality = (acc) => (acc == null ? 'manual' : acc <= 30 ? 'buna' : acc <= 100 ? 'medie' : 'slaba');
+// Aceleași coordonate (construcțiile 2… „ca la prima construcție”)
+export const gpsEgal = (a, b) => !!(a && b && a.lat === b.lat && a.lon === b.lon);
+
+// Coordonate scrise de mână: „44.426800, 26.102500”, „44,4268 26,1025”, „44°25′36″ N 26°6′9″ E” (Busola de pe iPhone).
+// Întoarce { lat, lon } (6 zecimale) sau null.
+export function parseCoord(text) {
+  const s = String(text || '').trim().replace(/[’′‘]/g, "'").replace(/[”″“]/g, '"').replace(/º/g, '°');
+  if (!s) return null;
+  let lat, lon;
+  if (s.includes('°')) {
+    const re = /(-?\d+(?:[.,]\d+)?)\s*°\s*(?:(\d+(?:[.,]\d+)?)\s*'\s*)?(?:(\d+(?:[.,]\d+)?)\s*(?:"|'')\s*)?([NSEWV])?/gi;
+    const p = [...s.matchAll(re)].map((m) => {
+      const [g, mi, se] = [m[1], m[2], m[3]].map((x) => Number(String(x || '0').replace(',', '.')));
+      const v = Math.abs(g) + mi / 60 + se / 3600;
+      const neg = g < 0 || /[SWV]/i.test(m[4] || '');
+      return { v: neg ? -v : v, emisfera: (m[4] || '').toUpperCase() };
+    });
+    if (p.length !== 2) return null;
+    // ordinea: latitudinea (N / S) întâi; „E 26° N 44°” se întoarce
+    [lat, lon] = /[EWV]/.test(p[0].emisfera) || /[NS]/.test(p[1].emisfera) ? [p[1].v, p[0].v] : [p[0].v, p[1].v];
+  } else {
+    const m = s.match(/^(-?\d{1,3}[.,]\d+)(\s*[,;\s]\s*)(-?\d{1,3}[.,]\d+)$/);
+    // cu virgulă zecimală, separatorul trebuie să fie spațiu sau „;” („44,4268,26,1025” e ambiguu)
+    if (!m || ((m[1].includes(',') || m[3].includes(',')) && !/[;\s]/.test(m[2]))) return null;
+    [lat, lon] = [m[1], m[3]].map((x) => Number(x.replace(',', '.')));
+  }
+  if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) return null;
+  const r6 = (x) => Math.round(x * 1e6) / 1e6;
+  return { lat: r6(lat), lon: r6(lon) };
+}
 
 // ───────── Verificări pe instalații: data ultimei verificări, pe construcție ─────────
 // Construcțiile relevante pentru un rând: cele cu DA la instalația cerută (dacă rândul ține de o instalație),
@@ -992,16 +1156,44 @@ export function constructiiEligibile(c, n) {
   const list = c.constructii || [];
   const t = n && !n.custom ? sablon(n.key) : null;
   if (!t?.req || t.grav) return list;
-  const cu = list.filter((k) => t.req.some((r) => (r === 'centrala' ? (k.dotari?.centrala?.tipuri || []).length > 0 : k.dotari?.[r]?.v === 'DA')));
+  const cu = list.filter((k) => t.req.some((r) => (r === 'centrala' ? areCentrala(k) : valDotare(c, k, r) === 'DA')));
   return cu.length ? cu : list;
 }
 
 export const isVerificare = (n) => !n.custom && !!sablon(n.key)?.verif;
 
-// Starea verificării unei construcții, față de data controlului (data începerii).
-export function verifStare(c, n, k) {
+// ───────── Rândurile pe centrală termică (v1.25: b3, g, h) ─────────
+// Controalele încheiate înainte de v1.25 rămân pe construcție.
+export const perCT = (c, n) => !n.custom && !!sablon(n.key)?.perCT && catalogOf(c) >= 12;
+const numeConstr = (c, k) => k.denumire || `Construcția ${(c.constructii || []).indexOf(k) + 1}`;
+// Centralele unei construcții, ca unități: { id: „<construcție>:<centrală>”, k, ct, nr (1…), denumire }
+export const unitatiCT = (c, k) => centraleOf(k).map((x, i) => ({ id: `${k.id}:${x.id}`, k, ct: x, nr: i + 1, denumire: `${numeConstr(c, k)} – CT ${i + 1}` }));
+// Centralele alese la o constatare, pe construcțiile ei (alese explicit în `ctIds`); [] = construcțiile întregi
+export function centraleAlese(c, n) {
+  if (!perCT(c, n) || !(n.ctIds || []).length) return [];
+  const ids = new Set(n.ctIds);
+  return constructiiOf(c, n).flatMap((k) => unitatiCT(c, k).filter((u) => ids.has(u.id)));
+}
+
+// Unitățile de verificare ale unui rând: construcțiile relevante; la verificarea CT, fiecare centrală
+// (construcția cu „NU ARE” nu are rând; cea fără centrale declarate rămâne pe construcție).
+// { id, k, denumire, ct?, nr? } — `id` = cheia din `n.verificari`
+export function verifUnitati(c, n) {
+  const list = constructiiEligibile(c, n);
+  const cons = (k) => ({ id: k.id, k, denumire: k.denumire || 'Construcție' });
+  if (!perCT(c, n)) return list.map(cons);
+  return list.flatMap((k) => {
+    const u = unitatiCT(c, k);
+    if (u.length) return u;
+    return k.dotari?.centrala?.nuAre ? [] : [cons(k)];
+  });
+}
+
+// Starea verificării unei unități (construcție sau centrală), față de data controlului (data începerii).
+// Prima centrală a unei construcții preia data scrisă pe construcție înainte de v1.25.
+export function verifStare(c, n, u) {
   const t = sablon(n.key);
-  const v = n.verificari?.[k.id] || {};
+  const v = n.verificari?.[u.id] || (u.ct && u.nr === 1 ? n.verificari?.[u.k.id] : null) || {};
   const luni = t.verifAlegeri?.includes(Number(v.luni)) ? Number(v.luni) : t.verif;
   if (!isISO(v.data)) return { data: '', luni, stare: 'lipsa' };
   const expira = addMonths(v.data, luni);
@@ -1009,17 +1201,27 @@ export function verifStare(c, n, k) {
   return { data: v.data, luni, expira, stare: expira < ref ? 'expirata' : 'valabila' };
 }
 
-export const verifExpirate = (c, n) => (isVerificare(n) ? constructiiEligibile(c, n).filter((k) => verifStare(c, n, k).stare === 'expirata') : []);
+export const verifExpirate = (c, n) => (isVerificare(n) ? verifUnitati(c, n).filter((u) => verifStare(c, n, u).stare === 'expirata') : []);
 
-// Textul pentru PV / fișă: datele ultimei verificări la construcțiile alese
+// Unitățile constatării (PV / fișă): la rândurile pe CT, centralele alese sau toate centralele construcțiilor alese
+function unitatiConstatare(c, n) {
+  if (!perCT(c, n)) return constructiiOf(c, n).map((k) => ({ id: k.id, k, denumire: k.denumire || 'construcție' }));
+  const alese = centraleAlese(c, n);
+  if (alese.length) return alese;
+  const ks = new Set(constructiiOf(c, n));
+  return verifUnitati(c, n).filter((u) => ks.has(u.k));
+}
+
+// Textul pentru PV / fișă: datele ultimei verificări la construcțiile (centralele) alese
 export function verifText(c, n) {
   if (!isVerificare(n)) return '';
-  const multe = (c.constructii || []).length > 1;
-  return constructiiOf(c, n).map((k) => {
-    const s = verifStare(c, n, k);
+  const unit = unitatiConstatare(c, n);
+  const multe = (c.constructii || []).length > 1 || unit.some((u) => u.ct);
+  return unit.map((u) => {
+    const s = verifStare(c, n, u);
     const cum = s.stare === 'lipsa' ? 'fără verificare prezentată'
       : `ultima verificare ${fmtDate(s.data)}${s.stare === 'expirata' ? `, expirată (era valabilă până la ${fmtDate(s.expira)})` : ''}`;
-    return multe ? `${k.denumire || 'construcție'}: ${cum}` : cum;
+    return multe ? `${u.denumire}: ${cum}` : cum;
   }).join('; ');
 }
 
@@ -1040,6 +1242,8 @@ export function schimbare(a, b) {
   for (const act of ACTE) {
     if (!eq(a.acte?.[act.key], b.acte?.[act.key])) return { tab: 'acte', focus: `act-${act.key}`, text: act.label };
   }
+  if (!eq(a.deIntrebat, b.deIntrebat)) return { tab: 'obiectiv', focus: 'sec-intrebari', text: 'De întrebat până la finalizarea controlului' };
+  if (a.observatiiGenerale !== b.observatiiGenerale) return { tab: 'obiectiv', focus: 'sec-observatii', text: 'Observații generale' };
   const ka = new Map((a.constructii || []).map((k) => [k.id, k]));
   const kb = new Map((b.constructii || []).map((k) => [k.id, k]));
   for (const id of new Set([...ka.keys(), ...kb.keys()])) {
@@ -1047,6 +1251,7 @@ export function schimbare(a, b) {
     const k = kb.get(id);
     return k ? { tab: 'obiectiv', focus: `constr-${id}`, text: k.denumire || 'construcția' } : { tab: 'obiectiv', focus: 'sec-constructii', text: 'construcțiile' };
   }
+  if (!eq((a.constructii || []).map((k) => k.id), (b.constructii || []).map((k) => k.id))) return { tab: 'obiectiv', focus: 'sec-constructii', text: 'ordinea construcțiilor' };
   if (!eq(a.adapostPC, b.adapostPC)) return { tab: 'pc', focus: 'adapostPC', text: 'Adăpost de protecție civilă' };
   if (a.dataInceput !== b.dataInceput || a.dataIncheiere !== b.dataIncheiere) return { tab: 'obiectiv', focus: 'sec-perioada', text: 'perioada controlului' };
   return { tab: 'obiectiv', focus: 'sec-date', text: 'datele obiectivului' };

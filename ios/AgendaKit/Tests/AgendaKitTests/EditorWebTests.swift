@@ -126,6 +126,9 @@ final class EditorWebTests: TestVectori {
                     r = ed.click(act, d, &c, raspuns: pas.bool("raspuns"), catEcran: cat)
                     r.mesaje = mesaje + r.mesaje
                 }
+                if act == "gps-manual", let id = r.cereCoordonate, let r2 = ed.gpsIntrodus(id, pas.str("coord"), &c) {
+                    r.mesaje += r2.mesaje
+                }
                 if act == "gps-get", r.cereGps != nil {
                     let g = pas.obj("gps")
                     let r2 = ed.gpsPreluat(d["id"] ?? "", lat: g["lat"]!.numar!, lon: g["lon"]!.numar!, acc: g["acc"]!.numar!, &c)
@@ -320,6 +323,19 @@ enum Jetoane {
             if c.cale == "telefon" && !o.telefon.isEmpty { s.b() }
             if c.cale == "email" && !o.email.isEmpty { s.b() }
         }
+        // De întrebat până la finalizarea controlului
+        let q = o.intrebari
+        s.t("De întrebat până la finalizarea controlului")
+        if let p = q.pastila { s.pill(p) }
+        if q.randuri.isEmpty {
+            s.t("Sarcini, întrebări sau verificări de făcut până la încheiere (ex.: documente de cerut mai târziu). Cele nebifate apar în „Ce mai aveți de făcut”.")
+        }
+        for r in q.randuri {
+            if r.gata { s.s(["is-gata"]) }
+            s.b(r.gata); s.ta(r.text, "Ce trebuie întrebat, cerut sau verificat"); s.b()
+        }
+        s.b(); s.t("Adaugă")
+        s.t("Observații generale"); s.ta(o.observatiiGenerale, "Orice notițe despre obiectiv sau despre control")
         s.t("Perioada controlului"); s.t("Data începerii controlului"); s.inp(o.dataInceput); s.b(); s.t("Azi")
         s.t("Data încheierii controlului")
         if o.incheiat {
@@ -349,7 +365,9 @@ enum Jetoane {
         s.t("\(k.nr)"); s.inp(k.denumire.valoare, k.denumire.indiciu)
         if let l = k.lipsa { s.pill(PastilaUI("red", l)) }
         if k.grfV { s.pill(PastilaUI("red", "GRF/NSI V peste parter")) }
-        s.t(k.sumar); s.b()
+        s.t(k.sumar)
+        if let o = k.ordine { s.b(dis: !o.sus); s.b(dis: !o.jos) }
+        s.b()
         guard let c = k.corp else { return }
         for x in c.campuri { camp(x, s) }
         if c.grf.grav { s.s(["is-grav"]) }
@@ -361,8 +379,19 @@ enum Jetoane {
         for d in c.dotari {
             if d.centrala {
                 s.t(d.eticheta)
-                for t in K.centralaTipuri { s.b(d.tipuri.contains(t)); s.t(t) }
+                let n = d.centrale.count
+                s.b(dis: n == 0); s.t("−")
+                if n == 0 { s.s(["is-empty"]) }
+                s.t("\(n)"); s.t(n == 1 ? "centrală" : "centrale"); s.b(); s.t("+")
                 s.b(d.nuAre); s.t("NU ARE")
+                for x in d.centrale {
+                    s.t("CT \(x.nr)")
+                    for t in K.centralaTipuri { s.b(x.tipuri.contains(t)); s.t(t) }
+                }
+                if n == 0 && !d.nuAre {
+                    s.s(["is-nou"]); s.t("CT 1")
+                    for t in K.centralaTipuri { s.b(); s.t(t) }
+                }
                 obs(d.obs, s)
                 continue
             }
@@ -378,15 +407,23 @@ enum Jetoane {
 
     static func gps(_ g: ModelGps, _ s: Sir) {
         s.t("Coordonate GPS")
+        func caPrima() {
+            guard let x = g.caPrima else { return }
+            s.b(x.activ, dis: !x.disponibil, x.activ ? ["t-accent"] : []); s.t(x.text)
+        }
         guard let coord = g.coordonate else {
             s.s(["is-empty"]); s.t("Necompletat"); s.b(dis: g.cautare); s.t(g.cautare ? "Se caută semnalul…" : "Completează coordonatele")
+            s.b(); s.t("Introdu coordonatele")
+            caPrima()
             s.t("Doar la cerere: poziția se citește o singură dată, când apăsați, lângă această construcție. Nu se urmărește locația.")
             return
         }
         s.t(coord); s.s(["q-\(g.calitate)"]); s.t(g.precizie)
         if let p = g.preluate { s.t("· \(p)") }
         if g.slaba { s.t("Precizie slabă: ieșiți în aer liber sau lângă o fereastră și apăsați „Actualizează”.") }
-        s.b(); s.t("Google Maps"); s.b(); s.t("Hărți Apple"); s.b(); s.t("Copiază"); s.b(dis: g.cautare); s.t(g.cautare ? "Se caută…" : "Actualizează"); s.b()
+        s.b(); s.t("Google Maps"); s.b(); s.t("Hărți Apple"); s.b(); s.t("Copiază"); s.b(dis: g.cautare); s.t(g.cautare ? "Se caută…" : "Actualizează")
+        s.b(); s.t("Introdu coordonatele"); s.b()
+        caPrima()
     }
 
     static func randAdapost(_ a: ModelRandAdapost, _ s: Sir) {
@@ -502,7 +539,9 @@ enum Jetoane {
                 s.t(r.nume); s.inp(r.data)
                 for l in r.alegeri ?? [] { s.b(r.luni == l); s.t("\(l) luni") }
                 s.t(r.text)
+                if let ca = r.caPrima { s.b(ca.activ, dis: false, ca.activ ? ["t-accent"] : []); s.t(ca.text) }
             }
+            s.t(v.gol)
             if let p = v.propunere { s.t(p.text); s.b(); s.t(p.buton) }
         }
         s.t(c.constrNU)
@@ -510,7 +549,14 @@ enum Jetoane {
             if x.deschis { s.s(["open"]) }
             s.b(dis: !x.multe); s.t(x.eticheta); s.t(x.valoare)
             if x.deschis {
-                for o in x.optiuni { s.b(o.ales); s.t(o.text) }
+                for o in x.optiuni {
+                    s.b(o.ales); s.t(o.text)
+                    if !o.centrale.isEmpty {
+                        s.t("Centralele:")
+                        for ct in o.centrale { s.b(ct.ales); s.t(ct.text) }
+                        s.t("nicio alegere = toate")
+                    }
+                }
                 s.t(x.nota)
                 s.b(dis: x.toate); s.t("Toate construcțiile"); s.b(); s.t("Gata")
             }
@@ -533,7 +579,6 @@ enum Jetoane {
         }
         if let f = d.amendaBox {
             s.s(["fb-\(f.nivel)"]); s.t(f.titlu); s.t(f.mesaj)
-            camp(f.serie, s)
             camp(f.data, s)
             if f.folosesteIncheierea { s.b(); s.t("Folosește data încheierii") } else { s.t(f.dataImplicita) }
             camp(f.suma, s)

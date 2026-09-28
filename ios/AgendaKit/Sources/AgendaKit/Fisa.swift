@@ -34,6 +34,7 @@ public func fisaMarkup(_ c: Control, _ controls: [Control], acum: Date = Ceas.ac
           <span><b>Tip:</b> \(c.tip == "LOCALITATE" ? "Localitate" : "OPEC / Instituție")</span>
           <span><b>Perioada:</b> \(escHTML(perioada))</span>
           \(c.administrator.isEmpty ? "" : "<span><b>Administrator:</b> \(escHTML(c.administrator))</span>")
+          \(c.persoanaParticipanta.isEmpty ? "" : "<span><b>Persoană participantă:</b> \(escHTML(c.persoanaParticipanta))</span>")
           \(c.telefon.isEmpty ? "" : "<span><b>Telefon:</b> \(escHTML(c.telefon))</span>")
           \(c.email.isEmpty ? "" : "<span><b>Email:</b> \(escHTML(c.email))</span>")
           \(c.adresa.isEmpty && c.localitate.isEmpty ? "" : "<span><b>Adresă:</b> \(escHTML(adresa))</span>")
@@ -48,21 +49,38 @@ public func fisaMarkup(_ c: Control, _ controls: [Control], acum: Date = Ceas.ac
       </header>
     """)
 
+    // „De întrebat până la finalizarea controlului” și observațiile generale (v1.25)
+    let intreb = c.deIntrebat.filter { !$0.text.trimJS.isEmpty }
+    if !intreb.isEmpty {
+        let li = intreb.map { x in
+            "<li class=\"\(x.gata ? "" : "f-nok")\">\(x.gata ? "✓" : "☐") \(obsFisa(x.text))\(x.gata ? "" : " <b>(nerezolvat)</b>")</li>"
+        }.joined()
+        h.append("<section><h2>De întrebat până la finalizarea controlului</h2><ul class=\"f-intreb\">\n      \(li)\n    </ul></section>")
+    }
+    if !c.observatiiGenerale.trimJS.isEmpty {
+        h.append("<section><h2>Observații generale</h2><p>\(obsFisa(c.observatiiGenerale))</p></section>")
+    }
+
     // Construcții
     h.append("<section><h2>Construcții (\(c.constructii.count))</h2>")
     for (i, k) in c.constructii.enumerated() {
         var by: [String: [String]] = ["DA": [], "NU": [], "NEC": []]
-        for d in K.dotari where !d.centrala {
+        let vis = dotariVizibile(c, k)
+        for d in vis where !d.centrala {
             let v = k.dotare(d.key)?.v ?? ""
             if by[v] != nil { by[v]!.append(d.label) }
         }
-        let ct = k.dotare("centrala")
-        let centrala = ct.map { $0.nuAre ? "nu are" : $0.tipuri.joined(separator: ", ") } ?? ""
+        // o centrală: tipurile ei (ca până acum); mai multe: fiecare, cu numărul ei
+        let cen = k.dotare("centrala")
+        let cts = cen?.ct ?? []
+        let centrala = cen?.nuAre == true ? "nu are"
+            : cts.count > 1 ? cts.enumerated().map { j, x in "CT \(j + 1)\(x.tipuri.isEmpty ? "" : ": \(x.tipuri.joined(separator: ", "))")" }.joined(separator: "; ")
+            : (cts.first?.tipuri ?? cen?.tipuri ?? []).joined(separator: ", ")
         let ruta = { (s: String) in s.isEmpty ? "—" : s }
-        let gps = k.gps.map { "<a href=\"\(escHTML(googleMapsUrl($0)))\">\(escHTML(fmtCoord($0)))</a> (± \(rotunjesteJS($0.acc)) m)" } ?? "necompletate"
+        let gps = k.gps.map { "<a href=\"\(escHTML(googleMapsUrl($0)))\">\(escHTML(fmtCoord($0)))</a> (\($0.faraPrecizie ? "introduse manual" : "± \(rotunjesteJS($0.acc)) m"))" } ?? "necompletate"
         let numere = ["asi", "aviz"].filter { d in k.dotare(d)?.v == "DA" && !(k.dotare(d)?.nr.trimJS.isEmpty ?? true) }
             .map { "<p class=\"f-dot\"><b>\($0 == "asi" ? "Nr. autorizație (ASI)" : "Nr. aviz"):</b> \(escHTML(k.dotare($0)?.nr ?? ""))</p>" }.joined()
-        let obsDotari = K.dotari.filter { !(k.dotare($0.key)?.obs.trimJS.isEmpty ?? true) }
+        let obsDotari = vis.filter { !(k.dotare($0.key)?.obs.trimJS.isEmpty ?? true) }
             .map { "<p class=\"f-dot f-small\"><b>\(escHTML($0.label)):</b> \(obsFisa(k.dotare($0.key)?.obs ?? ""))</p>" }.joined()
         h.append("""
         <div class="f-constr">
@@ -89,7 +107,7 @@ public func fisaMarkup(_ c: Control, _ controls: [Control], acum: Date = Ceas.ac
     if !isLocalitate(c) { h.append("<section><h2>Adăposturi de protecție civilă</h2>\(adaposturiFisa(c))</section>") }
 
     // Acte
-    let acte = K.acte.enumerated().map { i, a -> String in
+    let acte = acteOf(c).enumerated().map { i, a -> String in
         let v = c.act(a.key)
         let sit = v.status == "ok" ? "Prezentat" : v.status == "nok" ? "Lipsă" : v.status == "nec" ? "NEC (nu este cazul)" : "—"
         return "<tr class=\"\(v.status == "nok" ? "f-nok" : "")\">\n      <td>\(i + 1)</td><td>\(escHTML(a.label))</td><td>\(sit)</td><td>\(obsFisa(v.obs))</td></tr>"
@@ -119,11 +137,11 @@ public func fisaMarkup(_ c: Control, _ controls: [Control], acum: Date = Ceas.ac
                 let o = obsFisa(n.obs)
                 if !o.isEmpty { det.append(o) }
                 if isVerificare(n) && n.status != "nec" {
-                    let vs = constructiiEligibile(c, n).map { k -> String in
-                        let s = verifStare(c, n, k)
+                    let vs = verifUnitati(c, n).map { u -> String in
+                        let s = verifStare(c, n, u)
                         let t = s.stare == "lipsa" ? "fără dată"
                             : "\(fmtDate(s.data)) (\(s.luni) luni)\(s.stare == "expirata" ? " — <b>expirată (era valabilă până la \(fmtDate(s.expira ?? "")))</b>" : "")"
-                        return "\(multe ? "\(escHTML(k.denumire)): " : "")\(t)"
+                        return "\(multe || u.ct != nil ? "\(escHTML(u.denumire)): " : "")\(t)"
                     }
                     if !vs.isEmpty { det.append("<b>Ultima verificare:</b> \(vs.joined(separator: "; "))") }
                 }
@@ -132,8 +150,8 @@ public func fisaMarkup(_ c: Control, _ controls: [Control], acum: Date = Ceas.ac
                 if vi.veche { det.append("<b>Neregulă veche</b>\(vi.auto.map { " (și la controlul din \(fmtDate($0.dataInceput)))" } ?? "")") }
                 if n.status == "nok" && n.amenda.aplicata {
                     let fs = fineStatus(c, n, today)
-                    let serie = amendaSerieNr(n.amenda), bani = moneyFisa(n.amenda.suma)
-                    det.append("<b>Amendă</b>\(serie.isEmpty ? "" : " \(escHTML(serie))")\(bani.isEmpty ? "" : ", \(bani)") — \(escHTML(fs.label))")
+                    let bani = moneyFisa(n.amenda.suma)
+                    det.append("<b>Amendă</b>\(bani.isEmpty ? "" : ", \(bani)") — \(escHTML(fs.label))")
                 }
                 if sec == "ner" && n.key == "a" && !n.custom, let d = asiDeadline(c, today) {
                     det.append("<b>ASI 90 zile:</b> \(escHTML(d.msg))")

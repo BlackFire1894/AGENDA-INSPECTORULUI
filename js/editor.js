@@ -2,12 +2,13 @@
 import { state, today, historyState } from './state.js';
 import { fmtDate, fmtDateLong, toISO, nextWorkingDay } from './dates.js';
 import {
-  TIP_OBIECTIV, DOTARI, CENTRALA_TIPURI, ACTE, STRUCTURI, MATERIALE_PERETI, SECTIUNI, CATEGORII,
+  TIP_OBIECTIV, DOTARI, CENTRALA_TIPURI, STRUCTURI, MATERIALE_PERETI, SECTIUNI, CATEGORII,
   controlStats, secStats, fineStatus, fineDate, asiDeadline, incarcareStatus, isIncheiat, neregulaLabel, neregulaLetter,
-  neregulaCat, secOf, isApplicable, isLocalitate, constructiiOf, constructiiNume, matchNeregula, fold, amendaSerieNr, vecheInfo, todoList,
+  neregulaCat, secOf, isApplicable, isLocalitate, constructiiOf, constructiiNume, matchNeregula, fold, vecheInfo, todoList,
   LIPSA_DOTARI, isGrav, constructiiDeclansate, GRF_NIVELURI, grfVPesteParter, sablon, fmtCoord, googleMapsUrl, appleMapsUrl, gpsQuality,
   constructiiEligibile, isVerificare, verifStare, verifExpirate, ascunsaDeDotari, matchAct,
   adaposturi, adaposturiStats, adaposturiText,
+  acteOf, dotariVizibile, centraleOf, unitatiCT, verifUnitati, perCT, centraleAlese, gpsEgal,
 } from './model.js';
 import { icon, esc, pill, finePill, tipBadge } from './ui.js';
 
@@ -93,7 +94,7 @@ export function edTabsHTML(c, tab) {
   // cât din tab e completat, scris lângă bară: dotările (Obiectiv), actele, rândurile verificate (secțiunile)
   const progres = (t) => {
     if (t.key === 'obiectiv') {
-      const s = c.constructii.map(dotariSummary).reduce((a, x) => ({ set: a.set + x.set, total: a.total + x.total }), { set: 0, total: 0 });
+      const s = c.constructii.map((k) => dotariSummary(c, k)).reduce((a, x) => ({ set: a.set + x.set, total: a.total + x.total }), { set: 0, total: 0 });
       return ['Dotări', s.set, s.total];
     }
     if (t.key === 'acte') return ['Verificate', st.acteDone, st.acteTotal];
@@ -160,25 +161,31 @@ export function grfBlock(c, k, p = `constructii.#${k.id}`) {
 }
 
 // Data ultimei verificări, pe fiecare construcție relevantă; expirarea se calculează față de data controlului
+// La verificarea CT (v1.25): câte un rând pe fiecare centrală termică. De la al doilea rând: „Aceeași dată ca la …”
+// copiază data (și periodicitatea) primului rând; bifa arată că sunt egale.
 function verifBlock(c, n) {
   const t = sablon(n.key);
-  const list = constructiiEligibile(c, n);
+  const list = verifUnitati(c, n);
   const exp = verifExpirate(c, n);
-  const rows = list.map((k) => {
-    const s = verifStare(c, n, k);
+  const prima = list[0] ? verifStare(c, n, list[0]) : null;
+  const rows = list.map((u, i) => {
+    const s = verifStare(c, n, u);
     const stare = s.stare === 'lipsa' ? '<span class="vf-st vf-lipsa">fără dată</span>'
       : s.stare === 'expirata' ? `<span class="vf-st vf-exp">${icon('alert')} expirată — era valabilă până la ${esc(fmtDate(s.expira))}</span>`
         : `<span class="vf-st vf-ok">${icon('check')} valabilă până la ${esc(fmtDate(s.expira))}</span>`;
+    const ca = i > 0 && prima?.data ? `<button type="button" class="toggle vf-ca ${s.data === prima.data && s.luni === prima.luni ? 'on t-accent' : ''}" data-act="verif-ca-prima" data-key="${esc(n.key)}" data-id="${esc(u.id)}" aria-pressed="${s.data === prima.data && s.luni === prima.luni}">
+        <span class="tg-box">${s.data === prima.data && s.luni === prima.luni ? icon('check') : ''}</span><span>Aceeași dată ca la ${esc(list[0].denumire)}</span></button>` : '';
     return `<div class="vf-row ${s.stare === 'expirata' ? 'is-exp' : ''}">
-      <span class="vf-name">${icon('building')} ${esc(k.denumire || 'Construcție')}</span>
-      <span class="inp-wrap vf-date"><input type="date" data-verif="${esc(n.key)}|${k.id}|data" value="${esc(s.data)}" aria-label="Data ultimei verificări – ${esc(k.denumire)}"></span>
-      ${t.verifAlegeri ? `<div class="segmented vf-luni" role="radiogroup" aria-label="Periodicitate">${t.verifAlegeri.map((l) => `<button type="button" class="${s.luni === l ? 'on' : ''}" data-act="verif-luni" data-key="${esc(n.key)}" data-id="${k.id}" data-val="${l}" role="radio" aria-checked="${s.luni === l}">${l} luni</button>`).join('')}</div>` : ''}
+      <span class="vf-name">${icon('building')} ${esc(u.denumire)}</span>
+      <span class="inp-wrap vf-date"><input type="date" data-verif="${esc(n.key)}|${esc(u.id)}|data" value="${esc(s.data)}" aria-label="Data ultimei verificări – ${esc(u.denumire)}"></span>
+      ${t.verifAlegeri ? `<div class="segmented vf-luni" role="radiogroup" aria-label="Periodicitate">${t.verifAlegeri.map((l) => `<button type="button" class="${s.luni === l ? 'on' : ''}" data-act="verif-luni" data-key="${esc(n.key)}" data-id="${esc(u.id)}" data-val="${l}" role="radio" aria-checked="${s.luni === l}">${l} luni</button>`).join('')}</div>` : ''}
       ${stare}
+      ${ca}
     </div>`;
   }).join('');
   return `<div class="verif-block">
     <span class="lbl">Data ultimei verificări${t.verifAlegeri ? '' : ` · valabilă ${t.verif} luni`}</span>
-    ${rows}
+    ${rows || `<p class="hint">Nicio centrală termică: „NU ARE” la toate construcțiile (tabul Obiectiv).</p>`}
     ${exp.length && n.status !== 'nok' ? `<div class="vf-propune">${icon('alert')}<span>Verificare expirată: <b>${esc(exp.map((k) => k.denumire).join(', '))}</b>. Constatați neregula?</span>
       <button class="btn btn-ghost" data-act="verif-nok" data-key="${esc(n.key)}">${icon('x')} Constatat pentru ${exp.length === 1 ? 'aceasta' : `cele ${exp.length}`}</button></div>` : ''}
   </div>`;
@@ -194,13 +201,21 @@ function instalatiaText(n) {
 function constrSelect(c, n) {
   const sel = constructiiOf(c, n);
   if (!sel.length) return '';
-  const multe = constructiiEligibile(c, n).length > 1 || sel.length > 1;
+  // la rândurile pe centrală termică (v1.25): în construcțiile alese cu mai multe centrale se pot alege centralele
+  const peCT = perCT(c, n);
+  const multe = constructiiEligibile(c, n).length > 1 || sel.length > 1 || (peCT && sel.some((k) => centraleOf(k).length > 1));
   const open = multe && state.ui.constrPick === n.key;
   const ids = new Set(sel.map((k) => k.id));
+  const ctAles = new Set(centraleAlese(c, n).map((u) => u.id));
   // în meniu: doar construcțiile care au instalația rândului (plus cele deja alese, ca să poată fi debifate)
   const elig = new Set(constructiiEligibile(c, n).map((k) => k.id));
   const opts = c.constructii.filter((k) => elig.has(k.id) || ids.has(k.id));
   const all = opts.every((k) => ids.has(k.id));
+  const cts = (k) => (peCT && ids.has(k.id) && centraleOf(k).length > 1 ? `<div class="ct-pick" role="group" aria-label="Centralele din ${esc(k.denumire)}">
+      <span class="lbl">Centralele:</span>
+      ${unitatiCT(c, k).map((u) => `<button type="button" class="chip-sel ${ctAles.has(u.id) ? 'on' : ''}" data-act="ct-opt" data-key="${esc(n.key)}" data-id="${esc(u.id)}" aria-pressed="${ctAles.has(u.id)}">CT ${u.nr}</button>`).join('')}
+      <span class="hint">nicio alegere = toate</span>
+    </div>` : '');
   return `<div class="constr-sel ${open ? 'open' : ''}">
     <button type="button" class="constr-sel-btn" data-act="constr-pick" data-key="${esc(n.key)}" aria-expanded="${open}" ${multe ? '' : 'disabled'} aria-label="Construcțiile în care s-a făcut constatarea">
       ${icon('building')}<span class="constr-sel-lbl">${sel.length > 1 ? `Construcțiile (${sel.length})` : 'Construcția'}</span>
@@ -209,7 +224,7 @@ function constrSelect(c, n) {
     </button>
     ${open ? `<div class="constr-pick" role="group" aria-label="Alegeți una sau mai multe construcții">
       ${opts.map((k) => { const i = c.constructii.indexOf(k); return `<button type="button" class="constr-opt ${ids.has(k.id) ? 'on' : ''}" data-act="constr-opt" data-key="${esc(n.key)}" data-id="${k.id}" aria-pressed="${ids.has(k.id)}">
-        <span class="cbox">${ids.has(k.id) ? icon('check') : ''}</span><span>${i + 1}. ${esc(k.denumire || `Construcția ${i + 1}`)}</span></button>`; }).join('')}
+        <span class="cbox">${ids.has(k.id) ? icon('check') : ''}</span><span>${i + 1}. ${esc(k.denumire || `Construcția ${i + 1}`)}</span></button>${cts(k)}`; }).join('')}
       ${opts.length < c.constructii.length ? `<p class="constr-pick-note">${icon('info')} Doar construcțiile cu ${esc(instalatiaText(n))} bifat DA în fișă.</p>` : ''}
       <div class="constr-pick-foot">
         <button type="button" class="btn btn-ghost" data-act="constr-opt-all" data-key="${esc(n.key)}" ${all ? 'disabled' : ''}>${icon('check')} Toate construcțiile</button>
@@ -302,12 +317,13 @@ function tabObiectiv(c) {
     <div class="form-grid">
       ${field('Denumire obiectiv', 'denumire', c.denumire, { ph: 'ex: Școala Gimnazială nr. 1', wide: true, live: 'denumire' })}
       ${field('Administrator obiectiv', 'administrator', c.administrator, { ph: 'Nume și prenume' })}
+      ${field('Persoană participantă', 'persoanaParticipanta', c.persoanaParticipanta, { ph: 'Nume și prenume, funcția' })}
       <label class="field">
         <span class="lbl">Telefon</span>
         <span class="inp-wrap"><input type="tel" data-bind="telefon" value="${esc(c.telefon)}" placeholder="07xx xxx xxx" inputmode="tel" autocomplete="off">
         ${c.telefon ? `<a class="inp-action" href="tel:${esc(c.telefon.replace(/\s/g, ''))}" aria-label="Sună">${icon('phone')}</a>` : ''}</span>
       </label>
-      <label class="field wide">
+      <label class="field">
         <span class="lbl">Email</span>
         <span class="inp-wrap"><input type="email" data-bind="email" value="${esc(c.email)}" placeholder="nume@exemplu.ro" inputmode="email" autocomplete="off" autocapitalize="off">
         ${c.email ? `<a class="inp-action" href="mailto:${esc(c.email)}" aria-label="Trimite email">${icon('mail')}</a>` : ''}</span>
@@ -315,6 +331,11 @@ function tabObiectiv(c) {
       ${field('Adresă', 'adresa', c.adresa, { ph: 'Strada, nr., bloc…' })}
       ${field('Localitate', 'localitate', c.localitate, { ph: 'ex: Cluj-Napoca' })}
     </div>
+  </section>
+  ${intrebariHTML(c)}
+  <section class="card form-card" id="sec-observatii">
+    <h2 class="sec-title">${icon('doc')} Observații generale</h2>
+    <textarea class="obs obs-gen" data-bind="observatiiGenerale" rows="3" placeholder="Orice notițe despre obiectiv sau despre control" autocomplete="off" enterkeyhint="enter">${esc(c.observatiiGenerale || '')}</textarea>
   </section>
 
   <section class="card form-card" id="sec-perioada">
@@ -330,7 +351,7 @@ function tabObiectiv(c) {
   </section>
   ${incarcareHTML(c)}
 
-  <section class="card form-card">
+  <section class="card form-card" id="sec-constructii">
     <div class="sec-title-row">
       <h2 class="sec-title">${icon('layers')} Construcții</h2>
       <div class="stepper" aria-label="Număr construcții">
@@ -350,29 +371,58 @@ function tabObiectiv(c) {
   <datalist id="dl-pereti">${MATERIALE_PERETI.map((s) => `<option value="${esc(s)}">`).join('')}</datalist>`;
 }
 
-// Coordonate GPS pe construcție: preluate doar la cerere (o atingere), cu precizia afișată și legături spre hărți
+// „De întrebat până la finalizarea controlului”: sarcini cu bifă; cele nebifate apar în „Ce mai aveți de făcut”
+function intrebariHTML(c) {
+  const l = c.deIntrebat || [];
+  const rest = l.filter((x) => !x.gata && String(x.text || '').trim()).length;
+  return `<section class="card form-card" id="sec-intrebari">
+    <div class="sec-title-row">
+      <h2 class="sec-title">${icon('list')} De întrebat până la finalizarea controlului</h2>
+      ${rest ? `<span class="pill pill-warn">${rest} ${rest === 1 ? 'nerezolvată' : 'nerezolvate'}</span>` : l.length ? pill('green', 'Toate rezolvate', 'check') : ''}
+    </div>
+    ${l.length ? `<div class="intreb-list">${l.map((x) => `<div class="intreb-row ${x.gata ? 'is-gata' : ''}" id="intreb-${esc(x.id)}">
+      <button type="button" class="intreb-bifa ${x.gata ? 'on' : ''}" data-act="flag" data-path="deIntrebat.#${esc(x.id)}.gata" aria-pressed="${!!x.gata}" aria-label="${x.gata ? 'Rezolvată' : 'Nerezolvată'}"><span class="cbox">${x.gata ? icon('check') : ''}</span></button>
+      <textarea class="obs intreb-txt" data-bind="deIntrebat.#${esc(x.id)}.text" rows="1" placeholder="Ce trebuie întrebat, cerut sau verificat" autocomplete="off" enterkeyhint="enter">${esc(x.text)}</textarea>
+      <button type="button" class="icon-btn danger" data-act="intreb-del" data-id="${esc(x.id)}" aria-label="Șterge">${icon('trash')}</button>
+    </div>`).join('')}</div>` : '<p class="hint">Sarcini, întrebări sau verificări de făcut până la încheiere (ex.: documente de cerut mai târziu). Cele nebifate apar în „Ce mai aveți de făcut”.</p>'}
+    <button type="button" class="btn btn-ghost" data-act="intreb-add">${icon('plus')} Adaugă</button>
+  </section>`;
+}
+
+// Coordonate GPS pe construcție: preluate doar la cerere (o atingere), cu precizia afișată și legături spre hărți;
+// sau introduse de mână (v1.25). De la a doua construcție: „Aceleași coordonate ca la …” copiază coordonatele primei.
 function gpsBlock(c, k, i) {
   const g = k.gps;
   const busy = state.ui.gpsBusy === k.id;
   const numeHarta = [c.denumire, k.denumire || `Construcția ${i + 1}`].filter(Boolean).join(' – ');
+  const prima = c.constructii[0];
+  const egal = i > 0 && gpsEgal(g, prima?.gps);
+  const caPrima = i > 0 ? `<button type="button" class="toggle gps-ca ${egal ? 'on t-accent' : ''}" data-act="gps-ca-prima" data-id="${k.id}" aria-pressed="${egal}" ${prima?.gps ? '' : 'disabled'}>
+      <span class="tg-box">${egal ? icon('check') : ''}</span><span>Aceleași coordonate ca la ${esc(prima.denumire || 'Construcția 1')}${prima?.gps ? '' : ' (necompletate)'}</span></button>` : '';
+  const manual = `<button class="btn btn-ghost" data-act="gps-manual" data-id="${k.id}">${icon('pin')} Introdu coordonatele</button>`;
   if (!g) {
     return `<div class="gps-field" id="gps-${k.id}">
       <span class="lbl">Coordonate GPS</span>
       <div class="gps-empty">
         <span class="gps-cell is-empty">Necompletat</span>
         <button class="btn btn-primary btn-lg" data-act="gps-get" data-id="${k.id}" ${busy ? 'disabled' : ''}>${icon('locate')} ${busy ? 'Se caută semnalul…' : 'Completează coordonatele'}</button>
+        ${manual}
       </div>
+      ${caPrima}
       <span class="hint">Doar la cerere: poziția se citește o singură dată, când apăsați, lângă această construcție. Nu se urmărește locația.</span>
     </div>`;
   }
   const q = gpsQuality(g.acc);
   const la = g.la ? new Date(g.la) : null;
+  const cand = la ? `${esc(fmtDate(toISO(la)))}, ${String(la.getHours()).padStart(2, '0')}:${String(la.getMinutes()).padStart(2, '0')}` : '';
   return `<div class="gps-field" id="gps-${k.id}">
     <span class="lbl">Coordonate GPS</span>
     <div class="gps-box">
       <div class="gps-main">
         <b class="gps-coord gps-cell">${esc(fmtCoord(g))}</b>
-        <span class="gps-meta"><span class="gps-q q-${q}">± ${Math.round(g.acc)} m · precizie ${q === 'buna' ? 'bună' : q === 'medie' ? 'medie' : 'slabă'}</span>${la ? ` · preluate ${esc(fmtDate(toISO(la)))}, ${String(la.getHours()).padStart(2, '0')}:${String(la.getMinutes()).padStart(2, '0')}` : ''}</span>
+        <span class="gps-meta">${q === 'manual'
+    ? `<span class="gps-q q-manual">introduse manual</span>${cand ? ` · ${cand}` : ''}`
+    : `<span class="gps-q q-${q}">± ${Math.round(g.acc)} m · precizie ${q === 'buna' ? 'bună' : q === 'medie' ? 'medie' : 'slabă'}</span>${cand ? ` · preluate ${cand}` : ''}`}</span>
         ${q === 'slaba' ? `<span class="gps-warn">${icon('alert')} Precizie slabă: ieșiți în aer liber sau lângă o fereastră și apăsați „Actualizează”.</span>` : ''}
       </div>
       <div class="gps-actions">
@@ -380,9 +430,11 @@ function gpsBlock(c, k, i) {
         <a class="btn btn-ghost" href="${esc(appleMapsUrl(g, numeHarta))}" target="_blank" rel="noopener">${icon('pin')} Hărți Apple</a>
         <button class="btn btn-ghost" data-act="gps-copy" data-id="${k.id}">${icon('doc')} Copiază</button>
         <button class="btn btn-ghost" data-act="gps-get" data-id="${k.id}" ${busy ? 'disabled' : ''}>${icon('history')} ${busy ? 'Se caută…' : 'Actualizează'}</button>
+        ${manual}
         <button class="icon-btn danger" data-act="gps-clear" data-id="${k.id}" aria-label="Șterge coordonatele">${icon('trash')}</button>
       </div>
     </div>
+    ${caPrima}
   </div>`;
 }
 
@@ -393,23 +445,26 @@ function isOpen(c, k, i) {
   return c.constructii.length === 1 || i === 0;
 }
 
-function dotariSummary(k) {
+// Dotările completate (rândurile ascunse nu se numără: iluminat Hint fără hidranți interiori, dotări noi la controalele vechi)
+export function dotariSummary(c, k) {
   let da = 0, nec = 0, set = 0, lipsa = 0;
-  for (const d of DOTARI) {
+  const vis = dotariVizibile(c, k);
+  for (const d of vis) {
     const v = k.dotari[d.key];
-    if (d.centrala) { if (v.tipuri.length || v.nuAre) set++; continue; }
+    if (d.centrala) { if ((v.ct || []).length || v.tipuri.length || v.nuAre) set++; continue; }
     if (v.v) set++;
     if (v.v === 'DA') da++;
     if (v.v === 'NEC') nec++;
     if (v.v === 'NU' && LIPSA_DOTARI.includes(d.key)) lipsa++;
   }
-  return { da, nec, set, lipsa, total: DOTARI.length };
+  return { da, nec, set, lipsa, total: vis.length };
 }
 
 function constructieHTML(c, k, i) {
   const open = isOpen(c, k, i);
   const p = `constructii.#${k.id}`;
-  const s = dotariSummary(k);
+  const s = dotariSummary(c, k);
+  const nr = c.constructii.length;
   return `<article class="constr ${open ? 'open' : ''}" id="constr-${k.id}">
     <div class="constr-head">
       <span class="constr-num">${i + 1}</span>
@@ -417,6 +472,10 @@ function constructieHTML(c, k, i) {
       ${s.lipsa ? `<span class="pill pill-red">${icon('alert')}${s.lipsa} ${s.lipsa === 1 ? 'instalație lipsă' : 'instalații lipsă'}</span>` : ''}
       <span class="pill pill-red" id="grf-pill-${k.id}" ${grfVPesteParter(k) ? '' : 'hidden'}>${icon('alert')}GRF/NSI V peste parter</span>
       <span class="constr-sum">${s.set}/${s.total} dotări${k.suprafata ? ` · ${esc(k.suprafata)} m²` : ''}${k.regimInaltime ? ` · ${esc(k.regimInaltime)}` : ''}${k.grf ? ` · ${k.grf === 'NN' ? 'GRF/NSI nu e necesar' : `GRF/NSI ${k.grf}`}` : ''}${k.gps ? ' · GPS ✓' : ''}</span>
+      ${nr > 1 ? `<span class="constr-ord">
+        <button class="icon-btn" data-act="constr-up" data-id="${k.id}" ${i === 0 ? 'disabled' : ''} aria-label="Mută mai sus">${icon('up')}</button>
+        <button class="icon-btn" data-act="constr-down" data-id="${k.id}" ${i === nr - 1 ? 'disabled' : ''} aria-label="Mută mai jos">${icon('up', 'rot')}</button>
+      </span>` : ''}
       <button class="icon-btn" data-act="constr-toggle" data-id="${k.id}" aria-label="${open ? 'Restrânge' : 'Extinde'}">${icon('chevD', open ? 'rot' : '')}</button>
     </div>
     ${open ? `<div class="constr-body">
@@ -431,7 +490,7 @@ function constructieHTML(c, k, i) {
       ${grfBlock(c, k, p)}
       ${gpsBlock(c, k, i)}
       <div class="mini-row"><h3 class="mini-title">Dotări și instalații <small>NEC = nu este cazul</small></h3></div>
-      <div class="dotari">${DOTARI.map((d) => dotareRow(p, k, d)).join('')}</div>
+      <div class="dotari">${dotariVizibile(c, k).map((d) => dotareRow(p, k, d)).join('')}</div>
       ${c.constructii.length > 1 ? `<div class="constr-foot"><button class="btn btn-ghost danger" data-act="constr-del" data-id="${k.id}">${icon('trash')} Șterge construcția</button></div>` : ''}
     </div>` : ''}
   </article>`;
@@ -441,12 +500,24 @@ function dotareRow(p, k, d) {
   const v = k.dotari[d.key];
   const path = `${p}.dotari.${d.key}`;
   if (d.centrala) {
-    return `<div class="dot-row">
+    // câte centrale (CT 1, CT 2…), fiecare cu tipurile ei; „NU ARE” le șterge
+    const ct = v.ct || [];
+    return `<div class="dot-row dot-ct">
       <span class="dot-label">${esc(d.label)}</span>
-      <div class="chips-sel">
-        ${CENTRALA_TIPURI.map((t) => `<button type="button" class="chip-sel ${v.tipuri.includes(t) ? 'on' : ''}" data-act="centrala" data-path="${path}" data-val="${t}">${t}</button>`).join('')}
+      <div class="ct-head">
+        <div class="stepper sm" aria-label="Număr de centrale termice">
+          <button class="step-btn" data-act="ct-count" data-path="${path}" data-val="-1" aria-label="Mai puține" ${ct.length ? '' : 'disabled'}>−</button>
+          <span class="step-val ${ct.length ? '' : 'is-empty'}"><b>${ct.length}</b><small>${ct.length === 1 ? 'centrală' : 'centrale'}</small></span>
+          <button class="step-btn" data-act="ct-count" data-path="${path}" data-val="1" aria-label="Mai multe">+</button>
+        </div>
         <button type="button" class="chip-sel ${v.nuAre ? 'on off-kind' : ''}" data-act="centrala" data-path="${path}" data-val="NU_ARE">NU ARE</button>
       </div>
+      ${ct.map((x, i) => `<div class="ct-row"><span class="ct-nr">CT ${i + 1}</span><div class="chips-sel">
+        ${CENTRALA_TIPURI.map((t) => `<button type="button" class="chip-sel ${x.tipuri.includes(t) ? 'on' : ''}" data-act="centrala" data-path="${path}" data-ct="${esc(x.id)}" data-val="${t}">${t}</button>`).join('')}
+      </div></div>`).join('')}
+      ${!ct.length && !v.nuAre ? `<div class="ct-row is-nou"><span class="ct-nr">CT 1</span><div class="chips-sel">
+        ${CENTRALA_TIPURI.map((t) => `<button type="button" class="chip-sel" data-act="centrala" data-path="${path}" data-val="${t}">${t}</button>`).join('')}
+      </div></div>` : ''}
       ${obsField(`${path}.obs`, v.obs, 'dot-obs')}
     </div>`;
   }
@@ -492,7 +563,7 @@ function actRow(c, a, i) {
 function acteResultsHTML(c) {
   const f = state.ui.nerFilter;
   const q = state.ui.nerQuery.trim();
-  const toate = ACTE.map((a, i) => ({ a, i, v: c.acte[a.key] }));
+  const toate = acteOf(c).map((a, i) => ({ a, i, v: c.acte[a.key] }));
   const vis = toate.filter(({ a, v }) => (f === 'ALL' || (f === 'NOK' ? v.status === 'nok' : !v.status)) && matchAct(c, a.key, q));
   const closed = !q && state.ui.catCollapsed.has('acte');
   const gol = toate.filter(({ v }) => !v.status);
@@ -520,12 +591,13 @@ export const listaHTML = (c, sec) => (sec === 'acte' ? acteResultsHTML(c) : nerR
 
 function tabActe(c) {
   const st = controlStats(c, today());
-  const ok = ACTE.filter((a) => c.acte[a.key].status === 'ok').length;
+  const acte = acteOf(c);
+  const ok = acte.filter((a) => c.acte[a.key].status === 'ok').length;
   const f = state.ui.nerFilter;
-  const gol = ACTE.filter((a) => !c.acte[a.key].status).length;
-  const deschiseGata = ACTE.filter((a) => c.acte[a.key].status && !state.ui.rowCollapsed.has(actKey(c, a.key))).length;
-  const vreunaInchisa = ACTE.some((a) => state.ui.rowCollapsed.has(actKey(c, a.key)));
-  const nec = ACTE.filter((a) => c.acte[a.key].status === 'nec').length;
+  const gol = acte.filter((a) => !c.acte[a.key].status).length;
+  const deschiseGata = acte.filter((a) => c.acte[a.key].status && !state.ui.rowCollapsed.has(actKey(c, a.key))).length;
+  const vreunaInchisa = acte.some((a) => state.ui.rowCollapsed.has(actKey(c, a.key)));
+  const nec = acte.filter((a) => c.acte[a.key].status === 'nec').length;
   return `<div class="sum-line">
       <span><b>${st.acteDone}</b>/${st.acteTotal} verificate</span>
       <span class="t-green"><b>${ok}</b> prezentate</span>
@@ -788,11 +860,14 @@ function rowPills(c, n, collapsed) {
   if (vi.veche) pills.push(`<span class="pill pill-veche">${icon('history')}Neregulă veche</span>`);
   if (n.status === 'nok' && isGrav(n) && n.sigiliu) pills.push(pill('red', 'Sigiliu', 'lock'));
   if (n.status === 'nok' && n.custom && n.grav) pills.push(pill('red', 'Neregulă gravă', 'alert'));
-  if (n.status === 'nok' && n.auto) pills.push(pill('neutral', `Din fișa obiectivului: NU la ${DOTARI.find((d) => d.key === sablon(n.key)?.autoNU)?.label || ''}`, 'building'));
+  if (n.status === 'nok' && n.auto) {
+    pills.push(sablon(n.key)?.autoActe ? pill('neutral', 'Din tabul Acte: act lipsă', 'doc')
+      : pill('neutral', `Din fișa obiectivului: NU la ${DOTARI.find((d) => d.key === sablon(n.key)?.autoNU)?.label || ''}`, 'building'));
+  }
   if (n.status === 'nok') {
     pills.push(n.inPV ? pill('green', 'Trecut în PV', 'pv') : pill('warn', 'Netrecut în PV', 'pv'));
     if (n.amenda.aplicata) { const fs = fineStatus(c, n, today()); pills.push(finePill(fs.level, `Amendă · ${fs.label}`)); }
-    if (collapsed && (c.constructii || []).length > 1 && secOf(n) === 'ner') pills.push(pill('neutral', constructiiNume(c, n), 'building'));
+    if (collapsed && (c.constructii || []).length > 1 && secOf(n) === 'ner' && constructiiOf(c, n).length) pills.push(pill('neutral', constructiiNume(c, n), 'building'));
   }
   const exp = n.status !== 'nok' && n.status !== 'nec' ? verifExpirate(c, n) : [];
   if (exp.length) pills.push(pill('warn', `Verificare expirată: ${exp.map((k) => k.denumire).join(', ')}`, 'alert'));
@@ -868,10 +943,9 @@ function neregulaDetail(c, n, path) {
     fine = `<div class="fine-box fb-${fs.level}">
       <div class="fine-status">
         <span class="fine-dot"></span>
-        <div><b>${esc(fs.label)}${amendaSerieNr(a) ? ` · ${esc(amendaSerieNr(a))}` : ''}</b><span>${esc(fs.msg)}</span></div>
+        <div><b>${esc(fs.label)}</b><span>${esc(fs.msg)}</span></div>
       </div>
       <div class="form-grid g3">
-        ${field('Seria și nr. amenzii', `${path}.amenda.serieNr`, a.serieNr, { ph: 'ex: DB 0012345' })}
         <label class="field">
           <span class="lbl">Data aplicării</span>
           <span class="inp-wrap"><input type="date" data-bind="${path}.amenda.data" data-rerender="1" value="${esc(a.data)}"></span>

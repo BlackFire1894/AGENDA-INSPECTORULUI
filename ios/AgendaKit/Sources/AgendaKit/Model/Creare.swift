@@ -9,7 +9,8 @@ public func emptyConstructie(_ nr: Int = 1) -> Constructie {
     var dotari = JSObiect()
     for d in K.dotari {
         if d.centrala {
-            dotari[d.key] = ["tipuri": [], "nuAre": false, "obs": ""]
+            // `ct` = centralele construcției ({ id, tipuri }); `tipuri` = toate tipurile lor (compatibilitate)
+            dotari[d.key] = ["tipuri": [], "nuAre": false, "obs": "", "ct": []]
         } else {
             var x: JSObiect = JSObiect([("v", ""), ("obs", "")])
             if let nr = d.nr, !nr.isEmpty { x["nr"] = "" }
@@ -49,6 +50,7 @@ public func newControl(objectiveId: String? = nil, tip: String? = nil, denumire:
         ("createdAt", .string(acum)), ("updatedAt", .string(acum)),
         ("tip", .string(tip ?? "OPEC")), ("denumire", .string(denumire ?? "")),
         ("administrator", ""), ("telefon", ""), ("email", ""), ("adresa", ""), ("localitate", ""),
+        ("persoanaParticipanta", ""), ("observatiiGenerale", ""), ("deIntrebat", []),
         ("dataInceput", .string(today)), ("dataIncheiere", ""),
         ("constructii", [emptyConstructie(1).json]),
         ("acte", .object(acte)),
@@ -58,15 +60,25 @@ public func newControl(objectiveId: String? = nil, tip: String? = nil, denumire:
     ]))
 }
 
-/// Control nou pe un obiectiv existent: preia datele de identificare și construcțiile (caracteristici + dotări)
-/// din ultimul control; actele și neregulile pornesc de la zero.
+/// Control nou pe un obiectiv existent (v1.25, regula utilizatorului): se preia tot din controlul imediat anterior —
+/// datele obiectivului, construcțiile (caracteristici, dotări, centrale, GPS), adăposturile, observațiile actelor,
+/// sarcinile „De întrebat” nerezolvate și constatările (cu observațiile și construcțiile lor; devin „neregulă veche”).
+/// Pornesc de la zero: perioada, datele verificărilor, starea actelor, încărcarea, PV, amenzile, sigiliile,
+/// termenul ASI și rândurile Conform / NEC.
 public func controlFromPrevious(_ prev: Control, _ start: String? = nil) -> Control {
     var c = newControl(objectiveId: prev.objectiveId, tip: prev.o["tip"] == nil ? nil : prev.tip, denumire: prev.denumire, start: start)
-    c.administrator = prev.administrator
-    c.telefon = prev.telefon
-    c.email = prev.email
-    c.adresa = prev.adresa
-    c.localitate = prev.localitate
+    for f in ["administrator", "telefon", "email", "adresa", "localitate", "persoanaParticipanta", "observatiiGenerale"] {
+        let v = prev.o[f]
+        c.o[f] = v?.truthy == true ? v! : ""
+    }
+    c.o["deIntrebat"] = .array(prev.o.arr("deIntrebat").compactMap { v -> JSONValue? in
+        guard let x = v.obiect, x["gata"]?.truthy != true, let t = x["text"], t.truthy, !t.textJS.trimJS.isEmpty else { return nil }
+        var q = JSObiect()
+        if let id = x["id"] { q["id"] = id }
+        q["text"] = t
+        q["gata"] = false
+        return .object(q)
+    })
     var idNou: [String: String] = [:]
     c.constructii = prev.constructii.map { k in
         var k = k
@@ -76,29 +88,60 @@ public func controlFromPrevious(_ prev: Control, _ start: String? = nil) -> Cont
         return k
     }
     if c.constructii.isEmpty { c.constructii = [emptyConstructie(1)] }
-    // datele ultimelor verificări rămân valabile de la un control la altul
-    var nereguli = c.nereguli
-    let prevNereguli = prev.nereguli
-    for i in nereguli.indices {
-        guard isVerificare(nereguli[i]), let p = prevNereguli.first(where: { $0.key == nereguli[i].key }),
-              p.o["verificari"]?.truthy == true else { continue }
-        for (kid, v) in p.verificari {
-            if let nou = idNou[kid] { nereguli[i].setVerificare(nou, Verificare(v.obiect ?? JSObiect())) }
+    var acte = c.o.obj("acte")
+    let acteVechi = prev.o.obj("acte")
+    for a in K.acte {
+        if let o = acteVechi[a.key]?.obiect?["obs"], o.truthy, var x = acte[a.key]?.obiect {
+            x["obs"] = o
+            acte[a.key] = .object(x)
         }
     }
-    c.nereguli = nereguli
-    if prev.o["adapostPC"]?.truthy == true { c.adapostPC = prev.adapostPC }
-    // adăposturile rămân (aceeași cheie și locație); starea se verifică din nou
-    if c.adapostPC.v == "DA" {
-        var l = c.nereguli
-        for a in adaposturi(prev) {
-            var n = emptyAdapost(c, a.key)
-            n.locatie = a.locatie
-            l.append(n)
+    c.o["acte"] = .object(acte)
+    if prev.o["adapostPC"]?.truthy == true { c.o["adapostPC"] = .object(prev.o.obj("adapostPC")) }
+    // o constatare preluată: starea, observațiile și construcțiile (fără PV, amendă, sigiliu, termen ASI, verificări)
+    func constatare(_ p: Neregula) -> JSObiect {
+        let po = p.o
+        var o = JSObiect([
+            ("status", "nok"), ("obs", po["obs"]?.truthy == true ? po["obs"]! : ""),
+            ("obsAuto", po["obsAuto"]?.truthy == true ? po["obsAuto"]! : ""), ("auto", .bool(po.bool("auto"))),
+            ("constructieIds", .array(po.arr("constructieIds").compactMap { $0.sir.flatMap { idNou[$0] }.map { .string($0) } })),
+        ])
+        let ct: [String] = po.arr("ctIds").compactMap { v in
+            guard let u = v.sir else { return nil }
+            let parte = u.split(separator: ":", omittingEmptySubsequences: false).map(String.init)
+            guard let k = idNou[parte[0]] else { return nil }
+            return "\(k):\(parte.count > 1 ? parte[1] : "undefined")"
         }
-        c.nereguli = l
+        if !ct.isEmpty { o["ctIds"] = JSONValue(ct) }
+        return o
     }
-    for (dot, _) in K.autoNU { _ = syncAutoNU(&c, dot) }
+    var l = c.nereguli
+    for p in prev.nereguli {
+        // adăposturile rămân (aceeași cheie și locație, ca „neregulă veche” să se recunoască); cele conforme se verifică din nou
+        if p.adapost {
+            if c.adapostPC.v == "DA" {
+                var o = emptyAdapost(c, p.key).o
+                o["locatie"] = p.o["locatie"]?.truthy == true ? p.o["locatie"]! : ""
+                if p.status == "nok" { o = o.combinat(cu: constatare(p)) }
+                l.append(Neregula(o))
+            }
+            continue
+        }
+        if p.status != "nok" { continue }
+        if p.custom {
+            var o = emptyNeregula(p.key, true, secOf(p)).o
+            o["label"] = p.o["label"]?.truthy == true ? p.o["label"]! : ""
+            o["grav"] = .bool(p.o.bool("grav"))
+            l.append(Neregula(o.combinat(cu: constatare(p))))
+            continue
+        }
+        if let t = sablon(p.key), let i = l.firstIndex(where: { $0.key == p.key }), inCatalog(c, t) {
+            l[i] = Neregula(l[i].o.combinat(cu: constatare(p)))
+        }
+    }
+    c.nereguli = l
+    for (dot, _) in K.autoNU { _ = syncAutoNU(&c, dot) }   // NU la ASI / AVIZ / iluminat Hint moștenit
+    syncAutoActe(&c)   // actele pornesc necompletate: neregulile lor apar din nou când actele sunt bifate „Lipsă”
     return c
 }
 
@@ -148,6 +191,64 @@ public func syncAutoNU(_ c: inout Control, _ dot: String, obsOnly: Bool = false)
         return .removed
     }
     return nil
+}
+
+// ───────── Acte lipsă (tabul Acte) → neregulile ao / ap / aq, completate automat (v1.25) ─────────
+// Controalele proprii și analiza semestrială au neregula lor; celelalte acte lipsă intră toate în „ao”.
+
+public let AUTO_ACTE = ["ao", "ap", "aq"]
+let ACTE_SEPARATE = ["controale", "analiza"]
+
+/// Actele din lista controlului (un act adăugat după încheiere nu apare la controalele încheiate)
+public func acteOf(_ c: Control) -> [ActSablon] { K.acte.filter { inCatalog(c, din: $0.din) } }
+
+public func acteLipsa(_ c: Control, _ t: RandSablon) -> [ActSablon] {
+    let acte = c.o.obj("acte")
+    return acteOf(c).filter { a in
+        acte[a.key]?.obiect?["status"] == .string("nok")
+            && (t.autoActe == "grup" ? !ACTE_SEPARATE.contains(a.key) : a.key == t.autoActe)
+    }
+}
+
+func obsDinActe(_ c: Control, _ list: [ActSablon], _ grup: Bool) -> String {
+    let acte = c.o.obj("acte")
+    return list.map { a in
+        let v = acte.obj(a.key)["obs"]
+        let o = (v?.truthy == true ? v!.textJS : "").trimJS.inlocuiesteRegex("\\s*\n\\s*", "; ")
+        return grup ? "\(a.label)\(o.isEmpty ? "" : ": \(o)")" : o
+    }.filter { !$0.isEmpty }.joined(separator: "\n")
+}
+
+/// Aduce neregulile actelor în acord cu tabul Acte, cu aceleași reguli ca `syncAutoNU` (o neregulă lucrată nu se
+/// șterge). Întoarce rândurile schimbate.
+@discardableResult
+public func syncAutoActe(_ c: inout Control, obsOnly: Bool = false) -> [(key: String, r: RezultatSync)] {
+    var out: [(key: String, r: RezultatSync)] = []
+    var nereguli = c.nereguli
+    for key in AUTO_ACTE {
+        guard let t = sablon(key), let i = nereguli.firstIndex(where: { $0.key == key && !$0.custom }), inCatalog(c, t) else { continue }
+        var n = nereguli[i]
+        let list = acteLipsa(c, t)
+        let obs = obsDinActe(c, list, t.autoActe == "grup")
+        let obsProprii = !n.obs.isEmpty && !n.obs.trimJS.isEmpty && n.obs != n.obsAuto
+        var r: RezultatSync?
+        if obsOnly {
+            if !list.isEmpty && n.auto && n.status == "nok" && !obsProprii && n.obs != obs { n.obs = obs; n.obsAuto = obs; r = .updated }
+        } else if !list.isEmpty {
+            r = n.status != "nok" ? .added : (n.auto && (obsProprii || n.obs == obs) ? nil : .updated)
+            n.status = "nok"
+            n.auto = true
+            if !obsProprii { n.obs = obs; n.obsAuto = obs }
+        } else if n.auto && n.status == "nok" {
+            let lucrata = obsProprii || n.inPV || n.amenda.aplicata || n.sigiliu || n.vecheManual
+            n.auto = false
+            if lucrata { r = .kept } else { n.status = ""; n.obs = ""; n.obsAuto = ""; n.constructieIds = []; r = .removed }
+        }
+        nereguli[i] = n
+        if let r { out.append((key, r)) }
+    }
+    c.nereguli = nereguli
+    return out
 }
 
 // ───────── Normalizarea (date importate sau versiuni vechi) ─────────
@@ -207,9 +308,34 @@ public func normalizeControl(_ intrare: JSObiect) -> Control {
         for (key, v) in k.obj("dotari") {
             dotari[key] = .object(e.o.obj("dotari").obj(key).combinat(cu: v.obiect ?? JSObiect()))
         }
+        // până la v1.24: centrala fără număr → o singură centrală, cu tipurile bifate
+        if var cen = dotari["centrala"]?.obiect {
+            let src = k.obj("dotari")["centrala"]?.obiect?["ct"]?.lista
+            let tipuri = cen["tipuri"]?.lista ?? []
+            if src == nil || (src!.isEmpty && !tipuri.isEmpty) {
+                cen["ct"] = tipuri.isEmpty ? [] : [["id": "ct1", "tipuri": .array(tipuri)]]
+            } else {
+                cen["ct"] = .array(cen.arr("ct").compactMap(\.obiect).enumerated().map { j, x in
+                    var x = x
+                    x["id"] = .string(x["id"]?.truthy == true ? x["id"]!.textJS : "ct\(j + 1)")
+                    x["tipuri"] = x["tipuri"]?.lista != nil ? x["tipuri"]! : []
+                    return .object(x)
+                })
+            }
+            dotari["centrala"] = .object(cen)
+        }
         var r = e.o.combinat(cu: k)
         r["dotari"] = .object(dotari)
         return .object(r)
+    })
+    // „De întrebat până la finalizarea controlului”: [{ id, text, gata }]
+    out["deIntrebat"] = .array((c["deIntrebat"]?.lista ?? []).compactMap(\.obiect).enumerated().map { i, x in
+        var x = x
+        x["id"] = .string(x["id"]?.truthy == true ? x["id"]!.textJS : "q\(i + 1)")
+        let t = x["text"]
+        x["text"] = .string(t == nil || t!.esteNull ? "" : t!.textJS)
+        x["gata"] = .bool(x["gata"]?.truthy ?? false)
+        return .object(x)
     })
     // Coordonatele stăteau pe control, nu pe construcție, într-o versiune de probă: se mută la prima construcție.
     if let gps = out["gps"], gps.truthy, var prima = out.arr("constructii").first?.obiect, prima["gps"]?.truthy != true {
@@ -224,7 +350,21 @@ public func normalizeControl(_ intrare: JSObiect) -> Control {
     out["schema"] = c["schema"]?.truthy == true ? c["schema"]! : 1
     var r = Control(out)
     if isIncheiat(r) && r.o["catalog"]?.truthy != true { r.o["catalog"] = out["schema"] }
+    migreazaDeschis(&r)
     return r
+}
+
+/// v1.25: controalele în desfășurare (și cele redeschise) din versiunile vechi primesc noile reguli o singură dată —
+/// actele lipsă devin nereguli (ao / ap / aq); fără hidranți interiori, „Lipsă iluminat Hint” se retrage (dacă nu a
+/// fost lucrată). Cele încheiate nu se ating. Întoarce true dacă s-a aplicat.
+@discardableResult
+public func migreazaDeschis(_ c: inout Control) -> Bool {
+    let schema = c.o["schema"].flatMap { $0.truthy ? $0.numarJSValoare : nil } ?? 1
+    guard !isIncheiat(c), schema < 12 else { return false }
+    syncAutoActe(&c)
+    syncAutoNU(&c, "ilumHint")
+    c.o["schema"] = 12
+    return true
 }
 
 public func isIncheiat(_ c: Control) -> Bool { isISO(c.dataIncheiere) }
@@ -239,20 +379,25 @@ public func catalogOf(_ c: Control) -> Int {
     return 1
 }
 
-public func inCatalog(_ c: Control, _ t: RandSablon) -> Bool {
+public func inCatalog(_ c: Control, _ t: RandSablon) -> Bool { inCatalog(c, din: t.din, retrasDin: t.retrasDin) }
+
+/// Și pentru acte și dotări (`din`: versiunea de la care există)
+public func inCatalog(_ c: Control, din: Int?, retrasDin: Int? = nil) -> Bool {
     let v = catalogOf(c)
-    let din = (t.din ?? 0) != 0 ? t.din! : 1
-    let retras = t.retrasDin.map { $0 != 0 && v >= $0 } ?? false
-    return din <= v && !retras
+    let d = (din ?? 0) != 0 ? din! : 1
+    let retras = retrasDin.map { $0 != 0 && v >= $0 } ?? false
+    return d <= v && !retras
 }
 
 /// Se apelează la fiecare salvare: încheierea fixează lista, redeschiderea o eliberează.
+/// Un control încheiat într-o versiune veche și redeschis primește acum noile reguli (`migreazaDeschis`).
 public func fixeazaCatalog(_ c: inout Control) {
     if isIncheiat(c) && c.o["catalog"]?.truthy != true {
         c.catalog = SCHEMA_VERSION
     } else if !isIncheiat(c) && c.o["catalog"]?.truthy == true {
         c.o["catalog"] = nil
     }
+    migreazaDeschis(&c)
 }
 
 // ───────── Adăposturi de protecție civilă ─────────

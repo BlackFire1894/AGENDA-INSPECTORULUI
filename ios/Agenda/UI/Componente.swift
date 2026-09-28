@@ -131,11 +131,17 @@ struct BaraCautare: View {
                 }
                 .accessibilityLabel("Caută după dată")
                 .popover(isPresented: $alegeData) {
-                    DatePicker("Dată", selection: dataLegata, displayedComponents: .date)
-                        .datePickerStyle(.graphical)
-                        .environment(\.locale, Locale(identifier: "ro_RO"))
-                        .padding()
-                        .frame(minWidth: 320)
+                    VStack(spacing: 0.6667 * rem) {
+                        DatePicker("Dată", selection: dataLegata, displayedComponents: .date)
+                            .datePickerStyle(.graphical)
+                            .environment(\.locale, Locale(identifier: "ro_RO"))
+                        HStack {
+                            Spacer()
+                            Button("Gata") { alegeData = false }.font(.system(size: rem, weight: .heavy))
+                        }
+                    }
+                    .padding()
+                    .frame(minWidth: 320)
                 }
             }
             .padding(EdgeInsets(top: 0.3333 * rem, leading: rem, bottom: 0.3333 * rem, trailing: 0.3333 * rem))
@@ -163,8 +169,8 @@ struct BaraCautare: View {
                 return Calendar.current.date(from: DateComponents(year: p[0], month: p[1], day: p[2])) ?? Date()
             },
             set: { d in
+                // fereastra rămâne deschisă (schimbarea lunii / anului nu o închide); „Gata” o închide
                 text = fmtDate(toISO(d))
-                alegeData = false
             })
     }
 }

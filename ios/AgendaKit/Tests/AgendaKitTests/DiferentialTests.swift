@@ -104,6 +104,48 @@ final class DiferentialTests: TestVectori {
             compara(adaposturiStats(c)?.json ?? .null, p["adaposturi"], "adăposturi \(id)")
             compara(adaposturiStats(c).map { .string(adaposturiText($0)) } ?? .null, p["adaposturiText"], "adaposturiText \(id)")
             compara(n(catalogOf(c)), p["catalogOf"], "catalogOf \(id)")
+            compara(JSONValue(acteOf(c).map(\.key)), p["acteOf"], "acteOf \(id)")
+            let dot: [JSONValue] = c.constructii.map { k in
+                .object(JSObiect([("vis", JSONValue(dotariVizibile(c, k).map(\.key))), ("are", .bool(areCentrala(k))),
+                                  ("ilum", .string(valDotare(c, k, "ilumHint"))),
+                                  ("ct", .array(unitatiCT(c, k).map { [.string($0.id), .string($0.denumire)] }))]))
+            }
+            compara(.array(dot), p["dotari"], "dotările afișate \(id)")
+        }
+    }
+
+    /// Controlul nou pe același obiectiv (v1.25: preia tot, constatările devin „neregulă veche”), fără identificatorii noi
+    func testControlulUrmator() {
+        var n = 0
+        for p in d.arr("perControl").compactMap(\.obiect) {
+            guard let w = p["urmator"]?.obiect else { continue }
+            let c = controls.first { $0.id == p.str("id") }!
+            let urm = controlFromPrevious(c, addDays(c.dataInceput, 30))
+            compara(canonic(urm), canonic(Control(w)), "controlul următor după \(c.id)")
+            n += 1
+        }
+        XCTAssertGreaterThan(n, 100)
+    }
+
+    /// Identificatorii noi (controlul, construcțiile) și momentele creării se înlocuiesc cu nume fixe
+    private func canonic(_ c: Control) -> JSONValue {
+        var o = c.o
+        o["createdAt"] = ""; o["updatedAt"] = ""
+        var text = JSONValue.object(o).text()
+        text = text.replacingOccurrences(of: "\"\(c.id)\"", with: "\"#C\"")
+        for (i, k) in c.constructii.enumerated() where !k.id.isEmpty {
+            text = text.replacingOccurrences(of: "\"\(k.id)\"", with: "\"#K\(i)\"").replacingOccurrences(of: "\"\(k.id):", with: "\"#K\(i):")
+        }
+        return (try? JSONValue.citeste(Data(text.utf8))) ?? .null
+    }
+
+    /// Coordonatele scrise de mână (v1.25)
+    func testCoordonateleScriseDeMana() {
+        let l = d.obj("global").arr("coordonate").compactMap(\.obiect)
+        XCTAssertGreaterThan(l.count, 15)
+        for x in l {
+            let r: JSONValue = parseCoord(x.str("t")).map { ["lat": .number($0.lat), "lon": .number($0.lon)] } ?? .null
+            compara(r, x["r"], "coordonatele „\(x.str("t"))”")
         }
     }
 
@@ -135,9 +177,10 @@ final class DiferentialTests: TestVectori {
             XCTAssertEqual(web.count, c.nereguli.count)
             for (i, r) in c.nereguli.enumerated() where i < web.count {
                 let v = vecheInfo(controls, c, r)
-                let verif: JSONValue = isVerificare(r) ? .array(c.constructii.map { k in
-                    let s = verifStare(c, r, k)
-                    return ["data": .string(s.data), "luni": n(s.luni), "expira": s.expira.map { .string($0) } ?? .null, "stare": .string(s.stare)]
+                let verif: JSONValue = isVerificare(r) ? .array(verifUnitati(c, r).map { u in
+                    let s = verifStare(c, r, u)
+                    return .object(JSObiect([("id", .string(u.id)), ("denumire", .string(u.denumire)), ("data", .string(s.data)), ("luni", n(s.luni)),
+                                             ("expira", s.expira.map { .string($0) } ?? .null), ("stare", .string(s.stare))]))
                 }) : .null
                 let x: JSONValue = .object(JSObiect([
                     ("key", .string(r.key)), ("litera", .string(neregulaLetter(c, r))), ("eticheta", .string(neregulaLabel(r))),
@@ -146,7 +189,8 @@ final class DiferentialTests: TestVectori {
                     ("veche", ["veche": .bool(v.veche), "auto": v.auto.map { .string($0.id) } ?? .null, "manual": .bool(v.manual)]),
                     ("constructii", ids(constructiiOf(c, r))), ("nume", .string(constructiiNume(c, r))), ("eligibile", ids(constructiiEligibile(c, r))),
                     ("serieNr", .string(amendaSerieNr(r.amenda))), ("suma", parseSuma(r.amenda.o["suma"].map { $0.esteNull ? "" : $0.textJS }).map { .number($0) } ?? .null),
-                    ("verifText", .string(verifText(c, r))), ("verif", verif), ("expirate", ids(verifExpirate(c, r))),
+                    ("verifText", .string(verifText(c, r))), ("verif", verif), ("expirate", JSONValue(verifExpirate(c, r).map(\.id))),
+                    ("centrale", JSONValue(centraleAlese(c, r).map(\.id))), ("perCT", .bool(perCT(c, r))),
                     ("cautari", JSONValue(INTREBARI.filter { matchNeregula(c, r, $0) })),
                 ]))
                 compara(x, web[i], "rând \(r.key) din \(c.id)")

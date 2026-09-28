@@ -225,9 +225,10 @@ public struct StatControl: Sendable {
 public func controlStats(_ c: Control, _ today: String = todayISO()) -> StatControl {
     let rows = activeNereguli(c)
     let nok = rows.filter { $0.status == "nok" }
+    let acte = acteOf(c)
     return StatControl(
-        acteDone: K.acte.filter { !c.act($0.key).status.isEmpty }.count, acteTotal: K.acte.count,
-        acteNok: K.acte.filter { c.act($0.key).status == "nok" }.count,
+        acteDone: acte.filter { !c.act($0.key).status.isEmpty }.count, acteTotal: acte.count,
+        acteNok: acte.filter { c.act($0.key).status == "nok" }.count,
         nereguliChecked: rows.filter { !$0.status.isEmpty }.count, nereguliTotal: rows.filter { isApplicable(c, $0) }.count,
         constatate: nok.count, netrecute: nok.filter { !$0.inPV }.count,
         fines: nok.filter { $0.amenda.aplicata }.map { AmendaCuStadiu(n: $0, st: fineStatus(c, $0, today)) },

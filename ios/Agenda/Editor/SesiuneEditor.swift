@@ -90,6 +90,7 @@ final class SesiuneEditor {
         if let f = r.focusCamp { focusCerut = f }
         if let t = r.copiaza { UIPasteboard.general.string = t }
         if let id = r.cereGps { citestePozitia(id) }
+        if let id = r.cereCoordonate { arataCoordonate(id) }
         if let q = r.cerere, let reluare { arata(q, reluare) }
     }
 
@@ -201,14 +202,41 @@ final class SesiuneEditor {
             switch r {
             case .pozitie(let lat, let lon, let acc):
                 self.pas { $0.gpsPreluat(id, lat: lat, lon: lon, acc: acc, &$1) }
-            case .faraSemnal:
-                self.pas { ed, _ in ed.gpsEsuat(timp: true) }
+            case .faraSemnal, .faraPozitie:
+                // fără poziție (iPad doar cu Wi-Fi, fără rețele în jur) sau fără semnal la timp: variantele, cu introducerea de mână
+                self.pas { ed, _ in ed.gpsEsuat() }
+                let timp = { if case .faraSemnal = r { return true }; return false }()
+                self.ui?.deschide { FereastraFaraPozitie(timp: timp, reincearca: { [weak self] in
+                    self?.ui?.inchide()
+                    self?.click("gps-get", ["id": id])
+                }, deMana: { [weak self] in
+                    self?.ui?.inchide()
+                    self?.arataCoordonate(id)
+                }) }
             case .fara:
-                self.pas { ed, _ in ed.gpsEsuat(timp: false) }
+                self.pas { ed, _ in ed.gpsEsuat() }
                 self.ui?.deschide { FereastraLocalizare(reincearca: { [weak self] in
                     self?.ui?.inchide()
                     self?.click("gps-get", ["id": id])
                 }) }
+            }
+        }
+    }
+
+    /// „Introduceți coordonatele”: fereastra; la „Salvează”, textul trece prin editor (nerecunoscut: mesaj, rămâne deschisă)
+    private func arataCoordonate(_ id: String) {
+        guard let c = magazin?.control(editor.controlId), let k = c.constructii.first(where: { $0.id == id }) else { return }
+        ui?.deschide {
+            FereastraCoordonate(nume: k.denumire.isEmpty ? "Construcția" : k.denumire, initial: k.gps.map(fmtCoord) ?? "") { [weak self] text in
+                guard let self else { return false }
+                var ok = false
+                self.pas { ed, c in
+                    guard let r = ed.gpsIntrodus(id, text, &c) else { return RezultatPas() }
+                    ok = true
+                    return r
+                }
+                if ok { self.ui?.inchide() }
+                return ok
             }
         }
     }
@@ -217,7 +245,8 @@ final class SesiuneEditor {
 /// Poziția, citită o singură dată, la cerere (cu limită de timp, ca aplicația să nu rămână blocată)
 @MainActor
 final class Localizare: NSObject, CLLocationManagerDelegate {
-    enum Rezultat { case pozitie(Double, Double, Double), faraSemnal, fara }
+    /// faraSemnal = timpul a expirat; faraPozitie = CoreLocation nu a putut afla poziția; fara = localizarea oprită / refuzată
+    enum Rezultat { case pozitie(Double, Double, Double), faraSemnal, faraPozitie, fara }
 
     private let m = CLLocationManager()
     private var asteptare: CheckedContinuation<Rezultat, Never>?
@@ -278,7 +307,7 @@ final class Localizare: NSObject, CLLocationManagerDelegate {
                 if self.asteptare != nil { self.m.requestLocation() }
                 return
             }
-            self.termina(cod == .denied ? .fara : .faraSemnal)
+            self.termina(cod == .denied ? .fara : .faraPozitie)
         }
     }
 }

@@ -101,14 +101,41 @@ final class ModelTests: TestVectori {
     func testControlNouPeObiectivExistent() {
         var prev = newControl(denumire: "Primăria X", start: "2026-01-10")
         prev.administrator = "Ion Popescu"
-        prev.modificaConstructie(0) { $0.suprafata = "1200" }
-        prev.n(prev.nereguli[0].key) { $0.status = "nok" }
+        prev.persoanaParticipanta = "Ana Pop"; prev.observatiiGenerale = "Acces prin curte"
+        prev.o["deIntrebat"] = [["id": "q1", "text": "Cere avizul", "gata": false], ["id": "q2", "text": "Rezolvat", "gata": true]]
+        prev.dataIncheiere = "2026-01-12"
+        prev.modificaConstructie(0) { $0.suprafata = "1200"; $0.gps = gpsTest(45, 25, 10, "2026-01-10T08:00:00.000Z") }
+        prev.modificaAct("lfd") { $0.status = "nok"; $0.obs = "expirată" }
+        let k0 = prev.constructii[0].id
+        prev.n("d") { n in n.status = "nok"; n.obs = "P2"; n.inPV = true; n.constructieIds = [k0]; n.modificaAmenda { $0.aplicata = true; $0.suma = "500" } }
+        prev.n("e") { $0.status = "ok" }
+        prev.n("f") { $0.status = "nec" }
+        prev.n("a") { $0.status = "nok"; $0.asiTermen = true }
+        prev.n("b1") { $0.setVerificare(k0, Verificare(obiect([("data", "2025-05-01")]))) }
+        var k1 = emptyNeregula("k1", true, "ner"); k1.label = "Cablu neprotejat"; k1.status = "nok"; k1.grav = true; k1.sigiliu = true
+        var k2 = emptyNeregula("k2", true, "ner"); k2.label = "Conform suplimentar"; k2.status = "ok"
+        prev.adaugaNeregula(k1); prev.adaugaNeregula(k2)
         let next = controlFromPrevious(prev, "2026-09-01")
         XCTAssertEqual(next.objectiveId, prev.objectiveId)
         XCTAssertEqual(next.administrator, "Ion Popescu")
+        XCTAssertEqual(next.persoanaParticipanta, "Ana Pop"); XCTAssertEqual(next.observatiiGenerale, "Acces prin curte")
+        XCTAssertEqual(next.o["deIntrebat"], [["id": "q1", "text": "Cere avizul", "gata": false]])   // doar cele nerezolvate
+        XCTAssertEqual(next.dataInceput, "2026-09-01"); XCTAssertEqual(next.dataIncheiere, "")
         XCTAssertEqual(next.constructii[0].suprafata, "1200")
+        XCTAssertEqual(next.constructii[0].gps, prev.constructii[0].gps)
         XCTAssertNotEqual(next.constructii[0].id, prev.constructii[0].id)
-        XCTAssertEqual(next.nereguli[0].status, "")
+        XCTAssertEqual(next.o.obj("acte")["lfd"], ["status": "", "obs": "expirată"])   // starea se verifică din nou
+        // constatarea: aceeași stare, observații, construcții (noile id-uri); fără PV, amendă, sigiliu, termen ASI
+        XCTAssertEqual(next.n("d").status, "nok"); XCTAssertEqual(next.n("d").obs, "P2")
+        XCTAssertEqual(next.n("d").constructieIds, [next.constructii[0].id])
+        XCTAssertFalse(next.n("d").inPV); XCTAssertFalse(next.n("d").amenda.aplicata)
+        XCTAssertEqual(next.n("a").status, "nok"); XCTAssertFalse(next.n("a").asiTermen)
+        XCTAssertEqual(next.n("e").status, ""); XCTAssertEqual(next.n("f").status, "")
+        XCTAssertTrue(next.n("b1").verificari.isEmpty)
+        XCTAssertEqual(next.n("k1").status, "nok"); XCTAssertTrue(next.n("k1").grav); XCTAssertFalse(next.n("k1").sigiliu)
+        XCTAssertNil(next.neregula("k2"))
+        XCTAssertEqual(next.n("ao").status, "")
+        XCTAssertTrue(vecheInfo([prev, next], next, next.n("d")).veche)
         let objs = objectives([prev, next])
         XCTAssertEqual(objs.count, 1); XCTAssertEqual(objs[0].controls.count, 2); XCTAssertEqual(objs[0].last.id, next.id)
     }
@@ -141,7 +168,7 @@ final class ModelTests: TestVectori {
         XCTAssertTrue(isApplicable(c, c.n("g")) && isApplicable(c, c.n("h")))
         c.n("q") { $0.status = "nok" }
         XCTAssertTrue(isApplicable(c, c.n("q")))
-        XCTAssertEqual(secStats(c, "ner").total, 8 + 5 + 2 + 4 + 2 + 1)
+        XCTAssertEqual(secStats(c, "ner").total, 8 + 5 + 2 + 4 + 2 + 1 + 1)   // + an (v1.25)
     }
 
     func testPlanuriSiProtectieCivila() {
@@ -235,10 +262,12 @@ final class ModelTests: TestVectori {
         c.n("d") { n in n.status = "nok"; n.obs = "P6 nr. 3\nhol"; n.constructieIds = [id1]; n.inPV = true }
         c.n("e") { $0.status = "nok" }
         c.modificaAct("lfd") { $0.status = "nok" }
+        syncAutoActe(&c)   // ca la atingerea din tabul Acte
         let t = pvText(c, [c]).text
-        XCTAssertTrue(t.contains("1. Stingătoare expirate – construcția: Sala de sport. P6 nr. 3; hol"), t)
-        XCTAssertTrue(t.contains("2. Stingătoare neconforme – construcția: Construcția 1"))
-        XCTAssertTrue(t.contains("Acte de autoritate și evidențe lipsă:\n3. Dispoziție LFD"))
+        XCTAssertTrue(t.contains("1. Nu a prezentat acte de autoritate / evidențe. Dispoziție LFD\n"), t)   // fără construcție
+        XCTAssertTrue(t.contains("2. Stingătoare expirate – construcția: Sala de sport. P6 nr. 3; hol"), t)
+        XCTAssertTrue(t.contains("3. Stingătoare neconforme – construcția: Construcția 1"))
+        XCTAssertFalse(t.contains("Acte de autoritate și evidențe lipsă:"))
         let n2 = pvText(c, [c], doarNetrecute: true, cuActe: false)
         XCTAssertEqual(n2.count, 1); XCTAssertFalse(n2.text.contains("expirate"))
     }
@@ -267,7 +296,7 @@ final class ModelTests: TestVectori {
         var t = todoList(c)
         XCTAssertEqual(t.map(\.id), ["pv", "fine-d", "close"])
         XCTAssertEqual(t[0].focus, "d")
-        XCTAssertTrue(t[1].text.contains("seria / nr. și suma"))
+        XCTAssertTrue(t[1].text.hasPrefix("Amendă fără suma: "))
         c.n("d") { n in n.inPV = true; n.modificaAmenda { a in a.o["serie"] = "AB"; a.o["numar"] = "1"; a.suma = "500" } }
         c.dataIncheiere = "2026-09-01"
         XCTAssertEqual(todoList(c).map(\.id), ["incarcare"])
@@ -497,13 +526,12 @@ final class ModelTests: TestVectori {
         c.n("b2") { $0.status = "nec" }
         XCTAssertFalse(todoList(c).contains { $0.id == "verif-b2" })
         XCTAssertFalse(pvText(c, [c]).text.contains("împământare"))
+        // control nou (v1.25): constatarea rămâne, datele verificărilor pornesc goale (loc pentru datele noi)
         let urm = controlFromPrevious(c, "2027-10-01")
-        var b1 = urm.n("b1")
-        XCTAssertEqual(b1.status, "")
-        XCTAssertEqual(b1.verificari.map { Verificare($0.value.obiect!).data }.sorted(), ["2025-09-23", "2025-09-24"])
-        XCTAssertEqual(b1.verificare(urm.constructii[0].id).data, "2025-09-23")
-        b1.status = "nok"
-        XCTAssertEqual(verifText(urm, b1), "Construcția 1: ultima verificare 23.09.2025, expirată (era valabilă până la 23.09.2026)")
+        let b1 = urm.n("b1")
+        XCTAssertEqual(b1.status, "nok")
+        XCTAssertTrue(b1.verificari.isEmpty)
+        XCTAssertEqual(verifText(urm, b1), "Construcția 1: fără verificare prezentată")
     }
 
     func testNECsiCompatibilitate() {
@@ -570,9 +598,11 @@ final class ModelTests: TestVectori {
             ("nereguli", [["key": "d", "status": "nok", "amenda": ["aplicata": true, "serie": "DB", "numar": "0012345", "suma": "2500"]]])]))
         XCTAssertEqual(c.n("d").amenda.serieNr, "DB 0012345")
         XCTAssertFalse(c.n("d").amenda.o.contine("serie") || c.n("d").amenda.o.contine("numar"))
-        XCTAssertTrue(pvText(c, [c]).text.contains("sancționat cu amendă Seria DB nr. 0012345"))
+        // v1.25: seria nu mai apare (PV, fișă, Panou) și nu mai e cerută; datele vechi rămân în control
+        XCTAssertTrue(pvText(c, [c]).text.contains("Stingătoare expirate (sancționat cu amendă)"))
+        XCTAssertFalse(pvText(c, [c]).text.contains("Seria"))
         c.n("d") { $0.modificaAmenda { $0.serieNr = "" } }
-        XCTAssertTrue(todoList(c).contains { $0.id == "fine-d" && $0.text.contains("seria / nr.") })
+        XCTAssertFalse(todoList(c).contains { $0.id == "fine-d" })
     }
 
     func testAnuleazaRefaLoculSchimbat() {
@@ -767,15 +797,16 @@ final class ModelTests: TestVectori {
         c.tip = "LOCALITATE"
         syncAdaposturi(&c)
         XCTAssertTrue(adaposturi(c).allSatisfy { $0.sec == "pc" })
-        var c2 = controlFromPrevious(c, "2027-10-01")
-        XCTAssertEqual(adaposturi(c2).map { [$0.key, $0.locatie, $0.status, $0.sec] }, adaposturi(c).map { [$0.key, $0.locatie, "", "pc"] })
-        c2.n(a2.key) { $0.status = "nok" }
+        // controlul următor (v1.25): același adăposturi; cel neconform rămâne neconform (neregulă veche), celelalte se verifică din nou
+        let c2 = controlFromPrevious(c, "2027-10-01")
+        XCTAssertEqual(adaposturi(c2).map { [$0.key, $0.locatie, $0.status, $0.sec] }, adaposturi(c).map { [$0.key, $0.locatie, $0.status == "nok" ? "nok" : "", "pc"] })
+        XCTAssertEqual(c2.n(a2.key).obs, "Ușa etanșă lipsă")
         XCTAssertTrue(vecheInfo([c, c2], c2, c2.n(a2.key)).veche)
     }
 
     func testSchema11OrganizareaPC() {
         let keys = ["pcAgentInundatii", "pcInspector", "pcTaxa", "pcConventii"]
-        XCTAssertEqual(SCHEMA_VERSION, 11)
+        XCTAssertGreaterThanOrEqual(SCHEMA_VERSION, 11)
         var l = newControl(tip: "LOCALITATE", start: "2026-10-01")
         XCTAssertEqual(keys.map { isApplicable(l, l.n($0)) }, [true, true, true, true])
         var x = newControl(tip: "LOCALITATE", start: "2025-01-10").o
@@ -806,5 +837,166 @@ final class ModelTests: TestVectori {
         XCTAssertTrue(s.urmatoare.contains { $0.titlu == "Plata amenzii" && $0.data == "2026-10-16" })
         c.n("d") { $0.modificaAmenda { $0.achitata = true } }
         XCTAssertEqual(cifreZi([c], [], "2026-10-06").amenziActive, 0)
+    }
+
+    // ───────── v1.25 ─────────
+
+    func testV125ActeleLipsaDevinNereguli() {
+        var c = newControl(denumire: "X", start: "2026-10-01")
+        XCTAssertFalse(isApplicable(c, c.n("ao")) || isApplicable(c, c.n("ap")) || isApplicable(c, c.n("aq")))
+        c.modificaAct("lfd") { $0.status = "nok"; $0.obs = "expirată\nnesemnată" }
+        c.modificaAct("comisie") { $0.status = "nok" }
+        c.modificaAct("controale") { $0.status = "nok"; $0.obs = "ultimul în 2024" }
+        XCTAssertEqual(syncAutoActe(&c).map { "\($0.key):\($0.r)" }, ["ao:added", "ap:added"])
+        XCTAssertEqual(c.n("ao").obs, "Dispoziție LFD: expirată; nesemnată\nComisie PSI")
+        XCTAssertEqual(c.n("ap").obs, "ultimul în 2024")
+        XCTAssertEqual(c.n("aq").status, "")
+        XCTAssertTrue(c.n("ao").auto && isApplicable(c, c.n("ao")))
+        XCTAssertTrue(constructiiOf(c, c.n("ao")).isEmpty)
+        XCTAssertTrue(syncAutoActe(&c).isEmpty)
+        c.modificaAct("comisie") { $0.obs = "nenumită" }
+        XCTAssertEqual(syncAutoActe(&c, obsOnly: true).map { "\($0.key):\($0.r)" }, ["ao:updated"])
+        XCTAssertTrue(c.n("ao").obs.contains("Comisie PSI: nenumită"))
+        c.modificaAct("controale") { $0.status = "ok" }
+        XCTAssertEqual(syncAutoActe(&c).map { "\($0.key):\($0.r)" }, ["ap:removed"])
+        XCTAssertEqual(c.n("ap").status, "")
+        c.n("ao") { $0.inPV = true }
+        c.modificaAct("lfd") { $0.status = "ok" }; c.modificaAct("comisie") { $0.status = "ok" }
+        XCTAssertEqual(syncAutoActe(&c).map { "\($0.key):\($0.r)" }, ["ao:kept"])
+        XCTAssertEqual(c.n("ao").status, "nok")
+        XCTAssertEqual(neregulaLabel(c.n("ao")), "Nu a prezentat acte de autoritate / evidențe")
+        XCTAssertEqual(neregulaLabel(c.n("ap")), "Lipsă controale proprii")
+        XCTAssertEqual(neregulaLabel(c.n("aq")), "Lipsă analiză semestrială")
+    }
+
+    func testV125ActNouAscensorRandulAn() {
+        let c = newControl(start: "2026-10-01")
+        XCTAssertTrue(acteOf(c).contains { $0.key == "fumat" })
+        XCTAssertEqual(acteOf(c)[2].label, "Dispoziție de reglementare a fumatului")
+        XCTAssertTrue(dotariVizibile(c, c.constructii[0]).contains { $0.key == "ascensor" })
+        XCTAssertEqual(K.dotari.first { $0.key == "ascensor" }?.opts, ["DA", "NU"])
+        XCTAssertTrue(isApplicable(c, c.n("an")))
+        XCTAssertEqual(neregulaLabel(c.n("an")), "Chepengul / ușa de acces în pod nu este RF 30 / 45 minute")
+        XCTAssertEqual(sablon("an")?.cat, "electric")
+        var x = newControl(start: "2025-05-01").o
+        x["dataIncheiere"] = "2025-05-02"; x["catalog"] = 11; x["schema"] = 11
+        let vechi = normalizeControl(x)
+        XCTAssertFalse(acteOf(vechi).contains { $0.key == "fumat" })
+        XCTAssertEqual(controlStats(vechi).acteTotal, K.acte.count - 1)
+        XCTAssertFalse(dotariVizibile(vechi, vechi.constructii[0]).contains { $0.key == "ascensor" })
+        for k in ["an", "ao", "ap", "aq"] { XCTAssertFalse(isApplicable(vechi, vechi.n(k)), k) }
+    }
+
+    func testV125MigrareaControalelorInDesfasurare() {
+        var deschis = newControl(start: "2026-09-01")
+        deschis.o["schema"] = 11
+        deschis.modificaAct("analiza") { $0.status = "nok" }; deschis.modificaAct("lfd") { $0.status = "nok" }
+        var d = normalizeControl(deschis.o)
+        XCTAssertEqual(d.n("aq").status, "nok"); XCTAssertEqual(d.n("ao").status, "nok")
+        XCTAssertEqual(d.o["schema"], 12)
+        d.n("aq") { $0.status = "ok" }
+        XCTAssertEqual(normalizeControl(d.o).n("aq").status, "ok")   // o singură dată
+        var inc = deschis.o
+        inc["dataIncheiere"] = "2026-09-02"; inc["catalog"] = 11
+        var i = normalizeControl(inc)
+        XCTAssertEqual(i.n("aq").status, ""); XCTAssertEqual(i.o["schema"], 11)
+        // redeschis acum: primește regulile noi la salvare (fixeazaCatalog), fără reîncărcare
+        i.dataIncheiere = ""
+        fixeazaCatalog(&i)
+        XCTAssertFalse(i.o.contine("catalog"))
+        XCTAssertEqual(i.n("aq").status, "nok"); XCTAssertEqual(i.n("ao").status, "nok")
+        XCTAssertEqual(i.o["schema"], 12)
+        XCTAssertFalse(migreazaDeschis(&i))
+    }
+
+    func testV125IluminatHintAscuns() {
+        var c = newControl(start: "2026-10-01")
+        XCTAssertEqual(K.dotari.first { $0.key == "ilumHint" }?.opts, ["DA", "NU", "NEC"])
+        c.dot(0, "ilumHint", v: "NU")
+        XCTAssertEqual(syncAutoNU(&c, "ilumHint"), .added)
+        c.dot(0, "hidInt", v: "NEC")
+        XCTAssertTrue(ilumHintAscuns(c, c.constructii[0]))
+        XCTAssertFalse(dotariVizibile(c, c.constructii[0]).contains { $0.key == "ilumHint" })
+        XCTAssertEqual(valDotare(c, c.constructii[0], "ilumHint"), "")
+        XCTAssertEqual(syncAutoNU(&c, "ilumHint"), .removed)
+        c.dot(0, "hidInt", v: "NU")
+        XCTAssertTrue(ilumHintAscuns(c, c.constructii[0]))
+        c.dot(0, "hidInt", v: "DA")
+        XCTAssertFalse(ilumHintAscuns(c, c.constructii[0]))
+        XCTAssertEqual(valDotare(c, c.constructii[0], "ilumHint"), "NU")
+        var x = newControl(start: "2025-05-01").o
+        x["dataIncheiere"] = "2025-05-02"; x["catalog"] = 11
+        var vechi = normalizeControl(x)
+        vechi.dot(0, "hidInt", v: "NEC"); vechi.dot(0, "ilumHint", v: "NU")
+        XCTAssertFalse(ilumHintAscuns(vechi, vechi.constructii[0]))
+    }
+
+    func testV125CentraleleTermice() {
+        var c = normalizeControl(obiect([("id", "x"), ("objectiveId", "o"), ("dataInceput", "2026-10-01"),
+            ("constructii", [["id": "k1", "denumire": "Corp A", "dotari": ["centrala": ["tipuri": ["GAZOS"], "nuAre": false, "obs": ""]]],
+                             ["id": "k2", "denumire": "Corp B", "dotari": ["centrala": ["tipuri": [], "nuAre": true, "obs": ""]]],
+                             ["id": "k3", "denumire": "Corp C", "dotari": [:]]]),
+            ("nereguli", [["key": "b3", "verificari": ["k1": ["data": "2025-01-10"]]]])]))
+        XCTAssertEqual(centraleOf(c.constructii[0]).map(\.o), [JSObiect([("id", "ct1"), ("tipuri", ["GAZOS"])])])
+        XCTAssertTrue(centraleOf(c.constructii[1]).isEmpty && centraleOf(c.constructii[2]).isEmpty)
+        XCTAssertTrue(areCentrala(c.constructii[0]) && !areCentrala(c.constructii[1]) && !areCentrala(c.constructii[2]))
+        c.modificaConstructie(0) { $0.modificaDotare("centrala") { $0.ct = $0.ct + [Centrala(JSObiect([("id", "ctx"), ("tipuri", ["SOLID"])]))] } }
+        let u = verifUnitati(c, c.n("b3"))
+        XCTAssertEqual(u.map { "\($0.id)|\($0.denumire)" }, ["k1:ct1|Corp A – CT 1", "k1:ctx|Corp A – CT 2", "k3|Corp C"])
+        XCTAssertEqual(verifStare(c, c.n("b3"), u[0]).data, "2025-01-10")
+        XCTAssertEqual(verifStare(c, c.n("b3"), u[1]).stare, "lipsa")
+        c.n("g") { $0.status = "nok"; $0.constructieIds = ["k1"]; $0.ctIds = ["k1:ctx"] }
+        XCTAssertEqual(centraleAlese(c, c.n("g")).map(\.id), ["k1:ctx"])
+        XCTAssertEqual(constructiiNume(c, c.n("g")), "Corp A – CT 2")
+        c.n("g") { $0.ctIds = nil }
+        XCTAssertEqual(constructiiNume(c, c.n("g")), "Corp A")
+        var x = c.o
+        x["dataIncheiere"] = "2026-10-02"; x["catalog"] = 11
+        let vechi = normalizeControl(x)
+        XCTAssertEqual(verifUnitati(vechi, vechi.n("b3")).map(\.id), ["k1", "k2", "k3"])
+    }
+
+    func testV125DeIntrebatParticipantObservatii() {
+        var c = newControl(denumire: "X", start: "2026-10-01")
+        XCTAssertEqual(c.o["deIntrebat"], [])
+        XCTAssertEqual(c.persoanaParticipanta, ""); XCTAssertEqual(c.observatiiGenerale, "")
+        c.o["deIntrebat"] = [["id": "q1", "text": "Cere\ncontractul", "gata": false], ["id": "q2", "text": "Gata", "gata": true], ["id": "q3", "text": "  ", "gata": false]]
+        let t = todoList(c).filter { $0.id.hasPrefix("intreb-") }
+        XCTAssertEqual(t.map { [$0.id, $0.text, $0.tab, $0.focus] }, [["intreb-q1", "De întrebat: Cere; contractul", "obiectiv", "sec-intrebari"]])
+        let n = normalizeControl(obiect([("id", "x"), ("objectiveId", "o"), ("dataInceput", "2026-10-01"),
+            ("deIntrebat", [["text": "a"], .null, ["id": "z", "text": "b", "gata": 1]])]))
+        XCTAssertEqual(n.o["deIntrebat"], [["text": "a", "id": "q1", "gata": false], ["id": "z", "text": "b", "gata": true]])
+        c.persoanaParticipanta = "Ana Pop"
+        XCTAssertTrue(matchControl(c, "ana pop"))
+        let a = c
+        c.o["deIntrebat"] = [["id": "q1", "text": "Cere\ncontractul", "gata": true]]
+        XCTAssertEqual(schimbare(a, c).focus, "sec-intrebari")
+    }
+
+    func testV125NereguaVecheDoarControlulAnterior() {
+        var c1 = newControl(denumire: "X", start: "2025-01-10")
+        var c2 = newControl(objectiveId: c1.objectiveId, denumire: "X", start: "2026-01-10")
+        var c3 = newControl(objectiveId: c1.objectiveId, denumire: "X", start: "2026-10-10")
+        c1.n("d") { $0.status = "nok" }
+        c3.n("d") { $0.status = "nok" }
+        XCTAssertFalse(vecheInfo([c1, c2, c3], c3, c3.n("d")).veche)
+        c2.n("d") { $0.status = "nok" }
+        XCTAssertEqual(vecheInfo([c1, c2, c3], c3, c3.n("d")).auto?.id, c2.id)
+    }
+
+    func testV125CoordonateleScriseDeMana() {
+        func p(_ t: String) -> [Double]? { parseCoord(t).map { [$0.lat, $0.lon] } }
+        XCTAssertEqual(p("44.426800, 26.102500"), [44.4268, 26.1025])
+        XCTAssertEqual(p("44,4268 26,1025"), [44.4268, 26.1025])
+        XCTAssertEqual(p("44.4268;26.1025"), [44.4268, 26.1025])
+        XCTAssertEqual(p("-33.8688, 151.2093"), [-33.8688, 151.2093])
+        XCTAssertEqual(p("44°25′36″ N 26°6′9″ E"), [44.426667, 26.1025])
+        XCTAssertEqual(p("44° 25' 36\" N, 26° 6' 9\" E"), [44.426667, 26.1025])
+        XCTAssertEqual(p("26°6′9″ E 44°25′36″ N"), [44.426667, 26.1025])
+        XCTAssertEqual(p("33°52′ S 151°12′ E"), [-33.866667, 151.2])
+        for x in ["", "abc", "44.4268", "95.1, 26.1", "44.1, 190.2", "44,4268,26,1025", "44° N"] { XCTAssertNil(parseCoord(x), x) }
+        XCTAssertEqual(gpsQuality(nil), "manual")
+        XCTAssertTrue(gpsEgal(gpsTest(1, 2, 5, ""), gpsTest(1, 2, 9, "")))
+        XCTAssertFalse(gpsEgal(nil, gpsTest(1, 2, 5, "")) || gpsEgal(gpsTest(1, 2, 5, ""), gpsTest(1, 3, 5, "")))
     }
 }

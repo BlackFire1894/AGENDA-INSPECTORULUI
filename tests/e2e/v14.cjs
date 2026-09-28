@@ -11,18 +11,18 @@ const catsAll = async (p) => { if (!(await p.locator('[data-act="cats-all"]').co
     p.on('pageerror', (e) => errs.push(e.message));
     await p.goto('http://localhost:8080/'); await p.waitForTimeout(300);
     await p.click('.welcome [data-act="demo-load"]'); await p.waitForTimeout(300);
-    // 5. Panou arată seria amenzii
-    ok((await p.locator('#sec-fines').innerText()).includes('Amenda Seria DB nr. 0012345'), 'Panou: seria și nr. amenzii');
+    // 5. Panou: amenda fără serie (v1.25)
+    { const t = await p.locator('#sec-fines').innerText(); ok(/Școala/.test(t) && !/Seria/.test(t), 'Panou: amenzile, fără serie'); }
     // 1. acte noi
     await p.goto('http://localhost:8080/#/istoric'); await p.fill('[data-search="hist"]', 'Spitalul'); await p.waitForTimeout(200);
     await p.click('#hist-list .ctl-row'); await p.waitForTimeout(300);
     const id = p.url().split('/')[5];
     await p.goto(`http://localhost:8080/#/control/${id}/acte`); await p.waitForTimeout(300);
     const acte = await p.locator('.check-row .row-label').allInnerTexts();
-    ok(acte.length === 14 && acte.includes('Exerciții efectuate') && acte.includes('Rapoarte exerciții'), `acte: ${acte.length} rânduri, cu exercițiile`);
+    ok(acte.length === 15 && acte.includes('Dispoziție de reglementare a fumatului') && acte.includes('Exerciții efectuate') && acte.includes('Rapoarte exerciții'), `acte: ${acte.length} rânduri, cu exercițiile`);
     // 4. observații: câmpul gol nu apare — „+ Obs.” îl deschide; Enter = rând nou, lățime constantă, crește în jos
     const lipsaN = await p.locator('.act-row.is-nok').count();   // la Lipsă, câmpul e deschis din start
-    ok(await p.locator('.act-row textarea.row-obs').count() === lipsaN && await p.locator('.act-row [data-act="obs-open"]').count() === 14 - lipsaN, `acte: câmp gol doar la Lipsă (${lipsaN}); restul „+ Obs.”`);
+    ok(await p.locator('.act-row textarea.row-obs').count() === lipsaN && await p.locator('.act-row [data-act="obs-open"]').count() === 15 - lipsaN, `acte: câmp gol doar la Lipsă (${lipsaN}); restul „+ Obs.”`);
     await p.click('.act-row >> nth=0 >> [data-act="obs-open"]'); await p.waitForTimeout(250);
     ok(await p.evaluate(() => document.activeElement.tagName) === 'TEXTAREA', '„+ Obs.” deschide și focalizează câmpul');
     const ta = p.locator('.check-row >> nth=0 >> textarea.row-obs');
@@ -63,12 +63,9 @@ const catsAll = async (p) => { if (!(await p.locator('[data-act="cats-all"]').co
     await p.click('#ner-o .constr-opt >> nth=1'); await p.click('#ner-o .constr-opt >> nth=0'); await p.waitForTimeout(800);
     await p.reload(); await p.waitForTimeout(400);
     ok(/Construcția\s+Ambulatoriu/.test(await p.locator('#ner-o .constr-sel-btn').innerText()), 'construcția aleasă se salvează');
-    // 5. seria și nr. în amendă
-    ok(await p.locator('#ner-q [data-bind$=".amenda.serieNr"]').inputValue() === 'DB 0012377', 'un singur câmp „Seria și nr.”: DB 0012377');
-    await p.fill('#ner-q [data-bind$=".amenda.serieNr"]', 'DB 0099999'); await p.waitForTimeout(500);
-    await p.reload(); await p.waitForTimeout(400);
-    ok(await p.locator('#ner-q [data-bind$=".amenda.serieNr"]').inputValue() === 'DB 0099999' && /Seria DB nr\. 0099999/.test(await p.locator('#ner-q .fine-status').innerText()), 'seria și nr. salvate, afișate „Seria DB nr. 0099999”');
-    ok((await p.locator('#ner-q .fine-status b').innerText()).includes('Seria DB nr. 0099999'), 'seria/nr. afișate în caseta amenzii');
+    // 5. amenda: fără câmpul seriei (v1.25); caseta arată doar starea
+    ok(await p.locator('#ner-q [data-bind$=".amenda.serieNr"]').count() === 0 && await p.locator('#ner-q .fine-box').count() === 1, 'amenda fără câmpul seriei');
+    ok(!/Seria/.test(await p.locator('#ner-q .fine-status').innerText()), 'caseta amenzii nu arată seria');
     // 3. categorii pliabile
     const cats = await p.locator('.cat-title').count();
     await p.click('.cat-title >> nth=0'); await p.waitForTimeout(200);

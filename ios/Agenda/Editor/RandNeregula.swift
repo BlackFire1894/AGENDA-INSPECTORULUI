@@ -273,9 +273,16 @@ struct VerificareVedere: View {
                     }
                     .font(.system(size: 0.8611 * rem, weight: .bold))
                     .foregroundStyle(r.stare == "expirata" ? Color.warnInk : r.stare == "valabila" ? Color.greenInk : Color.muted)
+                    // de la al doilea rând: aceeași dată (și periodicitate) ca primul; din nou = se golește
+                    if let ca = r.caPrima {
+                        BifaActiune(text: ca.text, activ: ca.activ, mic: true) { ses.click("verif-ca-prima", ["key": m.key, "id": r.id]) }
+                    }
                 }
                 .padding(.top, i == 0 ? 0.3333 * rem : 0.5556 * rem)
                 .overlay(alignment: .top) { if i > 0 { Rectangle().fill(Color.line).frame(height: 1) } }
+            }
+            if let g = m.gol {
+                Text(g).font(.system(size: 0.8611 * rem)).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
             }
             if let p = m.propunere {
                 FlexWrap(spatiu: 0.7778 * rem, spatiuRanduri: 0.5556 * rem) {
@@ -344,6 +351,19 @@ struct ConstrSelectVedere: View {
                         }
                         .buttonStyle(.plain)
                         .accessibilityAddTraits(o.ales ? .isSelected : [])
+                        // rândurile pe centrală termică: centralele din construcția aleasă (nicio alegere = toate)
+                        if !o.centrale.isEmpty {
+                            FlowLayout(spatiu: 0.3333 * rem) {
+                                Text("Centralele:").font(.system(size: 0.8333 * rem, weight: .bold)).foregroundStyle(Color.muted)
+                                    .frame(minHeight: tinta(2.4444 * rem))
+                                ForEach(o.centrale, id: \.id) { ct in
+                                    Cip(text: ct.text, ales: ct.ales) { ses.click("ct-opt", ["key": m.key, "id": ct.id]) }
+                                }
+                                Text("nicio alegere = toate").font(.system(size: 0.7778 * rem)).foregroundStyle(Color.muted)
+                                    .frame(minHeight: tinta(2.4444 * rem))
+                            }
+                            .padding(.leading, 2.8889 * rem).padding(.bottom, 0.2222 * rem)
+                        }
                     }
                     if let n = m.nota {
                         HStack(spacing: 0.3889 * rem) {
@@ -450,7 +470,6 @@ struct CasetaAmenda: View {
                 .fixedSize(horizontal: false, vertical: true)
             }
             GrilaCampuri(coloane: lat ? 3 : 2) {
-                CampText(m: m.serie, fundal: .surface)
                 VStack(alignment: .leading, spacing: 0.3889 * rem) {
                     Eticheta(text: m.data.eticheta)
                     CampData(valoare: m.data.valoare, eticheta: m.data.eticheta, fundal: .surface) { ses.data(m.data.cale, $0) }

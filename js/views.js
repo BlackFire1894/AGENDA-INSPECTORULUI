@@ -7,7 +7,7 @@ import {
 import {
   objectives, allFines, allAsi, isIncheiat, byStartDesc, controlStats, matchControl, fold,
   neregulaLetter, fineStatus, asiDeadline, controlRange, activeNereguli, tabOfNeregula,
-  constructiiNume, secOf, amendaSerieNr, vecheInfo, constatareLabel, isApplicable, fmtCoord, googleMapsUrl, appleMapsUrl,
+  constructiiNume, secOf, vecheInfo, constatareLabel, isApplicable, fmtCoord, googleMapsUrl, appleMapsUrl,
   incarcareStatus, LIPSA_INCARCARE,
   parseSuma, isGrav, sigiliiControl, sigiliiText, adaposturiStats, adaposturiText,
 } from './model.js';
@@ -237,7 +237,6 @@ export function viewDashboard() {
       <span class="item-main">
         <span class="item-title">${esc(c.denumire || 'Obiectiv fără denumire')}</span>
         <span class="item-sub">${esc(neregulaLetter(c, n))}. ${esc(constatareLabel(n))}${c.constructii.length > 1 && secOf(n) === 'ner' ? ` · ${esc(constructiiNume(c, n))}` : ''}</span>
-        ${amendaSerieNr(n.amenda) ? `<span class="item-sub">Amenda ${esc(amendaSerieNr(n.amenda))}</span>` : ''}
         <span class="item-msg">${esc(st.msg)}</span>
         ${st.nelucr ? `<span class="item-warn">⚠ ${esc(st.nelucr)}</span>` : ''}
         ${vecheInfo(state.controls, c, n).veche ? `<span class="item-veche">${icon('history')} Neregulă veche</span>` : ''}

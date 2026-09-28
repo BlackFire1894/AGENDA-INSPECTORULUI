@@ -185,6 +185,107 @@ struct FereastraLocalizare: View {
     }
 }
 
+// ───────── Poziția nu a putut fi aflată ─────────
+/// iPad-ul fără cartelă SIM nu are GPS (se orientează doar după rețelele Wi-Fi din jur, pe care pe teren nu le găsește);
+/// telefonul are GPS, dar în interior semnalul poate lipsi. Variantele, cu introducerea de mână.
+struct FereastraFaraPozitie: View {
+    @Environment(Interfata.self) private var ui
+    @Environment(\.rem) private var rem
+    let timp: Bool
+    let reincearca: () -> Void
+    let deMana: () -> Void
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            TitluFereastra(iconita: "locate", text: timp ? "Nu s-a găsit semnal la timp" : "Poziția nu a putut fi aflată")
+            VStack(alignment: .leading, spacing: rem) {
+                Text(dsp("Un iPad fără cartelă SIM nu are GPS: își află poziția doar după rețelele Wi-Fi din jur, pe care pe teren de obicei nu le găsește. Hotspotul telefonului îi dă internet, nu și poziția.",
+                         "Telefonul are GPS, dar în interior semnalul poate lipsi."))
+                    .font(.system(size: 1.0556 * rem)).fixedSize(horizontal: false, vertical: true)
+                VStack(alignment: .leading, spacing: 0.5556 * rem) {
+                    pas(1, "**Introduceți coordonatele de mână**, de ex. din aplicația Busolă a telefonului (le arată și fără internet).")
+                    if UIDevice.current.userInterfaceIdiom != .phone {
+                        pas(2, "Un **receptor GPS prin Bluetooth** (ex. Garmin GLO 2, Bad Elf): iPad-ul îl folosește automat.")
+                        pas(3, "Încercați din nou lângă o clădire cu rețele Wi-Fi.")
+                    } else {
+                        pas(2, "Ieșiți în aer liber sau lângă o fereastră și încercați din nou.")
+                    }
+                }
+            }
+            .foregroundStyle(Color.text)
+            .padding(EdgeInsets(top: 0.5556 * rem, leading: 1.4444 * rem, bottom: 1.3333 * rem, trailing: 1.4444 * rem))
+            SubsolFereastra {
+                Buton(text: "Încearcă din nou", iconita: "locate") { reincearca() }
+                Buton(text: "Introdu coordonatele", iconita: "pin", tip: .primar) { deMana() }
+            }
+        }
+    }
+
+    private func pas(_ n: Int, _ t: String) -> some View {
+        HStack(alignment: .firstTextBaseline, spacing: 0.5556 * rem) {
+            Text("\(n).").bold()
+            textBogat(t).fixedSize(horizontal: false, vertical: true)
+        }
+        .font(.system(size: rem))
+        .lineSpacing(0.2 * rem)
+    }
+}
+
+// ───────── Introduceți coordonatele ─────────
+/// Coordonatele scrise de mână (sau lipite): „44.426800, 26.102500” sau formatul Busolei (44°25′36″ N 26°6′9″ E)
+struct FereastraCoordonate: View {
+    @Environment(Interfata.self) private var ui
+    @Environment(\.rem) private var rem
+    let nume: String
+    let initial: String
+    /// false = nerecunoscute (fereastra rămâne deschisă, cu mesajul)
+    let salveaza: (String) -> Bool
+    @State private var text = ""
+    @State private var eroare = false
+    @FocusState private var focus: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            TitluFereastra(iconita: "pin", text: "Introduceți coordonatele")
+            VStack(alignment: .leading, spacing: 0.6667 * rem) {
+                VStack(alignment: .leading, spacing: 0.3889 * rem) {
+                    Eticheta(text: "\(nume): latitudinea și longitudinea, în grade")
+                    CadruCamp(activ: focus, avertizare: eroare) {
+                        TextField("", text: $text, prompt: Text("ex: 44.426800, 26.102500").foregroundStyle(Color.muted.opacity(0.7)))
+                            .font(.system(size: max(16, 1.0556 * rem)).monospacedDigit())
+                            .textInputAutocapitalization(.never).autocorrectionDisabled()
+                            .keyboardType(.numbersAndPunctuation)
+                            .submitLabel(.done)
+                            .focused($focus)
+                            .onSubmit { trimite() }
+                            .onChange(of: text) { eroare = false }
+                            .padding(.horizontal, 0.8889 * rem)
+                            .frame(minHeight: tinta(3 * rem) - 4)
+                    }
+                }
+                Text("Se acceptă și formatul din aplicația Busolă a telefonului (44°25′36″ N 26°6′9″ E), care arată coordonatele și fără internet.")
+                    .font(.system(size: 0.8056 * rem)).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
+                if eroare {
+                    HStack(alignment: .top, spacing: 0.3333 * rem) {
+                        Iconita(nume: "alert", marime: 1.1111 * rem)
+                        Text("Coordonate nerecunoscute. Scrieți latitudinea și longitudinea, ex: 44.426800, 26.102500.").fixedSize(horizontal: false, vertical: true)
+                    }
+                    .font(.system(size: 0.8889 * rem, weight: .semibold)).foregroundStyle(Color.red)
+                }
+            }
+            .foregroundStyle(Color.text)
+            .padding(EdgeInsets(top: 0.5556 * rem, leading: 1.4444 * rem, bottom: 1.3333 * rem, trailing: 1.4444 * rem))
+            SubsolFereastra {
+                Buton(text: "Renunță") { ui.inchide() }
+                Buton(text: "Salvează", iconita: "check", tip: .primar) { trimite() }
+            }
+        }
+        .onAppear { text = initial; DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) { focus = true } }
+    }
+
+    private func trimite() { if !salveaza(text) { eroare = true } }
+}
+
 // ───────── Control nou ─────────
 struct FereastraControlNou: View {
     @Environment(Interfata.self) private var ui

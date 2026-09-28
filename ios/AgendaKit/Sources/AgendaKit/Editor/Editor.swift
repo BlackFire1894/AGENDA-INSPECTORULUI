@@ -101,6 +101,8 @@ public struct RezultatPas: Equatable, Sendable {
     public var copiaza: String?
     /// poziția trebuie citită pentru construcția cu acest id (apoi `gpsPreluat` / `gpsEsuat`)
     public var cereGps: String?
+    /// fereastra „Introduceți coordonatele” pentru construcția cu acest id (apoi `gpsIntrodus`)
+    public var cereCoordonate: String?
     /// s-a schimbat tabul (derulare la început)
     public var tabNou = false
 
@@ -238,6 +240,8 @@ public final class Editor {
         if let m = bind.grupeRegex("\\.dotari\\.([A-Za-z0-9_]+)\\.obs$"), K.autoNUCheie(m[1]) != nil {
             _ = syncAutoNU(&c, m[1], obsOnly: true)
         }
+        // observațiile unui act lipsă intră în observațiile neregulii lui (ao / ap / aq)
+        if bind.potrivesteRegex("^acte\\.[A-Za-z0-9_]+\\.obs$") { syncAutoActe(&c, obsOnly: true) }
         atinge(&c, acum: false, &r)
         return r
     }
@@ -325,7 +329,7 @@ public final class Editor {
 
         case "rows-collapse", "rows-expand":
             if d["sec"] == "acte" {
-                for a in K.acte {
+                for a in acteOf(c) {
                     let k = "\(c.id)|act:\(a.key)"
                     if act == "rows-expand" { ui.rowCollapsed.sterge(k) } else if !c.act(a.key).status.isEmpty { ui.rowCollapsed.adauga(k) }
                 }
@@ -345,13 +349,38 @@ public final class Editor {
                 n.verificari = v
             }
 
+        case "verif-ca-prima":
+            // aceeași dată (și periodicitate) ca la primul rând de verificare; din nou = se golește
+            guard let key = d["key"], let n = c.neregula(key) else { return r }
+            let list = verifUnitati(c, n)
+            guard let u = list.first(where: { $0.id == d["id"] }), let u0 = list.first else { return r }
+            let p = verifStare(c, n, u0), st = verifStare(c, n, u)
+            // periodicitatea se copiază doar unde se alege (b2: 12 / 24 de luni)
+            let alegeri = sablon(key)?.verifAlegeri != nil
+            c.modificaNeregula(key) { n in
+                var v = n.verificari
+                var x = v[u.id]?.obiect ?? JSObiect()
+                if st.data == p.data && st.luni == p.luni {
+                    x["data"] = ""
+                } else {
+                    x["data"] = .string(p.data)
+                    if alegeri { x["luni"] = .number(Double(p.luni)) }
+                }
+                v[u.id] = .object(x)
+                n.verificari = v
+            }
+
         case "verif-nok":
-            // „tu decizi”: constată neregula pentru construcțiile cu verificarea expirată
+            // „tu decizi”: constată neregula pentru construcțiile (centralele) cu verificarea expirată
             guard let key = d["key"], let n = c.neregula(key) else { return r }
             let exp = verifExpirate(c, n)
+            var kids: [String] = []
+            for u in exp where !kids.contains(u.k.id) { kids.append(u.k.id) }
+            let cts = exp.filter { $0.ct != nil }.map(\.id)
             c.modificaNeregula(key) { n in
                 n.status = "nok"
-                n.constructieIds = exp.map(\.id)
+                n.constructieIds = kids
+                n.ctIds = cts.isEmpty ? nil : cts
             }
             atinge(&c, acum: true, &r)
             r.mesaje.append(MesajEditor("\(key): constatat pentru \(exp.map(\.denumire).joined(separator: ", "))", "ok", .anuleazaPas))
@@ -382,7 +411,23 @@ public final class Editor {
                 r.mesaje.append(mesajGravGrf(c, Constructie(o)))
                 return r
             }
+            // act lipsă → neregulile ao / ap / aq se constată (sau se retrag) automat
+            if path.potrivesteRegex("^acte\\.[A-Za-z0-9_]+\\.status$"), let prim = syncAutoActe(&c).first {
+                let key = prim.key, rez = prim.r
+                atinge(&c, acum: true, &r)
+                let lbl = c.neregula(key).map(neregulaLabel) ?? ""
+                let vezi = ActiuneMesaj.vezi(tab: "nereguli", focus: key)
+                switch rez {
+                case .added: r.mesaje.append(MesajEditor("Neregulă trecută automat (\(key)): \(lbl)", "warn", vezi))
+                case .updated: r.mesaje.append(MesajEditor("Neregula \(key) actualizată din tabul Acte", "ok", vezi))
+                case .removed: r.mesaje.append(MesajEditor("Neregula \(key) a fost retrasă (niciun act „Lipsă”)"))
+                case .kept: r.mesaje.append(MesajEditor("Neregula \(key) rămâne constatată: are date completate. Verificați-o.", "warn", vezi))
+                }
+                return r
+            }
             let mDot = path.grupeRegex("\\.dotari\\.([A-Za-z0-9_]+)\\.v$")
+            // fără hidranți interiori (NU / NEC), iluminatul Hint nu se mai verifică: „Lipsă iluminat Hint” se recalculează
+            if mDot?[1] == "hidInt" { syncAutoNU(&c, "ilumHint") }
             // NU la ASI / AVIZ / iluminat → neregula ah / ai / am se constată automat, cu observațiile din dotări
             if let dot = mDot?[1], let key = K.autoNUCheie(dot) {
                 let rez = syncAutoNU(&c, dot)
@@ -427,17 +472,64 @@ public final class Editor {
             }
 
         case "centrala":
-            modificaLaCale(&c.o, d["path"] ?? "") { o in
-                var x = Dotare(o)
-                if val == "NU_ARE" {
-                    x.nuAre = !(o["nuAre"]?.truthy ?? false)
-                    if x.nuAre { x.tipuri = [] }
-                } else {
-                    x.nuAre = false
-                    x.tipuri = x.tipuri.contains(val) ? x.tipuri.filter { $0 != val } : x.tipuri + [val]
-                }
-                o = x.o
+            let path = d["path"] ?? ""
+            guard var o = valoareLaCale(c.o, path)?.obiect else { return r }
+            if !(o["ct"]?.truthy ?? false) { o["ct"] = [] }
+            var x = Dotare(o)
+            if val == "NU_ARE" {
+                x.nuAre = !(o["nuAre"]?.truthy ?? false)
+                if x.nuAre { x.tipuri = []; x.ct = [] }
+            } else if let ctId = d["ct"], !ctId.isEmpty {
+                // tipul unei centrale (CT 1, CT 2…); `tipuri` = toate tipurile construcției
+                var l = x.ct
+                guard let i = l.firstIndex(where: { $0.id == ctId }) else { return r }
+                x.nuAre = false
+                l[i].tipuri = l[i].tipuri.contains(val) ? l[i].tipuri.filter { $0 != val } : l[i].tipuri + [val]
+                x.ct = l
+                x.tipuri = tipuriCentrale(l)
+            } else {
+                // nicio centrală declarată: tipul ales creează CT 1
+                x.nuAre = false
+                let l = x.ct + [Centrala(JSObiect([("id", .string("ct\(uid())")), ("tipuri", JSONValue([val]))]))]
+                x.ct = l
+                x.tipuri = tipuriCentrale(l)
             }
+            let nou = x.o
+            modificaLaCale(&c.o, path) { $0 = nou }
+
+        case "ct-count":
+            // câte centrale termice are construcția; ultima se șterge (cu confirmare, dacă are tipul completat)
+            let path = d["path"] ?? ""
+            guard var o = valoareLaCale(c.o, path)?.obiect else { return r }
+            if !(o["ct"]?.truthy ?? false) { o["ct"] = [] }
+            var x = Dotare(o)
+            var l = x.ct
+            if val == "1" {
+                x.nuAre = false
+                l.append(Centrala(JSObiect([("id", .string("ct\(uid())")), ("tipuri", [])])))
+            } else {
+                guard let ultima = l.last else { return r }
+                if !ultima.tipuri.isEmpty {
+                    guard let ok = confirma("Ștergeți CT \(l.count)?", "Centrala termică \(l.count) (\(ultima.tipuri.joined(separator: ", "))) se elimină din această construcție.")
+                    else { return r }
+                    if !ok { return r }
+                }
+                l.removeLast()
+            }
+            x.ct = l
+            x.tipuri = tipuriCentrale(l)
+            let nou = x.o
+            modificaLaCale(&c.o, path) { $0 = nou }
+
+        case "ct-opt":
+            // centralele constatării (rândurile pe CT); nicio centrală aleasă = construcțiile întregi
+            guard let key = d["key"], let n = c.neregula(key) else { return r }
+            var ids = Set(n.ctIds ?? [])
+            let id = d["id"] ?? ""
+            if ids.contains(id) { ids.remove(id) } else { ids.insert(id) }
+            let valid = constructiiOf(c, n).flatMap { k in centraleOf(k).map { "\(k.id):\($0.id)" } }
+            let alese = valid.filter { ids.contains($0) }
+            c.modificaNeregula(key) { $0.ctIds = alese.isEmpty ? nil : alese }
 
         case "start-today": c.dataInceput = azi
         case "end-today": c.dataIncheiere = azi
@@ -455,6 +547,32 @@ public final class Editor {
             else { return r }
             if !ok { return r }
             c.constructii = c.constructii.filter { $0.id != k.id }
+
+        case "constr-up", "constr-down":
+            var l = c.constructii
+            guard let i = l.firstIndex(where: { $0.id == d["id"] }) else { return r }
+            let j = act == "constr-up" ? i - 1 : i + 1
+            guard j >= 0, j < l.count else { return r }
+            l.swapAt(i, j)
+            c.constructii = l
+
+        case "intreb-add":
+            let id = "q\(uid())"
+            c.o["deIntrebat"] = .array(c.o.arr("deIntrebat") + [.object(JSObiect([("id", .string(id)), ("text", ""), ("gata", false)]))])
+            atinge(&c, acum: true, &r)
+            r.focusCamp = "deIntrebat.#\(id).text"
+            return r
+
+        case "intreb-del":
+            var l = c.o.arr("deIntrebat")
+            guard let i = l.firstIndex(where: { $0.obiect?["id"] == .string(d["id"] ?? "") }) else { return r }
+            let t = l[i].obiect?["text"].map { $0.truthy ? $0.textJS : "" }?.trimJS ?? ""
+            if !t.isEmpty {
+                guard let ok = confirma("Ștergeți sarcina?", "„\(t)” se elimină din listă.") else { return r }
+                if !ok { return r }
+            }
+            l.remove(at: i)
+            c.o["deIntrebat"] = .array(l)
 
         case "constr-toggle":
             let id = d["id"] ?? ""
@@ -500,6 +618,16 @@ public final class Editor {
             guard c.constructii.contains(where: { $0.id == d["id"] }), ui.gpsBusy.isEmpty else { return r }
             ui.gpsBusy = d["id"] ?? ""
             r.cereGps = ui.gpsBusy
+            return r
+
+        case "gps-ca-prima":
+            // aceleași coordonate ca la prima construcție (copiate o dată); din nou = se golesc
+            guard let i = c.constructii.firstIndex(where: { $0.id == d["id"] }), i > 0, let pg = c.constructii[0].gps else { return r }
+            c.modificaConstructie(i) { $0.gps = gpsEgal($0.gps, pg) ? nil : pg }
+
+        case "gps-manual":
+            guard c.constructii.contains(where: { $0.id == d["id"] }) else { return r }
+            r.cereCoordonate = d["id"]
             return r
 
         case "gps-copy":
@@ -601,7 +729,7 @@ public final class Editor {
         var chei: [String] = []
         var items: [ModelRestConform.Pereche] = []
         if sec == "acte" {
-            for a in K.acte where c.act(a.key).status.isEmpty {
+            for a in acteOf(c) where c.act(a.key).status.isEmpty {
                 chei.append(a.key)
                 items.append(.init(litera: "", text: a.label))
             }
@@ -703,16 +831,29 @@ public final class Editor {
         return r
     }
 
-    /// Poziția nu s-a putut citi: fără semnal la timp (mesaj) sau localizarea oprită / refuzată (fereastra cu pașii)
-    public func gpsEsuat(timp: Bool) -> RezultatPas {
-        var r = RezultatPas()
+    /// Poziția nu s-a putut citi (fără poziție, fără semnal la timp, localizarea oprită): aplicația arată fereastra potrivită
+    public func gpsEsuat() -> RezultatPas {
         ui.gpsBusy = ""
-        if timp { r.mesaje.append(MesajEditor("Nu s-a găsit semnal la timp. Ieșiți în aer liber sau lângă o fereastră și încercați din nou.", "warn")) }
+        return RezultatPas()
+    }
+
+    /// Coordonatele scrise de mână (sau lipite); nil = nerecunoscute (fereastra arată mesajul și rămâne deschisă)
+    public func gpsIntrodus(_ id: String, _ text: String, _ c: inout Control) -> RezultatPas? {
+        guard let p = parseCoord(text), let i = c.constructii.firstIndex(where: { $0.id == id }) else { return nil }
+        var r = RezultatPas()
+        c.modificaConstructie(i) { k in
+            k.gps = Gps(JSObiect([("lat", .number(p.lat)), ("lon", .number(p.lon)), ("acc", .null), ("la", .string(isoMs())), ("manual", true)]))
+        }
+        atinge(&c, acum: true, &r)
+        r.mesaje.append(MesajEditor("Coordonate salvate (introduse manual)"))
         return r
     }
 }
 
 // ───────── chei de interfață ─────────
+
+/// `tipuri` = toate tipurile centralelor, în ordinea din catalog
+func tipuriCentrale(_ l: [Centrala]) -> [String] { K.centralaTipuri.filter { t in l.contains { $0.tipuri.contains(t) } } }
 
 /// `rowKey(c, n)`
 public func rowKey(_ c: Control, _ n: Neregula) -> String { "\(c.id)|\(n.key)" }

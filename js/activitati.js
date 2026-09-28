@@ -180,8 +180,8 @@ export function raportMarkup(r, controls, now = new Date()) {
   }
   h.push('</section>');
   if (r.amenzi.length || r.amenziFaraData) {
-    h.push(`<section><h2>Amenzi aplicate în lună</h2>${r.amenzi.length ? `<table class="f-table"><thead><tr><th>Data</th><th>Obiectiv</th><th>Seria și nr.</th><th>Suma</th></tr></thead><tbody>
-      ${r.amenzi.sort((a, b) => a.data.localeCompare(b.data)).map((x) => `<tr><td>${esc(fmtDate(x.data))}</td><td>${esc(x.c.denumire || '')}</td><td>${esc(x.n.amenda.serieNr || '—')}</td><td>${x.suma ? esc(lei(x.suma)) : '—'}</td></tr>`).join('')}</tbody></table>` : ''}
+    h.push(`<section><h2>Amenzi aplicate în lună</h2>${r.amenzi.length ? `<table class="f-table"><thead><tr><th>Data</th><th>Obiectiv</th><th>Suma</th></tr></thead><tbody>
+      ${r.amenzi.sort((a, b) => a.data.localeCompare(b.data)).map((x) => `<tr><td>${esc(fmtDate(x.data))}</td><td>${esc(x.c.denumire || '')}</td><td>${x.suma ? esc(lei(x.suma)) : '—'}</td></tr>`).join('')}</tbody></table>` : ''}
       ${r.amenziFaraData ? `<p>+ ${r.amenziFaraData} ${r.amenziFaraData === 1 ? 'amendă' : 'amenzi'} din controale neîncheiate, fără data aplicării (nu sunt numărate mai sus).</p>` : ''}</section>`);
   }
   if (r.anulate.length) h.push(`<section><h2>Activități anulate</h2><ul class="f-list">${r.anulate.map((a) => `<li>${esc(titluActivitate(a))} — ${esc(cand(a))}</li>`).join('')}</ul></section>`);

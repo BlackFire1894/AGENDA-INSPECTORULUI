@@ -1,6 +1,6 @@
 // Set de date cu cazuri-limită, relativ la T = 2026-10-15 (joi). Folosește constructorii aplicației doar pentru structură.
 import fs from 'node:fs';
-import { newControl, emptyNeregula, uid } from '../../js/model.js';
+import { newControl, emptyNeregula, uid, syncAutoActe } from '../../js/model.js';
 export const T = '2026-10-15';
 const day = (iso, n) => { const [y, m, d] = iso.split('-').map(Number); const x = new Date(Date.UTC(y, m - 1, d + n)); return x.toISOString().slice(0, 10); };
 const nok = (c, key, extra = {}) => { const n = c.nereguli.find((x) => x.key === key); n.status = 'nok'; Object.assign(n, extra); if (extra.amenda) n.amenda = { aplicata: true, serieNr: 'DB 1', data: '', suma: '1000', achitata: false, dataAchitare: '', ...extra.amenda }; return n; };
@@ -51,5 +51,7 @@ for (const [nume, inch, ap, doc] of [['Încărcare 3 zile', 0, false, false], ['
 // ASI: pierderea valabilității constatată
 const ap = newControl({ denumire: 'ASI pierdere constatată', start: day(T, -101) }); ap.dataIncheiere = day(T, -100);
 nok(ap, 'a', { asiTermen: true, asiPierdere: true, asiDataPierdere: day(T, -8), inPV: true }); out.push(ap);
+// v1.25: actele lipsă au neregulile lor (ao / ap / aq), ca în aplicație
+for (const c of out) syncAutoActe(c);
 fs.writeFileSync('date.json', JSON.stringify({ app: 'agenda-inspectorului', schema: 10, exportedAt: new Date().toISOString(), controls: out }, null, 1));
 console.log('controale:', out.length);

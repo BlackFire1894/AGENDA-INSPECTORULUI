@@ -3,11 +3,17 @@ import Foundation
 // Portarea din js/demo.js: date demonstrative, relative la ziua de azi, ca să se vadă toate stările.
 // La data din vectori (15.10.2026) rezultatul e identic cu vectori/demo.json (în afară de identificatori).
 
-private func fill(_ k: Constructie, _ base: [(String, JSONValue)], _ dotari: [(String, String)], centrala: [String]? = nil) -> Constructie {
+private func fill(_ k: Constructie, _ base: [(String, JSONValue)], _ dotari: [(String, String)], centrala: [[String]]? = nil) -> Constructie {
     var k = k
     for (key, v) in base { k.o[key] = v }
     for (key, v) in dotari { k.modificaDotare(key) { $0.v = v } }
-    if let centrala { k.modificaDotare("centrala") { $0.tipuri = centrala } }
+    // centralele termice (v1.25): câte una pe fiecare listă de tipuri
+    if let centrala {
+        k.modificaDotare("centrala") { d in
+            d.ct = centrala.enumerated().map { i, t in Centrala(JSObiect([("id", .string("ct\(i + 1)")), ("tipuri", JSONValue(t))])) }
+            d.tipuri = ["SOLID", "GAZOS", "ELECTRIC"].filter { t in centrala.contains { $0.contains(t) } }
+        }
+    }
     return k
 }
 
@@ -37,7 +43,7 @@ public func buildDemo(_ today: String) -> [Control] {
     seteaza(&s1, [("administrator", "Maria Ionescu"), ("telefon", "0721 456 789"), ("email", "secretariat@scoala3.ro"), ("dataIncheiere", addDays(today, -399))])
     s1.constructii = [
         fill(emptyConstructie(1), [("denumire", "Corp A – săli de clasă"), ("suprafata", "1850"), ("regimInaltime", "P+2E"), ("nrAngajati", "42"), ("structura", "Cadre din beton armat"), ("materialPereti", "Cărămidă")],
-             [("asi", "DA"), ("aviz", "DA"), ("hidInt", "DA"), ("hidExt", "NU"), ("idsai", "DA"), ("exit", "DA"), ("desfumare", "NEC"), ("ilumHint", "DA"), ("ipt", "DA")], centrala: ["GAZOS"]),
+             [("asi", "DA"), ("aviz", "DA"), ("hidInt", "DA"), ("hidExt", "NU"), ("idsai", "DA"), ("exit", "DA"), ("desfumare", "NEC"), ("ilumHint", "DA"), ("ipt", "DA")], centrala: [["GAZOS"]]),
         fill(emptyConstructie(2), [("denumire", "Sala de sport"), ("suprafata", "620"), ("regimInaltime", "P"), ("nrAngajati", "3"), ("structura", "Structură metalică"), ("materialPereti", "Panouri sandwich")],
              [("asi", "NU"), ("aviz", "NU"), ("idsai", "NEC"), ("exit", "DA")]),
     ]
@@ -48,7 +54,7 @@ public func buildDemo(_ today: String) -> [Control] {
     var s2 = controlFromPrevious(s1, addDays(today, -42))
     s2.dataIncheiere = addDays(today, -41)
     okAll(&s2, ["fise", "stingatoare"])
-    nok(&s2, "d", [("inPV", true), ("obs", "2 stingătoare expirate, corp A"), ("amenda", ["suma": "2500", "serieNr": "DB 0012345"])])
+    nok(&s2, "d", [("inPV", true), ("obs", "2 stingătoare expirate, corp A"), ("amenda", ["suma": "2500"])])
     let idSala = s2.constructii[1].id
     s2.modificaNeregula("j") { $0.constructieIds = [idSala] }
     nok(&s2, "j", [("inPV", true), ("obs", "Hol etaj 1")])
@@ -59,15 +65,15 @@ public func buildDemo(_ today: String) -> [Control] {
     seteaza(&h, [("administrator", "Dr. Andrei Popa"), ("telefon", "0744 112 233"), ("email", "administrativ@spital-vv.ro"), ("dataIncheiere", addDays(today, -20))])
     h.constructii = [
         fill(emptyConstructie(1), [("denumire", "Pavilion central"), ("suprafata", "6400"), ("regimInaltime", "S+P+4E"), ("nrAngajati", "210"), ("structura", "Beton armat"), ("materialPereti", "BCA")],
-             [("asi", "NU"), ("aviz", "DA"), ("hidInt", "DA"), ("hidExt", "DA"), ("sprinklere", "NEC"), ("idsai", "DA"), ("exit", "DA"), ("desfumare", "DA"), ("rezervaApa", "DA"), ("statiePompe", "DA"), ("acumulatori", "DA"), ("ilumHint", "DA"), ("ipt", "DA")],
-             centrala: ["GAZOS", "ELECTRIC"]),
+             [("asi", "NU"), ("aviz", "DA"), ("hidInt", "DA"), ("hidExt", "DA"), ("sprinklere", "NEC"), ("idsai", "DA"), ("exit", "DA"), ("desfumare", "DA"), ("rezervaApa", "DA"), ("statiePompe", "DA"), ("acumulatori", "DA"), ("ilumHint", "DA"), ("ipt", "DA"), ("ascensor", "DA")],
+             centrala: [["GAZOS"], ["ELECTRIC"]]),
         fill(emptyConstructie(2), [("denumire", "Ambulatoriu"), ("suprafata", "1200"), ("regimInaltime", "P+1E"), ("nrAngajati", "35"), ("structura", "Zidărie portantă"), ("materialPereti", "Cărămidă")],
              [("asi", "DA"), ("hidInt", "DA"), ("idsai", "DA"), ("exit", "NU")]),
     ]
     okAll(&h, ["sezon"])
     nok(&h, "a", [("inPV", true), ("asiTermen", true), ("obs", "Pavilion central")])
     nok(&h, "l", [("inPV", true), ("obs", "Erori zona 3 centrală")])
-    nok(&h, "q", [("inPV", false), ("obs", "Hidrant exterior H2 fără presiune"), ("amenda", ["suma": "5000", "serieNr": "DB 0012377"])])
+    nok(&h, "q", [("inPV", false), ("obs", "Hidrant exterior H2 fără presiune"), ("amenda", ["suma": "5000"])])
     out.append(h)
 
     // 3. Primărie (Localitate) — amendă albastră, o neregulă netrecută în PV
@@ -75,7 +81,7 @@ public func buildDemo(_ today: String) -> [Control] {
     seteaza(&p, [("administrator", "Primar Gheorghe Stan"), ("telefon", "0248 555 010"), ("email", "primaria@valeamare.ro"), ("dataIncheiere", addDays(today, -5))])
     p.modificaConstructie(0) { k in
         k = fill(k, [("denumire", "Sediu primărie"), ("suprafata", "540"), ("regimInaltime", "P+1E"), ("nrAngajati", "24"), ("structura", "Zidărie portantă"), ("materialPereti", "Cărămidă")],
-                 [("asi", "NEC"), ("aviz", "NU"), ("exit", "DA"), ("fotovoltaice", "DA"), ("ipt", "NU")], centrala: ["SOLID"])
+                 [("asi", "NEC"), ("aviz", "NU"), ("exit", "DA"), ("fotovoltaice", "DA"), ("ipt", "NU")], centrala: [["SOLID"]])
     }
     okAll(&p, ["comisie", "contract"])
     nok(&p, "b", [("inPV", true), ("amenda", ["suma": "1500"])])
@@ -99,7 +105,7 @@ public func buildDemo(_ today: String) -> [Control] {
     seteaza(&k, [("administrator", "Ion Radu"), ("telefon", "0766 000 111"), ("dataIncheiere", addDays(today, -60))])
     k.modificaConstructie(0) { x in
         x = fill(x, [("denumire", "Clădire cămin"), ("suprafata", "380"), ("regimInaltime", "P"), ("nrAngajati", "2"), ("structura", "Zidărie portantă"), ("materialPereti", "Cărămidă")],
-                 [("asi", "NU"), ("exit", "DA")], centrala: ["SOLID"])
+                 [("asi", "NU"), ("exit", "DA")], centrala: [["SOLID"]])
     }
     okAll(&k)
     nok(&k, "j", [("inPV", true), ("amenda", ["suma": "1000", "achitata": true, "dataAchitare": .string(addDays(today, -52))])])
@@ -107,7 +113,10 @@ public func buildDemo(_ today: String) -> [Control] {
 
     // 5. Controale neîncheiate
     var g = newControl(tip: "OPEC", denumire: "Grădinița cu Program Prelungit nr. 2", start: addDays(today, -2))
-    seteaza(&g, [("administrator", "Elena Dinu"), ("telefon", "0733 222 444"), ("email", "gpp2@edu.ro")])
+    seteaza(&g, [("administrator", "Elena Dinu"), ("telefon", "0733 222 444"), ("email", "gpp2@edu.ro"), ("persoanaParticipanta", "Ana Stoica, administrator de clădire"),
+                 ("observatiiGenerale", "Acces auto prin curtea din spate. Program cu publicul: 7:00–17:00.")])
+    g.o["deIntrebat"] = [["id": "q1", "text": "Cererea certificatului de verificare IPT (trimis ulterior pe email)", "gata": false],
+                         ["id": "q2", "text": "Verificarea registrului de instruire", "gata": true]]
     g.modificaConstructie(0) { $0.denumire = "Corp principal" }
     out.append(g)
 
@@ -129,6 +138,8 @@ public func buildDemo(_ today: String) -> [Control] {
         for (dot, cheie) in K.autoNU {
             if syncAutoNU(&c, dot) == .added && !c.dataIncheiere.isEmpty { c.modificaNeregula(cheie) { $0.inPV = true } }
         }
+        // actele lipsă → ao / ap / aq (v1.25), ca în aplicație; la controalele încheiate, deja trecute în PV
+        for x in syncAutoActe(&c) where x.r == .added && !c.dataIncheiere.isEmpty { c.modificaNeregula(x.key) { $0.inPV = true } }
         out[i] = c
     }
     return out

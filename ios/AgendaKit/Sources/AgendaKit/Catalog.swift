@@ -15,7 +15,7 @@ public final class Catalog: @unchecked Sendable {
     public let tipObiectiv: [(key: String, label: String)]
     public let dotari: [DotareSablon]
     public let centralaTipuri: [String]
-    public let acte: [(key: String, label: String)]
+    public let acte: [ActSablon]
     public let categorii: [(key: String, label: String)]
     public let sectiuni: [Sectiune]
     public let sablon: [RandSablon]
@@ -53,7 +53,7 @@ public final class Catalog: @unchecked Sendable {
         tipObiectiv = o.arr("tipObiectiv").map(perechi)
         dotari = o.arr("dotari").map { DotareSablon($0.obiect ?? JSObiect()) }
         centralaTipuri = o.strs("centralaTipuri")
-        acte = o.arr("acte").map(perechi)
+        acte = o.arr("acte").map { ActSablon($0.obiect ?? JSObiect()) }
         categorii = harta(o.obj("categorii"))
         sectiuni = o.obj("sectiuni").map { Sectiune(key: $0.key, $0.value.obiect ?? JSObiect()) }
         sablon = o.arr("sablon").map { RandSablon($0.obiect ?? JSObiect()) }
@@ -105,11 +105,22 @@ public struct DotareSablon: Sendable {
     public let opts: [String]
     public let nr: String?
     public let centrala: Bool
+    /// versiunea (schema) de la care există (v1.25: ascensor); controalele încheiate înainte nu o au
+    public let din: Int?
     init(_ o: JSObiect) {
         key = o.str("key"); label = o.str("label"); opts = o.strs("opts")
         nr = o.contine("nr") ? o.str("nr") : nil
         centrala = o.bool("centrala")
+        din = o.int("din")
     }
+}
+
+/// Un act de autoritate / evidență (tabul Acte)
+public struct ActSablon: Sendable {
+    public let key: String, label: String
+    /// versiunea (schema) de la care există (v1.25: „fumat”)
+    public let din: Int?
+    init(_ o: JSObiect) { key = o.str("key"); label = o.str("label"); din = o.int("din") }
 }
 
 public struct Sectiune: Sendable {
@@ -137,6 +148,10 @@ public struct RandSablon: Sendable {
     public let asi: Bool
     public let verif: Int?
     public let verifAlegeri: [Int]?
+    /// v1.25: pe fiecare centrală termică (b3, g, h)
+    public let perCT: Bool
+    /// v1.25: neregula actelor lipsă: „grup” (ao) sau cheia actului (ap: „controale”, aq: „analiza”)
+    public let autoActe: String?
 
     init(_ o: JSObiect) {
         key = o.str("key"); cat = o.str("cat"); label = o.str("label"); sec = o.str("sec")
@@ -152,5 +167,7 @@ public struct RandSablon: Sendable {
         asi = o.bool("asi")
         verif = o.int("verif")
         verifAlegeri = o.contine("verifAlegeri") ? o.arr("verifAlegeri").compactMap { $0.numar.map { Int($0) } } : nil
+        perCT = o.bool("perCT")
+        autoActe = o.contine("autoActe") ? o.str("autoActe") : nil
     }
 }

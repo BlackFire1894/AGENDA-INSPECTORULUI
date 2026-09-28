@@ -1,12 +1,17 @@
 // Date demonstrative, relative la data curentă, ca să se vadă toate stările (se pot șterge din Setări).
 import { addDays } from './dates.js';
 import { emptyActivitate } from './activitati.js';
-import { newControl, controlFromPrevious, emptyConstructie, uid, AUTO_NU, syncAutoNU } from './model.js';
+import { newControl, controlFromPrevious, emptyConstructie, uid, AUTO_NU, syncAutoNU, syncAutoActe } from './model.js';
 
 function fill(k, o) {
   Object.assign(k, o.base || {});
   for (const [key, v] of Object.entries(o.dotari || {})) k.dotari[key].v = v;
-  if (o.centrala) k.dotari.centrala.tipuri = o.centrala;
+  // centralele termice (v1.25): câte una pe fiecare listă de tipuri
+  if (o.centrala) {
+    const ct = Array.isArray(o.centrala[0]) ? o.centrala : [o.centrala];
+    k.dotari.centrala.ct = ct.map((t, i) => ({ id: `ct${i + 1}`, tipuri: [...t] }));
+    k.dotari.centrala.tipuri = ['SOLID', 'GAZOS', 'ELECTRIC'].filter((t) => ct.some((x) => x.includes(t)));
+  }
   return k;
 }
 
@@ -39,7 +44,7 @@ export function buildDemo(today) {
   const s2 = controlFromPrevious(s1, addDays(today, -42));
   s2.dataIncheiere = addDays(today, -41);
   okAll(s2, ['fise', 'stingatoare']);
-  nok(s2, 'd', { inPV: true, obs: '2 stingătoare expirate, corp A', amenda: { suma: '2500', serieNr: 'DB 0012345' } });
+  nok(s2, 'd', { inPV: true, obs: '2 stingătoare expirate, corp A', amenda: { suma: '2500' } });
   s2.nereguli.find((x) => x.key === 'j').constructieIds = [s2.constructii[1].id];
   nok(s2, 'j', { inPV: true, obs: 'Hol etaj 1' });
   out.push(s2);
@@ -48,13 +53,13 @@ export function buildDemo(today) {
   const h = newControl({ tip: 'OPEC', denumire: 'Spitalul Orășenesc Valea Verde', start: addDays(today, -21) });
   Object.assign(h, { administrator: 'Dr. Andrei Popa', telefon: '0744 112 233', email: 'administrativ@spital-vv.ro', dataIncheiere: addDays(today, -20) });
   h.constructii = [
-    fill(emptyConstructie(1), { base: { denumire: 'Pavilion central', suprafata: '6400', regimInaltime: 'S+P+4E', nrAngajati: '210', structura: 'Beton armat', materialPereti: 'BCA' }, dotari: { asi: 'NU', aviz: 'DA', hidInt: 'DA', hidExt: 'DA', sprinklere: 'NEC', idsai: 'DA', exit: 'DA', desfumare: 'DA', rezervaApa: 'DA', statiePompe: 'DA', acumulatori: 'DA', ilumHint: 'DA', ipt: 'DA' }, centrala: ['GAZOS', 'ELECTRIC'] }),
+    fill(emptyConstructie(1), { base: { denumire: 'Pavilion central', suprafata: '6400', regimInaltime: 'S+P+4E', nrAngajati: '210', structura: 'Beton armat', materialPereti: 'BCA' }, dotari: { asi: 'NU', aviz: 'DA', hidInt: 'DA', hidExt: 'DA', sprinklere: 'NEC', idsai: 'DA', exit: 'DA', desfumare: 'DA', rezervaApa: 'DA', statiePompe: 'DA', acumulatori: 'DA', ilumHint: 'DA', ipt: 'DA', ascensor: 'DA' }, centrala: [['GAZOS'], ['ELECTRIC']] }),
     fill(emptyConstructie(2), { base: { denumire: 'Ambulatoriu', suprafata: '1200', regimInaltime: 'P+1E', nrAngajati: '35', structura: 'Zidărie portantă', materialPereti: 'Cărămidă' }, dotari: { asi: 'DA', hidInt: 'DA', idsai: 'DA', exit: 'NU' } }),
   ];
   okAll(h, ['sezon']);
   nok(h, 'a', { inPV: true, asiTermen: true, obs: 'Pavilion central' });
   nok(h, 'l', { inPV: true, obs: 'Erori zona 3 centrală' });
-  nok(h, 'q', { inPV: false, obs: 'Hidrant exterior H2 fără presiune', amenda: { suma: '5000', serieNr: 'DB 0012377' } });
+  nok(h, 'q', { inPV: false, obs: 'Hidrant exterior H2 fără presiune', amenda: { suma: '5000' } });
   out.push(h);
 
   // 3. Primărie (Localitate) — amendă albastră, o neregulă netrecută în PV
@@ -85,7 +90,10 @@ export function buildDemo(today) {
 
   // 5. Controale neîncheiate
   const g = newControl({ tip: 'OPEC', denumire: 'Grădinița cu Program Prelungit nr. 2', start: addDays(today, -2) });
-  Object.assign(g, { administrator: 'Elena Dinu', telefon: '0733 222 444', email: 'gpp2@edu.ro' });
+  Object.assign(g, { administrator: 'Elena Dinu', telefon: '0733 222 444', email: 'gpp2@edu.ro', persoanaParticipanta: 'Ana Stoica, administrator de clădire',
+    observatiiGenerale: 'Acces auto prin curtea din spate. Program cu publicul: 7:00–17:00.',
+    deIntrebat: [{ id: 'q1', text: 'Cererea certificatului de verificare IPT (trimis ulterior pe email)', gata: false },
+      { id: 'q2', text: 'Verificarea registrului de instruire', gata: true }] });
   g.constructii[0].denumire = 'Corp principal';
   out.push(g);
 
@@ -105,6 +113,8 @@ export function buildDemo(today) {
     for (const dot of Object.keys(AUTO_NU)) {
       if (syncAutoNU(c, dot) === 'added' && c.dataIncheiere) c.nereguli.find((n) => n.key === AUTO_NU[dot]).inPV = true;
     }
+    // actele lipsă → ao / ap / aq (v1.25), ca în aplicație; la controalele încheiate, deja trecute în PV
+    for (const { key, r } of syncAutoActe(c)) if (r === 'added' && c.dataIncheiere) c.nereguli.find((n) => n.key === key).inPV = true;
   }
   return out;
 }

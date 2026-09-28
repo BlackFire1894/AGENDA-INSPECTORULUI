@@ -186,7 +186,7 @@ const intre = (a, b) => a + Math.floor(rnd() * (b - a + 1));
 
 const OBS = ['', '', 'hol etaj 1', 'P6 nr. 3\nhol', '  corp B  ', 'Lipsă aviz; se va reface', 'stingătoare expirate'];
 const SUME = ['', '2.500', '1500,5', '3000 lei', 'abc', '500', '12.345,67'];
-const SERII = ['', 'DB 0012345', 'seria CJ nr. 45 678', 'PV 12/2026'];
+const COORD = ['44.426800, 26.102500', '44°25′36″ N 26°6′9″ E', 'abc', '44,4268 26,1025', '', '91 10'];
 const REGIM = ['P', 'P+1', 'S+P+2E', '', 'D+P', 'P+M', 'S+P', 'parter'];
 const TEXTE = ['', 'Corp B', 'Ion Pop', '0722 123 456', 'a@b.ro', '1978', '250,5', 'Beton armat', 'Lemn', 'Școala nr. 3'];
 const ETICHETE = ['Căi de evacuare blocate', 'Depozitare butelii în subsol', '', 'Ușă blocată'];
@@ -228,7 +228,6 @@ function valoarePentru(bind, tip) {
   if (/regimInaltime$/.test(bind)) return alege(REGIM);
   if (/\.obs$/.test(bind)) return alege(OBS);
   if (/amenda\.suma$/.test(bind)) return alege(SUME);
-  if (/amenda\.serieNr$/.test(bind)) return alege(SERII);
   if (/\.locatie$/.test(bind)) return alege(LOCATII);
   if (/\.label$/.test(bind)) return alege(ETICHETE);
   return alege(TEXTE);
@@ -305,11 +304,21 @@ for (const [si, ales] of alese.entries()) {
     }
     if (!pas) continue;
 
-    const inainte = { constr: new Set(c.constructii.map((x) => x.id)), chei: new Set(c.nereguli.map((x) => x.key)) };
+    const centrale = () => c.constructii.flatMap((x) => x.dotari?.centrala?.ct || []).map((x) => x.id);
+    const inainte = { constr: new Set(c.constructii.map((x) => x.id)), chei: new Set(c.nereguli.map((x) => x.key)),
+      intreb: new Set((c.deIntrebat || []).map((x) => x.id)), ct: new Set(centrale()) };
     if (pas.t === 'click') {
       if (pas.act === 'gps-get') { gpsUrmator = { lat: 44 + rnd() * 4, lon: 21 + rnd() * 8, acc: intre(3, 300) }; pas.gps = gpsUrmator; }
       pas.raspuns = raspuns;
+      if (pas.act === 'gps-manual') pas.coord = alege(COORD);
       await click(pas.act, pas.d);
+      // „Introduceți coordonatele”: textul scris, apoi „Salvează” (nerecunoscut: fereastra rămâne, cu mesajul)
+      if (pas.act === 'gps-manual' && modalCurent) {
+        modalCurent.el('#gps-man').value = pas.coord;
+        modalCurent.el('#gps-man-ok').l.click();
+        await asteapta();
+        modale = [];
+      }
     } else if (pas.t === 'nav') {
       location.hash = pas.hash;
     } else if (pas.t === 'input') {
@@ -343,8 +352,10 @@ for (const [si, ales] of alese.entries()) {
     const acum = fara(c);
     const rec = { pas, tab, focus: rutaDin(location.hash).focus, tok: jetoane(E.viewControl(c, tab) + E.editToolsHTML(c)), ist: Object.values(S.historyState(c.id)) };
     if (acum !== anterior) { rec.c = JSON.parse(acum); anterior = acum; }
-    if (pas.t === 'click' && ['constr-inc', 'ner-add', 'adp-count'].includes(pas.act)) {
-      const nou = c.constructii.find((x) => !inainte.constr.has(x.id))?.id || c.nereguli.find((x) => !inainte.chei.has(x.key))?.key.replace(/^(k|adp)/, '');
+    if (pas.t === 'click' && ['constr-inc', 'ner-add', 'adp-count', 'intreb-add', 'ct-count', 'centrala'].includes(pas.act)) {
+      const nou = c.constructii.find((x) => !inainte.constr.has(x.id))?.id || c.nereguli.find((x) => !inainte.chei.has(x.key))?.key.replace(/^(k|adp)/, '')
+        || (c.deIntrebat || []).find((x) => !inainte.intreb.has(x.id))?.id.replace(/^q/, '')
+        || centrale().find((x) => !inainte.ct.has(x))?.replace(/^ct/, '');
       if (nou) rec.uid = nou;
     }
     if (mesaje.length) rec.mesaje = mesaje;

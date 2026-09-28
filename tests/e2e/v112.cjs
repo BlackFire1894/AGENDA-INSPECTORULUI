@@ -36,8 +36,8 @@ fs.writeFileSync(`${S}/v10.json`, JSON.stringify({ app: 'agenda-inspectorului', 
   await p.click('#ner-d .nok-btn'); await p.waitForTimeout(250);
   ok(!(await p.locator('#ner-d').getAttribute('class')).includes('is-collapsed'), 'Constatat → rămâne deschis');
   await p.click('#ner-d [data-path$=".amenda.aplicata"]'); await p.waitForTimeout(200);
-  ok(await p.locator('#ner-d [data-bind$=".amenda.serieNr"]').count() === 1 && await p.locator('#ner-d [data-bind$=".amenda.serie"], #ner-d [data-bind$=".amenda.numar"]').count() === 0, 'amendă: un singur câmp „Seria și nr.”');
-  await p.fill('#ner-d [data-bind$=".amenda.serieNr"]', 'DB 0012345'); await p.fill('#ner-d [data-bind$=".amenda.suma"]', '2500'); await p.waitForTimeout(500);
+  ok(await p.locator('#ner-d [data-bind$=".amenda.serieNr"], #ner-d [data-bind$=".amenda.serie"], #ner-d [data-bind$=".amenda.numar"]').count() === 0, 'amendă: fără câmpul seriei (scos în v1.25)');
+  await p.fill('#ner-d [data-bind$=".amenda.suma"]', '2500'); await p.waitForTimeout(500);
   await p.click('#ner-d .row-tgl'); await p.waitForTimeout(250);
   const dBar = await p.locator('#ner-d .ner-bar').innerText();
   ok(/Constatat/.test(dBar) && /Netrecut în PV/.test(dBar) && /Amendă/.test(dBar), `d strâns: bara arată ${dBar.replace(/\n/g, ' · ')}`);
@@ -111,16 +111,16 @@ fs.writeFileSync(`${S}/v10.json`, JSON.stringify({ app: 'agenda-inspectorului', 
   ok((await p.locator('#act-ctpsi').getAttribute('class')).includes('is-collapsed') && /Prezentat/.test(await p.locator('#act-ctpsi .ner-bar').innerText()), 'acte: ✓ → se strânge, bara „Prezentat”');
   await p.click('#act-lfd .nok-btn'); await p.waitForTimeout(250);
   const aT = await p.locator('.cat-acte .cat-title').innerText();
-  ok(/12 necompl\./.test(aT) && /1 lipsă/.test(aT), `bara actelor deschise (prescurtat): ${aT.replace(/\n/g, ' · ')}`);
+  ok(/13 necompl\./.test(aT) && /1 lipsă/.test(aT), `bara actelor deschise (prescurtat): ${aT.replace(/\n/g, ' · ')}`);
   await p.fill('#ner-search', 'foc deschis'); await p.dispatchEvent('#ner-search', 'input'); await p.waitForTimeout(250);
   ok(await p.locator('#ner-results .act-row').count() === 1 && await p.locator('#act-lfd').count() === 1, 'acte: căutare „foc deschis” → LFD');
   await p.click('[data-act="ner-q-clear"]'); await p.waitForTimeout(200);
   await p.click('[data-act="cat-toggle"][data-cat="acte"]'); await p.waitForTimeout(200);
   ok(await p.locator('.act-row').count() === 0 && /lipsă: 2/.test(await p.locator('.cat-acte .cat-title').innerText()), 'acte: lista se strânge, bara păstrează informațiile');
   await p.click('[data-act="cat-toggle"][data-cat="acte"]'); await p.waitForTimeout(200);
-  // PV: seria și nr.
+  // PV: amenda, fără serie (v1.25)
   await p.click('[data-act="pv-text"]'); await p.waitForTimeout(200);
-  ok(/sancționat cu amendă Seria DB nr\. 0012345/.test(await p.locator('.pv-text').inputValue()), 'Text PV: „Seria DB nr. 0012345”');
+  { const t = await p.locator('.pv-text').inputValue(); ok(/sancționat cu amendă\)/.test(t) && !/Seria/.test(t), 'Text PV: „sancționat cu amendă”, fără serie'); }
   await p.keyboard.press('Escape'); await p.click('.modal-backdrop').catch(() => {});
   // bandă doar în control
   await p.goto('http://localhost:8080/#/panou'); await p.waitForTimeout(300);
@@ -130,7 +130,7 @@ fs.writeFileSync(`${S}/v10.json`, JSON.stringify({ app: 'agenda-inspectorului', 
   await p.setInputFiles('[data-import]', `${S}/v10.json`); await p.waitForTimeout(200); await p.click('[data-mode="merge"]'); await p.waitForTimeout(400);
   await p.goto('http://localhost:8080/#/control/inch/nereguli'); await p.waitForTimeout(400);
   ok(await p.locator('#ner-b').count() === 1 && await p.locator('#ner-c').count() === 1 && await p.locator('#ner-b1, #ner-c2, #ner-aj, #ner-al').count() === 0, 'încheiat în v1.10: b și c, fără b1–c7 / aj–am');
-  ok(/Seria DB nr\. 0000777/.test(await p.locator('#ner-d').innerText()), 'amenda veche (serie + nr.) apare corect');
+  { const t = await p.locator('#ner-d').innerText(); ok(/Amendă|amendă/.test(t) && !/Seria|0000777/.test(t), 'amenda veche: rămâne, seria nu se mai afișează'); }
   await p.goto('http://localhost:8080/#/control/desc/nereguli'); await p.waitForTimeout(400);
   ok(await p.locator('#ner-b').count() === 1 && await p.locator('#ner-b1').count() === 1 && await p.locator('#ner-c').count() === 0, 'deschis: lista nouă (b1…), b rămâne fiindcă e completat');
   ok(await p.evaluate(() => document.documentElement.scrollWidth <= innerWidth), 'fără scroll orizontal');

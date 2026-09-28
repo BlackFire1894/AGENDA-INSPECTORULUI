@@ -50,3 +50,26 @@ Ce ai de făcut în Swift: aceleași texte în Termene.swift, Liste.swift, Panou
 Criterii de acceptare: testele 100% (vectori, verificarea încrucișată, ghidul); pastila roșie a amenzii nu se taie (Panou, Istoric, Obiective, editor, filtre), la toate mărimile și orientările.
 La final: commit + PR; raport scurt.
 ```
+
+### v1.25.0 — cererea în 12 puncte, controlul următor, coordonatele de mână (28.09.2026)
+Aplicată deja în aplicația nativă, în același PR (web și nativ lucrate împreună, la cererea utilizatorului: „Le fac eu pe amândouă”). Promptul rămâne pentru istoric și pentru verificare:
+
+```
+Actualizare la versiunea web v1.25.0 (schema 12). Rulează `git pull` pe main.
+Ce s-a schimbat (js/model.js, js/editor.js, js/app.js, js/fisa.js, js/views.js, js/activitati.js, js/help.js, js/demo.js, css/app.css, css/telefon.css):
+- Control: persoanaParticipanta, observatiiGenerale, deIntrebat [{id, text, gata}] (după localitate, în această ordine); cele nebifate cu text → „Ce mai aveți de făcut” (intreb-<id>, „De întrebat: …”, focus sec-intrebari).
+- Seria amenzii nu se mai afișează și nu se mai cere (editor, Panou, Fișă, PV „sancționat cu amendă”, todo doar „Amendă fără suma”, raportul lunii fără coloană); amenda.serieNr rămâne în date.
+- ACTE: „fumat” (din 12). acteOf(c) = actele din lista controlului. NEREGULI: ao / ap / aq (autoActe: grup / controale / analiza, din 12, docs) — syncAutoActe (ca syncAutoNU; obsOnly la observațiile actelor); constructiiOf = [] pentru ele; PV: fără lista separată a actelor dacă ao e în catalog; „an” (din 12, electric).
+- DOTARI: ilumHint cu NEC, ascuns când hidInt e NU / NEC (ilumHintAscuns, dotariVizibile, valDotare); ascensor DA / NU (din 12).
+- Centrala: dotari.centrala.ct [{id, tipuri}] (tipuri = reuniunea); normalizare: tipuri fără ct → ct1. b3 / g / h perCT: verifUnitati (unități „<k>:<ct>”, CT 1 preia data scrisă pe construcție), centraleAlese (ctIds), constructiiNume „Corp – CT 2”, verifText cu unități.
+- GPS: gpsQuality(null) = 'manual'; gpsEgal; parseCoord (zecimal și Busolă, 6 zecimale cu Math.round); manual = {lat, lon, acc: null, la, manual: true}.
+- controlFromPrevious: preia tot din controlul imediat anterior (constatările ca „nok” cu obs / construcții / ctIds remapate; adăposturile; observațiile actelor; deIntrebat nerezolvate); fără PV, amenzi, sigilii, starea actelor, termen ASI, verificări, rânduri Conform / NEC; apoi syncAutoNU + syncAutoActe.
+- constatareAnterioara: doar controlul imediat anterior.
+- migreazaDeschis (normalizare și fixeazaCatalog): control deschis cu schema < 12 → syncAutoActe + syncAutoNU('ilumHint') + schema 12, o singură dată.
+- schimbare: deIntrebat, observatiiGenerale, „ordinea construcțiilor”.
+- Editor: intreb-add / intreb-del, flag deIntrebat.#id.gata, constr-up / constr-down, gps-ca-prima, gps-manual (fereastra), ct-count, centrala cu data-ct (și fără centrale: tipul creează CT 1), ct-opt, verif-ca-prima, verif-nok cu ctIds, acte.X.status / obs → syncAutoActe (mesaje), hidInt → syncAutoNU('ilumHint'); GPS fără poziție → fereastra cu variantele.
+Date comune regenerate: catalog.json, ghid.json, stiluri-fisa.css. Vectori regenerați: demo.json, normalizare.json.
+Ce ai de făcut în Swift: portarea funcțiilor de mai sus (AgendaKit: Creare, Nereguli, PV, Termene, Cautare, Fisa, Raport, DateDemo, Editor, ModelEditor; aplicația: TabObiectiv, RandNeregula, Ferestre, SesiuneEditor, ComponenteEditor — CampData rămâne deschis până la „Gata”); genereaza.mjs / editor.mjs cu câmpurile și acțiunile noi; testele portate.
+Criterii de acceptare: ios/teste.sh 100% (vectori, verificarea încrucișată pe mai multe semințe, editorul pas cu pas); turul vizual pe iPad (orizontal și vertical); datele utilizatorului neatinse (doar migrarea cerută, la controalele în desfășurare).
+La final: commit + PR; raport scurt.
+```

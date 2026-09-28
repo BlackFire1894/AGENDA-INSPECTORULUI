@@ -64,7 +64,8 @@ const assert = (c, m) => { if (!c) { console.log('FAIL: ' + m); process.exitCode
   // panou
   await p.goto('http://localhost:8080/#/panou'); await p.waitForTimeout(300);
   const k = await p.locator('.kpi-num').allInnerTexts();
-  assert(k[0] === '1' && k[2] === '1' && k[4] === '3', 'dashboard KPIs ' + k.join(','));
+  // netrecute în PV: 3 + „ao” (actul lipsă devine neregulă, v1.25)
+  assert(k[0] === '1' && k[2] === '1' && k[4] === '4', 'dashboard KPIs ' + k.join(','));
   // căutare după dată
   await p.goto('http://localhost:8080/#/obiective'); await p.waitForTimeout(200);
   const dd = start.split('-').reverse().join('.');

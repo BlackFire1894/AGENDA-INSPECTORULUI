@@ -51,7 +51,7 @@ public func matchControl(_ c: Control, _ query: String) -> Bool {
         let (s, e) = controlRange(c)
         return rangesOverlap(s, e, a, b)
     }
-    let hay = fold([c.denumire, c.administrator, c.telefon, c.email, c.adresa, c.localitate].joined(separator: " "))
+    let hay = fold([c.denumire, c.administrator, c.telefon, c.email, c.adresa, c.localitate, c.persoanaParticipanta].joined(separator: " "))
     return fold(q).cuvinte.allSatisfy { hay.contains($0) }
 }
 
@@ -95,10 +95,11 @@ private func potriviri(_ hay: String, _ q: String) -> Bool { q.cuvinte.allSatisf
 public func matchAct(_ c: Control, _ key: String, _ query: String) -> Bool {
     let q = fold(query).trimJS
     if q.isEmpty { return true }
-    let i = K.acte.firstIndex { $0.key == key } ?? -1
+    let acte = acteOf(c)
+    let i = acte.firstIndex { $0.key == key } ?? -1
     if q == String(i + 1) { return true }
     if q.lungimeJS < 3 && !q.contains(where: { $0.isWhitespace }) { return false }
-    let label = i >= 0 ? K.acte[i].label : ""
+    let label = i >= 0 ? acte[i].label : ""
     return potriviri(cuGlosar([label, c.act(key).obs].joined(separator: " ")), q)
 }
 
@@ -132,8 +133,10 @@ public func controaleAnterioare(_ controls: [Control], _ c: Control) -> [Control
     }.sortatStabil(byStartDesc)
 }
 
+/// Referința e doar controlul imediat anterior (v1.25, regula utilizatorului): nu se cumulează controalele mai vechi.
 public func constatareAnterioara(_ controls: [Control], _ c: Control, _ n: Neregula) -> Control? {
-    controaleAnterioare(controls, c).first { prev in prev.nereguli.contains { $0.status == "nok" && sameRow($0, n) } }
+    guard let prev = controaleAnterioare(controls, c).first else { return nil }
+    return prev.nereguli.contains { $0.status == "nok" && sameRow($0, n) } ? prev : nil
 }
 
 public struct InfoVeche: Sendable {

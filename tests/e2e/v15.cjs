@@ -28,12 +28,12 @@ const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0
     // text PV
     await p.click('[data-act="pv-text"]'); await p.waitForTimeout(300);
     const txt = await p.locator('.pv-text').inputValue();
-    ok(/1\. Construcția funcționează fără ASI[^\n]*Sala de sport \(neregulă veche\)\n2\. Lucrări de extindere[^\n]*\n3\. Stingătoare expirate – construcția: Corp A.*neregulă veche; sancționat cu amendă Seria DB nr\. 0012345/.test(txt), 'text PV: neregulă, construcție, veche, amendă');
-    ok(/Acte de autoritate și evidențe lipsă:/.test(txt), 'text PV: acte lipsă');
+    ok(/1\. Construcția funcționează fără ASI[^\n]*Sala de sport \(neregulă veche\)\n2\. Lucrări de extindere[^\n]*\n3\. Nu a prezentat acte de autoritate \/ evidențe\.[^\n]*\n4\. Stingătoare expirate – construcția: Corp A.*neregulă veche; sancționat cu amendă\)/.test(txt), 'text PV: neregulă, construcție, veche, amendă');
+    ok(/3\. Nu a prezentat acte de autoritate \/ evidențe\. Fișe de instruire completate corect; Verificare lunară a stingătoarelor/.test(txt) && !/Acte de autoritate și evidențe lipsă:/.test(txt), 'text PV: actele lipsă sunt neregula „ao” (v1.25), cu lista actelor');
     await p.click('[data-pv="copy"]'); await p.waitForTimeout(200);
     ok((await p.evaluate(() => navigator.clipboard.readText())) === txt, 'Copiază → clipboard');
     await p.click('[data-opt="doarNetrecute"]'); await p.waitForTimeout(100);
-    { const t2 = await p.locator('.pv-text').inputValue(); ok(!/Stingătoare expirate|EXIT defect/.test(t2) && /Acte de autoritate/.test(t2), 'filtru doar netrecute: dispar cele trecute în PV'); }
+    { const t2 = await p.locator('.pv-text').inputValue(); ok(!/Stingătoare expirate|EXIT defect|Nu a prezentat acte/.test(t2) && /fără ASI/.test(t2), 'filtru doar netrecute: dispar cele trecute în PV'); }
     await p.screenshot({ path: `${S}/v15-${ori}-pv.png` });
     await p.click('.modal [data-act="modal-close"]'); await p.waitForTimeout(200);
     // marchează trecute: la spital (q netrecut)
@@ -50,7 +50,7 @@ const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0
     // fișa
     await p.goto(`http://localhost:8080/#/fisa/${sid}`); await p.waitForTimeout(400);
     const f = await p.locator('.fisa-doc').textContent();
-    ok(f.includes('Fișa controlului') && f.includes('Pavilion central') && f.includes('Acte de autoritate') && f.includes('Hext nefuncțional') && f.includes('Seria DB nr. 0012377'), 'fișa: date, construcții, acte, nereguli, amendă');
+    ok(f.includes('Fișa controlului') && f.includes('Pavilion central') && f.includes('Acte de autoritate') && f.includes('Hext nefuncțional') && f.includes('Amendă') && !f.includes('Seria'), 'fișa: date, construcții, acte, nereguli, amendă');
     ok(await p.locator('[data-act="fisa-print"]').count() === 1 && await p.locator('[data-act="fisa-share"]').count() === 1, 'butoane Tipărește / Partajează');
     await p.screenshot({ path: `${S}/v15-${ori}-fisa.png` });
     if (ori === 'land') {

@@ -53,7 +53,7 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
     ok(d.n > 10 && d.bad === 0, `dotări: ${d.n} rânduri, câmp doar unde e text`);
     // acte
     await p.goto(`http://localhost:8080/#/control/${id}/acte`); await p.waitForTimeout(300);
-    ok(await p.locator('.act-row [data-act="obs-open"]').count() + await p.locator('.act-row textarea.obs').count() === 14, 'acte: fiecare act are fie câmp (scris sau la Lipsă), fie „+ Obs.”');
+    ok(await p.locator('.act-row [data-act="obs-open"]').count() + await p.locator('.act-row textarea.obs').count() === 15, 'acte: fiecare act are fie câmp (scris sau la Lipsă), fie „+ Obs.”');
     await p.click('.act-row >> nth=0 >> [data-act="obs-open"]'); await p.waitForTimeout(250);
     const ta = p.locator('.act-row >> nth=0 >> textarea');
     const b0 = await ta.boundingBox(); await ta.fill('a\nb\nc\nd'); await ta.dispatchEvent('input'); await p.waitForTimeout(100);

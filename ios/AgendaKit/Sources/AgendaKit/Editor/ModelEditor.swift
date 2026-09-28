@@ -134,7 +134,7 @@ public func modelTaburi(_ c: Control, _ tab: String, azi: String) -> [ModelTabEd
         if t.key == "obiectiv" {
             let n = c.constructii.count
             (text, warn) = ("\(n) \(n == 1 ? "construcție" : "construcții")", false)
-            let s = c.constructii.map(dotariSummary).reduce((0, 0)) { ($0.0 + $1.set, $0.1 + $1.total) }
+            let s = c.constructii.map { dotariSummary(c, $0) }.reduce((0, 0)) { ($0.0 + $1.set, $0.1 + $1.total) }
             (ce, gata, total) = ("Dotări", s.0, s.1)
         } else if t.key == "acte" {
             (text, warn) = ("\(st.acteNok) lipsă", st.acteNok > 0)
@@ -157,8 +157,12 @@ public func modelTaburi(_ c: Control, _ tab: String, azi: String) -> [ModelTabEd
 
 public struct ModelTabObiectiv: Equatable, Sendable {
     public let tip: ModelSegment
-    public let campuri: [ModelCamp]   // denumire, administrator, telefon, email, adresă, localitate
+    public let campuri: [ModelCamp]   // denumire, administrator, persoana participantă, telefon, email, adresă, localitate
     public let telefon: String, email: String
+    /// „De întrebat până la finalizarea controlului”
+    public let intrebari: ModelIntrebari
+    /// „Observații generale”
+    public let observatiiGenerale: String
     public let dataInceput: String, dataIncheiere: String, incheiat: Bool
     /// „Data încheierii este înaintea datei de începere.”
     public let eroareIncheiere: Bool
@@ -166,6 +170,22 @@ public struct ModelTabObiectiv: Equatable, Sendable {
     public let constructii: [ModelConstructie]
     /// nil la Localitate (adăposturile sunt în tabul Protecție civilă)
     public let adaposturi: ModelAdaposturi?
+}
+
+/// „De întrebat până la finalizarea controlului”: sarcini cu bifă; cele nebifate apar în „Ce mai aveți de făcut”
+public struct ModelIntrebari: Equatable, Sendable {
+    public struct Rand: Equatable, Sendable { public let id: String, text: String, gata: Bool }
+    public let randuri: [Rand]
+    /// „2 nerezolvate” (portocaliu) / „Toate rezolvate” (verde) / nimic (listă goală)
+    public let pastila: PastilaUI?
+}
+
+func modelIntrebari(_ c: Control) -> ModelIntrebari {
+    let l = c.deIntrebat
+    let rest = l.filter { !$0.gata && !$0.text.trimJS.isEmpty }.count
+    let pastila = rest > 0 ? PastilaUI("warn", "\(rest) \(rest == 1 ? "nerezolvată" : "nerezolvate")", nil)
+        : l.isEmpty ? nil : PastilaUI("green", "Toate rezolvate", "check")
+    return ModelIntrebari(randuri: l.map { .init(id: $0.id, text: $0.text, gata: $0.gata) }, pastila: pastila)
 }
 
 public struct ModelIncarcare: Equatable, Sendable {
@@ -184,8 +204,9 @@ public func modelTabObiectiv(_ c: Control, _ controls: [Control], _ ed: Editor, 
     let campuri = [
         ModelCamp(eticheta: "Denumire obiectiv", cale: "denumire", valoare: c.denumire, indiciu: "ex: Școala Gimnazială nr. 1", lat: true),
         ModelCamp(eticheta: "Administrator obiectiv", cale: "administrator", valoare: c.administrator, indiciu: "Nume și prenume"),
+        ModelCamp(eticheta: "Persoană participantă", cale: "persoanaParticipanta", valoare: c.persoanaParticipanta, indiciu: "Nume și prenume, funcția"),
         ModelCamp(eticheta: "Telefon", cale: "telefon", valoare: c.telefon, indiciu: "07xx xxx xxx", tip: .telefon),
-        ModelCamp(eticheta: "Email", cale: "email", valoare: c.email, indiciu: "nume@exemplu.ro", tip: .email, lat: true),
+        ModelCamp(eticheta: "Email", cale: "email", valoare: c.email, indiciu: "nume@exemplu.ro", tip: .email),
         ModelCamp(eticheta: "Adresă", cale: "adresa", valoare: c.adresa, indiciu: "Strada, nr., bloc…"),
         ModelCamp(eticheta: "Localitate", cale: "localitate", valoare: c.localitate, indiciu: "ex: Cluj-Napoca"),
     ]
@@ -198,6 +219,7 @@ public func modelTabObiectiv(_ c: Control, _ controls: [Control], _ ed: Editor, 
     return ModelTabObiectiv(
         tip: ModelSegment(cale: "tip", optiuni: K.tipObiectiv, ales: c.tip),
         campuri: campuri, telefon: c.telefon, email: c.email,
+        intrebari: modelIntrebari(c), observatiiGenerale: c.observatiiGenerale,
         dataInceput: c.dataInceput, dataIncheiere: c.dataIncheiere, incheiat: isIncheiat(c),
         eroareIncheiere: isIncheiat(c) && c.dataIncheiere < c.dataInceput,
         incarcare: modelIncarcare(c, azi: azi),
@@ -227,17 +249,19 @@ func modelIncarcare(_ c: Control, azi: String) -> ModelIncarcare? {
 
 public struct SumarDotari: Equatable, Sendable { public let da: Int, nec: Int, set: Int, lipsa: Int, total: Int }
 
-public func dotariSummary(_ k: Constructie) -> SumarDotari {
+/// Dotările completate (rândurile ascunse nu se numără: iluminat Hint fără hidranți interiori, dotări noi la controalele vechi)
+public func dotariSummary(_ c: Control, _ k: Constructie) -> SumarDotari {
     var da = 0, nec = 0, set = 0, lipsa = 0
-    for d in K.dotari {
+    let vis = dotariVizibile(c, k)
+    for d in vis {
         let v = k.dotare(d.key) ?? Dotare()
-        if d.centrala { if !v.tipuri.isEmpty || v.nuAre { set += 1 }; continue }
+        if d.centrala { if !v.ct.isEmpty || !v.tipuri.isEmpty || v.nuAre { set += 1 }; continue }
         if !v.v.isEmpty { set += 1 }
         if v.v == "DA" { da += 1 }
         if v.v == "NEC" { nec += 1 }
         if v.v == "NU" && K.lipsaDotari.contains(d.key) { lipsa += 1 }
     }
-    return SumarDotari(da: da, nec: nec, set: set, lipsa: lipsa, total: K.dotari.count)
+    return SumarDotari(da: da, nec: nec, set: set, lipsa: lipsa, total: vis.count)
 }
 
 public struct ModelConstructie: Equatable, Sendable {
@@ -247,7 +271,13 @@ public struct ModelConstructie: Equatable, Sendable {
     public let lipsa: String?
     public let grfV: Bool
     public let sumar: String
+    /// ▲▼ (la mai multe construcții): se poate muta mai sus / mai jos
+    public let ordine: (sus: Bool, jos: Bool)?
     public let corp: ModelCorpConstructie?
+    public static func == (a: Self, b: Self) -> Bool {
+        a.id == b.id && a.nr == b.nr && a.deschisa == b.deschisa && a.denumire == b.denumire && a.lipsa == b.lipsa && a.grfV == b.grfV
+            && a.sumar == b.sumar && a.ordine?.sus == b.ordine?.sus && a.ordine?.jos == b.ordine?.jos && a.corp == b.corp
+    }
 }
 
 public struct ModelCorpConstructie: Equatable, Sendable {
@@ -271,9 +301,16 @@ public struct ModelGps: Equatable, Sendable {
     public let cautare: Bool
     /// nil = necompletat
     public let coordonate: String?
+    /// „buna” | „medie” | „slaba” | „manual” (introduse de mână)
     public var calitate = "", precizie = "", preluate: String? = nil
     public var slaba = false
     public var google = "", apple = ""
+    /// de la a doua construcție: „Aceleași coordonate ca la …”
+    public var caPrima: CaPrima? = nil
+
+    public struct CaPrima: Equatable, Sendable {
+        public let activ: Bool, disponibil: Bool, text: String
+    }
 }
 
 public struct ModelDotare: Equatable, Sendable {
@@ -283,15 +320,23 @@ public struct ModelDotare: Equatable, Sendable {
     public var tipuri: [String] = [], nuAre = false
     public var segment: ModelSegment? = nil
     public var grav = false
+    /// centrala (v1.25): centralele construcției, fiecare cu tipurile ei
+    public var centrale: [ModelCentrala] = []
     public let obs: ModelObs
     /// nr. autorizație / aviz la DA
     public var nr: ModelCamp? = nil
 }
 
+/// O centrală termică: „CT 1”, cu tipurile alese
+public struct ModelCentrala: Equatable, Sendable {
+    public let id: String, nr: Int, tipuri: [String]
+}
+
 func modelConstructie(_ c: Control, _ k: Constructie, _ i: Int, _ ed: Editor) -> ModelConstructie {
     let open = ed.isOpen(c, k, i)
     let p = "constructii.#\(k.id)"
-    let s = dotariSummary(k)
+    let s = dotariSummary(c, k)
+    let n = c.constructii.count
     var sumar = "\(s.set)/\(s.total) dotări"
     if !k.suprafata.isEmpty { sumar += " · \(k.suprafata) m²" }
     if !k.regimInaltime.isEmpty { sumar += " · \(k.regimInaltime)" }
@@ -312,31 +357,39 @@ func modelConstructie(_ c: Control, _ k: Constructie, _ i: Int, _ ed: Editor) ->
             grf: ModelGrf(cale: "\(p).grf", ales: k.grf, grav: grav,
                           nota: grav ? "Neregulă gravă: GRF/NSI V cu regim de înălțime \(k.regimInaltime) (peste parter). Apare în tabul Nereguli." : nil),
             gps: modelGps(c, k, i, ed),
-            dotari: K.dotari.map { modelDotare(c, p, k, $0, ed) },
+            dotari: dotariVizibile(c, k).map { modelDotare(c, p, k, $0, ed) },
             stergere: c.constructii.count > 1)
     }
     return ModelConstructie(
         id: k.id, nr: i + 1, deschisa: open,
         denumire: ModelCamp(eticheta: "", cale: "\(p).denumire", valoare: k.denumire, indiciu: "Denumirea construcției \(i + 1)"),
         lipsa: s.lipsa > 0 ? "\(s.lipsa) \(s.lipsa == 1 ? "instalație lipsă" : "instalații lipsă")" : nil,
-        grfV: grfVPesteParter(k), sumar: sumar, corp: corp)
+        grfV: grfVPesteParter(k), sumar: sumar, ordine: n > 1 ? (i > 0, i < n - 1) : nil, corp: corp)
 }
 
-/// Coordonate GPS pe construcție: preluate doar la cerere (o atingere), cu precizia afișată și legături spre hărți
+/// Coordonate GPS pe construcție: preluate doar la cerere (o atingere), cu precizia afișată și legături spre hărți;
+/// sau introduse de mână (v1.25). De la a doua construcție: „Aceleași coordonate ca la …” copiază coordonatele primei.
 func modelGps(_ c: Control, _ k: Constructie, _ i: Int, _ ed: Editor) -> ModelGps {
     let busy = ed.ui.gpsBusy == k.id
-    guard let g = k.gps else { return ModelGps(id: k.id, cautare: busy, coordonate: nil) }
-    let q = gpsQuality(g.acc)
-    var preluate: String?
+    var caPrima: ModelGps.CaPrima?
+    if i > 0, let prima = c.constructii.first {
+        caPrima = .init(activ: gpsEgal(k.gps, prima.gps), disponibil: prima.gps != nil,
+                        text: "Aceleași coordonate ca la \(prima.denumire.isEmpty ? "Construcția 1" : prima.denumire)\(prima.gps == nil ? " (necompletate)" : "")")
+    }
+    guard let g = k.gps else { return ModelGps(id: k.id, cautare: busy, coordonate: nil, caPrima: caPrima) }
+    let q = gpsQuality(g)
+    var cand: String?
     if let d = dataDinISO(g.la) {
         let cal = Ceas.calendar
         let p = cal.dateComponents([.hour, .minute], from: d)
-        preluate = "preluate \(fmtDate(toISO(d))), \(String(format: "%02d:%02d", p.hour ?? 0, p.minute ?? 0))"
+        cand = "\(fmtDate(toISO(d))), \(String(format: "%02d:%02d", p.hour ?? 0, p.minute ?? 0))"
     }
     let numeHarta = [c.denumire, k.denumire.isEmpty ? "Construcția \(i + 1)" : k.denumire].filter { !$0.isEmpty }.joined(separator: " – ")
+    let manual = q == "manual"
     return ModelGps(id: k.id, cautare: busy, coordonate: fmtCoord(g), calitate: q,
-                    precizie: "± \(rotunjesteJS(g.acc)) m · precizie \(q == "buna" ? "bună" : q == "medie" ? "medie" : "slabă")",
-                    preluate: preluate, slaba: q == "slaba", google: googleMapsUrl(g), apple: appleMapsUrl(g, numeHarta))
+                    precizie: manual ? "introduse manual" : "± \(rotunjesteJS(g.acc)) m · precizie \(q == "buna" ? "bună" : q == "medie" ? "medie" : "slabă")",
+                    preluate: cand.map { manual ? $0 : "preluate \($0)" }, slaba: q == "slaba", google: googleMapsUrl(g), apple: appleMapsUrl(g, numeHarta),
+                    caPrima: caPrima)
 }
 
 /// `new Date(iso)` pentru momentele salvate de aplicație („2026-09-01T08:00:00.000Z”)
@@ -358,7 +411,9 @@ func modelDotare(_ c: Control, _ p: String, _ k: Constructie, _ d: DotareSablon,
     let v = k.dotare(d.key) ?? Dotare()
     let path = "\(p).dotari.\(d.key)"
     if d.centrala {
+        // câte centrale (CT 1, CT 2…), fiecare cu tipurile ei; „NU ARE” le șterge
         return ModelDotare(key: d.key, eticheta: d.label, cale: path, centrala: true, tipuri: v.tipuri, nuAre: v.nuAre,
+                           centrale: v.ct.enumerated().map { ModelCentrala(id: $1.id, nr: $0 + 1, tipuri: $1.tipuri) },
                            obs: modelObs(c, ed, "\(path).obs", v.obs))
     }
     let grav = v.v == "NU" && K.lipsaDotari.contains(d.key)
@@ -458,10 +513,11 @@ let ACT_OK = "Prezentat", ACT_NOK = "Lipsă"
 
 public func modelTabActe(_ c: Control, _ ed: Editor, azi: String) -> ModelTabActe {
     let st = controlStats(c, azi)
-    let stari = K.acte.map { c.act($0.key).status }
+    let acte = acteOf(c)
+    let stari = acte.map { c.act($0.key).status }
     let actKey = { (k: String) in "\(c.id)|act:\(k)" }
-    let deschiseGata = K.acte.filter { !c.act($0.key).status.isEmpty && !ed.ui.rowCollapsed.are(actKey($0.key)) }.count
-    let vreunaInchisa = K.acte.contains { ed.ui.rowCollapsed.are(actKey($0.key)) }
+    let deschiseGata = acte.filter { !c.act($0.key).status.isEmpty && !ed.ui.rowCollapsed.are(actKey($0.key)) }.count
+    let vreunaInchisa = acte.contains { ed.ui.rowCollapsed.are(actKey($0.key)) }
     let gol = stari.filter(\.isEmpty).count
     var meniu: [ButonMeniu] = []
     if deschiseGata > 0 { meniu = [ButonMeniu(act: "rows-collapse", date: ["sec": "acte"], text: "Restrânge completate (\(deschiseGata))", iconita: "list")] }
@@ -482,12 +538,12 @@ public func modelTabActe(_ c: Control, _ ed: Editor, azi: String) -> ModelTabAct
 func acteRezultate(_ c: Control, _ ed: Editor) -> (ModelNotaCautare?, ModelGrupActe) {
     let f = ed.ui.nerFilter
     let q = ed.ui.nerQuery.trimJS
-    let toate = K.acte.enumerated().map { (a: $1, i: $0, v: c.act($1.key)) }
+    let toate = acteOf(c).enumerated().map { (a: $1, i: $0, v: c.act($1.key)) }
     let vis = toate.filter { x in (f == "ALL" || (f == "NOK" ? x.v.status == "nok" : x.v.status.isEmpty)) && matchAct(c, x.a.key, q) }
     let closed = q.isEmpty && ed.ui.catCollapsed.are("acte")
     let gol = toate.filter { $0.v.status.isEmpty }
     let lipsa = toate.filter { $0.v.status == "nok" }
-    func nr(_ l: [(a: (key: String, label: String), i: Int, v: Act)]) -> String {
+    func nr(_ l: [(a: ActSablon, i: Int, v: Act)]) -> String {
         l.count > 8 ? "\(l.prefix(8).map { "\($0.i + 1)" }.joined(separator: ", ")) +\(l.count - 8)" : l.map { "\($0.i + 1)" }.joined(separator: ", ")
     }
     var nota: ModelNotaCautare?
@@ -505,7 +561,7 @@ func acteRezultate(_ c: Control, _ ed: Editor) -> (ModelNotaCautare?, ModelGrupA
     return (nota, ModelGrupActe(restrans: closed, dezactivat: !q.isEmpty, numar: "\(vis.count) \(vis.count == 1 ? "act" : "acte")", info: info, randuri: randuri))
 }
 
-func modelRandAct(_ c: Control, _ ed: Editor, _ a: (key: String, label: String), _ i: Int) -> ModelRandAct {
+func modelRandAct(_ c: Control, _ ed: Editor, _ a: ActSablon, _ i: Int) -> ModelRandAct {
     let v = c.act(a.key)
     let path = "acte.\(a.key)"
     let collapsed = ed.ui.rowCollapsed.are("\(c.id)|act:\(a.key)")
@@ -776,6 +832,8 @@ public struct ModelCorpNeregula: Equatable, Sendable {
 public struct ModelVerificare: Equatable, Sendable {
     public let key: String, titlu: String
     public let randuri: [Rand]
+    /// fără rânduri: „Nicio centrală termică: „NU ARE” la toate construcțiile (tabul Obiectiv).”
+    public let gol: String?
     /// „Verificare expirată: X. Constatați neregula?” + butonul
     public let propunere: (text: String, buton: String)?
 
@@ -786,9 +844,13 @@ public struct ModelVerificare: Equatable, Sendable {
         /// „lipsa” | „expirata” | „valabila”
         public let stare: String
         public let text: String
+        /// de la al doilea rând: „Aceeași dată ca la …” (activ = aceeași dată și periodicitate)
+        public let caPrima: CaPrima?
     }
+    public struct CaPrima: Equatable, Sendable { public let activ: Bool, text: String }
     public static func == (a: Self, b: Self) -> Bool {
-        a.key == b.key && a.titlu == b.titlu && a.randuri == b.randuri && a.propunere?.text == b.propunere?.text && a.propunere?.buton == b.propunere?.buton
+        a.key == b.key && a.titlu == b.titlu && a.randuri == b.randuri && a.gol == b.gol
+            && a.propunere?.text == b.propunere?.text && a.propunere?.buton == b.propunere?.buton
     }
 }
 
@@ -799,7 +861,12 @@ public struct ModelConstrSelect: Equatable, Sendable {
     public let nota: String?
     public let toate: Bool
 
-    public struct Optiune: Equatable, Sendable { public let id: String, text: String, ales: Bool }
+    public struct Optiune: Equatable, Sendable {
+        public let id: String, text: String, ales: Bool
+        /// la rândurile pe centrală termică (v1.25), în construcțiile alese cu mai multe centrale: CT 1, CT 2…
+        public var centrale: [OptiuneCT] = []
+    }
+    public struct OptiuneCT: Equatable, Sendable { public let id: String, text: String, ales: Bool }
 }
 
 public struct ModelDetaliuNeregula: Equatable, Sendable {
@@ -826,7 +893,7 @@ public struct ModelASI: Equatable, Sendable {
 
 public struct ModelAmenda: Equatable, Sendable {
     public let key: String, nivel: String, titlu: String, mesaj: String
-    public let serie: ModelCamp, data: ModelCamp
+    public let data: ModelCamp
     /// „Folosește data încheierii” (buton) sau „Implicit: data încheierii (…)”
     public let dataImplicita: String?
     public let folosesteIncheierea: Bool
@@ -860,8 +927,12 @@ func rowPills(_ c: Control, _ controls: [Control], _ n: Neregula, _ collapsed: B
     if n.status == "nok" && isGrav(n) && n.sigiliu { p.append(PastilaUI("red", "Sigiliu", "lock")) }
     if n.status == "nok" && n.custom && n.grav { p.append(PastilaUI("red", "Neregulă gravă", "alert")) }
     if n.status == "nok" && n.auto {
-        let dot = sablon(n.key)?.autoNU
-        p.append(PastilaUI("neutral", "Din fișa obiectivului: NU la \(K.dotari.first { $0.key == dot }?.label ?? "")", "building"))
+        if sablon(n.key)?.autoActe != nil {
+            p.append(PastilaUI("neutral", "Din tabul Acte: act lipsă", "doc"))
+        } else {
+            let dot = sablon(n.key)?.autoNU
+            p.append(PastilaUI("neutral", "Din fișa obiectivului: NU la \(K.dotari.first { $0.key == dot }?.label ?? "")", "building"))
+        }
     }
     if n.status == "nok" {
         p.append(n.inPV ? PastilaUI("green", "Trecut în PV", "pv") : PastilaUI("warn", "Netrecut în PV", "pv"))
@@ -869,7 +940,7 @@ func rowPills(_ c: Control, _ controls: [Control], _ n: Neregula, _ collapsed: B
             let fs = fineStatus(c, n, azi)
             p.append(PastilaUI("fs-\(fs.level)", "Amendă · \(fs.label)", "fine"))
         }
-        if collapsed && c.constructii.count > 1 && secOf(n) == "ner" { p.append(PastilaUI("neutral", constructiiNume(c, n), "building")) }
+        if collapsed && c.constructii.count > 1 && secOf(n) == "ner" && !constructiiOf(c, n).isEmpty { p.append(PastilaUI("neutral", constructiiNume(c, n), "building")) }
     }
     let exp = n.status != "nok" && n.status != "nec" ? verifExpirate(c, n) : []
     if !exp.isEmpty { p.append(PastilaUI("warn", "Verificare expirată: \(exp.map(\.denumire).joined(separator: ", "))", "alert")) }
@@ -932,18 +1003,26 @@ func textConstrNU(_ c: Control, _ t: RandSablon) -> String? {
     return "\(cum): \(list.map { $0.denumire + (t.reqGrfV && !$0.regimInaltime.isEmpty ? " (\($0.regimInaltime))" : "") }.joined(separator: ", "))"
 }
 
-/// Data ultimei verificări, pe fiecare construcție relevantă; expirarea se calculează față de data controlului
+/// Data ultimei verificări, pe fiecare construcție relevantă (la verificarea CT: pe fiecare centrală); expirarea se
+/// calculează față de data controlului. De la al doilea rând: „Aceeași dată ca la …” copiază data primului rând.
 func modelVerificare(_ c: Control, _ n: Neregula) -> ModelVerificare {
     let t = sablon(n.key)
     let exp = verifExpirate(c, n)
-    let randuri = constructiiEligibile(c, n).map { k -> ModelVerificare.Rand in
-        let s = verifStare(c, n, k)
+    let list = verifUnitati(c, n)
+    let prima = list.first.map { verifStare(c, n, $0) }
+    let randuri = list.enumerated().map { i, u -> ModelVerificare.Rand in
+        let s = verifStare(c, n, u)
         let text = s.stare == "lipsa" ? "fără dată" : s.stare == "expirata" ? "expirată — era valabilă până la \(fmtDate(s.expira ?? ""))" : "valabilă până la \(fmtDate(s.expira ?? ""))"
-        return .init(id: k.id, nume: k.denumire.isEmpty ? "Construcție" : k.denumire, data: s.data, expirata: s.stare == "expirata",
-                     alegeri: t?.verifAlegeri, luni: s.luni, stare: s.stare, text: text)
+        var ca: ModelVerificare.CaPrima?
+        if i > 0, let prima, !prima.data.isEmpty {
+            ca = .init(activ: s.data == prima.data && s.luni == prima.luni, text: "Aceeași dată ca la \(list[0].denumire)")
+        }
+        return .init(id: u.id, nume: u.denumire, data: s.data, expirata: s.stare == "expirata",
+                     alegeri: t?.verifAlegeri, luni: s.luni, stare: s.stare, text: text, caPrima: ca)
     }
     return ModelVerificare(
         key: n.key, titlu: "Data ultimei verificări\(t?.verifAlegeri != nil ? "" : " · valabilă \(t?.verif ?? 0) luni")", randuri: randuri,
+        gol: randuri.isEmpty ? "Nicio centrală termică: „NU ARE” la toate construcțiile (tabul Obiectiv)." : nil,
         propunere: !exp.isEmpty && n.status != "nok"
             ? ("Verificare expirată: \(exp.map(\.denumire).joined(separator: ", ")). Constatați neregula?", "Constatat pentru \(exp.count == 1 ? "aceasta" : "cele \(exp.count)")")
             : nil)
@@ -959,15 +1038,24 @@ func modelConstrSelect(_ c: Control, _ ed: Editor, _ n: Neregula) -> ModelConstr
     let sel = constructiiOf(c, n)
     if sel.isEmpty { return nil }
     let elig = constructiiEligibile(c, n)
-    let multe = elig.count > 1 || sel.count > 1
+    // la rândurile pe centrală termică (v1.25): în construcțiile alese cu mai multe centrale se pot alege centralele
+    let peCT = perCT(c, n)
+    let multe = elig.count > 1 || sel.count > 1 || (peCT && sel.contains { centraleOf($0).count > 1 })
     let open = multe && ed.ui.constrPick == n.key
     let ids = Set(sel.map(\.id))
+    let ctAles = Set(centraleAlese(c, n).map(\.id))
     let eligIds = Set(elig.map(\.id))
     let opts = c.constructii.enumerated().filter { eligIds.contains($1.id) || ids.contains($1.id) }
+    func cts(_ k: Constructie) -> [ModelConstrSelect.OptiuneCT] {
+        guard peCT, ids.contains(k.id), centraleOf(k).count > 1 else { return [] }
+        return unitatiCT(c, k).map { .init(id: $0.id, text: "CT \($0.nr)", ales: ctAles.contains($0.id)) }
+    }
     return ModelConstrSelect(
         key: n.key, eticheta: sel.count > 1 ? "Construcțiile (\(sel.count))" : "Construcția", valoare: constructiiNume(c, n),
         multe: multe, deschis: open,
-        optiuni: open ? opts.map { i, k in .init(id: k.id, text: "\(i + 1). \(k.denumire.isEmpty ? "Construcția \(i + 1)" : k.denumire)", ales: ids.contains(k.id)) } : [],
+        optiuni: open ? opts.map { i, k in
+            .init(id: k.id, text: "\(i + 1). \(k.denumire.isEmpty ? "Construcția \(i + 1)" : k.denumire)", ales: ids.contains(k.id), centrale: cts(k))
+        } : [],
         nota: open && opts.count < c.constructii.count ? "Doar construcțiile cu \(instalatiaText(n)) bifat DA în fișă." : nil,
         toate: opts.allSatisfy { ids.contains($0.element.id) })
 }
@@ -1001,7 +1089,6 @@ func modelDetaliu(_ c: Control, _ n: Neregula, _ path: String, _ vi: InfoVeche, 
     if a.aplicata {
         let fs = fineStatus(c, n, azi)
         let fd = fineDate(c, n)
-        let serie = amendaSerieNr(a)
         var plata: ModelAmenda.Etapa?, anaf: ModelAmenda.Etapa?
         if let pp = fs.plataPana, !pp.isEmpty, !a.achitata {
             plata = .init(stare: fs.level == "blue" ? "cur" : "past", text: "Plată până la", data: fmtDate(pp),
@@ -1011,8 +1098,7 @@ func modelDetaliu(_ c: Control, _ n: Neregula, _ path: String, _ vi: InfoVeche, 
                          nelucr: fs.anafNelucr.flatMap { $0.isEmpty ? nil : "(\($0) → \(fmtDate(nextWorkingDay(ap))))" })
         }
         box = ModelAmenda(
-            key: n.key, nivel: fs.level, titlu: fs.label + (serie.isEmpty ? "" : " · \(serie)"), mesaj: fs.msg,
-            serie: ModelCamp(eticheta: "Seria și nr. amenzii", cale: "\(path).amenda.serieNr", valoare: a.serieNr, indiciu: "ex: DB 0012345"),
+            key: n.key, nivel: fs.level, titlu: fs.label, mesaj: fs.msg,
             data: ModelCamp(eticheta: "Data aplicării", cale: "\(path).amenda.data", valoare: a.data, indiciu: "", tip: .data),
             dataImplicita: a.data.isEmpty ? "Implicit: data încheierii\(fd.isEmpty ? " — necompletată" : " (\(fmtDate(fd)))")" : nil,
             folosesteIncheierea: !a.data.isEmpty,

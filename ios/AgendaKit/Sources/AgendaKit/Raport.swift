@@ -83,10 +83,9 @@ public func raportMarkup(_ r: RaportLunar, _ controls: [Control], acum: Date = C
     }
     h.append("</section>")
     if !r.amenzi.isEmpty || r.amenziFaraData > 0 {
-        let tabel = r.amenzi.isEmpty ? "" : "<table class=\"f-table\"><thead><tr><th>Data</th><th>Obiectiv</th><th>Seria și nr.</th><th>Suma</th></tr></thead><tbody>\n      "
+        let tabel = r.amenzi.isEmpty ? "" : "<table class=\"f-table\"><thead><tr><th>Data</th><th>Obiectiv</th><th>Suma</th></tr></thead><tbody>\n      "
             + r.amenzi.sortatStabil { compara($0.data, $1.data) }.map { x in
-                let serie = x.n.amenda.serieNr
-                return "<tr><td>\(escHTML(fmtDate(x.data)))</td><td>\(escHTML(x.c.denumire))</td><td>\(escHTML(serie.isEmpty ? "—" : serie))</td><td>\(x.suma != 0 && !x.suma.isNaN ? escHTML(lei(x.suma)) : "—")</td></tr>"
+                "<tr><td>\(escHTML(fmtDate(x.data)))</td><td>\(escHTML(x.c.denumire))</td><td>\(x.suma != 0 && !x.suma.isNaN ? escHTML(lei(x.suma)) : "—")</td></tr>"
             }.joined() + "</tbody></table>"
         let fara = r.amenziFaraData > 0
             ? "<p>+ \(r.amenziFaraData) \(r.amenziFaraData == 1 ? "amendă" : "amenzi") din controale neîncheiate, fără data aplicării (nu sunt numărate mai sus).</p>" : ""

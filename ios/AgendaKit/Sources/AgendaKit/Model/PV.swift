@@ -18,7 +18,9 @@ public func pvText(_ c: Control, _ controls: [Control] = [], doarNetrecute: Bool
     var nr = 0
     let multe = c.constructii.count > 1
     for sec in sectiuniActive(c) {
-        let rows = c.nereguli.filter { secOf($0) == sec && $0.status == "nok" && (!doarNetrecute || !$0.inPV) }
+        // fără „cu acte”: nici neregulile actelor lipsă (ao, ap, aq)
+        let rows = c.nereguli.filter { secOf($0) == sec && $0.status == "nok" && (!doarNetrecute || !$0.inPV)
+            && (cuActe || $0.custom || sablon($0.key)?.autoActe == nil) }
         if rows.isEmpty { continue }
         lines.append(contentsOf: ["", "\(K.sectiune(sec).label):"])
         for n in rows {
@@ -33,16 +35,14 @@ public func pvText(_ c: Control, _ controls: [Control] = [], doarNetrecute: Bool
             if n.custom && n.grav { extra.append("neregulă gravă") }
             if isGrav(n) && n.sigiliu { extra.append("sigiliu aplicat") }
             if vecheInfo(controls, c, n).veche { extra.append("neregulă veche") }
-            if n.amenda.aplicata {
-                let sn = amendaSerieNr(n.amenda)
-                extra.append("sancționat cu amendă\(sn.isEmpty ? "" : " \(sn)")")
-            }
+            if n.amenda.aplicata { extra.append("sancționat cu amendă") }
             if !extra.isEmpty { t += " (\(extra.joined(separator: "; ")))" }
             lines.append(t)
         }
     }
-    if cuActe {
-        let lipsa = K.acte.filter { c.act($0.key).status == "nok" }
+    // din v1.25 actele lipsă sunt nereguli (ao, ap, aq), deja în listă; controalele încheiate înainte le au separat
+    if cuActe, !(sablon("ao").map { inCatalog(c, $0) } ?? false) {
+        let lipsa = acteOf(c).filter { c.act($0.key).status == "nok" }
         if !lipsa.isEmpty {
             lines.append(contentsOf: ["", "Acte de autoritate și evidențe lipsă:"])
             for a in lipsa {
@@ -75,7 +75,7 @@ public func todoList(_ c: Control, includeClose: Bool = true) -> [PasDeFacut] {
     if c.denumire.trimJS.isEmpty {
         out.append(PasDeFacut(id: "denumire", level: "todo", text: "Completați denumirea obiectivului", tab: "obiectiv", focus: "sec-date"))
     }
-    let acteTodo = K.acte.filter { c.act($0.key).status.isEmpty }
+    let acteTodo = acteOf(c).filter { c.act($0.key).status.isEmpty }
     if !acteTodo.isEmpty {
         out.append(PasDeFacut(id: "acte", level: "todo", text: "\(acteTodo.count) \(acteTodo.count == 1 ? "act neverificat" : "acte neverificate")",
                               tab: "acte", focus: "act-\(acteTodo[0].key)"))
@@ -113,14 +113,13 @@ public func todoList(_ c: Control, includeClose: Bool = true) -> [PasDeFacut] {
         out.append(PasDeFacut(id: "pv", level: "warn", text: "\(netrec.count) \(netrec.count == 1 ? "constatare netrecută" : "constatări netrecute") în PV",
                               tab: tabOf(secOf(netrec[0])), focus: netrec[0].key))
     }
-    for n in active where n.status == "nok" && n.amenda.aplicata {
-        var lipsa: [String] = []
-        if amendaSerieNr(n.amenda).isEmpty { lipsa.append("seria / nr.") }
-        if n.amenda.suma.trimJS.isEmpty { lipsa.append("suma") }
-        if !lipsa.isEmpty {
-            out.append(PasDeFacut(id: "fine-\(n.key)", level: "warn", text: "Amendă fără \(lipsa.joined(separator: " și ")): \(constatareLabel(n))",
-                                  tab: tabOf(secOf(n)), focus: n.key))
-        }
+    for n in active where n.status == "nok" && n.amenda.aplicata && n.amenda.suma.trimJS.isEmpty {
+        out.append(PasDeFacut(id: "fine-\(n.key)", level: "warn", text: "Amendă fără suma: \(constatareLabel(n))",
+                              tab: tabOf(secOf(n)), focus: n.key))
+    }
+    // „De întrebat până la finalizarea controlului”: fiecare sarcină nerezolvată, cu textul ei
+    for x in c.deIntrebat where !x.gata && !x.text.trimJS.isEmpty {
+        out.append(PasDeFacut(id: "intreb-\(x.id)", level: "warn", text: "De întrebat: \(peUnRand(x.text.trimJS))", tab: "obiectiv", focus: "sec-intrebari"))
     }
     let faraGps = c.constructii.filter { $0.gps == nil }
     if !faraGps.isEmpty {
@@ -177,6 +176,12 @@ public func schimbare(_ a: Control, _ b: Control) -> Schimbare {
     for act in K.acte where a.o.obj("acte")[act.key] != b.o.obj("acte")[act.key] {
         return Schimbare(tab: "acte", focus: "act-\(act.key)", text: act.label)
     }
+    if a.o["deIntrebat"] != b.o["deIntrebat"] {
+        return Schimbare(tab: "obiectiv", focus: "sec-intrebari", text: "De întrebat până la finalizarea controlului")
+    }
+    if a.o["observatiiGenerale"] != b.o["observatiiGenerale"] {
+        return Schimbare(tab: "obiectiv", focus: "sec-observatii", text: "Observații generale")
+    }
     let ka = a.constructii, kb = b.constructii
     var ids: [String] = []
     for k in ka + kb where !ids.contains(k.id) { ids.append(k.id) }
@@ -186,6 +191,7 @@ public func schimbare(_ a: Control, _ b: Control) -> Schimbare {
         if let y { return Schimbare(tab: "obiectiv", focus: "constr-\(id)", text: y.denumire.isEmpty ? "construcția" : y.denumire) }
         return Schimbare(tab: "obiectiv", focus: "sec-constructii", text: "construcțiile")
     }
+    if ka.map(\.id) != kb.map(\.id) { return Schimbare(tab: "obiectiv", focus: "sec-constructii", text: "ordinea construcțiilor") }
     if a.o["adapostPC"] != b.o["adapostPC"] { return Schimbare(tab: "pc", focus: "adapostPC", text: "Adăpost de protecție civilă") }
     if a.dataInceput != b.dataInceput || a.dataIncheiere != b.dataIncheiere {
         return Schimbare(tab: "obiectiv", focus: "sec-perioada", text: "perioada controlului")

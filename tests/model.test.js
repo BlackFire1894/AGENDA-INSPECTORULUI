@@ -8,7 +8,9 @@ import {
   neregulaLetter, tabOfNeregula, controlStats, constructieOf, amendaSerieNr, ACTE, emptyConstructie,
   vecheInfo, pvText, constatareLabel, todoList, NEREGULI_GRAVE, constructiiCuNU,
   fmtCoord, googleMapsUrl, gpsQuality, constructiiOf, constructiiNume, matchNeregula, pesteParter, grfVPesteParter, sablon, isGrav, syncAutoNU,
-  constructiiEligibile, verifStare, verifExpirate, verifText, catalogOf, fixeazaCatalog, schimbare, SCHEMA_VERSION, matchAct,
+  constructiiEligibile, verifStare, verifExpirate, verifText, catalogOf, fixeazaCatalog, migreazaDeschis, schimbare, SCHEMA_VERSION, matchAct,
+  syncAutoActe, acteOf, acteLipsa, dotariVizibile, valDotare, ilumHintAscuns, areCentrala, centraleOf, verifUnitati, centraleAlese,
+  parseCoord, gpsEgal, DOTARI, neregulaLabel,
   incarcareStatus, parseSuma,
   sigiliiControl, sigiliiText, emptyNeregula,
   emptyAdapost, adaposturi, adaposturiStats, adaposturiText, syncAdaposturi,
@@ -100,17 +102,48 @@ test('căutare după nume (fără diacritice) și după dată', () => {
   assert.deepEqual(parseDateQuery('31.02.2026'), null);
 });
 
-test('control nou pe obiectiv existent preia datele, resetează constatările', () => {
+test('control nou pe obiectiv existent (v1.25): preia tot, constatările vin constatate, restul de la zero', () => {
   const prev = newControl({ denumire: 'Primăria X', start: '2026-01-10' });
   prev.administrator = 'Ion Popescu';
+  Object.assign(prev, { persoanaParticipanta: 'Ana Pop', observatiiGenerale: 'Acces prin curte',
+    deIntrebat: [{ id: 'q1', text: 'Cere avizul', gata: false }, { id: 'q2', text: 'Rezolvat', gata: true }] });
+  prev.dataIncheiere = '2026-01-12';
   prev.constructii[0].suprafata = '1200';
-  prev.nereguli[0].status = 'nok';
+  prev.constructii[0].gps = { lat: 45, lon: 25, acc: 10, la: '2026-01-10T08:00:00.000Z' };
+  prev.acte.lfd = { status: 'nok', obs: 'expirată' };
+  const d = prev.nereguli.find((n) => n.key === 'd');
+  Object.assign(d, { status: 'nok', obs: 'P2', inPV: true, constructieIds: [prev.constructii[0].id] });
+  d.amenda = { ...d.amenda, aplicata: true, suma: '500' };
+  prev.nereguli.find((n) => n.key === 'e').status = 'ok';
+  prev.nereguli.find((n) => n.key === 'f').status = 'nec';
+  Object.assign(prev.nereguli.find((n) => n.key === 'a'), { status: 'nok', asiTermen: true });
+  prev.nereguli.find((n) => n.key === 'b1').verificari[prev.constructii[0].id] = { data: '2025-05-01' };
+  prev.nereguli.push({ ...emptyNeregula('k1', true, 'ner'), label: 'Cablu neprotejat', status: 'nok', grav: true, sigiliu: true });
+  prev.nereguli.push({ ...emptyNeregula('k2', true, 'ner'), label: 'Conform suplimentar', status: 'ok' });
   const next = controlFromPrevious(prev, '2026-09-01');
+  const n = (k) => next.nereguli.find((x) => x.key === k);
   assert.equal(next.objectiveId, prev.objectiveId);
   assert.equal(next.administrator, 'Ion Popescu');
+  assert.equal(next.persoanaParticipanta, 'Ana Pop');
+  assert.equal(next.observatiiGenerale, 'Acces prin curte');
+  assert.deepEqual(next.deIntrebat, [{ id: 'q1', text: 'Cere avizul', gata: false }]);   // doar cele nerezolvate
+  assert.equal(next.dataInceput, '2026-09-01');
+  assert.equal(next.dataIncheiere, '');
   assert.equal(next.constructii[0].suprafata, '1200');
+  assert.deepEqual(next.constructii[0].gps, prev.constructii[0].gps);
   assert.notEqual(next.constructii[0].id, prev.constructii[0].id);
-  assert.equal(next.nereguli[0].status, '');
+  assert.deepEqual(next.acte.lfd, { status: '', obs: 'expirată' });                        // starea se verifică din nou
+  // constatarea: aceeași stare, observații, construcții (noile id-uri); fără PV, amendă, sigiliu, termen ASI
+  assert.equal(n('d').status, 'nok'); assert.equal(n('d').obs, 'P2');
+  assert.deepEqual(n('d').constructieIds, [next.constructii[0].id]);
+  assert.equal(n('d').inPV, false); assert.equal(n('d').amenda.aplicata, false);
+  assert.equal(n('a').status, 'nok'); assert.equal(n('a').asiTermen, false);
+  assert.equal(n('e').status, ''); assert.equal(n('f').status, '');                     // Conform / NEC: de la zero
+  assert.deepEqual(n('b1').verificari, {});                                                // datele verificărilor: de la zero
+  assert.equal(n('k1').status, 'nok'); assert.equal(n('k1').grav, true); assert.equal(n('k1').sigiliu, false);
+  assert.equal(n('k2'), undefined);
+  assert.equal(n('ao').status, '');                   // actele pornesc necompletate: neregula lor, doar la „Lipsă”
+  assert.equal(vecheInfo([prev, next], next, n('d')).veche, true);                          // devin „neregulă veche”
   const objs = objectives([prev, next]);
   assert.equal(objs.length, 1);
   assert.equal(objs[0].controls.length, 2);
@@ -163,7 +196,7 @@ test('nereguli de instalații: apar doar dacă instalația e bifată DA la dotă
   // un rând completat nu dispare, chiar dacă instalația e scoasă
   n('q').status = 'nok';
   assert.ok(isApplicable(c, n('q')));
-  assert.equal(secStats(c, 'ner').total, 8 + 5 + 2 + 4 + 2 + 1); // a,b1,b2,b3,d,e,f,al + aa…ae + ah,ai (mereu) + c1,i,l,m + g,h + q
+  assert.equal(secStats(c, 'ner').total, 8 + 5 + 2 + 4 + 2 + 1 + 1); // a,b1,b2,b3,d,e,f,al + aa…ae + ah,ai (mereu) + c1,i,l,m + g,h + q + an (v1.25)
 });
 
 test('Planuri/SVSU și Protecție civilă: doar la Localitate, cu amenzi în Panou', () => {
@@ -272,10 +305,12 @@ test('text PV: numerotare, construcție, observații pe un rând, filtru netrecu
   Object.assign(d, { status: 'nok', obs: 'P6 nr. 3\nhol', constructieIds: [c.constructii[1].id], inPV: true });
   c.nereguli.find((n) => n.key === 'e').status = 'nok';
   c.acte.lfd.status = 'nok';
+  syncAutoActe(c);   // ca la atingerea din tabul Acte
   const t = pvText(c, [c]).text;
-  assert.match(t, /1\. Stingătoare expirate – construcția: Sala de sport\. P6 nr\. 3; hol/);
-  assert.match(t, /2\. Stingătoare neconforme – construcția: Construcția 1/);
-  assert.match(t, /Acte de autoritate și evidențe lipsă:\n3\. Dispoziție LFD/);
+  assert.match(t, /1\. Nu a prezentat acte de autoritate \/ evidențe\. Dispoziție LFD\n/);   // fără construcție
+  assert.match(t, /2\. Stingătoare expirate – construcția: Sala de sport\. P6 nr\. 3; hol/);
+  assert.match(t, /3\. Stingătoare neconforme – construcția: Construcția 1/);
+  assert.doesNotMatch(t, /Acte de autoritate și evidențe lipsă:/);                         // din v1.25: ca nereguli
   const n2 = pvText(c, [c], { doarNetrecute: true, cuActe: false });
   assert.equal(n2.count, 1);
   assert.doesNotMatch(n2.text, /expirate/);
@@ -309,7 +344,7 @@ test('„Ce mai am de făcut”: pașii rămași, în ordine, și lista goală l
   t = todoList(c);
   assert.deepEqual(t.map((x) => x.id), ['pv', 'fine-d', 'close']);
   assert.equal(t[0].focus, 'd');
-  assert.match(t[1].text, /seria \/ nr\. și suma/);
+  assert.match(t[1].text, /^Amendă fără suma: /);
   d.inPV = true; Object.assign(d.amenda, { serie: 'AB', numar: '1', suma: '500' });
   c.dataIncheiere = '2026-09-01';
   // după încheiere rămâne încărcarea (aplicația ISU + documentul)
@@ -588,13 +623,12 @@ test('v1.11: verificări defalcate, date pe construcție, expirare față de dat
   n('b2').status = 'nec';
   assert.ok(!todoList(c).some((x) => x.id === 'verif-b2'));
   assert.doesNotMatch(pvText(c, [c]).text, /împământare/);
-  // control nou: datele verificărilor se preiau, pe construcțiile noi
+  // control nou (v1.25): constatarea rămâne, datele verificărilor pornesc goale (loc pentru datele noi)
   const urm = controlFromPrevious(c, '2027-10-01');
   const b1 = urm.nereguli.find((x) => x.key === 'b1');
-  assert.equal(b1.status, '');
-  assert.deepEqual(Object.values(b1.verificari).map((v) => v.data).sort(), ['2025-09-23', '2025-09-24']);
-  assert.equal(b1.verificari[urm.constructii[0].id].data, '2025-09-23');
-  assert.equal(verifText(urm, { ...b1, status: 'nok' }), 'Construcția 1: ultima verificare 23.09.2025, expirată (era valabilă până la 23.09.2026)');
+  assert.equal(b1.status, 'nok');
+  assert.deepEqual(b1.verificari, {});
+  assert.equal(verifText(urm, b1), 'Construcția 1: fără verificare prezentată');
 });
 
 test('v1.11: NEC, aj/ak, rânduri vechi b/c, an construire, nr. ASI — compatibilitate', () => {
@@ -676,10 +710,11 @@ test('v1.12: seria și nr. amenzii într-un singur câmp', () => {
   const d = c.nereguli.find((x) => x.key === 'd');
   assert.equal(d.amenda.serieNr, 'DB 0012345');
   assert.ok(!('serie' in d.amenda) && !('numar' in d.amenda));
-  assert.match(pvText(c, [c]).text, /sancționat cu amendă Seria DB nr\. 0012345/);
-  // „Ce mai aveți de făcut”: lipsa seriei / nr.
+  // v1.25: seria nu mai apare (PV, fișă, Panou) și nu mai e cerută; datele vechi rămân în control
+  assert.match(pvText(c, [c]).text, /Stingătoare expirate \(sancționat cu amendă\)/);
+  assert.doesNotMatch(pvText(c, [c]).text, /Seria/);
   d.amenda.serieNr = '';
-  assert.ok(todoList(c).some((x) => x.id === 'fine-d' && /seria \/ nr\./.test(x.text)));
+  assert.ok(!todoList(c).some((x) => x.id === 'fine-d'));
 });
 
 test('v1.12: Anulează / Refă — locul schimbat', () => {
@@ -696,6 +731,13 @@ test('v1.12: Anulează / Refă — locul schimbat', () => {
   assert.equal(schimbare(a, b).focus, 'sec-perioada');
   b = clone(); b.administrator = 'Ion';
   assert.equal(schimbare(a, b).focus, 'sec-date');
+  // v1.25: ordinea construcțiilor, De întrebat, observațiile generale
+  b = clone(); b.constructii.reverse();
+  assert.deepEqual(schimbare(a, b), { tab: 'obiectiv', focus: 'sec-constructii', text: 'ordinea construcțiilor' });
+  b = clone(); b.deIntrebat.push({ id: 'q1', text: 'x', gata: false });
+  assert.equal(schimbare(a, b).focus, 'sec-intrebari');
+  b = clone(); b.observatiiGenerale = 'y';
+  assert.equal(schimbare(a, b).focus, 'sec-observatii');
   // rând adăugat, apoi anulat: se arată secțiunea de rânduri adăugate
   const cu = clone(); cu.nereguli.push({ key: 'x1', custom: true, sec: 'ner', label: 'test', status: 'nok' });
   assert.deepEqual(schimbare(cu, a), { tab: 'nereguli', focus: 'add-ner', text: 'rândul adăugat' });
@@ -886,16 +928,18 @@ test('adăposturile de protecție civilă: rânduri de neregulă, pe tipul obiec
   // Localitate: trec în tabul Protecție civilă
   c.adapostPC.v = 'DA'; c.tip = 'LOCALITATE'; syncAdaposturi(c);
   assert.ok(adaposturi(c).every((n) => n.sec === 'pc'));
-  // controlul următor: aceleași adăposturi (cheie, locație), starea se verifică din nou; neconform din nou = neregulă veche
+  // controlul următor (v1.25): aceleași adăposturi (cheie, locație); cel neconform rămâne neconform (neregulă veche),
+  // celelalte se verifică din nou
   const c2 = controlFromPrevious(c, '2027-10-01');
-  assert.deepEqual(adaposturi(c2).map((n) => [n.key, n.locatie, n.status, n.sec]), adaposturi(c).map((n) => [n.key, n.locatie, '', 'pc']));
-  const b = adaposturi(c2).find((n) => n.key === a2.key); b.status = 'nok';
+  assert.deepEqual(adaposturi(c2).map((n) => [n.key, n.locatie, n.status, n.sec]), adaposturi(c).map((n) => [n.key, n.locatie, n.status === 'nok' ? 'nok' : '', 'pc']));
+  const b = adaposturi(c2).find((n) => n.key === a2.key);
+  assert.equal(b.obs, 'Ușa etanșă lipsă');
   assert.equal(vecheInfo([c, c2], c2, b).veche, true);
 });
 
 test('schema 11: cele 4 rubrici de organizare a protecției civile, doar la controalele noi', () => {
   const keys = ['pcAgentInundatii', 'pcInspector', 'pcTaxa', 'pcConventii'];
-  assert.equal(SCHEMA_VERSION, 11);
+  assert.ok(SCHEMA_VERSION >= 11);
   const l = newControl({ tip: 'LOCALITATE', start: '2026-10-01' });
   assert.deepEqual(keys.map((k) => isApplicable(l, l.nereguli.find((n) => n.key === k))), [true, true, true, true]);
   const inc = normalizeControl({ ...newControl({ tip: 'LOCALITATE', start: '2025-01-10' }), dataIncheiere: '2025-01-10', catalog: 10 });
@@ -936,3 +980,173 @@ test('datele și cazurile de test pentru aplicația nativă sunt la zi (altfel: 
   execFileSync(process.execPath, ['tests/nativ/exporta.mjs', '--verifica'], { stdio: 'pipe' });
 });
 
+
+// ───────── v1.25 ─────────
+
+test('v1.25: actele lipsă devin nereguli (ao grup, ap controale proprii, aq analiză semestrială)', () => {
+  const c = newControl({ denumire: 'X', start: '2026-10-01' });
+  const n = (k) => c.nereguli.find((x) => x.key === k);
+  assert.ok(!isApplicable(c, n('ao')) && !isApplicable(c, n('ap')) && !isApplicable(c, n('aq')));   // doar la „Lipsă”
+  c.acte.lfd = { status: 'nok', obs: 'expirată\nnesemnată' };
+  c.acte.comisie.status = 'nok';
+  c.acte.controale = { status: 'nok', obs: 'ultimul în 2024' };
+  assert.deepEqual(syncAutoActe(c), [{ key: 'ao', r: 'added' }, { key: 'ap', r: 'added' }]);
+  assert.equal(n('ao').obs, 'Dispoziție LFD: expirată; nesemnată\nComisie PSI');
+  assert.equal(n('ap').obs, 'ultimul în 2024');
+  assert.equal(n('aq').status, '');
+  assert.ok(n('ao').auto && isApplicable(c, n('ao')));
+  assert.deepEqual(constructiiOf(c, n('ao')), []);                                        // țin de obiectiv
+  assert.deepEqual(syncAutoActe(c), []);                                                  // nimic nou
+  // observațiile actului se actualizează în neregulă (cât timp nu au fost editate în neregulă)
+  c.acte.comisie.obs = 'nenumită';
+  assert.deepEqual(syncAutoActe(c, { obsOnly: true }), [{ key: 'ao', r: 'updated' }]);
+  assert.match(n('ao').obs, /Comisie PSI: nenumită/);
+  // act prezentat: neregula se retrage; lucrată (PV): rămâne
+  c.acte.controale.status = 'ok';
+  assert.deepEqual(syncAutoActe(c), [{ key: 'ap', r: 'removed' }]);
+  assert.equal(n('ap').status, '');
+  n('ao').inPV = true;
+  c.acte.lfd.status = 'ok'; c.acte.comisie.status = 'ok';
+  assert.deepEqual(syncAutoActe(c), [{ key: 'ao', r: 'kept' }]);
+  assert.equal(n('ao').status, 'nok');
+  assert.equal(neregulaLabel(n('ao')), 'Nu a prezentat acte de autoritate / evidențe');
+  assert.equal(neregulaLabel(n('ap')), 'Lipsă controale proprii');
+  assert.equal(neregulaLabel(n('aq')), 'Lipsă analiză semestrială');
+});
+
+test('v1.25: act nou „fumat”, dotarea „Ascensor” și rândul „an”: doar la controalele deschise / încheiate de acum', () => {
+  const c = newControl({ start: '2026-10-01' });
+  assert.ok(acteOf(c).some((a) => a.key === 'fumat'));
+  assert.equal(acteOf(c)[2].label, 'Dispoziție de reglementare a fumatului');
+  assert.ok(dotariVizibile(c, c.constructii[0]).some((d) => d.key === 'ascensor'));
+  assert.deepEqual(DOTARI.find((d) => d.key === 'ascensor').opts, ['DA', 'NU']);
+  const an = c.nereguli.find((x) => x.key === 'an');
+  assert.ok(isApplicable(c, an));
+  assert.equal(neregulaLabel(an), 'Chepengul / ușa de acces în pod nu este RF 30 / 45 minute');
+  assert.equal(sablon('an').cat, 'electric');
+  // încheiat înainte de v1.25 (lista înghețată la 11): fără act nou, fără ascensor, fără rândurile noi
+  const vechi = normalizeControl({ ...newControl({ start: '2025-05-01' }), dataIncheiere: '2025-05-02', catalog: 11, schema: 11 });
+  assert.ok(!acteOf(vechi).some((a) => a.key === 'fumat'));
+  assert.equal(controlStats(vechi).acteTotal, ACTE.length - 1);
+  assert.ok(!dotariVizibile(vechi, vechi.constructii[0]).some((d) => d.key === 'ascensor'));
+  for (const k of ['an', 'ao', 'ap', 'aq']) assert.ok(!isApplicable(vechi, vechi.nereguli.find((x) => x.key === k)), k);
+});
+
+test('v1.25: controalele în desfășurare primesc o dată neregulile actelor lipsă; cele încheiate rămân neatinse', () => {
+  const deschis = newControl({ start: '2026-09-01' });
+  deschis.schema = 11; deschis.acte.analiza.status = 'nok'; deschis.acte.lfd.status = 'nok';
+  const d = normalizeControl(JSON.parse(JSON.stringify(deschis)));
+  assert.equal(d.nereguli.find((x) => x.key === 'aq').status, 'nok');
+  assert.equal(d.nereguli.find((x) => x.key === 'ao').status, 'nok');
+  assert.equal(d.schema, 12);
+  // o singură dată: marcată Conform de inspector, nu se reconstată la încărcarea următoare
+  d.nereguli.find((x) => x.key === 'aq').status = 'ok';
+  assert.equal(normalizeControl(JSON.parse(JSON.stringify(d))).nereguli.find((x) => x.key === 'aq').status, 'ok');
+  const inc = { ...JSON.parse(JSON.stringify(deschis)), dataIncheiere: '2026-09-02', catalog: 11 };
+  const i = normalizeControl(inc);
+  assert.equal(i.nereguli.find((x) => x.key === 'aq').status, '');
+  assert.equal(i.schema, 11);
+  // redeschis acum: primește regulile noi la salvare (fixeazaCatalog), fără reîncărcare
+  i.dataIncheiere = '';
+  fixeazaCatalog(i);
+  assert.ok(!('catalog' in i));
+  assert.equal(i.nereguli.find((x) => x.key === 'aq').status, 'nok');
+  assert.equal(i.nereguli.find((x) => x.key === 'ao').status, 'nok');
+  assert.equal(i.schema, 12);
+  assert.equal(migreazaDeschis(i), false);
+});
+
+test('v1.25: iluminat Hint cu NEC; ascuns (și fără „Lipsă iluminat Hint”) când Hidranți interiori e NU / NEC', () => {
+  const c = newControl({ start: '2026-10-01' });
+  const k = c.constructii[0];
+  assert.deepEqual(DOTARI.find((d) => d.key === 'ilumHint').opts, ['DA', 'NU', 'NEC']);
+  k.dotari.ilumHint.v = 'NU';
+  assert.equal(syncAutoNU(c, 'ilumHint'), 'added');
+  k.dotari.hidInt.v = 'NEC';
+  assert.ok(ilumHintAscuns(c, k));
+  assert.ok(!dotariVizibile(c, k).some((d) => d.key === 'ilumHint'));
+  assert.equal(valDotare(c, k, 'ilumHint'), '');
+  assert.equal(syncAutoNU(c, 'ilumHint'), 'removed');
+  k.dotari.hidInt.v = 'NU';
+  assert.ok(ilumHintAscuns(c, k));
+  k.dotari.hidInt.v = 'DA';
+  assert.ok(!ilumHintAscuns(c, k));
+  assert.equal(valDotare(c, k, 'ilumHint'), 'NU');
+  // controalele încheiate înainte: regula nu se aplică
+  const vechi = normalizeControl({ ...newControl({ start: '2025-05-01' }), dataIncheiere: '2025-05-02', catalog: 11 });
+  vechi.constructii[0].dotari.hidInt.v = 'NEC'; vechi.constructii[0].dotari.ilumHint.v = 'NU';
+  assert.ok(!ilumHintAscuns(vechi, vechi.constructii[0]));
+});
+
+test('v1.25: centralele termice pe număr; verificarea CT (b3) și camera CT (g, h) pe fiecare centrală', () => {
+  // date vechi: tipurile bifate → o centrală
+  const c = normalizeControl({ id: 'x', objectiveId: 'o', dataInceput: '2026-10-01',
+    constructii: [{ id: 'k1', denumire: 'Corp A', dotari: { centrala: { tipuri: ['GAZOS'], nuAre: false, obs: '' } } },
+      { id: 'k2', denumire: 'Corp B', dotari: { centrala: { tipuri: [], nuAre: true, obs: '' } } },
+      { id: 'k3', denumire: 'Corp C', dotari: {} }],
+    nereguli: [{ key: 'b3', verificari: { k1: { data: '2025-01-10' } } }] });
+  const [k1, k2, k3] = c.constructii;
+  assert.deepEqual(centraleOf(k1), [{ id: 'ct1', tipuri: ['GAZOS'] }]);
+  assert.deepEqual(centraleOf(k2), []); assert.deepEqual(centraleOf(k3), []);
+  assert.ok(areCentrala(k1) && !areCentrala(k2) && !areCentrala(k3));
+  k1.dotari.centrala.ct.push({ id: 'ctx', tipuri: ['SOLID'] });
+  const b3 = c.nereguli.find((x) => x.key === 'b3');
+  const u = verifUnitati(c, b3);
+  // Corp A: CT 1, CT 2; Corp B „NU ARE”: fără rând; Corp C necompletat: pe construcție
+  assert.deepEqual(u.map((x) => [x.id, x.denumire]), [['k1:ct1', 'Corp A – CT 1'], ['k1:ctx', 'Corp A – CT 2'], ['k3', 'Corp C']]);
+  assert.equal(verifStare(c, b3, u[0]).data, '2025-01-10');   // prima centrală preia data scrisă pe construcție
+  assert.equal(verifStare(c, b3, u[1]).stare, 'lipsa');
+  // camera CT: centralele alese
+  const g = c.nereguli.find((x) => x.key === 'g');
+  Object.assign(g, { status: 'nok', constructieIds: ['k1'], ctIds: ['k1:ctx'] });
+  assert.deepEqual(centraleAlese(c, g).map((x) => x.id), ['k1:ctx']);
+  assert.equal(constructiiNume(c, g), 'Corp A – CT 2');
+  delete g.ctIds;
+  assert.equal(constructiiNume(c, g), 'Corp A');
+  // controalele încheiate înainte: pe construcție
+  const vechi = normalizeControl({ ...JSON.parse(JSON.stringify(c)), dataIncheiere: '2026-10-02', catalog: 11 });
+  assert.deepEqual(verifUnitati(vechi, vechi.nereguli.find((x) => x.key === 'b3')).map((x) => x.id), ['k1', 'k2', 'k3']);
+});
+
+test('v1.25: „De întrebat până la finalizarea controlului” în „Ce mai aveți de făcut”; participant, observații', () => {
+  const c = newControl({ denumire: 'X', start: '2026-10-01' });
+  assert.deepEqual(c.deIntrebat, []);
+  assert.equal(c.persoanaParticipanta, ''); assert.equal(c.observatiiGenerale, '');
+  c.deIntrebat = [{ id: 'q1', text: 'Cere\ncontractul', gata: false }, { id: 'q2', text: 'Gata', gata: true }, { id: 'q3', text: '  ', gata: false }];
+  const t = todoList(c).filter((x) => x.id.startsWith('intreb-'));
+  assert.deepEqual(t.map((x) => [x.id, x.text, x.tab, x.focus]), [['intreb-q1', 'De întrebat: Cere; contractul', 'obiectiv', 'sec-intrebari']]);
+  // normalizare: elemente fără id primesc unul stabil
+  const n = normalizeControl({ id: 'x', objectiveId: 'o', dataInceput: '2026-10-01', deIntrebat: [{ text: 'a' }, null, { id: 'z', text: 'b', gata: 1 }] });
+  assert.deepEqual(n.deIntrebat, [{ text: 'a', id: 'q1', gata: false }, { id: 'z', text: 'b', gata: true }]);
+  c.persoanaParticipanta = 'Ana Pop';
+  assert.ok(matchControl(c, 'ana pop'));
+  // Anulează / Refă: locul schimbat
+  const a = JSON.parse(JSON.stringify(c)); c.deIntrebat[0].gata = true;
+  assert.equal(schimbare(a, c).focus, 'sec-intrebari');
+});
+
+test('v1.25: neregula veche se raportează doar la controlul imediat anterior', () => {
+  const c1 = newControl({ denumire: 'X', start: '2025-01-10' });
+  const c2 = { ...newControl({ denumire: 'X', start: '2026-01-10' }), objectiveId: c1.objectiveId };
+  const c3 = { ...newControl({ denumire: 'X', start: '2026-10-10' }), objectiveId: c1.objectiveId };
+  c1.nereguli.find((x) => x.key === 'd').status = 'nok';
+  const d3 = c3.nereguli.find((x) => x.key === 'd'); d3.status = 'nok';
+  assert.equal(vecheInfo([c1, c2, c3], c3, d3).veche, false);     // constatată acum 2 controale, nu la cel anterior
+  c2.nereguli.find((x) => x.key === 'd').status = 'nok';
+  assert.equal(vecheInfo([c1, c2, c3], c3, d3).auto.id, c2.id);
+});
+
+test('v1.25: coordonatele scrise de mână și „aceleași coordonate”', () => {
+  assert.deepEqual(parseCoord('44.426800, 26.102500'), { lat: 44.4268, lon: 26.1025 });
+  assert.deepEqual(parseCoord('44,4268 26,1025'), { lat: 44.4268, lon: 26.1025 });
+  assert.deepEqual(parseCoord('44.4268;26.1025'), { lat: 44.4268, lon: 26.1025 });
+  assert.deepEqual(parseCoord('-33.8688, 151.2093'), { lat: -33.8688, lon: 151.2093 });
+  assert.deepEqual(parseCoord('44°25′36″ N 26°6′9″ E'), { lat: 44.426667, lon: 26.1025 });
+  assert.deepEqual(parseCoord("44° 25' 36\" N, 26° 6' 9\" E"), { lat: 44.426667, lon: 26.1025 });
+  assert.deepEqual(parseCoord('26°6′9″ E 44°25′36″ N'), { lat: 44.426667, lon: 26.1025 });
+  assert.deepEqual(parseCoord('33°52′ S 151°12′ E'), { lat: -33.866667, lon: 151.2 });
+  for (const x of ['', 'abc', '44.4268', '95.1, 26.1', '44.1, 190.2', '44,4268,26,1025', '44° N']) assert.equal(parseCoord(x), null, x);
+  assert.equal(gpsQuality(null), 'manual');
+  assert.ok(gpsEgal({ lat: 1, lon: 2, acc: 5 }, { lat: 1, lon: 2, acc: 9 }));
+  assert.ok(!gpsEgal(null, { lat: 1, lon: 2 }) && !gpsEgal({ lat: 1, lon: 2 }, { lat: 1, lon: 3 }));
+});

@@ -63,6 +63,13 @@ enum Tur {
             }
             await pas("foto-fisa", asteapta: 3, maxPagini: 40) { nav.mergi(.fisa(o.id)) }
         }
+        // v1.25: De întrebat, observații, participant; centralele pe număr; verificarea CT pe centrale; actele lipsă
+        if let d = deschis { await pas("v125-obiectiv") { nav.mergi(.control(id: d.id, tab: "obiectiv", focus: nil)) } }
+        if let sp = cs.first(where: { $0.constructii.contains { centraleOf($0).count > 1 } }) {
+            await pas("v125-centrale") { nav.mergi(.control(id: sp.id, tab: "obiectiv", focus: nil)) }
+            await pas("v125-b3", maxPagini: 8) { nav.mergi(.control(id: sp.id, tab: "nereguli", focus: "b3")) }
+            await pas("v125-ao", maxPagini: 3) { nav.mergi(.control(id: sp.id, tab: "nereguli", focus: "ao")) }
+        }
         await pas("ghid", asteapta: 3, maxPagini: 4) { nav.mergi(.ghid) }
         await pas("setari") { nav.mergi(.setari) }
 
@@ -75,6 +82,14 @@ enum Tur {
         }
         await pas("f-controlnou", fereastra: true) { ui.controlNou() }
         ui.inchide()
+        if let d = deschis, let k = d.constructii.first {
+            await pas("f-coordonate", fereastra: true, inainte: { nav.mergi(.control(id: d.id, tab: "obiectiv", focus: nil)) }) {
+                ses.click("gps-manual", ["id": k.id])
+            }
+            ui.inchide()
+            await pas("f-farapozitie", fereastra: true) { ui.deschide { FereastraFaraPozitie(timp: false, reincearca: {}, deMana: {}) } }
+            ui.inchide()
+        }
         if let o = opec {
             await pas("f-textpv", fereastra: true, inainte: { nav.mergi(.control(id: o.id, tab: "nereguli", focus: nil)) }) {
                 ui.deschide(lata: true) { FereastraTextPV(id: o.id) }

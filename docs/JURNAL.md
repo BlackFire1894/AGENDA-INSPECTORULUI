@@ -3,7 +3,7 @@
 Memoria proiectului: ce face aplicația, de ce arată și funcționează așa, ce s-a decis și ce s-a respins.
 **Se citește la începutul oricărei sesiuni de lucru și se completează la fiecare versiune nouă** (regulă în `CLAUDE.md`).
 
-Ultima actualizare: v1.24.0 — 28.09.2026.
+Ultima actualizare: v1.25.0 — 28.09.2026.
 
 ---
 
@@ -72,6 +72,7 @@ Ultima actualizare: v1.24.0 — 28.09.2026.
 | 1.22 | **Protecție civilă**: categoria nouă „Organizare protecție civilă” (agent de inundații, inspector PC, taxa PC, convenții cu OPEC; schema 11). **Adăposturi de protecție civilă** la Localitate (tabul PC) și la OPEC (tabul Obiectiv + grupul din Nereguli): DA → câte → fiecare cu locație, Conform / Neconform, observații; neconform = neregulă completă; pe bară „3 adăposturi: 2 conforme, 1 neconform”; filtrul „Adăposturi PC” (Istoric, Obiective – ultimul control); în Fișa PDF (tabel) |
 | 1.23 | **Telefon** (`css/telefon.css`, doar sub 600px lățime sau 520px înălțime): bara de jos cu 5 butoane (Setări din Panou), antet și taburi compacte, derulabile, butoanele Conform / Constatat / NEC sub denumire, calendar cu buline, filtrele pe 2 rânduri derulabile, text Mare/Mediu/Mic = 17/16/15px, peisaj cu bare subțiri; textele „tabletă / iPad” devin „telefon” pe telefon. Tableta: capturile identice (verificat pixel cu pixel pe 60 de ecrane; singura diferență: capitolul nou din Ghid) |
 | 1.23.1 | Categoria „Organizare protecție civilă” (tabul Protecție civilă) are culoarea ei: **albastru-cer** (`--cat-pcorg: #0284c7`); până acum rămânea fără bandă colorată. Găsit la auditul aplicației native (aceeași lipsă și acolo). |
+| 1.25.0 | Cererea utilizatorului (12 puncte + controlul următor), în web și în aplicația nativă, în același PR (schema 12): **„De întrebat până la finalizarea controlului”** (listă cu bifă; cele nebifate apar în „Ce mai aveți de făcut” și la încheiere), **Observații generale**, **Persoană participantă**; **seria amenzii scoasă** peste tot (câmp, Panou, Fișă, PV, raportul lunii; datele vechi rămân în fișier, neafișate); **actele lipsă devin nereguli** în „Documentație și verificări”: **ao** „Nu a prezentat acte de autoritate / evidențe” (toate, cu lista în observații), **ap** „Lipsă controale proprii”, **aq** „Lipsă analiză semestrială”; act nou **„Dispoziție de reglementare a fumatului”**; **ordinea construcțiilor** (▲▼); **„Aceleași coordonate ca la …”** și **„Aceeași dată ca la …”** (copiere o dată); **centralele termice pe număr** (CT 1, CT 2…, fiecare cu tipurile ei; b3 pe fiecare centrală, la g / h se aleg centralele); neregula **an** „Chepengul / ușa de acces în pod nu este RF 30 / 45 minute” (categoria „Instalații electrice și compartimentări”); **Ascensor** DA / NU (fără neregulă); **Iluminat Hint cu NEC**, ascuns când Hidranți interiori e NU / NEC; **coordonatele introduse de mână** (și formatul Busolei) + fereastra care explică de ce iPad-ul doar cu Wi-Fi nu își află poziția; **controlul următor preia tot** din controlul imediat anterior (constatările vin „Constatat”, ca neregulă veche); **neregula veche = doar controlul imediat anterior**; controalele în desfășurare (și cele redeschise) primesc o dată regulile noi. Nativ: calendarul rămâne deschis până la „Gata”. |
 | 1.24.0 | **„ANAF / Taxe și impozite”** în locul lui „ANAF”, peste tot (cererea utilizatorului): stadiul amenzii („Trimite la ANAF / Taxe și impozite”), mesajele termenelor, filtrul, legenda Panoului și a calendarului („termen ANAF / Taxe și impozite sau ASI”), caseta amenzii („ANAF / Taxe și impozite până la”), Setări, Ghid. Regula e neschimbată: 15 zile plată, apoi 30 de zile pentru transmitere (termen: ziua 45), roșu din ziua 40. |
 
 ## 4. Ce face aplicația (inventar)
@@ -103,20 +104,22 @@ Ultima actualizare: v1.24.0 — 28.09.2026.
 - **Tabul Obiectiv:**
   - datele obiectivului și perioada controlului (Încheie controlul / Redeschide);
   - **Încărcare după încheiere** (două bife);
-  - construcțiile: date, GRF/NSI, GPS, dotări DA / NU / NEC, centrala termică, nr. ASI / aviz.
-- **Tabul Acte:** Prezentat / Lipsă / NEC; căutare; filtre; Restul prezentate.
+  - persoana participantă (lângă administrator); **„De întrebat până la finalizarea controlului”** (sarcini cu bifă, Adaugă / Șterge); **Observații generale** (v1.25);
+  - construcțiile: ordinea (▲▼), date, GRF/NSI, GPS (preluat, **introdus de mână**, „Aceleași coordonate ca la …”), dotări DA / NU / NEC (ascensor DA / NU; Iluminat Hint ascuns fără hidranți interiori), **centralele termice** (numărul lor, tipurile fiecăreia sau NU ARE), nr. ASI / aviz.
+- **Tabul Acte:** Prezentat / Lipsă / NEC; căutare; filtre; Restul prezentate. Un act „Lipsă” constată automat neregula lui (ao / ap / aq), cu observațiile actului (v1.25).
 - **Tabul Nereguli:**
   - partea de sus: sumar, căutare (cu glosar de abrevieri), meniul ⋯, filtre, Restul conform;
   - categorii cu bară scrisă în cuvinte;
   - rânduri cu ✓ ✗ NEC pe bară;
-  - la ✗: construcțiile, PV, amenda (seria și nr., data, suma, achitată), neregulă veche, sigiliu (la cele grave), termenul ASI la „a”;
+  - la ✗: construcțiile (la g / h și centralele), PV, amenda (data, suma, achitată; fără serie din v1.25), neregulă veche, sigiliu (la cele grave), termenul ASI la „a”;
+  - verificările: data ultimei verificări pe construcție (la b3 pe fiecare centrală), „Aceeași dată ca la …”;
   - rânduri adăugate de inspector (se pot marca grave).
 - **Observațiile:** câmpul apare doar cu text, la ✗ sau când apăsați „+ Obs.”.
 - **Text PV:** constatările și actele lipsă; opțiunile „Doar netrecute” și „Include actele lipsă”; butoane Copiază, Partajează, Marchează-le trecute.
 - **Fișa PDF:** tipărire sau partajare.
 
 ### Celelalte ecrane
-- **Obiective:** căutare după nume, localitate, adresă sau dată; pagina obiectivului (date, GPS, statistici, istoric); „Control nou pe acest obiectiv” preia datele din ultimul control.
+- **Obiective:** căutare după nume, localitate, adresă, persoana participantă sau dată; pagina obiectivului (date, GPS, statistici, istoric); „Control nou pe acest obiectiv” preia **tot** din controlul imediat anterior (v1.25): datele obiectivului, construcțiile (cu GPS și centralele), adăposturile, observațiile actelor, sarcinile „De întrebat” nerezolvate și constatările (ca neregulă veche). Pornesc de la zero: perioada, datele verificărilor, starea actelor, PV, amenzile, sigiliile, termenul ASI, rândurile Conform / NEC.
 - **Istoric:** controalele pe luni; pastile scrise (nereguli, netrecute, amenzi cu stadiul, ASI, încărcare).
 - **Calendar = plan lunar:** controalele, **activitățile** (în culoarea tipului; ✓ = efectuată) termenele și **zilele libere** (weekend + sărbători legale, derivate automat), pe zile; ziua selectată cu listele și butoanele „Control nou / Activitate nouă în această zi”; butonul **Plan lunar** → raportul lunii (`#/luna/AAAA-LL`), de tipărit / partajat.
 - **Setări:**
@@ -157,7 +160,9 @@ Ultima actualizare: v1.24.0 — 28.09.2026.
   - NU la o instalație necesară → neregulă gravă G1–G12;
   - GRF/NSI V + regim de înălțime peste parter → G13;
   - NU la ASI / AVIZ / Iluminat Hint → ah / ai / am, constatate automat și retrase la DA / NEC, dacă nu s-a lucrat pe ele;
-  - neregula veche = aceeași cheie constatată la un control anterior al obiectivului.
+  - NU / NEC la Hidranți interiori → Iluminat Hint nu se mai completează, iar „Lipsă iluminat Hint” (am) se retrage (v1.25; nu la controalele încheiate înainte);
+  - act „Lipsă” → ao (toate actele, în afară de controalele proprii și analiza semestrială, cu lista lor în observații), ap (controale proprii), aq (analiza semestrială); actul prezentat → neregula se retrage, dacă nu s-a lucrat pe ea (PV, amendă, sigiliu, observații proprii); la controalele încheiate înainte de v1.25, actele lipsă rămân listă separată în Text PV;
+  - neregula veche = aceeași cheie constatată la **controlul imediat anterior** al obiectivului (v1.25; înainte: la oricare anterior).
 - **Raportul lunii:** controalele începute în lună (și câte încheiate), neregulile constatate la ele; amenzile **aplicate în lună** după data aplicării (implicit data încheierii), cu suma; amenzile fără dată (controale neîncheiate) separat; activitățile care ating luna — efectuate pe tipuri (număr și zile din lună), planificate, anulate; **zilele libere** (weekend + sărbători legale, o sărbătoare căzută în weekend se numără o dată, ca sărbătoare): efectuate = până azi inclusiv, planificate = după; zile lucrătoare = zilele lunii − zilele libere; „lucrată” = în ziua liberă a început un control sau există o activitate efectuată, alta decât concediul.
 - **Sumele** se citesc în stil românesc: punct = mii, virgulă = zecimale („2.500” = 2500, „1.500,50” = 1500,5); până la v1.18, „2.500” apărea greșit ca 2,5 lei.
 - **Cifre consistente:** „Ce mai aveți de făcut”, filtrul „Neverificate”, sumarul, tabul și suma barelor de categorie dau aceeași cifră.
@@ -179,6 +184,8 @@ Ultima actualizare: v1.24.0 — 28.09.2026.
 - v1.20: filtrele — alese de utilizator din propuneri (respinse: „nereguli vechi”, „fără nereguli”; afișare în fereastră „Filtre”); în Obiective regula „mixt”: termenele la oricare control, gravitatea (grave, sigiliu) la ultimul; filtrele țin doar cât e deschisă aplicația (nu se salvează).
 - v1.20: **sigiliul se aplică pe construcție**; neregulile grave constatate (✗) cu bifa Sigiliu sunt **criteriile** lui (precizarea utilizatorului): mai multe criterii în aceeași construcție = un sigiliu; construcții diferite = câte un sigiliu pe fiecare; o neregulă constatată în mai multe construcții = sigiliu în toate (fără alegere separată a construcțiilor sigilate); „bara obiectivului” = rândul controlului din liste (ales de utilizator, nu antetul controlului și nu pagina obiectivului).
 - v1.19: zilele libere nu se salvează (nu sunt activități) — se calculează din `zinelucratoare()`, deci nu intră în backup și nu cer confirmare; se actualizează singure odată cu lista sărbătorilor.
+
+- v1.25.0: alese de utilizator — „De întrebat” ca **listă cu bifă** (nu text liber); actele lipsă: **o singură neregulă** pentru toate, dar controalele proprii și analiza semestrială separat; la controlul următor constatările **vin deja constatate** (neregulă veche), iar Conform / NEC **pornesc necompletate**; nu se preiau PV, amenzile, sigiliile, starea actelor, termenul ASI; datele verificărilor se golesc („trebuie să am loc pentru noile date”); seria amenzii: „putem șterge fără probleme”; „Aceleași coordonate / Aceeași dată”: **se copiază o singură dată** (nu legătură permanentă); verificarea CT **pe fiecare CT**; Iluminat Hint ascuns la **NEC sau NU**; coordonatele de mână: „Da, adaugă” (iPad-ul e doar Wi-Fi). Decizii proprii: fără nicio centrală declarată, tipul ales declară CT 1 (o singură atingere, ca înainte); ao / ap / aq nu țin de o construcție; migrarea o singură dată (`schema` 12), și la redeschiderea unui control încheiat înainte; Anulează după mutarea unei construcții spune „ordinea construcțiilor”; în nativ, antetul construcției are denumirea și, dedesubt, sumarul, cu ▲▼ în dreapta.
 
 **Respinse (nu se repropun fără un motiv nou):**
 - scoaterea ceasului din bara laterală;
@@ -216,5 +223,6 @@ Ultima actualizare: v1.24.0 — 28.09.2026.
 ## 9. Limite cunoscute și idei
 
 - Datele sunt doar pe tabletă; fără backup regulat, se pot pierde.
+- **iPad-ul fără cartelă SIM nu are GPS**: își află poziția doar după rețelele Wi-Fi din jur; pe teren, fără ele, nu găsește poziția (hotspotul telefonului dă internet, nu poziție). Soluția: coordonatele scrise de mână (inclusiv din aplicația Busolă a telefonului) sau un receptor GPS prin Bluetooth (v1.25).
 - Controalele încheiate înainte de v1.3 (schema < 3) ar arăta actele despre exerciții ca neverificate; în practică nu există astfel de date pe iPad.
 - Testele din browser încarcă Playwright dintr-o cale a mediului Claude Code (`/opt/node22/...`).

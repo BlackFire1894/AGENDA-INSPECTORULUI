@@ -129,9 +129,12 @@ struct CampData: View {
     var latimeFixa: CGFloat? = nil
     let schimba: (String) -> Void
     @State private var deschis = false
+    /// data aleasă în calendar, încă nesalvată: fereastra rămâne deschisă până la „Gata” (sau atingerea în afara ei),
+    /// ca schimbarea lunii / anului să nu o închidă înainte de alegerea zilei
+    @State private var ciorna: Date?
 
     var body: some View {
-        Button { deschis = true } label: {
+        Button { ciorna = nil; deschis = true } label: {
             CadruCamp(activ: deschis, avertizare: avertizare, fundal: fundal) {
                 Text(valoare.isEmpty ? "ZZ.LL.AAAA" : fmtDate(valoare))
                     .font(.system(size: max(16, 1.0556 * rem)).monospacedDigit())
@@ -146,18 +149,25 @@ struct CampData: View {
         .accessibilityLabel("\(eticheta): \(valoare.isEmpty ? "necompletată" : fmtDateLong(valoare))")
         .popover(isPresented: $deschis) {
             VStack(spacing: 0.6667 * rem) {
-                DatePicker(eticheta, selection: Binding(get: { dataDin(valoare) }, set: { schimba(toISO($0)); deschis = false }), displayedComponents: .date)
+                DatePicker(eticheta, selection: Binding(get: { ciorna ?? dataDin(valoare) }, set: { ciorna = $0 }), displayedComponents: .date)
                     .datePickerStyle(.graphical)
                     .environment(\.locale, Locale(identifier: "ro_RO"))
-                HStack {
-                    Button("Șterge") { schimba(""); deschis = false }.foregroundStyle(Color.red)
+                HStack(spacing: rem) {
+                    Button("Șterge") { ciorna = nil; schimba(""); deschis = false }.foregroundStyle(Color.red)
                     Spacer()
-                    Button("Azi") { schimba(todayISO()); deschis = false }
+                    Button("Azi") { ciorna = nil; schimba(todayISO()); deschis = false }
+                    Button("Gata") { deschis = false }.fontWeight(.heavy)
                 }
                 .font(.system(size: rem, weight: .semibold))
             }
             .padding()
             .frame(minWidth: 320)
+        }
+        // închisă („Gata” sau atingere în afară): data aleasă se salvează o singură dată
+        .onChange(of: deschis) { _, d in
+            guard !d, let x = ciorna else { return }
+            ciorna = nil
+            if toISO(x) != valoare { schimba(toISO(x)) }
         }
     }
 
@@ -492,6 +502,41 @@ struct Pasi: View {
         .disabled(!activ)
         .opacity(activ ? 1 : 0.45)
         .accessibilityLabel(et)
+    }
+}
+
+/// `.toggle` cu acțiunea ei (nu o bifă din date): „Aceleași coordonate ca la …”, „Aceeași dată ca la …”
+struct BifaActiune: View {
+    @Environment(\.rem) private var rem
+    let text: String
+    let activ: Bool
+    var dezactivat = false
+    var mic = false
+    let actiune: () -> Void
+
+    var body: some View {
+        Button(action: actiune) {
+            HStack(spacing: 0.5556 * rem) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 0.4444 * rem, style: .continuous).fill(activ ? Color.white.opacity(0.2) : Color.surface)
+                    RoundedRectangle(cornerRadius: 0.4444 * rem, style: .continuous)
+                        .strokeBorder(activ ? Color.white.opacity(0.7) : Color.lineStrong, lineWidth: 2.5)
+                    if activ { Iconita(nume: "check", marime: 1.0556 * rem, grosime: 2.8) }
+                }
+                .frame(width: 1.4444 * rem, height: 1.4444 * rem)
+                Text(text).font(.system(size: (mic ? 0.8333 : 0.8889) * rem, weight: .bold)).multilineTextAlignment(.leading)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+            .foregroundStyle(activ ? Color.white : Color.text)
+            .padding(.leading, 0.5556 * rem).padding(.trailing, 0.8889 * rem)
+            .frame(minHeight: tinta((mic ? 2.4444 : 2.7778) * rem))
+            .background(activ ? Color.accent : Color.surface, in: RoundedRectangle(cornerRadius: 0.7778 * rem, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 0.7778 * rem, style: .continuous).strokeBorder(activ ? Color.accent : Color.line, lineWidth: 2))
+        }
+        .buttonStyle(.plain)
+        .disabled(dezactivat)
+        .opacity(dezactivat ? 0.55 : 1)
+        .accessibilityAddTraits(activ ? .isSelected : [])
     }
 }
 

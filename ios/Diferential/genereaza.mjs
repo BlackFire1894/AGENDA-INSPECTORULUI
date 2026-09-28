@@ -48,11 +48,20 @@ function constructie(i) {
   k.regimInaltime = alege(REGIM);
   k.grf = alege(['', '', 'I', 'III', 'V', 'V', 'NN']);
   for (const d of M.DOTARI) {
-    if (d.centrala) { k.dotari.centrala.tipuri = M.CENTRALA_TIPURI.filter(() => sansa(0.3)); continue; }
+    if (d.centrala) {
+      // v1.25: centralele pe număr, fiecare cu tipurile ei; uneori „NU ARE”, uneori date vechi (doar tipuri)
+      const cen = k.dotari.centrala;
+      cen.ct = Array.from({ length: alege([0, 0, 1, 1, 2, 3]) }, (_, j) => ({ id: sansa(0.5) ? `ct${j + 1}` : `ct${M.uid()}`, tipuri: M.CENTRALA_TIPURI.filter(() => sansa(0.4)) }));
+      cen.tipuri = M.CENTRALA_TIPURI.filter((t) => cen.ct.some((x) => x.tipuri.includes(t)));
+      if (!cen.ct.length && sansa(0.3)) cen.nuAre = true;
+      if (sansa(0.1)) { cen.ct = []; cen.tipuri = M.CENTRALA_TIPURI.filter(() => sansa(0.5)); cen.nuAre = false; }
+      continue;
+    }
     k.dotari[d.key].v = sansa(0.45) ? '' : alege(d.opts);
     if (sansa(0.15)) k.dotari[d.key].obs = alege(OBS);
   }
   if (sansa(0.5)) k.gps = { lat: 44 + rnd() * 4, lon: 21 + rnd() * 8, acc: intre(3, 300), la: '2026-09-01T08:00:00.000Z' };
+  else if (sansa(0.3)) k.gps = { ...M.parseCoord(`${(44 + rnd() * 4).toFixed(6)} ${(21 + rnd() * 8).toFixed(6)}`), acc: null, la: '2026-09-02T10:30:00.000Z', manual: true };
   return k;
 }
 
@@ -61,9 +70,17 @@ function amesteca(c) {
   c.denumire = alege(NUME);
   c.administrator = alege(['Ion Popescu', 'Maria Ionescu', '']);
   c.localitate = alege(['Brașov', 'Șușani', '']);
+  // v1.25: persoana participantă, observațiile generale, „De întrebat” (uneori rămân cele preluate)
+  c.persoanaParticipanta = alege(['', 'Ana Pop', 'Ion Șerban, administrator']);
+  c.observatiiGenerale = alege(['', '', 'Acces prin curte', 'notă\npe 2 rânduri']);
+  if (sansa(0.6)) c.deIntrebat = Array.from({ length: intre(0, 3) }, (_, j) => ({ id: sansa(0.5) ? `q${j + 1}` : `q${M.uid()}`, text: alege(['', 'Cere IPT', 'Registru\ninstruire', '  ', 'popescu']), gata: sansa(0.4) }));
   if (!c.constructii.length || sansa(0.6)) c.constructii = Array.from({ length: intre(1, 3) }, (_, i) => constructie(i + 1));
   const ids = c.constructii.map((k) => k.id);
-  for (const a of M.ACTE) c.acte[a.key].status = alege(['', '', 'ok', 'ok', 'nok', 'nec']);
+  for (const a of M.ACTE) {
+    c.acte[a.key].status = alege(['', '', 'ok', 'ok', 'nok', 'nec']);
+    if (sansa(0.2)) c.acte[a.key].obs = alege(OBS);
+  }
+  const unitatiCT = c.constructii.flatMap((k) => (k.dotari.centrala.ct || []).map((x) => `${k.id}:${x.id}`));
   for (const n of c.nereguli) {
     n.status = alege(['', '', '', '', 'ok', 'ok', 'nok', 'nok', 'nec']);
     if (n.status !== 'nok') { if (sansa(0.1)) n.obs = alege(OBS); continue; }
@@ -72,6 +89,7 @@ function amesteca(c) {
     n.constructieIds = sansa(0.4) ? [] : sansa(0.1) ? ['inexistent'] : ids.filter(() => sansa(0.6));
     n.vecheManual = sansa(0.15);
     n.sigiliu = sansa(0.3);
+    if (M.sablon(n.key)?.perCT && sansa(0.5)) n.ctIds = [...unitatiCT.filter(() => sansa(0.5)), ...(sansa(0.1) ? ['x:ct1'] : [])];
     if (sansa(0.4)) {
       n.amenda = { aplicata: true, serieNr: alege(SERII), data: sansa(0.5) ? '' : D.addDays(c.dataInceput, intre(-3, 12)), suma: alege(SUME), achitata: sansa(0.2), dataAchitare: '' };
       if (n.amenda.achitata && sansa(0.7)) n.amenda.dataAchitare = D.addDays(c.dataInceput, intre(1, 40));
@@ -82,7 +100,7 @@ function amesteca(c) {
     }
   }
   for (const n of c.nereguli.filter(M.isVerificare)) {
-    for (const id of ids) if (sansa(0.4)) n.verificari[id] = { data: D.addDays(c.dataInceput, -intre(0, 900)), ...(sansa(0.3) ? { luni: alege([12, 24, '24', 6]) } : {}) };
+    for (const id of [...ids, ...unitatiCT]) if (sansa(0.4)) n.verificari[id] = { data: D.addDays(c.dataInceput, -intre(0, 900)), ...(sansa(0.3) ? { luni: alege([12, 24, '24', 6]) } : {}) };
   }
   for (let i = intre(0, 2); i > 0; i--) {
     c.nereguli.push({ ...M.emptyNeregula(`k${M.uid()}`, true, alege(['ner', 'plan', 'pc'])), label: alege(ETICHETE), status: alege(['', 'ok', 'nok']), grav: sansa(0.3), sigiliu: sansa(0.3), inPV: sansa(0.5), obs: alege(OBS) });
@@ -92,13 +110,16 @@ function amesteca(c) {
     for (let i = intre(0, 3); i > 0; i--) c.nereguli.push({ ...M.emptyAdapost(c), locatie: alege(LOCATII), status: alege(['', 'ok', 'nok']), inPV: sansa(0.5) });
   }
   for (const dot of Object.keys(M.AUTO_NU)) if (sansa(0.6)) M.syncAutoNU(c, dot);
+  if (sansa(0.7)) M.syncAutoActe(c);
   if (sansa(0.7)) {
     c.dataIncheiere = D.addDays(c.dataInceput, intre(0, 3));
     c.incarcare = { aplicatie: sansa(0.5), aplicatieData: '', document: sansa(0.4), documentData: '' };
-    if (sansa(0.25)) c.catalog = alege([8, 9, 10, 11]);
+    if (sansa(0.25)) c.catalog = alege([8, 9, 10, 11, 12]);
   } else {
     c.dataIncheiere = '';
     delete c.catalog;
+    // un control deschis dintr-o versiune veche: primește o dată regulile v1.25 (la normalizare)
+    if (sansa(0.2)) c.schema = alege([10, 11]);
   }
   M.syncAdaposturi(c);
   return c;
@@ -153,14 +174,19 @@ const perControl = date.map((c) => {
     adaposturi: M.adaposturiStats(c),
     adaposturiText: M.adaposturiStats(c) ? M.adaposturiText(M.adaposturiStats(c)) : null,
     catalogOf: M.catalogOf(c),
+    acteOf: M.acteOf(c).map((a) => a.key),
+    dotari: c.constructii.map((k) => ({ vis: M.dotariVizibile(c, k).map((d) => d.key), are: M.areCentrala(k), ilum: M.valDotare(c, k, 'ilumHint') || '', ct: M.unitatiCT(c, k).map((u) => [u.id, u.denumire]) })),
+    urmator: M.controlFromPrevious(c, D.addDays(c.dataInceput, 30)),
     randuri: c.nereguli.map((n) => ({
       key: n.key, litera: M.neregulaLetter(c, n), eticheta: M.neregulaLabel(n), constatare: M.constatareLabel(n), cat: M.neregulaCat(n),
       tab: M.tabOfNeregula(n), aplicabil: M.isApplicable(c, n), ascunsa: M.ascunsaDeDotari(c, n), grav: M.isGrav(n),
       veche: (({ veche, auto, manual }) => ({ veche, auto: auto?.id ?? null, manual }))(M.vecheInfo(date, c, n)),
       constructii: M.constructiiOf(c, n).map((k) => k.id), nume: M.constructiiNume(c, n), eligibile: M.constructiiEligibile(c, n).map((k) => k.id),
       serieNr: M.amendaSerieNr(n.amenda), suma: M.parseSuma(n.amenda?.suma) ?? null, verifText: M.verifText(c, n),
-      verif: M.isVerificare(n) ? c.constructii.map((k) => (({ data, luni, expira, stare }) => ({ data, luni, expira: expira ?? null, stare }))(M.verifStare(c, n, k))) : null,
-      expirate: M.verifExpirate(c, n).map((k) => k.id),
+      verif: M.isVerificare(n) ? M.verifUnitati(c, n).map((u) => ({ id: u.id, denumire: u.denumire, ...(({ data, luni, expira, stare }) => ({ data, luni, expira: expira ?? null, stare }))(M.verifStare(c, n, u)) })) : null,
+      expirate: M.verifExpirate(c, n).map((u) => u.id),
+      centrale: M.centraleAlese(c, n).map((u) => u.id),
+      perCT: M.perCT(c, n),
       cautari: INTREBARI.filter((q) => M.matchNeregula(c, n, q)),
     })),
     acte: M.ACTE.map((a) => INTREBARI.filter((q) => M.matchAct(c, a.key, q))),
@@ -186,6 +212,11 @@ const global = {
     rec.html = A.raportMarkup(r, date, new Date(ACUM));
     return rec;
   }),
+  // coordonatele scrise de mână (v1.25)
+  coordonate: ['44.426800, 26.102500', '44,4268 26,1025', '44,4268,26,1025', '44°25′36″ N 26°6′9″ E', "26°6'9\" E 44°25'36\" N",
+    '44° 25\' 36" S, 26° 6\' 9" V', '-44.5 -26.25', '91 10', '44.1;26.2', 'abc', '', '  45.5  25.5  ', '44.4268 26', '44°N 26°E',
+    '44º25’36” N 26º6’9” E', '4.5, 200.5', '44.1234567, 26.7654321', '-0.0000004, 0.0000005', '44°25,5\' N 26°6\' E', '44.5,26.5', '44,5;26,5']
+    .map((t) => ({ t, r: M.parseCoord(t) })),
   activitati: activitati.map((a) => ({ id: a.id, titlu: A.titluActivitate(a), cand: A.cand(a), zile: A.zileActivitate(a) })),
   peZile: zileGlobale.map((d) => ({ d, deConfirmat: A.deConfirmat(activitati, d).map((a) => a.id), inZi: A.activitatiInZi(activitati, d).map((a) => a.id), libera: A.ziLibera(d, '2026-10-15') })),
 };
@@ -203,7 +234,18 @@ const vechi = Array.from({ length: 40 }, (_, i) => {
     for (const k of ['verificari', 'grav', 'sigiliu', 'auto', 'obsAuto', 'asiPierdere']) if (sansa(0.3)) delete x[k];
     return x;
   });
-  c.constructii = c.constructii.map((k) => { const x = { ...k, dotari: { ...k.dotari } }; if (sansa(0.3)) delete x.grf; if (sansa(0.3)) delete x.gps; if (sansa(0.3)) delete x.dotari.asi; return x; });
+  c.constructii = c.constructii.map((k) => {
+    const x = { ...k, dotari: { ...k.dotari } };
+    if (sansa(0.3)) delete x.grf; if (sansa(0.3)) delete x.gps; if (sansa(0.3)) delete x.dotari.asi;
+    // până la v1.24: centrala fără număr (doar tipurile)
+    if (sansa(0.3)) { const { ct, ...cen } = x.dotari.centrala || {}; x.dotari.centrala = cen; }
+    if (sansa(0.1)) delete x.dotari.ascensor;
+    return x;
+  });
+  // până la v1.24: fără persoana participantă, observații, „De întrebat”; uneori liste stricate
+  for (const k of ['persoanaParticipanta', 'observatiiGenerale', 'deIntrebat']) if (sansa(0.3)) delete c[k];
+  if (sansa(0.1)) c.deIntrebat = [{ text: 'fără id' }, null, 'text', { id: 7, text: null, gata: 1 }];
+  if (!c.dataIncheiere && sansa(0.3)) c.schema = alege([9, 11, 12]);
   return { intrare: c, rezultat: M.normalizeControl(JSON.parse(JSON.stringify(c))) };
 });
 

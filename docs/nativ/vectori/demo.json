@@ -3,7 +3,7 @@
  "controls": [
   {
    "id": "mv94q800f9a9az",
-   "schema": 11,
+   "schema": 12,
    "objectiveId": "mv94q800do3uiy",
    "createdAt": "2026-10-15T06:00:00.000Z",
    "updatedAt": "2026-10-15T06:00:00.000Z",
@@ -14,6 +14,9 @@
    "email": "secretariat@scoala3.ro",
    "adresa": "",
    "localitate": "",
+   "persoanaParticipanta": "",
+   "observatiiGenerale": "",
+   "deIntrebat": [],
    "dataInceput": "2025-09-10",
    "dataIncheiere": "2025-09-11",
    "constructii": [
@@ -102,10 +105,22 @@
         "GAZOS"
        ],
        "nuAre": false,
-       "obs": ""
+       "obs": "",
+       "ct": [
+        {
+         "id": "ct1",
+         "tipuri": [
+          "GAZOS"
+         ]
+        }
+       ]
       },
       "ipt": {
        "v": "DA",
+       "obs": ""
+      },
+      "ascensor": {
+       "v": "",
        "obs": ""
       }
      },
@@ -195,9 +210,14 @@
       "centrala": {
        "tipuri": [],
        "nuAre": false,
-       "obs": ""
+       "obs": "",
+       "ct": []
       },
       "ipt": {
+       "v": "",
+       "obs": ""
+      },
+      "ascensor": {
        "v": "",
        "obs": ""
       }
@@ -212,6 +232,10 @@
      "obs": ""
     },
     "lfd": {
+     "status": "ok",
+     "obs": ""
+    },
+    "fumat": {
      "status": "ok",
      "obs": ""
     },
@@ -717,6 +741,93 @@
      "grav": false,
      "sigiliu": false,
      "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "ao",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "ap",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "aq",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "nok",
+     "obs": "",
+     "inPV": true,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": true,
      "verificari": {},
      "obsAuto": "",
      "asiTermen": false,
@@ -1257,6 +1368,35 @@
     },
     {
      "key": "i",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "an",
      "custom": false,
      "sec": "ner",
      "label": "",
@@ -2659,11 +2799,11 @@
     "documentData": "2025-09-13"
    },
    "demo": true,
-   "catalog": 11
+   "catalog": 12
   },
   {
    "id": "mv94q8000t8fj6",
-   "schema": 11,
+   "schema": 12,
    "objectiveId": "mv94q800do3uiy",
    "createdAt": "2026-10-15T06:00:00.000Z",
    "updatedAt": "2026-10-15T06:00:00.000Z",
@@ -2674,6 +2814,9 @@
    "email": "secretariat@scoala3.ro",
    "adresa": "",
    "localitate": "",
+   "persoanaParticipanta": "",
+   "observatiiGenerale": "",
+   "deIntrebat": [],
    "dataInceput": "2026-09-03",
    "dataIncheiere": "2026-09-04",
    "constructii": [
@@ -2762,10 +2905,22 @@
         "GAZOS"
        ],
        "nuAre": false,
-       "obs": ""
+       "obs": "",
+       "ct": [
+        {
+         "id": "ct1",
+         "tipuri": [
+          "GAZOS"
+         ]
+        }
+       ]
       },
       "ipt": {
        "v": "DA",
+       "obs": ""
+      },
+      "ascensor": {
+       "v": "",
        "obs": ""
       }
      },
@@ -2855,9 +3010,14 @@
       "centrala": {
        "tipuri": [],
        "nuAre": false,
-       "obs": ""
+       "obs": "",
+       "ct": []
       },
       "ipt": {
+       "v": "",
+       "obs": ""
+      },
+      "ascensor": {
        "v": "",
        "obs": ""
       }
@@ -2872,6 +3032,10 @@
      "obs": ""
     },
     "lfd": {
+     "status": "ok",
+     "obs": ""
+    },
+    "fumat": {
      "status": "ok",
      "obs": ""
     },
@@ -3394,6 +3558,93 @@
      }
     },
     {
+     "key": "ao",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "nok",
+     "obs": "Fișe de instruire completate corect\nVerificare lunară a stingătoarelor",
+     "inPV": true,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": true,
+     "verificari": {},
+     "obsAuto": "Fișe de instruire completate corect\nVerificare lunară a stingătoarelor",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "ap",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "aq",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
      "key": "b1",
      "custom": false,
      "sec": "ner",
@@ -3763,7 +4014,7 @@
      "asiDataPierdere": "",
      "amenda": {
       "aplicata": true,
-      "serieNr": "DB 0012345",
+      "serieNr": "",
       "data": "",
       "suma": "2500",
       "achitata": false,
@@ -3917,6 +4168,35 @@
     },
     {
      "key": "i",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "an",
      "custom": false,
      "sec": "ner",
      "label": "",
@@ -5321,11 +5601,11 @@
     "documentData": "2026-09-06"
    },
    "demo": true,
-   "catalog": 11
+   "catalog": 12
   },
   {
    "id": "mv94q80065jb0x",
-   "schema": 11,
+   "schema": 12,
    "objectiveId": "mv94q800ok0c8c",
    "createdAt": "2026-10-15T06:00:00.000Z",
    "updatedAt": "2026-10-15T06:00:00.000Z",
@@ -5336,6 +5616,9 @@
    "email": "administrativ@spital-vv.ro",
    "adresa": "",
    "localitate": "",
+   "persoanaParticipanta": "",
+   "observatiiGenerale": "",
+   "deIntrebat": [],
    "dataInceput": "2026-09-24",
    "dataIncheiere": "2026-09-25",
    "constructii": [
@@ -5425,9 +5708,27 @@
         "ELECTRIC"
        ],
        "nuAre": false,
-       "obs": ""
+       "obs": "",
+       "ct": [
+        {
+         "id": "ct1",
+         "tipuri": [
+          "GAZOS"
+         ]
+        },
+        {
+         "id": "ct2",
+         "tipuri": [
+          "ELECTRIC"
+         ]
+        }
+       ]
       },
       "ipt": {
+       "v": "DA",
+       "obs": ""
+      },
+      "ascensor": {
        "v": "DA",
        "obs": ""
       }
@@ -5518,9 +5819,14 @@
       "centrala": {
        "tipuri": [],
        "nuAre": false,
-       "obs": ""
+       "obs": "",
+       "ct": []
       },
       "ipt": {
+       "v": "",
+       "obs": ""
+      },
+      "ascensor": {
        "v": "",
        "obs": ""
       }
@@ -5535,6 +5841,10 @@
      "obs": ""
     },
     "lfd": {
+     "status": "ok",
+     "obs": ""
+    },
+    "fumat": {
      "status": "ok",
      "obs": ""
     },
@@ -6041,6 +6351,93 @@
      "verificari": {},
      "obsAuto": "",
      "asiTermen": true,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "ao",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "nok",
+     "obs": "Dispoziție măsuri sezon canicular / secetos / rece",
+     "inPV": true,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": true,
+     "verificari": {},
+     "obsAuto": "Dispoziție măsuri sezon canicular / secetos / rece",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "ap",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "aq",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
      "asiPrezentat": false,
      "asiDataPrezentare": "",
      "asiPierdere": false,
@@ -6606,6 +7003,35 @@
      }
     },
     {
+     "key": "an",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
      "key": "j",
      "custom": false,
      "sec": "ner",
@@ -6917,7 +7343,7 @@
      "asiDataPierdere": "",
      "amenda": {
       "aplicata": true,
-      "serieNr": "DB 0012377",
+      "serieNr": "",
       "data": "",
       "suma": "5000",
       "achitata": false,
@@ -7980,11 +8406,11 @@
     "documentData": "2026-09-27"
    },
    "demo": true,
-   "catalog": 11
+   "catalog": 12
   },
   {
    "id": "mv94q800hi7el8",
-   "schema": 11,
+   "schema": 12,
    "objectiveId": "mv94q800f14se0",
    "createdAt": "2026-10-15T06:00:00.000Z",
    "updatedAt": "2026-10-15T06:00:00.000Z",
@@ -7995,6 +8421,9 @@
    "email": "primaria@valeamare.ro",
    "adresa": "",
    "localitate": "",
+   "persoanaParticipanta": "",
+   "observatiiGenerale": "",
+   "deIntrebat": [],
    "dataInceput": "2026-10-09",
    "dataIncheiere": "2026-10-10",
    "constructii": [
@@ -8083,10 +8512,22 @@
         "SOLID"
        ],
        "nuAre": false,
-       "obs": ""
+       "obs": "",
+       "ct": [
+        {
+         "id": "ct1",
+         "tipuri": [
+          "SOLID"
+         ]
+        }
+       ]
       },
       "ipt": {
        "v": "NU",
+       "obs": ""
+      },
+      "ascensor": {
+       "v": "",
        "obs": ""
       }
      },
@@ -8100,6 +8541,10 @@
      "obs": ""
     },
     "lfd": {
+     "status": "ok",
+     "obs": ""
+    },
+    "fumat": {
      "status": "ok",
      "obs": ""
     },
@@ -8592,6 +9037,93 @@
     },
     {
      "key": "a",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "ao",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "nok",
+     "obs": "Comisie PSI\nContract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)",
+     "inPV": true,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": true,
+     "verificari": {},
+     "obsAuto": "Comisie PSI\nContract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "ap",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "aq",
      "custom": false,
      "sec": "ner",
      "label": "",
@@ -9143,6 +9675,35 @@
     },
     {
      "key": "i",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "an",
      "custom": false,
      "sec": "ner",
      "label": "",
@@ -10574,11 +11135,11 @@
     "documentData": ""
    },
    "demo": true,
-   "catalog": 11
+   "catalog": 12
   },
   {
    "id": "mv94q800burnig",
-   "schema": 11,
+   "schema": 12,
    "objectiveId": "mv94q800jg8ey9",
    "createdAt": "2026-10-15T06:00:00.000Z",
    "updatedAt": "2026-10-15T06:00:00.000Z",
@@ -10589,6 +11150,9 @@
    "email": "",
    "adresa": "",
    "localitate": "",
+   "persoanaParticipanta": "",
+   "observatiiGenerale": "",
+   "deIntrebat": [],
    "dataInceput": "2026-08-16",
    "dataIncheiere": "2026-08-16",
    "constructii": [
@@ -10677,9 +11241,21 @@
         "SOLID"
        ],
        "nuAre": false,
-       "obs": ""
+       "obs": "",
+       "ct": [
+        {
+         "id": "ct1",
+         "tipuri": [
+          "SOLID"
+         ]
+        }
+       ]
       },
       "ipt": {
+       "v": "",
+       "obs": ""
+      },
+      "ascensor": {
        "v": "",
        "obs": ""
       }
@@ -10694,6 +11270,10 @@
      "obs": ""
     },
     "lfd": {
+     "status": "ok",
+     "obs": ""
+    },
+    "fumat": {
      "status": "ok",
      "obs": ""
     },
@@ -11186,6 +11766,93 @@
     },
     {
      "key": "a",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "ao",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "ap",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "aq",
      "custom": false,
      "sec": "ner",
      "label": "",
@@ -11737,6 +12404,35 @@
     },
     {
      "key": "i",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "an",
      "custom": false,
      "sec": "ner",
      "label": "",
@@ -13139,11 +13835,11 @@
     "documentData": "2026-08-18"
    },
    "demo": true,
-   "catalog": 11
+   "catalog": 12
   },
   {
    "id": "mv94q800zkeezx",
-   "schema": 11,
+   "schema": 12,
    "objectiveId": "mv94q800tntegh",
    "createdAt": "2026-10-15T06:00:00.000Z",
    "updatedAt": "2026-10-15T06:00:00.000Z",
@@ -13154,6 +13850,20 @@
    "email": "gpp2@edu.ro",
    "adresa": "",
    "localitate": "",
+   "persoanaParticipanta": "Ana Stoica, administrator de clădire",
+   "observatiiGenerale": "Acces auto prin curtea din spate. Program cu publicul: 7:00–17:00.",
+   "deIntrebat": [
+    {
+     "id": "q1",
+     "text": "Cererea certificatului de verificare IPT (trimis ulterior pe email)",
+     "gata": false
+    },
+    {
+     "id": "q2",
+     "text": "Verificarea registrului de instruire",
+     "gata": true
+    }
+   ],
    "dataInceput": "2026-10-13",
    "dataIncheiere": "",
    "constructii": [
@@ -13240,9 +13950,14 @@
       "centrala": {
        "tipuri": [],
        "nuAre": false,
-       "obs": ""
+       "obs": "",
+       "ct": []
       },
       "ipt": {
+       "v": "",
+       "obs": ""
+      },
+      "ascensor": {
        "v": "",
        "obs": ""
       }
@@ -13257,6 +13972,10 @@
      "obs": ""
     },
     "lfd": {
+     "status": "",
+     "obs": ""
+    },
+    "fumat": {
      "status": "",
      "obs": ""
     },
@@ -13747,6 +14466,93 @@
     },
     {
      "key": "a",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "ao",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "ap",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "aq",
      "custom": false,
      "sec": "ner",
      "label": "",
@@ -14298,6 +15104,35 @@
     },
     {
      "key": "i",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "an",
      "custom": false,
      "sec": "ner",
      "label": "",
@@ -15703,7 +16538,7 @@
   },
   {
    "id": "mv94q8003joh17",
-   "schema": 11,
+   "schema": 12,
    "objectiveId": "mv94q800ybjla2",
    "createdAt": "2026-10-15T06:00:00.000Z",
    "updatedAt": "2026-10-15T06:00:00.000Z",
@@ -15714,6 +16549,9 @@
    "email": "",
    "adresa": "",
    "localitate": "",
+   "persoanaParticipanta": "",
+   "observatiiGenerale": "",
+   "deIntrebat": [],
    "dataInceput": "2026-10-15",
    "dataIncheiere": "",
    "constructii": [
@@ -15800,9 +16638,14 @@
       "centrala": {
        "tipuri": [],
        "nuAre": false,
-       "obs": ""
+       "obs": "",
+       "ct": []
       },
       "ipt": {
+       "v": "",
+       "obs": ""
+      },
+      "ascensor": {
        "v": "",
        "obs": ""
       }
@@ -15817,6 +16660,10 @@
      "obs": ""
     },
     "lfd": {
+     "status": "",
+     "obs": ""
+    },
+    "fumat": {
      "status": "",
      "obs": ""
     },
@@ -16307,6 +17154,93 @@
     },
     {
      "key": "a",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "ao",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "ap",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "aq",
      "custom": false,
      "sec": "ner",
      "label": "",
@@ -16858,6 +17792,35 @@
     },
     {
      "key": "i",
+     "custom": false,
+     "sec": "ner",
+     "label": "",
+     "status": "",
+     "obs": "",
+     "inPV": false,
+     "constructieIds": [],
+     "vecheManual": false,
+     "grav": false,
+     "sigiliu": false,
+     "auto": false,
+     "verificari": {},
+     "obsAuto": "",
+     "asiTermen": false,
+     "asiPrezentat": false,
+     "asiDataPrezentare": "",
+     "asiPierdere": false,
+     "asiDataPierdere": "",
+     "amenda": {
+      "aplicata": false,
+      "serieNr": "",
+      "data": "",
+      "suma": "",
+      "achitata": false,
+      "dataAchitare": ""
+     }
+    },
+    {
+     "key": "an",
      "custom": false,
      "sec": "ner",
      "label": "",
@@ -18395,12 +19358,12 @@
   {
    "id": "mv94q800f9a9az",
    "controlStats": {
-    "acteDone": 14,
-    "acteTotal": 14,
+    "acteDone": 15,
+    "acteTotal": 15,
     "acteNok": 1,
-    "nereguliChecked": 3,
-    "nereguliTotal": 29,
-    "constatate": 3,
+    "nereguliChecked": 4,
+    "nereguliTotal": 31,
+    "constatate": 4,
     "netrecute": 0,
     "fines": [],
     "asi": null,
@@ -18411,10 +19374,10 @@
    },
    "secStats": {
     "ner": {
-     "total": 29,
-     "checked": 3,
+     "total": 31,
+     "checked": 4,
      "hidden": 19,
-     "constatate": 3,
+     "constatate": 4,
      "netrecute": 0,
      "fines": 0
     }
@@ -18430,7 +19393,7 @@
     {
      "id": "todo-ner",
      "level": "todo",
-     "text": "Nereguli: 26 nereguli neverificate",
+     "text": "Nereguli: 27 nereguli neverificate",
      "tab": "nereguli",
      "focus": "lipsa-hidExt"
     },
@@ -18443,7 +19406,7 @@
     }
    ],
    "pvText": {
-    "text": "Nereguli constatate – Școala Gimnazială nr. 3 (control 10.09.2025 – 11.09.2025)\n\nNereguli:\n1. Construcția funcționează fără ASI (autorizație de securitate la incendiu) – construcția: Sala de sport\n2. Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz – construcția: Sala de sport\n3. Stingătoare expirate – construcția: Corp A – săli de clasă. 4 stingătoare P6 expirate\n\nActe de autoritate și evidențe lipsă:\n4. Analiza semestrială",
+    "text": "Nereguli constatate – Școala Gimnazială nr. 3 (control 10.09.2025 – 11.09.2025)\n\nNereguli:\n1. Construcția funcționează fără ASI (autorizație de securitate la incendiu) – construcția: Sala de sport\n2. Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz – construcția: Sala de sport\n3. Lipsă analiză semestrială\n4. Stingătoare expirate – construcția: Corp A – săli de clasă. 4 stingătoare P6 expirate",
     "count": 4
    },
    "pvTextNetrecute": {
@@ -18774,6 +19737,60 @@
      "amenda": null
     },
     {
+     "key": "ao",
+     "sec": "ner",
+     "litera": "ao",
+     "eticheta": "Nu a prezentat acte de autoritate / evidențe",
+     "constatare": "Nu a prezentat acte de autoritate / evidențe",
+     "categorie": "docs",
+     "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
+     "amenda": null
+    },
+    {
+     "key": "ap",
+     "sec": "ner",
+     "litera": "ap",
+     "eticheta": "Lipsă controale proprii",
+     "constatare": "Lipsă controale proprii",
+     "categorie": "docs",
+     "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
+     "amenda": null
+    },
+    {
+     "key": "aq",
+     "sec": "ner",
+     "litera": "aq",
+     "eticheta": "Lipsă analiză semestrială",
+     "constatare": "Lipsă analiză semestrială",
+     "categorie": "docs",
+     "aplicabil": true,
+     "status": "nok",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
+     "amenda": null
+    },
+    {
      "key": "b1",
      "sec": "ner",
      "litera": "b1",
@@ -19139,6 +20156,26 @@
      "litera": "i",
      "eticheta": "Ușă RF 60 minute cameră IDSAI",
      "constatare": "Ușă RF 60 minute cameră IDSAI",
+     "categorie": "electric",
+     "aplicabil": true,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [
+      "mv94q800mo28v0"
+     ],
+     "amenda": null
+    },
+    {
+     "key": "an",
+     "sec": "ner",
+     "litera": "an",
+     "eticheta": "Chepengul / ușa de acces în pod nu este RF 30 / 45 minute",
+     "constatare": "Chepengul / ușa de acces în pod nu este RF 30 / 45 minute",
      "categorie": "electric",
      "aplicabil": true,
      "status": "",
@@ -19714,18 +20751,18 @@
      "amenda": null
     }
    ],
-   "fisaHtml": "<header class=\"f-head\">\n    <div class=\"f-kicker\">Fișa controlului</div>\n    <h1>Școala Gimnazială nr. 3</h1>\n    <div class=\"f-meta\">\n      <span><b>Tip:</b> OPEC / Instituție</span>\n      <span><b>Perioada:</b> 10.09.2025 – 11.09.2025</span>\n      <span><b>Administrator:</b> Maria Ionescu</span>\n      <span><b>Telefon:</b> 0721 456 789</span>\n      <span><b>Email:</b> secretariat@scoala3.ro</span>\n      \n    </div>\n    <div class=\"f-sum\">\n      <div><b>3</b><span>nereguli / neconformități</span></div>\n      <div><b>0</b><span>netrecute în PV</span></div>\n      <div><b>0</b><span>amenzi</span></div>\n      <div><b>0</b><span>nereguli vechi</span></div>\n      <div><b>1</b><span>act lipsă</span></div>\n    </div>\n  </header>\n<section><h2>Construcții (2)</h2>\n<div class=\"f-constr\">\n      <h3>1. Corp A – săli de clasă</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>1850 m²</td>\n        <td><b>Regim înălțime</b><br>P+2E</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>42</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>Cadre din beton armat</td>\n        <td><b>Pereți</b><br>Cărămidă</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> ASI, AVIZ, Hidranți interiori, IDSAI, EXIT, Iluminat Hint, IPT · <b>Centrală termică:</b> GAZOS</p>\n      <p class=\"f-dot\"><b>NU:</b> Hidranți exteriori · <b>NEC:</b> Desfumare</p>\n      \n    </div>\n<div class=\"f-constr\">\n      <h3>2. Sala de sport</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>620 m²</td>\n        <td><b>Regim înălțime</b><br>P</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>3</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>Structură metalică</td>\n        <td><b>Pereți</b><br>Panouri sandwich</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> EXIT</p>\n      <p class=\"f-dot\"><b>NU:</b> ASI, AVIZ · <b>NEC:</b> IDSAI</p>\n      \n    </div>\n</section>\n<section><h2>Adăposturi de protecție civilă</h2><p><b>Adăposturi de protecție civilă:</b> —</p></section>\n<section><h2>Acte de autoritate și evidențe</h2><table class=\"f-table\">\n    <thead><tr><th>#</th><th>Act / evidență</th><th>Situație</th><th>Observații</th></tr></thead><tbody>\n    <tr class=\"\">\n      <td>1</td><td>Dispoziție CTPSI / RESP</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>2</td><td>Dispoziție LFD</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>3</td><td>Dispoziție instruire</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>4</td><td>Dispoziție organizarea apărării împotriva incendiilor</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>5</td><td>Comisie PSI</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>6</td><td>Dispoziție măsuri sezon canicular / secetos / rece</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>7</td><td>Controale proprii</td><td>Prezentat</td><td></td></tr><tr class=\"f-nok\">\n      <td>8</td><td>Analiza semestrială</td><td>Lipsă</td><td></td></tr><tr class=\"\">\n      <td>9</td><td>Fișe de instruire completate corect</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>10</td><td>Verificare lunară a stingătoarelor</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>11</td><td>Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>12</td><td>Exerciții efectuate</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>13</td><td>Registrele exercițiilor sunt la zi</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>14</td><td>Rapoarte exerciții</td><td>Prezentat</td><td></td></tr>\n  </tbody></table></section>\n<section><h2>Nereguli</h2>\n<table class=\"f-table\"><thead><tr><th>Nr.</th><th>Neregulă</th><th>Construcția</th><th>Situație</th><th>PV</th><th>Observații / sancțiune</th></tr></thead><tbody>\n<tr class=\"f-nok\">\n          <td>G2</td>\n          <td>Lipsă hidranți exteriori<div class=\"f-cat\">Instalații lipsă (NU la dotări) — nereguli grave</div></td>\n          <td>Corp A – săli de clasă</td>\n          <td><b>Neverificată — gravă</b></td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>ah</td>\n          <td>Construcția funcționează fără ASI (autorizație de securitate la incendiu)<div class=\"f-cat\">Documentație și verificări</div></td>\n          <td>Sala de sport</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>ai</td>\n          <td>Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz<div class=\"f-cat\">Documentație și verificări</div></td>\n          <td>Sala de sport</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>d</td>\n          <td>Stingătoare expirate<div class=\"f-cat\">Stingătoare</div></td>\n          <td>Corp A – săli de clasă</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td>4 stingătoare P6 expirate</td>\n        </tr>\n</tbody></table>\n<p class=\"f-small\">25 rubrici neverificate (nu apar în tabel).</p>\n</section>\n<footer class=\"f-foot\">Generat la joi, 15 octombrie 2026, 09:00 · Agenda inspectorului</footer>",
+   "fisaHtml": "<header class=\"f-head\">\n    <div class=\"f-kicker\">Fișa controlului</div>\n    <h1>Școala Gimnazială nr. 3</h1>\n    <div class=\"f-meta\">\n      <span><b>Tip:</b> OPEC / Instituție</span>\n      <span><b>Perioada:</b> 10.09.2025 – 11.09.2025</span>\n      <span><b>Administrator:</b> Maria Ionescu</span>\n      \n      <span><b>Telefon:</b> 0721 456 789</span>\n      <span><b>Email:</b> secretariat@scoala3.ro</span>\n      \n    </div>\n    <div class=\"f-sum\">\n      <div><b>4</b><span>nereguli / neconformități</span></div>\n      <div><b>0</b><span>netrecute în PV</span></div>\n      <div><b>0</b><span>amenzi</span></div>\n      <div><b>0</b><span>nereguli vechi</span></div>\n      <div><b>1</b><span>act lipsă</span></div>\n    </div>\n  </header>\n<section><h2>Construcții (2)</h2>\n<div class=\"f-constr\">\n      <h3>1. Corp A – săli de clasă</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>1850 m²</td>\n        <td><b>Regim înălțime</b><br>P+2E</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>42</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>Cadre din beton armat</td>\n        <td><b>Pereți</b><br>Cărămidă</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> ASI, AVIZ, Hidranți interiori, IDSAI, EXIT, Iluminat Hint, IPT · <b>Centrală termică:</b> GAZOS</p>\n      <p class=\"f-dot\"><b>NU:</b> Hidranți exteriori · <b>NEC:</b> Desfumare</p>\n      \n    </div>\n<div class=\"f-constr\">\n      <h3>2. Sala de sport</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>620 m²</td>\n        <td><b>Regim înălțime</b><br>P</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>3</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>Structură metalică</td>\n        <td><b>Pereți</b><br>Panouri sandwich</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> EXIT</p>\n      <p class=\"f-dot\"><b>NU:</b> ASI, AVIZ · <b>NEC:</b> IDSAI</p>\n      \n    </div>\n</section>\n<section><h2>Adăposturi de protecție civilă</h2><p><b>Adăposturi de protecție civilă:</b> —</p></section>\n<section><h2>Acte de autoritate și evidențe</h2><table class=\"f-table\">\n    <thead><tr><th>#</th><th>Act / evidență</th><th>Situație</th><th>Observații</th></tr></thead><tbody>\n    <tr class=\"\">\n      <td>1</td><td>Dispoziție CTPSI / RESP</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>2</td><td>Dispoziție LFD</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>3</td><td>Dispoziție de reglementare a fumatului</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>4</td><td>Dispoziție instruire</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>5</td><td>Dispoziție organizarea apărării împotriva incendiilor</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>6</td><td>Comisie PSI</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>7</td><td>Dispoziție măsuri sezon canicular / secetos / rece</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>8</td><td>Controale proprii</td><td>Prezentat</td><td></td></tr><tr class=\"f-nok\">\n      <td>9</td><td>Analiza semestrială</td><td>Lipsă</td><td></td></tr><tr class=\"\">\n      <td>10</td><td>Fișe de instruire completate corect</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>11</td><td>Verificare lunară a stingătoarelor</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>12</td><td>Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>13</td><td>Exerciții efectuate</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>14</td><td>Registrele exercițiilor sunt la zi</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>15</td><td>Rapoarte exerciții</td><td>Prezentat</td><td></td></tr>\n  </tbody></table></section>\n<section><h2>Nereguli</h2>\n<table class=\"f-table\"><thead><tr><th>Nr.</th><th>Neregulă</th><th>Construcția</th><th>Situație</th><th>PV</th><th>Observații / sancțiune</th></tr></thead><tbody>\n<tr class=\"f-nok\">\n          <td>G2</td>\n          <td>Lipsă hidranți exteriori<div class=\"f-cat\">Instalații lipsă (NU la dotări) — nereguli grave</div></td>\n          <td>Corp A – săli de clasă</td>\n          <td><b>Neverificată — gravă</b></td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>ah</td>\n          <td>Construcția funcționează fără ASI (autorizație de securitate la incendiu)<div class=\"f-cat\">Documentație și verificări</div></td>\n          <td>Sala de sport</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>ai</td>\n          <td>Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz<div class=\"f-cat\">Documentație și verificări</div></td>\n          <td>Sala de sport</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>aq</td>\n          <td>Lipsă analiză semestrială<div class=\"f-cat\">Documentație și verificări</div></td>\n          <td>—</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>d</td>\n          <td>Stingătoare expirate<div class=\"f-cat\">Stingătoare</div></td>\n          <td>Corp A – săli de clasă</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td>4 stingătoare P6 expirate</td>\n        </tr>\n</tbody></table>\n<p class=\"f-small\">26 rubrici neverificate (nu apar în tabel).</p>\n</section>\n<footer class=\"f-foot\">Generat la joi, 15 octombrie 2026, 09:00 · Agenda inspectorului</footer>",
    "fisaFisier": "Fisa-control-Scoala-Gimnaziala-nr-3-2025-09-10.html"
   },
   {
    "id": "mv94q8000t8fj6",
    "controlStats": {
-    "acteDone": 14,
-    "acteTotal": 14,
+    "acteDone": 15,
+    "acteTotal": 15,
     "acteNok": 2,
-    "nereguliChecked": 4,
-    "nereguliTotal": 29,
-    "constatate": 4,
+    "nereguliChecked": 5,
+    "nereguliTotal": 31,
+    "constatate": 5,
     "netrecute": 2,
     "fines": [
      {
@@ -19750,10 +20787,10 @@
    },
    "secStats": {
     "ner": {
-     "total": 29,
-     "checked": 4,
+     "total": 31,
+     "checked": 5,
      "hidden": 19,
-     "constatate": 4,
+     "constatate": 5,
      "netrecute": 2,
      "fines": 1
     }
@@ -19769,7 +20806,7 @@
     {
      "id": "todo-ner",
      "level": "todo",
-     "text": "Nereguli: 25 nereguli neverificate",
+     "text": "Nereguli: 26 nereguli neverificate",
      "tab": "nereguli",
      "focus": "lipsa-hidExt"
     },
@@ -19789,8 +20826,8 @@
     }
    ],
    "pvText": {
-    "text": "Nereguli constatate – Școala Gimnazială nr. 3 (control 03.09.2026 – 04.09.2026)\n\nNereguli:\n1. Construcția funcționează fără ASI (autorizație de securitate la incendiu) – construcția: Sala de sport (neregulă veche)\n2. Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz – construcția: Sala de sport (neregulă veche)\n3. Stingătoare expirate – construcția: Corp A – săli de clasă. 2 stingătoare expirate, corp A (neregulă veche; sancționat cu amendă Seria DB nr. 0012345)\n4. EXIT defect – construcția: Sala de sport. Hol etaj 1\n\nActe de autoritate și evidențe lipsă:\n5. Fișe de instruire completate corect\n6. Verificare lunară a stingătoarelor",
-    "count": 6
+    "text": "Nereguli constatate – Școala Gimnazială nr. 3 (control 03.09.2026 – 04.09.2026)\n\nNereguli:\n1. Construcția funcționează fără ASI (autorizație de securitate la incendiu) – construcția: Sala de sport (neregulă veche)\n2. Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz – construcția: Sala de sport (neregulă veche)\n3. Nu a prezentat acte de autoritate / evidențe. Fișe de instruire completate corect; Verificare lunară a stingătoarelor\n4. Stingătoare expirate – construcția: Corp A – săli de clasă. 2 stingătoare expirate, corp A (neregulă veche; sancționat cu amendă)\n5. EXIT defect – construcția: Sala de sport. Hol etaj 1",
+    "count": 5
    },
    "pvTextNetrecute": {
     "text": "Nereguli constatate – Școala Gimnazială nr. 3 (control 03.09.2026 – 04.09.2026)\n\nNereguli:\n1. Construcția funcționează fără ASI (autorizație de securitate la incendiu) – construcția: Sala de sport (neregulă veche)\n2. Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz – construcția: Sala de sport (neregulă veche)",
@@ -20120,6 +21157,60 @@
      "amenda": null
     },
     {
+     "key": "ao",
+     "sec": "ner",
+     "litera": "ao",
+     "eticheta": "Nu a prezentat acte de autoritate / evidențe",
+     "constatare": "Nu a prezentat acte de autoritate / evidențe",
+     "categorie": "docs",
+     "aplicabil": true,
+     "status": "nok",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
+     "amenda": null
+    },
+    {
+     "key": "ap",
+     "sec": "ner",
+     "litera": "ap",
+     "eticheta": "Lipsă controale proprii",
+     "constatare": "Lipsă controale proprii",
+     "categorie": "docs",
+     "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
+     "amenda": null
+    },
+    {
+     "key": "aq",
+     "sec": "ner",
+     "litera": "aq",
+     "eticheta": "Lipsă analiză semestrială",
+     "constatare": "Lipsă analiză semestrială",
+     "categorie": "docs",
+     "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": "mv94q800f9a9az",
+      "manual": false
+     },
+     "constructii": [],
+     "amenda": null
+    },
+    {
      "key": "b1",
      "sec": "ner",
      "litera": "b1",
@@ -20496,6 +21587,26 @@
      "litera": "i",
      "eticheta": "Ușă RF 60 minute cameră IDSAI",
      "constatare": "Ușă RF 60 minute cameră IDSAI",
+     "categorie": "electric",
+     "aplicabil": true,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [
+      "mv94q800fk33hr"
+     ],
+     "amenda": null
+    },
+    {
+     "key": "an",
+     "sec": "ner",
+     "litera": "an",
+     "eticheta": "Chepengul / ușa de acces în pod nu este RF 30 / 45 minute",
+     "constatare": "Chepengul / ușa de acces în pod nu este RF 30 / 45 minute",
      "categorie": "electric",
      "aplicabil": true,
      "status": "",
@@ -21071,18 +22182,18 @@
      "amenda": null
     }
    ],
-   "fisaHtml": "<header class=\"f-head\">\n    <div class=\"f-kicker\">Fișa controlului</div>\n    <h1>Școala Gimnazială nr. 3</h1>\n    <div class=\"f-meta\">\n      <span><b>Tip:</b> OPEC / Instituție</span>\n      <span><b>Perioada:</b> 03.09.2026 – 04.09.2026</span>\n      <span><b>Administrator:</b> Maria Ionescu</span>\n      <span><b>Telefon:</b> 0721 456 789</span>\n      <span><b>Email:</b> secretariat@scoala3.ro</span>\n      \n    </div>\n    <div class=\"f-sum\">\n      <div><b>4</b><span>nereguli / neconformități</span></div>\n      <div><b>2</b><span>netrecute în PV</span></div>\n      <div><b>1</b><span>amendă</span></div>\n      <div><b>3</b><span>nereguli vechi</span></div>\n      <div><b>2</b><span>acte lipsă</span></div>\n    </div>\n  </header>\n<section><h2>Construcții (2)</h2>\n<div class=\"f-constr\">\n      <h3>1. Corp A – săli de clasă</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>1850 m²</td>\n        <td><b>Regim înălțime</b><br>P+2E</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>42</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>Cadre din beton armat</td>\n        <td><b>Pereți</b><br>Cărămidă</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> ASI, AVIZ, Hidranți interiori, IDSAI, EXIT, Iluminat Hint, IPT · <b>Centrală termică:</b> GAZOS</p>\n      <p class=\"f-dot\"><b>NU:</b> Hidranți exteriori · <b>NEC:</b> Desfumare</p>\n      \n    </div>\n<div class=\"f-constr\">\n      <h3>2. Sala de sport</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>620 m²</td>\n        <td><b>Regim înălțime</b><br>P</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>3</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>Structură metalică</td>\n        <td><b>Pereți</b><br>Panouri sandwich</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> EXIT</p>\n      <p class=\"f-dot\"><b>NU:</b> ASI, AVIZ · <b>NEC:</b> IDSAI</p>\n      \n    </div>\n</section>\n<section><h2>Adăposturi de protecție civilă</h2><p><b>Adăposturi de protecție civilă:</b> —</p></section>\n<section><h2>Acte de autoritate și evidențe</h2><table class=\"f-table\">\n    <thead><tr><th>#</th><th>Act / evidență</th><th>Situație</th><th>Observații</th></tr></thead><tbody>\n    <tr class=\"\">\n      <td>1</td><td>Dispoziție CTPSI / RESP</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>2</td><td>Dispoziție LFD</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>3</td><td>Dispoziție instruire</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>4</td><td>Dispoziție organizarea apărării împotriva incendiilor</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>5</td><td>Comisie PSI</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>6</td><td>Dispoziție măsuri sezon canicular / secetos / rece</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>7</td><td>Controale proprii</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>8</td><td>Analiza semestrială</td><td>Prezentat</td><td></td></tr><tr class=\"f-nok\">\n      <td>9</td><td>Fișe de instruire completate corect</td><td>Lipsă</td><td></td></tr><tr class=\"f-nok\">\n      <td>10</td><td>Verificare lunară a stingătoarelor</td><td>Lipsă</td><td></td></tr><tr class=\"\">\n      <td>11</td><td>Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>12</td><td>Exerciții efectuate</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>13</td><td>Registrele exercițiilor sunt la zi</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>14</td><td>Rapoarte exerciții</td><td>Prezentat</td><td></td></tr>\n  </tbody></table></section>\n<section><h2>Nereguli</h2>\n<table class=\"f-table\"><thead><tr><th>Nr.</th><th>Neregulă</th><th>Construcția</th><th>Situație</th><th>PV</th><th>Observații / sancțiune</th></tr></thead><tbody>\n<tr class=\"f-nok\">\n          <td>G2</td>\n          <td>Lipsă hidranți exteriori<div class=\"f-cat\">Instalații lipsă (NU la dotări) — nereguli grave</div></td>\n          <td>Corp A – săli de clasă</td>\n          <td><b>Neverificată — gravă</b></td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>ah</td>\n          <td>Construcția funcționează fără ASI (autorizație de securitate la incendiu)<div class=\"f-cat\">Documentație și verificări</div></td>\n          <td>Sala de sport</td>\n          <td>Constatat</td>\n          <td><b>Netrecut</b></td>\n          <td><b>Neregulă veche</b> (și la controlul din 10.09.2025)</td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>ai</td>\n          <td>Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz<div class=\"f-cat\">Documentație și verificări</div></td>\n          <td>Sala de sport</td>\n          <td>Constatat</td>\n          <td><b>Netrecut</b></td>\n          <td><b>Neregulă veche</b> (și la controlul din 10.09.2025)</td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>d</td>\n          <td>Stingătoare expirate<div class=\"f-cat\">Stingătoare</div></td>\n          <td>Corp A – săli de clasă</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td>2 stingătoare expirate, corp A<br><b>Neregulă veche</b> (și la controlul din 10.09.2025)<br><b>Amendă</b> Seria DB nr. 0012345, 2.500 lei — Trimite la ANAF / Taxe și impozite</td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>j</td>\n          <td>EXIT defect<div class=\"f-cat\">Semnalizare și iluminat</div></td>\n          <td>Sala de sport</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td>Hol etaj 1</td>\n        </tr>\n</tbody></table>\n<p class=\"f-small\">24 rubrici neverificate (nu apar în tabel).</p>\n</section>\n<footer class=\"f-foot\">Generat la joi, 15 octombrie 2026, 09:00 · Agenda inspectorului</footer>",
+   "fisaHtml": "<header class=\"f-head\">\n    <div class=\"f-kicker\">Fișa controlului</div>\n    <h1>Școala Gimnazială nr. 3</h1>\n    <div class=\"f-meta\">\n      <span><b>Tip:</b> OPEC / Instituție</span>\n      <span><b>Perioada:</b> 03.09.2026 – 04.09.2026</span>\n      <span><b>Administrator:</b> Maria Ionescu</span>\n      \n      <span><b>Telefon:</b> 0721 456 789</span>\n      <span><b>Email:</b> secretariat@scoala3.ro</span>\n      \n    </div>\n    <div class=\"f-sum\">\n      <div><b>5</b><span>nereguli / neconformități</span></div>\n      <div><b>2</b><span>netrecute în PV</span></div>\n      <div><b>1</b><span>amendă</span></div>\n      <div><b>3</b><span>nereguli vechi</span></div>\n      <div><b>2</b><span>acte lipsă</span></div>\n    </div>\n  </header>\n<section><h2>Construcții (2)</h2>\n<div class=\"f-constr\">\n      <h3>1. Corp A – săli de clasă</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>1850 m²</td>\n        <td><b>Regim înălțime</b><br>P+2E</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>42</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>Cadre din beton armat</td>\n        <td><b>Pereți</b><br>Cărămidă</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> ASI, AVIZ, Hidranți interiori, IDSAI, EXIT, Iluminat Hint, IPT · <b>Centrală termică:</b> GAZOS</p>\n      <p class=\"f-dot\"><b>NU:</b> Hidranți exteriori · <b>NEC:</b> Desfumare</p>\n      \n    </div>\n<div class=\"f-constr\">\n      <h3>2. Sala de sport</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>620 m²</td>\n        <td><b>Regim înălțime</b><br>P</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>3</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>Structură metalică</td>\n        <td><b>Pereți</b><br>Panouri sandwich</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> EXIT</p>\n      <p class=\"f-dot\"><b>NU:</b> ASI, AVIZ · <b>NEC:</b> IDSAI</p>\n      \n    </div>\n</section>\n<section><h2>Adăposturi de protecție civilă</h2><p><b>Adăposturi de protecție civilă:</b> —</p></section>\n<section><h2>Acte de autoritate și evidențe</h2><table class=\"f-table\">\n    <thead><tr><th>#</th><th>Act / evidență</th><th>Situație</th><th>Observații</th></tr></thead><tbody>\n    <tr class=\"\">\n      <td>1</td><td>Dispoziție CTPSI / RESP</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>2</td><td>Dispoziție LFD</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>3</td><td>Dispoziție de reglementare a fumatului</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>4</td><td>Dispoziție instruire</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>5</td><td>Dispoziție organizarea apărării împotriva incendiilor</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>6</td><td>Comisie PSI</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>7</td><td>Dispoziție măsuri sezon canicular / secetos / rece</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>8</td><td>Controale proprii</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>9</td><td>Analiza semestrială</td><td>Prezentat</td><td></td></tr><tr class=\"f-nok\">\n      <td>10</td><td>Fișe de instruire completate corect</td><td>Lipsă</td><td></td></tr><tr class=\"f-nok\">\n      <td>11</td><td>Verificare lunară a stingătoarelor</td><td>Lipsă</td><td></td></tr><tr class=\"\">\n      <td>12</td><td>Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>13</td><td>Exerciții efectuate</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>14</td><td>Registrele exercițiilor sunt la zi</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>15</td><td>Rapoarte exerciții</td><td>Prezentat</td><td></td></tr>\n  </tbody></table></section>\n<section><h2>Nereguli</h2>\n<table class=\"f-table\"><thead><tr><th>Nr.</th><th>Neregulă</th><th>Construcția</th><th>Situație</th><th>PV</th><th>Observații / sancțiune</th></tr></thead><tbody>\n<tr class=\"f-nok\">\n          <td>G2</td>\n          <td>Lipsă hidranți exteriori<div class=\"f-cat\">Instalații lipsă (NU la dotări) — nereguli grave</div></td>\n          <td>Corp A – săli de clasă</td>\n          <td><b>Neverificată — gravă</b></td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>ah</td>\n          <td>Construcția funcționează fără ASI (autorizație de securitate la incendiu)<div class=\"f-cat\">Documentație și verificări</div></td>\n          <td>Sala de sport</td>\n          <td>Constatat</td>\n          <td><b>Netrecut</b></td>\n          <td><b>Neregulă veche</b> (și la controlul din 10.09.2025)</td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>ai</td>\n          <td>Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz<div class=\"f-cat\">Documentație și verificări</div></td>\n          <td>Sala de sport</td>\n          <td>Constatat</td>\n          <td><b>Netrecut</b></td>\n          <td><b>Neregulă veche</b> (și la controlul din 10.09.2025)</td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>ao</td>\n          <td>Nu a prezentat acte de autoritate / evidențe<div class=\"f-cat\">Documentație și verificări</div></td>\n          <td>—</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td>Fișe de instruire completate corect<br>Verificare lunară a stingătoarelor</td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>d</td>\n          <td>Stingătoare expirate<div class=\"f-cat\">Stingătoare</div></td>\n          <td>Corp A – săli de clasă</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td>2 stingătoare expirate, corp A<br><b>Neregulă veche</b> (și la controlul din 10.09.2025)<br><b>Amendă</b>, 2.500 lei — Trimite la ANAF / Taxe și impozite</td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>j</td>\n          <td>EXIT defect<div class=\"f-cat\">Semnalizare și iluminat</div></td>\n          <td>Sala de sport</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td>Hol etaj 1</td>\n        </tr>\n</tbody></table>\n<p class=\"f-small\">25 rubrici neverificate (nu apar în tabel).</p>\n</section>\n<footer class=\"f-foot\">Generat la joi, 15 octombrie 2026, 09:00 · Agenda inspectorului</footer>",
    "fisaFisier": "Fisa-control-Scoala-Gimnaziala-nr-3-2026-09-03.html"
   },
   {
    "id": "mv94q80065jb0x",
    "controlStats": {
-    "acteDone": 14,
-    "acteTotal": 14,
+    "acteDone": 15,
+    "acteTotal": 15,
     "acteNok": 1,
-    "nereguliChecked": 4,
-    "nereguliTotal": 37,
-    "constatate": 4,
+    "nereguliChecked": 5,
+    "nereguliTotal": 39,
+    "constatate": 5,
     "netrecute": 1,
     "fines": [
      {
@@ -21112,10 +22223,10 @@
    },
    "secStats": {
     "ner": {
-     "total": 37,
-     "checked": 4,
+     "total": 39,
+     "checked": 5,
      "hidden": 11,
-     "constatate": 4,
+     "constatate": 5,
      "netrecute": 1,
      "fines": 1
     }
@@ -21131,7 +22242,7 @@
     {
      "id": "todo-ner",
      "level": "todo",
-     "text": "Nereguli: 33 nereguli neverificate",
+     "text": "Nereguli: 34 nereguli neverificate",
      "tab": "nereguli",
      "focus": "lipsa-exit"
     },
@@ -21151,11 +22262,11 @@
     }
    ],
    "pvText": {
-    "text": "Nereguli constatate – Spitalul Orășenesc Valea Verde (control 24.09.2026 – 25.09.2026)\n\nNereguli:\n1. Construcția funcționează fără ASI (autorizație de securitate la incendiu) – construcția: Pavilion central\n2. Nu a prezentat documentație ASI – construcția: Pavilion central. Pavilion central\n3. Erori IDSAI – construcția: Pavilion central. Erori zona 3 centrală\n4. Hext nefuncțional – construcția: Pavilion central. Hidrant exterior H2 fără presiune (sancționat cu amendă Seria DB nr. 0012377)\n\nActe de autoritate și evidențe lipsă:\n5. Dispoziție măsuri sezon canicular / secetos / rece",
+    "text": "Nereguli constatate – Spitalul Orășenesc Valea Verde (control 24.09.2026 – 25.09.2026)\n\nNereguli:\n1. Construcția funcționează fără ASI (autorizație de securitate la incendiu) – construcția: Pavilion central\n2. Nu a prezentat documentație ASI – construcția: Pavilion central. Pavilion central\n3. Nu a prezentat acte de autoritate / evidențe. Dispoziție măsuri sezon canicular / secetos / rece\n4. Erori IDSAI – construcția: Pavilion central. Erori zona 3 centrală\n5. Hext nefuncțional – construcția: Pavilion central. Hidrant exterior H2 fără presiune (sancționat cu amendă)",
     "count": 5
    },
    "pvTextNetrecute": {
-    "text": "Nereguli constatate – Spitalul Orășenesc Valea Verde (control 24.09.2026 – 25.09.2026)\n\nNereguli:\n1. Hext nefuncțional – construcția: Pavilion central. Hidrant exterior H2 fără presiune (sancționat cu amendă Seria DB nr. 0012377)",
+    "text": "Nereguli constatate – Spitalul Orășenesc Valea Verde (control 24.09.2026 – 25.09.2026)\n\nNereguli:\n1. Hext nefuncțional – construcția: Pavilion central. Hidrant exterior H2 fără presiune (sancționat cu amendă)",
     "count": 1
    },
    "sigilii": null,
@@ -21479,6 +22590,60 @@
      "constructii": [
       "mv94q800ri2i7n"
      ],
+     "amenda": null
+    },
+    {
+     "key": "ao",
+     "sec": "ner",
+     "litera": "ao",
+     "eticheta": "Nu a prezentat acte de autoritate / evidențe",
+     "constatare": "Nu a prezentat acte de autoritate / evidențe",
+     "categorie": "docs",
+     "aplicabil": true,
+     "status": "nok",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
+     "amenda": null
+    },
+    {
+     "key": "ap",
+     "sec": "ner",
+     "litera": "ap",
+     "eticheta": "Lipsă controale proprii",
+     "constatare": "Lipsă controale proprii",
+     "categorie": "docs",
+     "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
+     "amenda": null
+    },
+    {
+     "key": "aq",
+     "sec": "ner",
+     "litera": "aq",
+     "eticheta": "Lipsă analiză semestrială",
+     "constatare": "Lipsă analiză semestrială",
+     "categorie": "docs",
+     "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
      "amenda": null
     },
     {
@@ -21847,6 +23012,26 @@
      "litera": "i",
      "eticheta": "Ușă RF 60 minute cameră IDSAI",
      "constatare": "Ușă RF 60 minute cameră IDSAI",
+     "categorie": "electric",
+     "aplicabil": true,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [
+      "mv94q800ri2i7n"
+     ],
+     "amenda": null
+    },
+    {
+     "key": "an",
+     "sec": "ner",
+     "litera": "an",
+     "eticheta": "Chepengul / ușa de acces în pod nu este RF 30 / 45 minute",
+     "constatare": "Chepengul / ușa de acces în pod nu este RF 30 / 45 minute",
      "categorie": "electric",
      "aplicabil": true,
      "status": "",
@@ -22433,18 +23618,18 @@
      "amenda": null
     }
    ],
-   "fisaHtml": "<header class=\"f-head\">\n    <div class=\"f-kicker\">Fișa controlului</div>\n    <h1>Spitalul Orășenesc Valea Verde</h1>\n    <div class=\"f-meta\">\n      <span><b>Tip:</b> OPEC / Instituție</span>\n      <span><b>Perioada:</b> 24.09.2026 – 25.09.2026</span>\n      <span><b>Administrator:</b> Dr. Andrei Popa</span>\n      <span><b>Telefon:</b> 0744 112 233</span>\n      <span><b>Email:</b> administrativ@spital-vv.ro</span>\n      \n    </div>\n    <div class=\"f-sum\">\n      <div><b>4</b><span>nereguli / neconformități</span></div>\n      <div><b>1</b><span>netrecută în PV</span></div>\n      <div><b>1</b><span>amendă</span></div>\n      <div><b>0</b><span>nereguli vechi</span></div>\n      <div><b>1</b><span>act lipsă</span></div>\n    </div>\n  </header>\n<section><h2>Construcții (2)</h2>\n<div class=\"f-constr\">\n      <h3>1. Pavilion central</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>6400 m²</td>\n        <td><b>Regim înălțime</b><br>S+P+4E</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>210</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>Beton armat</td>\n        <td><b>Pereți</b><br>BCA</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> AVIZ, Hidranți interiori, Hidranți exteriori, IDSAI, EXIT, Desfumare, Rezervă de apă, Stație de pompe, Acumulatori, Iluminat Hint, IPT · <b>Centrală termică:</b> GAZOS, ELECTRIC</p>\n      <p class=\"f-dot\"><b>NU:</b> ASI · <b>NEC:</b> Sprinklere</p>\n      \n    </div>\n<div class=\"f-constr\">\n      <h3>2. Ambulatoriu</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>1200 m²</td>\n        <td><b>Regim înălțime</b><br>P+1E</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>35</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>Zidărie portantă</td>\n        <td><b>Pereți</b><br>Cărămidă</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> ASI, Hidranți interiori, IDSAI</p>\n      <p class=\"f-dot\"><b>NU:</b> EXIT · <b>NEC:</b> —</p>\n      \n    </div>\n</section>\n<section><h2>Adăposturi de protecție civilă</h2><p><b>Adăposturi de protecție civilă:</b> —</p></section>\n<section><h2>Acte de autoritate și evidențe</h2><table class=\"f-table\">\n    <thead><tr><th>#</th><th>Act / evidență</th><th>Situație</th><th>Observații</th></tr></thead><tbody>\n    <tr class=\"\">\n      <td>1</td><td>Dispoziție CTPSI / RESP</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>2</td><td>Dispoziție LFD</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>3</td><td>Dispoziție instruire</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>4</td><td>Dispoziție organizarea apărării împotriva incendiilor</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>5</td><td>Comisie PSI</td><td>Prezentat</td><td></td></tr><tr class=\"f-nok\">\n      <td>6</td><td>Dispoziție măsuri sezon canicular / secetos / rece</td><td>Lipsă</td><td></td></tr><tr class=\"\">\n      <td>7</td><td>Controale proprii</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>8</td><td>Analiza semestrială</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>9</td><td>Fișe de instruire completate corect</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>10</td><td>Verificare lunară a stingătoarelor</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>11</td><td>Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>12</td><td>Exerciții efectuate</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>13</td><td>Registrele exercițiilor sunt la zi</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>14</td><td>Rapoarte exerciții</td><td>Prezentat</td><td></td></tr>\n  </tbody></table></section>\n<section><h2>Nereguli</h2>\n<table class=\"f-table\"><thead><tr><th>Nr.</th><th>Neregulă</th><th>Construcția</th><th>Situație</th><th>PV</th><th>Observații / sancțiune</th></tr></thead><tbody>\n<tr class=\"f-nok\">\n          <td>G8</td>\n          <td>Lipsă marcaje EXIT<div class=\"f-cat\">Instalații lipsă (NU la dotări) — nereguli grave</div></td>\n          <td>Ambulatoriu</td>\n          <td><b>Neverificată — gravă</b></td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>ah</td>\n          <td>Construcția funcționează fără ASI (autorizație de securitate la incendiu)<div class=\"f-cat\">Documentație și verificări</div></td>\n          <td>Pavilion central</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>a</td>\n          <td>Nu a prezentat documentație ASI<div class=\"f-cat\">Documentație și verificări</div></td>\n          <td>Pavilion central</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td>Pavilion central<br><b>ASI 90 zile:</b> Mai sunt 70 de zile până la 24.12.2026</td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>l</td>\n          <td>Erori IDSAI<div class=\"f-cat\">IDSAI</div></td>\n          <td>Pavilion central</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td>Erori zona 3 centrală</td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>q</td>\n          <td>Hext nefuncțional<div class=\"f-cat\">Hidranți</div></td>\n          <td>Pavilion central</td>\n          <td>Constatat</td>\n          <td><b>Netrecut</b></td>\n          <td>Hidrant exterior H2 fără presiune<br><b>Amendă</b> Seria DB nr. 0012377, 5.000 lei — Termen 15 zile expirat</td>\n        </tr>\n</tbody></table>\n<p class=\"f-small\">32 rubrici neverificate (nu apar în tabel).</p>\n</section>\n<footer class=\"f-foot\">Generat la joi, 15 octombrie 2026, 09:00 · Agenda inspectorului</footer>",
+   "fisaHtml": "<header class=\"f-head\">\n    <div class=\"f-kicker\">Fișa controlului</div>\n    <h1>Spitalul Orășenesc Valea Verde</h1>\n    <div class=\"f-meta\">\n      <span><b>Tip:</b> OPEC / Instituție</span>\n      <span><b>Perioada:</b> 24.09.2026 – 25.09.2026</span>\n      <span><b>Administrator:</b> Dr. Andrei Popa</span>\n      \n      <span><b>Telefon:</b> 0744 112 233</span>\n      <span><b>Email:</b> administrativ@spital-vv.ro</span>\n      \n    </div>\n    <div class=\"f-sum\">\n      <div><b>5</b><span>nereguli / neconformități</span></div>\n      <div><b>1</b><span>netrecută în PV</span></div>\n      <div><b>1</b><span>amendă</span></div>\n      <div><b>0</b><span>nereguli vechi</span></div>\n      <div><b>1</b><span>act lipsă</span></div>\n    </div>\n  </header>\n<section><h2>Construcții (2)</h2>\n<div class=\"f-constr\">\n      <h3>1. Pavilion central</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>6400 m²</td>\n        <td><b>Regim înălțime</b><br>S+P+4E</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>210</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>Beton armat</td>\n        <td><b>Pereți</b><br>BCA</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> AVIZ, Hidranți interiori, Hidranți exteriori, IDSAI, EXIT, Desfumare, Rezervă de apă, Stație de pompe, Acumulatori, Iluminat Hint, IPT, Ascensor · <b>Centrală termică:</b> CT 1: GAZOS; CT 2: ELECTRIC</p>\n      <p class=\"f-dot\"><b>NU:</b> ASI · <b>NEC:</b> Sprinklere</p>\n      \n    </div>\n<div class=\"f-constr\">\n      <h3>2. Ambulatoriu</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>1200 m²</td>\n        <td><b>Regim înălțime</b><br>P+1E</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>35</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>Zidărie portantă</td>\n        <td><b>Pereți</b><br>Cărămidă</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> ASI, Hidranți interiori, IDSAI</p>\n      <p class=\"f-dot\"><b>NU:</b> EXIT · <b>NEC:</b> —</p>\n      \n    </div>\n</section>\n<section><h2>Adăposturi de protecție civilă</h2><p><b>Adăposturi de protecție civilă:</b> —</p></section>\n<section><h2>Acte de autoritate și evidențe</h2><table class=\"f-table\">\n    <thead><tr><th>#</th><th>Act / evidență</th><th>Situație</th><th>Observații</th></tr></thead><tbody>\n    <tr class=\"\">\n      <td>1</td><td>Dispoziție CTPSI / RESP</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>2</td><td>Dispoziție LFD</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>3</td><td>Dispoziție de reglementare a fumatului</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>4</td><td>Dispoziție instruire</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>5</td><td>Dispoziție organizarea apărării împotriva incendiilor</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>6</td><td>Comisie PSI</td><td>Prezentat</td><td></td></tr><tr class=\"f-nok\">\n      <td>7</td><td>Dispoziție măsuri sezon canicular / secetos / rece</td><td>Lipsă</td><td></td></tr><tr class=\"\">\n      <td>8</td><td>Controale proprii</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>9</td><td>Analiza semestrială</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>10</td><td>Fișe de instruire completate corect</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>11</td><td>Verificare lunară a stingătoarelor</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>12</td><td>Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>13</td><td>Exerciții efectuate</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>14</td><td>Registrele exercițiilor sunt la zi</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>15</td><td>Rapoarte exerciții</td><td>Prezentat</td><td></td></tr>\n  </tbody></table></section>\n<section><h2>Nereguli</h2>\n<table class=\"f-table\"><thead><tr><th>Nr.</th><th>Neregulă</th><th>Construcția</th><th>Situație</th><th>PV</th><th>Observații / sancțiune</th></tr></thead><tbody>\n<tr class=\"f-nok\">\n          <td>G8</td>\n          <td>Lipsă marcaje EXIT<div class=\"f-cat\">Instalații lipsă (NU la dotări) — nereguli grave</div></td>\n          <td>Ambulatoriu</td>\n          <td><b>Neverificată — gravă</b></td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>ah</td>\n          <td>Construcția funcționează fără ASI (autorizație de securitate la incendiu)<div class=\"f-cat\">Documentație și verificări</div></td>\n          <td>Pavilion central</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>a</td>\n          <td>Nu a prezentat documentație ASI<div class=\"f-cat\">Documentație și verificări</div></td>\n          <td>Pavilion central</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td>Pavilion central<br><b>ASI 90 zile:</b> Mai sunt 70 de zile până la 24.12.2026</td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>ao</td>\n          <td>Nu a prezentat acte de autoritate / evidențe<div class=\"f-cat\">Documentație și verificări</div></td>\n          <td>—</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td>Dispoziție măsuri sezon canicular / secetos / rece</td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>l</td>\n          <td>Erori IDSAI<div class=\"f-cat\">IDSAI</div></td>\n          <td>Pavilion central</td>\n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td>Erori zona 3 centrală</td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>q</td>\n          <td>Hext nefuncțional<div class=\"f-cat\">Hidranți</div></td>\n          <td>Pavilion central</td>\n          <td>Constatat</td>\n          <td><b>Netrecut</b></td>\n          <td>Hidrant exterior H2 fără presiune<br><b>Amendă</b>, 5.000 lei — Termen 15 zile expirat</td>\n        </tr>\n</tbody></table>\n<p class=\"f-small\">33 rubrici neverificate (nu apar în tabel).</p>\n</section>\n<footer class=\"f-foot\">Generat la joi, 15 octombrie 2026, 09:00 · Agenda inspectorului</footer>",
    "fisaFisier": "Fisa-control-Spitalul-Orasenesc-Valea-Verde-2026-09-24.html"
   },
   {
    "id": "mv94q800hi7el8",
    "controlStats": {
-    "acteDone": 14,
-    "acteTotal": 14,
+    "acteDone": 15,
+    "acteTotal": 15,
     "acteNok": 2,
-    "nereguliChecked": 16,
-    "nereguliTotal": 40,
-    "constatate": 7,
+    "nereguliChecked": 17,
+    "nereguliTotal": 42,
+    "constatate": 8,
     "netrecute": 2,
     "fines": [
      {
@@ -22488,10 +23673,10 @@
    },
    "secStats": {
     "ner": {
-     "total": 21,
-     "checked": 4,
+     "total": 23,
+     "checked": 5,
      "hidden": 28,
-     "constatate": 4,
+     "constatate": 5,
      "netrecute": 1,
      "fines": 1
     },
@@ -22516,7 +23701,7 @@
     {
      "id": "todo-ner",
      "level": "todo",
-     "text": "Nereguli: 17 nereguli neverificate",
+     "text": "Nereguli: 18 nereguli neverificate",
      "tab": "nereguli",
      "focus": "ah"
     },
@@ -22542,20 +23727,6 @@
      "focus": "h"
     },
     {
-     "id": "fine-b",
-     "level": "warn",
-     "text": "Amendă fără seria / nr.: Nu a prezentat / nu are verificare instalații electrice / IPT / CT",
-     "tab": "nereguli",
-     "focus": "b"
-    },
-    {
-     "id": "fine-svsuDotare",
-     "level": "warn",
-     "text": "Amendă fără seria / nr.: Dotare SVSU neconformă",
-     "tab": "planuri",
-     "focus": "svsuDotare"
-    },
-    {
      "id": "gps",
      "level": "warn",
      "text": "Coordonate GPS necompletate: Sediu primărie",
@@ -22571,8 +23742,8 @@
     }
    ],
    "pvText": {
-    "text": "Nereguli constatate – Comuna Valea Mare (control 09.10.2026 – 10.10.2026)\n\nNereguli:\n1. Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz\n2. Nu a prezentat / nu are verificare instalații electrice / IPT / CT (sancționat cu amendă)\n3. Ușă RF 15 minute cameră CT\n4. Căi de evacuare blocate cu mobilier. Hol parter\n\nPlanuri și SVSU:\n5. Plan evacuare neconform. Neactualizat din 2021\n6. Dotare SVSU neconformă. Lipsă motopompă (sancționat cu amendă)\n\nProtecție civilă:\n7. Sirene defecte. Sirena S3 – sat Poiana\n\nActe de autoritate și evidențe lipsă:\n8. Comisie PSI\n9. Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)",
-    "count": 9
+    "text": "Nereguli constatate – Comuna Valea Mare (control 09.10.2026 – 10.10.2026)\n\nNereguli:\n1. Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz\n2. Nu a prezentat acte de autoritate / evidențe. Comisie PSI; Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)\n3. Nu a prezentat / nu are verificare instalații electrice / IPT / CT (sancționat cu amendă)\n4. Ușă RF 15 minute cameră CT\n5. Căi de evacuare blocate cu mobilier. Hol parter\n\nPlanuri și SVSU:\n6. Plan evacuare neconform. Neactualizat din 2021\n7. Dotare SVSU neconformă. Lipsă motopompă (sancționat cu amendă)\n\nProtecție civilă:\n8. Sirene defecte. Sirena S3 – sat Poiana",
+    "count": 8
    },
    "pvTextNetrecute": {
     "text": "Nereguli constatate – Comuna Valea Mare (control 09.10.2026 – 10.10.2026)\n\nNereguli:\n1. Ușă RF 15 minute cameră CT\n\nProtecție civilă:\n2. Sirene defecte. Sirena S3 – sat Poiana",
@@ -22899,6 +24070,60 @@
      "constructii": [
       "mv94q8008ftxio"
      ],
+     "amenda": null
+    },
+    {
+     "key": "ao",
+     "sec": "ner",
+     "litera": "ao",
+     "eticheta": "Nu a prezentat acte de autoritate / evidențe",
+     "constatare": "Nu a prezentat acte de autoritate / evidențe",
+     "categorie": "docs",
+     "aplicabil": true,
+     "status": "nok",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
+     "amenda": null
+    },
+    {
+     "key": "ap",
+     "sec": "ner",
+     "litera": "ap",
+     "eticheta": "Lipsă controale proprii",
+     "constatare": "Lipsă controale proprii",
+     "categorie": "docs",
+     "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
+     "amenda": null
+    },
+    {
+     "key": "aq",
+     "sec": "ner",
+     "litera": "aq",
+     "eticheta": "Lipsă analiză semestrială",
+     "constatare": "Lipsă analiză semestrială",
+     "categorie": "docs",
+     "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
      "amenda": null
     },
     {
@@ -23280,6 +24505,26 @@
      "constatare": "Ușă RF 60 minute cameră IDSAI",
      "categorie": "electric",
      "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [
+      "mv94q8008ftxio"
+     ],
+     "amenda": null
+    },
+    {
+     "key": "an",
+     "sec": "ner",
+     "litera": "an",
+     "eticheta": "Chepengul / ușa de acces în pod nu este RF 30 / 45 minute",
+     "constatare": "Chepengul / ușa de acces în pod nu este RF 30 / 45 minute",
+     "categorie": "electric",
+     "aplicabil": true,
      "status": "",
      "grav": false,
      "veche": {
@@ -24264,17 +25509,17 @@
      "amenda": null
     }
    ],
-   "fisaHtml": "<header class=\"f-head\">\n    <div class=\"f-kicker\">Fișa controlului</div>\n    <h1>Comuna Valea Mare</h1>\n    <div class=\"f-meta\">\n      <span><b>Tip:</b> Localitate</span>\n      <span><b>Perioada:</b> 09.10.2026 – 10.10.2026</span>\n      <span><b>Administrator:</b> Primar Gheorghe Stan</span>\n      <span><b>Telefon:</b> 0248 555 010</span>\n      <span><b>Email:</b> primaria@valeamare.ro</span>\n      \n    </div>\n    <div class=\"f-sum\">\n      <div><b>7</b><span>nereguli / neconformități</span></div>\n      <div><b>2</b><span>netrecute în PV</span></div>\n      <div><b>2</b><span>amenzi</span></div>\n      <div><b>0</b><span>nereguli vechi</span></div>\n      <div><b>2</b><span>acte lipsă</span></div>\n    </div>\n  </header>\n<section><h2>Construcții (1)</h2>\n<div class=\"f-constr\">\n      <h3>1. Sediu primărie</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>540 m²</td>\n        <td><b>Regim înălțime</b><br>P+1E</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>24</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>Zidărie portantă</td>\n        <td><b>Pereți</b><br>Cărămidă</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> EXIT, Panouri fotovoltaice · <b>Centrală termică:</b> SOLID</p>\n      <p class=\"f-dot\"><b>NU:</b> AVIZ, IPT · <b>NEC:</b> ASI</p>\n      \n    </div>\n</section>\n<section><h2>Acte de autoritate și evidențe</h2><table class=\"f-table\">\n    <thead><tr><th>#</th><th>Act / evidență</th><th>Situație</th><th>Observații</th></tr></thead><tbody>\n    <tr class=\"\">\n      <td>1</td><td>Dispoziție CTPSI / RESP</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>2</td><td>Dispoziție LFD</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>3</td><td>Dispoziție instruire</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>4</td><td>Dispoziție organizarea apărării împotriva incendiilor</td><td>Prezentat</td><td></td></tr><tr class=\"f-nok\">\n      <td>5</td><td>Comisie PSI</td><td>Lipsă</td><td></td></tr><tr class=\"\">\n      <td>6</td><td>Dispoziție măsuri sezon canicular / secetos / rece</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>7</td><td>Controale proprii</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>8</td><td>Analiza semestrială</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>9</td><td>Fișe de instruire completate corect</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>10</td><td>Verificare lunară a stingătoarelor</td><td>Prezentat</td><td></td></tr><tr class=\"f-nok\">\n      <td>11</td><td>Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)</td><td>Lipsă</td><td></td></tr><tr class=\"\">\n      <td>12</td><td>Exerciții efectuate</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>13</td><td>Registrele exercițiilor sunt la zi</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>14</td><td>Rapoarte exerciții</td><td>Prezentat</td><td></td></tr>\n  </tbody></table></section>\n<section><h2>Nereguli</h2>\n<table class=\"f-table\"><thead><tr><th>Nr.</th><th>Neregulă</th><th>Situație</th><th>PV</th><th>Observații / sancțiune</th></tr></thead><tbody>\n<tr class=\"f-nok\">\n          <td>ai</td>\n          <td>Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz<div class=\"f-cat\">Documentație și verificări</div></td>\n          \n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>b</td>\n          <td>Nu a prezentat / nu are verificare instalații electrice / IPT / CT<div class=\"f-cat\">Documentație și verificări</div></td>\n          \n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td><b>Amendă</b>, 1.500 lei — În curs</td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>h</td>\n          <td>Ușă RF 15 minute cameră CT<div class=\"f-cat\">Instalații electrice și compartimentări</div></td>\n          \n          <td>Constatat</td>\n          <td><b>Netrecut</b></td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>+1</td>\n          <td>Căi de evacuare blocate cu mobilier</td>\n          \n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td>Hol parter</td>\n        </tr>\n</tbody></table>\n<p class=\"f-small\">17 rubrici neverificate (nu apar în tabel).</p>\n</section>\n<section><h2>Planuri și SVSU</h2>\n<table class=\"f-table\"><thead><tr><th>Nr.</th><th>Rubrică</th><th>Situație</th><th>PV</th><th>Observații / sancțiune</th></tr></thead><tbody>\n<tr class=\"\">\n          <td>1</td>\n          <td>PAAR avizat<div class=\"f-cat\">Planuri</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"\">\n          <td>2</td>\n          <td>Plan inundații conform<div class=\"f-cat\">Planuri</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>3</td>\n          <td>Plan evacuare neconform<div class=\"f-cat\">Planuri</div></td>\n          \n          <td>Neconform</td>\n          <td>Trecut</td>\n          <td>Neactualizat din 2021</td>\n        </tr>\n<tr class=\"\">\n          <td>4</td>\n          <td>Plan cutremur conform<div class=\"f-cat\">Planuri</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"\">\n          <td>1</td>\n          <td>SVSU avizat<div class=\"f-cat\">SVSU</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"\">\n          <td>2</td>\n          <td>Șef SVSU avizat<div class=\"f-cat\">SVSU</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>3</td>\n          <td>Dotare SVSU neconformă<div class=\"f-cat\">SVSU</div></td>\n          \n          <td>Neconform</td>\n          <td>Trecut</td>\n          <td>Lipsă motopompă<br><b>Amendă</b>, 3.000 lei — În curs</td>\n        </tr>\n<tr class=\"\">\n          <td>4</td>\n          <td>Plan de pregătire avizat<div class=\"f-cat\">SVSU</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n</tbody></table>\n<p class=\"f-small\">1 rubrică neverificată (nu apar în tabel).</p>\n</section>\n<section><h2>Protecție civilă</h2>\n<table class=\"f-table\"><thead><tr><th>Nr.</th><th>Rubrică</th><th>Situație</th><th>PV</th><th>Observații / sancțiune</th></tr></thead><tbody>\n<tr class=\"\">\n          <td>1</td>\n          <td>Studiu de audibilitate<div class=\"f-cat\">Avertizare – sirene</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"\">\n          <td>2</td>\n          <td>Număr suficient de sirene<div class=\"f-cat\">Avertizare – sirene</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"\">\n          <td>3</td>\n          <td>Contract mentenanță sirene<div class=\"f-cat\">Avertizare – sirene</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>4</td>\n          <td>Sirene defecte<div class=\"f-cat\">Avertizare – sirene</div></td>\n          \n          <td>Neconform</td>\n          <td><b>Netrecut</b></td>\n          <td>Sirena S3 – sat Poiana</td>\n        </tr>\n</tbody></table>\n<p class=\"f-small\">6 rubrici neverificate (nu apar în tabel).</p>\n<p><b>Adăposturi de protecție civilă:</b> NU</p>\n</section>\n<footer class=\"f-foot\">Generat la joi, 15 octombrie 2026, 09:00 · Agenda inspectorului</footer>",
+   "fisaHtml": "<header class=\"f-head\">\n    <div class=\"f-kicker\">Fișa controlului</div>\n    <h1>Comuna Valea Mare</h1>\n    <div class=\"f-meta\">\n      <span><b>Tip:</b> Localitate</span>\n      <span><b>Perioada:</b> 09.10.2026 – 10.10.2026</span>\n      <span><b>Administrator:</b> Primar Gheorghe Stan</span>\n      \n      <span><b>Telefon:</b> 0248 555 010</span>\n      <span><b>Email:</b> primaria@valeamare.ro</span>\n      \n    </div>\n    <div class=\"f-sum\">\n      <div><b>8</b><span>nereguli / neconformități</span></div>\n      <div><b>2</b><span>netrecute în PV</span></div>\n      <div><b>2</b><span>amenzi</span></div>\n      <div><b>0</b><span>nereguli vechi</span></div>\n      <div><b>2</b><span>acte lipsă</span></div>\n    </div>\n  </header>\n<section><h2>Construcții (1)</h2>\n<div class=\"f-constr\">\n      <h3>1. Sediu primărie</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>540 m²</td>\n        <td><b>Regim înălțime</b><br>P+1E</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>24</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>Zidărie portantă</td>\n        <td><b>Pereți</b><br>Cărămidă</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> EXIT, Panouri fotovoltaice · <b>Centrală termică:</b> SOLID</p>\n      <p class=\"f-dot\"><b>NU:</b> AVIZ, IPT · <b>NEC:</b> ASI</p>\n      \n    </div>\n</section>\n<section><h2>Acte de autoritate și evidențe</h2><table class=\"f-table\">\n    <thead><tr><th>#</th><th>Act / evidență</th><th>Situație</th><th>Observații</th></tr></thead><tbody>\n    <tr class=\"\">\n      <td>1</td><td>Dispoziție CTPSI / RESP</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>2</td><td>Dispoziție LFD</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>3</td><td>Dispoziție de reglementare a fumatului</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>4</td><td>Dispoziție instruire</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>5</td><td>Dispoziție organizarea apărării împotriva incendiilor</td><td>Prezentat</td><td></td></tr><tr class=\"f-nok\">\n      <td>6</td><td>Comisie PSI</td><td>Lipsă</td><td></td></tr><tr class=\"\">\n      <td>7</td><td>Dispoziție măsuri sezon canicular / secetos / rece</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>8</td><td>Controale proprii</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>9</td><td>Analiza semestrială</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>10</td><td>Fișe de instruire completate corect</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>11</td><td>Verificare lunară a stingătoarelor</td><td>Prezentat</td><td></td></tr><tr class=\"f-nok\">\n      <td>12</td><td>Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)</td><td>Lipsă</td><td></td></tr><tr class=\"\">\n      <td>13</td><td>Exerciții efectuate</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>14</td><td>Registrele exercițiilor sunt la zi</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>15</td><td>Rapoarte exerciții</td><td>Prezentat</td><td></td></tr>\n  </tbody></table></section>\n<section><h2>Nereguli</h2>\n<table class=\"f-table\"><thead><tr><th>Nr.</th><th>Neregulă</th><th>Situație</th><th>PV</th><th>Observații / sancțiune</th></tr></thead><tbody>\n<tr class=\"f-nok\">\n          <td>ai</td>\n          <td>Lucrări de extindere / modificare a clădirii sau a instalațiilor realizate fără aviz<div class=\"f-cat\">Documentație și verificări</div></td>\n          \n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>ao</td>\n          <td>Nu a prezentat acte de autoritate / evidențe<div class=\"f-cat\">Documentație și verificări</div></td>\n          \n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td>Comisie PSI<br>Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)</td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>b</td>\n          <td>Nu a prezentat / nu are verificare instalații electrice / IPT / CT<div class=\"f-cat\">Documentație și verificări</div></td>\n          \n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td><b>Amendă</b>, 1.500 lei — În curs</td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>h</td>\n          <td>Ușă RF 15 minute cameră CT<div class=\"f-cat\">Instalații electrice și compartimentări</div></td>\n          \n          <td>Constatat</td>\n          <td><b>Netrecut</b></td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>+1</td>\n          <td>Căi de evacuare blocate cu mobilier</td>\n          \n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td>Hol parter</td>\n        </tr>\n</tbody></table>\n<p class=\"f-small\">18 rubrici neverificate (nu apar în tabel).</p>\n</section>\n<section><h2>Planuri și SVSU</h2>\n<table class=\"f-table\"><thead><tr><th>Nr.</th><th>Rubrică</th><th>Situație</th><th>PV</th><th>Observații / sancțiune</th></tr></thead><tbody>\n<tr class=\"\">\n          <td>1</td>\n          <td>PAAR avizat<div class=\"f-cat\">Planuri</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"\">\n          <td>2</td>\n          <td>Plan inundații conform<div class=\"f-cat\">Planuri</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>3</td>\n          <td>Plan evacuare neconform<div class=\"f-cat\">Planuri</div></td>\n          \n          <td>Neconform</td>\n          <td>Trecut</td>\n          <td>Neactualizat din 2021</td>\n        </tr>\n<tr class=\"\">\n          <td>4</td>\n          <td>Plan cutremur conform<div class=\"f-cat\">Planuri</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"\">\n          <td>1</td>\n          <td>SVSU avizat<div class=\"f-cat\">SVSU</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"\">\n          <td>2</td>\n          <td>Șef SVSU avizat<div class=\"f-cat\">SVSU</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>3</td>\n          <td>Dotare SVSU neconformă<div class=\"f-cat\">SVSU</div></td>\n          \n          <td>Neconform</td>\n          <td>Trecut</td>\n          <td>Lipsă motopompă<br><b>Amendă</b>, 3.000 lei — În curs</td>\n        </tr>\n<tr class=\"\">\n          <td>4</td>\n          <td>Plan de pregătire avizat<div class=\"f-cat\">SVSU</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n</tbody></table>\n<p class=\"f-small\">1 rubrică neverificată (nu apar în tabel).</p>\n</section>\n<section><h2>Protecție civilă</h2>\n<table class=\"f-table\"><thead><tr><th>Nr.</th><th>Rubrică</th><th>Situație</th><th>PV</th><th>Observații / sancțiune</th></tr></thead><tbody>\n<tr class=\"\">\n          <td>1</td>\n          <td>Studiu de audibilitate<div class=\"f-cat\">Avertizare – sirene</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"\">\n          <td>2</td>\n          <td>Număr suficient de sirene<div class=\"f-cat\">Avertizare – sirene</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"\">\n          <td>3</td>\n          <td>Contract mentenanță sirene<div class=\"f-cat\">Avertizare – sirene</div></td>\n          \n          <td>Conform</td>\n          <td></td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>4</td>\n          <td>Sirene defecte<div class=\"f-cat\">Avertizare – sirene</div></td>\n          \n          <td>Neconform</td>\n          <td><b>Netrecut</b></td>\n          <td>Sirena S3 – sat Poiana</td>\n        </tr>\n</tbody></table>\n<p class=\"f-small\">6 rubrici neverificate (nu apar în tabel).</p>\n<p><b>Adăposturi de protecție civilă:</b> NU</p>\n</section>\n<footer class=\"f-foot\">Generat la joi, 15 octombrie 2026, 09:00 · Agenda inspectorului</footer>",
    "fisaFisier": "Fisa-control-Comuna-Valea-Mare-2026-10-09.html"
   },
   {
    "id": "mv94q800burnig",
    "controlStats": {
-    "acteDone": 14,
-    "acteTotal": 14,
+    "acteDone": 15,
+    "acteTotal": 15,
     "acteNok": 0,
     "nereguliChecked": 2,
-    "nereguliTotal": 38,
+    "nereguliTotal": 39,
     "constatate": 2,
     "netrecute": 0,
     "fines": [
@@ -24293,7 +25538,7 @@
    },
    "secStats": {
     "ner": {
-     "total": 19,
+     "total": 20,
      "checked": 2,
      "hidden": 28,
      "constatate": 2,
@@ -24321,7 +25566,7 @@
     {
      "id": "todo-ner",
      "level": "todo",
-     "text": "Nereguli: 17 nereguli neverificate",
+     "text": "Nereguli: 18 nereguli neverificate",
      "tab": "nereguli",
      "focus": "ai"
     },
@@ -24338,13 +25583,6 @@
      "text": "Protecție civilă: 11 rubrici neverificate",
      "tab": "pc",
      "focus": "pcAudibilitate"
-    },
-    {
-     "id": "fine-j",
-     "level": "warn",
-     "text": "Amendă fără seria / nr.: EXIT defect",
-     "tab": "nereguli",
-     "focus": "j"
     },
     {
      "id": "gps",
@@ -24683,6 +25921,60 @@
      "constructii": [
       "mv94q800aexo94"
      ],
+     "amenda": null
+    },
+    {
+     "key": "ao",
+     "sec": "ner",
+     "litera": "ao",
+     "eticheta": "Nu a prezentat acte de autoritate / evidențe",
+     "constatare": "Nu a prezentat acte de autoritate / evidențe",
+     "categorie": "docs",
+     "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
+     "amenda": null
+    },
+    {
+     "key": "ap",
+     "sec": "ner",
+     "litera": "ap",
+     "eticheta": "Lipsă controale proprii",
+     "constatare": "Lipsă controale proprii",
+     "categorie": "docs",
+     "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
+     "amenda": null
+    },
+    {
+     "key": "aq",
+     "sec": "ner",
+     "litera": "aq",
+     "eticheta": "Lipsă analiză semestrială",
+     "constatare": "Lipsă analiză semestrială",
+     "categorie": "docs",
+     "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
      "amenda": null
     },
     {
@@ -25053,6 +26345,26 @@
      "constatare": "Ușă RF 60 minute cameră IDSAI",
      "categorie": "electric",
      "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [
+      "mv94q800aexo94"
+     ],
+     "amenda": null
+    },
+    {
+     "key": "an",
+     "sec": "ner",
+     "litera": "an",
+     "eticheta": "Chepengul / ușa de acces în pod nu este RF 30 / 45 minute",
+     "constatare": "Chepengul / ușa de acces în pod nu este RF 30 / 45 minute",
+     "categorie": "electric",
+     "aplicabil": true,
      "status": "",
      "grav": false,
      "veche": {
@@ -26010,17 +27322,17 @@
      "amenda": null
     }
    ],
-   "fisaHtml": "<header class=\"f-head\">\n    <div class=\"f-kicker\">Fișa controlului</div>\n    <h1>Căminul Cultural Poiana</h1>\n    <div class=\"f-meta\">\n      <span><b>Tip:</b> Localitate</span>\n      <span><b>Perioada:</b> 16.08.2026</span>\n      <span><b>Administrator:</b> Ion Radu</span>\n      <span><b>Telefon:</b> 0766 000 111</span>\n      \n      \n    </div>\n    <div class=\"f-sum\">\n      <div><b>2</b><span>nereguli / neconformități</span></div>\n      <div><b>0</b><span>netrecute în PV</span></div>\n      <div><b>1</b><span>amendă</span></div>\n      <div><b>0</b><span>nereguli vechi</span></div>\n      <div><b>0</b><span>acte lipsă</span></div>\n    </div>\n  </header>\n<section><h2>Construcții (1)</h2>\n<div class=\"f-constr\">\n      <h3>1. Clădire cămin</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>380 m²</td>\n        <td><b>Regim înălțime</b><br>P</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>2</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>Zidărie portantă</td>\n        <td><b>Pereți</b><br>Cărămidă</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> EXIT · <b>Centrală termică:</b> SOLID</p>\n      <p class=\"f-dot\"><b>NU:</b> ASI · <b>NEC:</b> —</p>\n      \n    </div>\n</section>\n<section><h2>Acte de autoritate și evidențe</h2><table class=\"f-table\">\n    <thead><tr><th>#</th><th>Act / evidență</th><th>Situație</th><th>Observații</th></tr></thead><tbody>\n    <tr class=\"\">\n      <td>1</td><td>Dispoziție CTPSI / RESP</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>2</td><td>Dispoziție LFD</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>3</td><td>Dispoziție instruire</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>4</td><td>Dispoziție organizarea apărării împotriva incendiilor</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>5</td><td>Comisie PSI</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>6</td><td>Dispoziție măsuri sezon canicular / secetos / rece</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>7</td><td>Controale proprii</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>8</td><td>Analiza semestrială</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>9</td><td>Fișe de instruire completate corect</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>10</td><td>Verificare lunară a stingătoarelor</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>11</td><td>Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>12</td><td>Exerciții efectuate</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>13</td><td>Registrele exercițiilor sunt la zi</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>14</td><td>Rapoarte exerciții</td><td>Prezentat</td><td></td></tr>\n  </tbody></table></section>\n<section><h2>Nereguli</h2>\n<table class=\"f-table\"><thead><tr><th>Nr.</th><th>Neregulă</th><th>Situație</th><th>PV</th><th>Observații / sancțiune</th></tr></thead><tbody>\n<tr class=\"f-nok\">\n          <td>ah</td>\n          <td>Construcția funcționează fără ASI (autorizație de securitate la incendiu)<div class=\"f-cat\">Documentație și verificări</div></td>\n          \n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>j</td>\n          <td>EXIT defect<div class=\"f-cat\">Semnalizare și iluminat</div></td>\n          \n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td><b>Amendă</b>, 1.000 lei — Achitată</td>\n        </tr>\n</tbody></table>\n<p class=\"f-small\">17 rubrici neverificate (nu apar în tabel).</p>\n</section>\n<section><h2>Planuri și SVSU</h2>\n<p class=\"f-small\">Nicio rubrică verificată.</p>\n<p class=\"f-small\">9 rubrici neverificate (nu apar în tabel).</p>\n</section>\n<section><h2>Protecție civilă</h2>\n<p class=\"f-small\">Nicio rubrică verificată.</p>\n<p class=\"f-small\">10 rubrici neverificate (nu apar în tabel).</p>\n<p><b>Adăposturi de protecție civilă:</b> —</p>\n</section>\n<footer class=\"f-foot\">Generat la joi, 15 octombrie 2026, 09:00 · Agenda inspectorului</footer>",
+   "fisaHtml": "<header class=\"f-head\">\n    <div class=\"f-kicker\">Fișa controlului</div>\n    <h1>Căminul Cultural Poiana</h1>\n    <div class=\"f-meta\">\n      <span><b>Tip:</b> Localitate</span>\n      <span><b>Perioada:</b> 16.08.2026</span>\n      <span><b>Administrator:</b> Ion Radu</span>\n      \n      <span><b>Telefon:</b> 0766 000 111</span>\n      \n      \n    </div>\n    <div class=\"f-sum\">\n      <div><b>2</b><span>nereguli / neconformități</span></div>\n      <div><b>0</b><span>netrecute în PV</span></div>\n      <div><b>1</b><span>amendă</span></div>\n      <div><b>0</b><span>nereguli vechi</span></div>\n      <div><b>0</b><span>acte lipsă</span></div>\n    </div>\n  </header>\n<section><h2>Construcții (1)</h2>\n<div class=\"f-constr\">\n      <h3>1. Clădire cămin</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>380 m²</td>\n        <td><b>Regim înălțime</b><br>P</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>2</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>Zidărie portantă</td>\n        <td><b>Pereți</b><br>Cărămidă</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> EXIT · <b>Centrală termică:</b> SOLID</p>\n      <p class=\"f-dot\"><b>NU:</b> ASI · <b>NEC:</b> —</p>\n      \n    </div>\n</section>\n<section><h2>Acte de autoritate și evidențe</h2><table class=\"f-table\">\n    <thead><tr><th>#</th><th>Act / evidență</th><th>Situație</th><th>Observații</th></tr></thead><tbody>\n    <tr class=\"\">\n      <td>1</td><td>Dispoziție CTPSI / RESP</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>2</td><td>Dispoziție LFD</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>3</td><td>Dispoziție de reglementare a fumatului</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>4</td><td>Dispoziție instruire</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>5</td><td>Dispoziție organizarea apărării împotriva incendiilor</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>6</td><td>Comisie PSI</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>7</td><td>Dispoziție măsuri sezon canicular / secetos / rece</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>8</td><td>Controale proprii</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>9</td><td>Analiza semestrială</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>10</td><td>Fișe de instruire completate corect</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>11</td><td>Verificare lunară a stingătoarelor</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>12</td><td>Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>13</td><td>Exerciții efectuate</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>14</td><td>Registrele exercițiilor sunt la zi</td><td>Prezentat</td><td></td></tr><tr class=\"\">\n      <td>15</td><td>Rapoarte exerciții</td><td>Prezentat</td><td></td></tr>\n  </tbody></table></section>\n<section><h2>Nereguli</h2>\n<table class=\"f-table\"><thead><tr><th>Nr.</th><th>Neregulă</th><th>Situație</th><th>PV</th><th>Observații / sancțiune</th></tr></thead><tbody>\n<tr class=\"f-nok\">\n          <td>ah</td>\n          <td>Construcția funcționează fără ASI (autorizație de securitate la incendiu)<div class=\"f-cat\">Documentație și verificări</div></td>\n          \n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td></td>\n        </tr>\n<tr class=\"f-nok\">\n          <td>j</td>\n          <td>EXIT defect<div class=\"f-cat\">Semnalizare și iluminat</div></td>\n          \n          <td>Constatat</td>\n          <td>Trecut</td>\n          <td><b>Amendă</b>, 1.000 lei — Achitată</td>\n        </tr>\n</tbody></table>\n<p class=\"f-small\">18 rubrici neverificate (nu apar în tabel).</p>\n</section>\n<section><h2>Planuri și SVSU</h2>\n<p class=\"f-small\">Nicio rubrică verificată.</p>\n<p class=\"f-small\">9 rubrici neverificate (nu apar în tabel).</p>\n</section>\n<section><h2>Protecție civilă</h2>\n<p class=\"f-small\">Nicio rubrică verificată.</p>\n<p class=\"f-small\">10 rubrici neverificate (nu apar în tabel).</p>\n<p><b>Adăposturi de protecție civilă:</b> —</p>\n</section>\n<footer class=\"f-foot\">Generat la joi, 15 octombrie 2026, 09:00 · Agenda inspectorului</footer>",
    "fisaFisier": "Fisa-control-Caminul-Cultural-Poiana-2026-08-16.html"
   },
   {
    "id": "mv94q800zkeezx",
    "controlStats": {
     "acteDone": 0,
-    "acteTotal": 14,
+    "acteTotal": 15,
     "acteNok": 0,
     "nereguliChecked": 0,
-    "nereguliTotal": 15,
+    "nereguliTotal": 16,
     "constatate": 0,
     "netrecute": 0,
     "fines": [],
@@ -26029,7 +27341,7 @@
    },
    "secStats": {
     "ner": {
-     "total": 15,
+     "total": 16,
      "checked": 0,
      "hidden": 32,
      "constatate": 0,
@@ -26041,16 +27353,23 @@
     {
      "id": "acte",
      "level": "todo",
-     "text": "14 acte neverificate",
+     "text": "15 acte neverificate",
      "tab": "acte",
      "focus": "act-ctpsi"
     },
     {
      "id": "todo-ner",
      "level": "todo",
-     "text": "Nereguli: 15 nereguli neverificate",
+     "text": "Nereguli: 16 nereguli neverificate",
      "tab": "nereguli",
      "focus": "ah"
+    },
+    {
+     "id": "intreb-q1",
+     "level": "warn",
+     "text": "De întrebat: Cererea certificatului de verificare IPT (trimis ulterior pe email)",
+     "tab": "obiectiv",
+     "focus": "sec-intrebari"
     },
     {
      "id": "gps",
@@ -26396,6 +27715,60 @@
      "constructii": [
       "mv94q800lg4f17"
      ],
+     "amenda": null
+    },
+    {
+     "key": "ao",
+     "sec": "ner",
+     "litera": "ao",
+     "eticheta": "Nu a prezentat acte de autoritate / evidențe",
+     "constatare": "Nu a prezentat acte de autoritate / evidențe",
+     "categorie": "docs",
+     "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
+     "amenda": null
+    },
+    {
+     "key": "ap",
+     "sec": "ner",
+     "litera": "ap",
+     "eticheta": "Lipsă controale proprii",
+     "constatare": "Lipsă controale proprii",
+     "categorie": "docs",
+     "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
+     "amenda": null
+    },
+    {
+     "key": "aq",
+     "sec": "ner",
+     "litera": "aq",
+     "eticheta": "Lipsă analiză semestrială",
+     "constatare": "Lipsă analiză semestrială",
+     "categorie": "docs",
+     "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
      "amenda": null
     },
     {
@@ -26766,6 +28139,26 @@
      "constatare": "Ușă RF 60 minute cameră IDSAI",
      "categorie": "electric",
      "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [
+      "mv94q800lg4f17"
+     ],
+     "amenda": null
+    },
+    {
+     "key": "an",
+     "sec": "ner",
+     "litera": "an",
+     "eticheta": "Chepengul / ușa de acces în pod nu este RF 30 / 45 minute",
+     "constatare": "Chepengul / ușa de acces în pod nu este RF 30 / 45 minute",
+     "categorie": "electric",
+     "aplicabil": true,
      "status": "",
      "grav": false,
      "veche": {
@@ -27339,17 +28732,17 @@
      "amenda": null
     }
    ],
-   "fisaHtml": "<header class=\"f-head\">\n    <div class=\"f-kicker\">Fișa controlului</div>\n    <h1>Grădinița cu Program Prelungit nr. 2</h1>\n    <div class=\"f-meta\">\n      <span><b>Tip:</b> OPEC / Instituție</span>\n      <span><b>Perioada:</b> din 13.10.2026 (în desfășurare)</span>\n      <span><b>Administrator:</b> Elena Dinu</span>\n      <span><b>Telefon:</b> 0733 222 444</span>\n      <span><b>Email:</b> gpp2@edu.ro</span>\n      \n    </div>\n    <div class=\"f-sum\">\n      <div><b>0</b><span>nereguli / neconformități</span></div>\n      <div><b>0</b><span>netrecute în PV</span></div>\n      <div><b>0</b><span>amenzi</span></div>\n      <div><b>0</b><span>nereguli vechi</span></div>\n      <div><b>0</b><span>acte lipsă</span></div>\n    </div>\n  </header>\n<section><h2>Construcții (1)</h2>\n<div class=\"f-constr\">\n      <h3>1. Corp principal</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>—</td>\n        <td><b>Regim înălțime</b><br>—</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>—</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>—</td>\n        <td><b>Pereți</b><br>—</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> —</p>\n      <p class=\"f-dot\"><b>NU:</b> — · <b>NEC:</b> —</p>\n      \n    </div>\n</section>\n<section><h2>Adăposturi de protecție civilă</h2><p><b>Adăposturi de protecție civilă:</b> —</p></section>\n<section><h2>Acte de autoritate și evidențe</h2><table class=\"f-table\">\n    <thead><tr><th>#</th><th>Act / evidență</th><th>Situație</th><th>Observații</th></tr></thead><tbody>\n    <tr class=\"\">\n      <td>1</td><td>Dispoziție CTPSI / RESP</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>2</td><td>Dispoziție LFD</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>3</td><td>Dispoziție instruire</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>4</td><td>Dispoziție organizarea apărării împotriva incendiilor</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>5</td><td>Comisie PSI</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>6</td><td>Dispoziție măsuri sezon canicular / secetos / rece</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>7</td><td>Controale proprii</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>8</td><td>Analiza semestrială</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>9</td><td>Fișe de instruire completate corect</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>10</td><td>Verificare lunară a stingătoarelor</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>11</td><td>Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>12</td><td>Exerciții efectuate</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>13</td><td>Registrele exercițiilor sunt la zi</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>14</td><td>Rapoarte exerciții</td><td>—</td><td></td></tr>\n  </tbody></table></section>\n<section><h2>Nereguli</h2>\n<p class=\"f-small\">Nicio rubrică verificată.</p>\n<p class=\"f-small\">15 rubrici neverificate (nu apar în tabel).</p>\n</section>\n<footer class=\"f-foot\">Generat la joi, 15 octombrie 2026, 09:00 · Agenda inspectorului</footer>",
+   "fisaHtml": "<header class=\"f-head\">\n    <div class=\"f-kicker\">Fișa controlului</div>\n    <h1>Grădinița cu Program Prelungit nr. 2</h1>\n    <div class=\"f-meta\">\n      <span><b>Tip:</b> OPEC / Instituție</span>\n      <span><b>Perioada:</b> din 13.10.2026 (în desfășurare)</span>\n      <span><b>Administrator:</b> Elena Dinu</span>\n      <span><b>Persoană participantă:</b> Ana Stoica, administrator de clădire</span>\n      <span><b>Telefon:</b> 0733 222 444</span>\n      <span><b>Email:</b> gpp2@edu.ro</span>\n      \n    </div>\n    <div class=\"f-sum\">\n      <div><b>0</b><span>nereguli / neconformități</span></div>\n      <div><b>0</b><span>netrecute în PV</span></div>\n      <div><b>0</b><span>amenzi</span></div>\n      <div><b>0</b><span>nereguli vechi</span></div>\n      <div><b>0</b><span>acte lipsă</span></div>\n    </div>\n  </header>\n<section><h2>De întrebat până la finalizarea controlului</h2><ul class=\"f-intreb\">\n      <li class=\"f-nok\">☐ Cererea certificatului de verificare IPT (trimis ulterior pe email) <b>(nerezolvat)</b></li><li class=\"\">✓ Verificarea registrului de instruire</li>\n    </ul></section>\n<section><h2>Observații generale</h2><p>Acces auto prin curtea din spate. Program cu publicul: 7:00–17:00.</p></section>\n<section><h2>Construcții (1)</h2>\n<div class=\"f-constr\">\n      <h3>1. Corp principal</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>—</td>\n        <td><b>Regim înălțime</b><br>—</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>—</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>—</td>\n        <td><b>Pereți</b><br>—</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> —</p>\n      <p class=\"f-dot\"><b>NU:</b> — · <b>NEC:</b> —</p>\n      \n    </div>\n</section>\n<section><h2>Adăposturi de protecție civilă</h2><p><b>Adăposturi de protecție civilă:</b> —</p></section>\n<section><h2>Acte de autoritate și evidențe</h2><table class=\"f-table\">\n    <thead><tr><th>#</th><th>Act / evidență</th><th>Situație</th><th>Observații</th></tr></thead><tbody>\n    <tr class=\"\">\n      <td>1</td><td>Dispoziție CTPSI / RESP</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>2</td><td>Dispoziție LFD</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>3</td><td>Dispoziție de reglementare a fumatului</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>4</td><td>Dispoziție instruire</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>5</td><td>Dispoziție organizarea apărării împotriva incendiilor</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>6</td><td>Comisie PSI</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>7</td><td>Dispoziție măsuri sezon canicular / secetos / rece</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>8</td><td>Controale proprii</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>9</td><td>Analiza semestrială</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>10</td><td>Fișe de instruire completate corect</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>11</td><td>Verificare lunară a stingătoarelor</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>12</td><td>Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>13</td><td>Exerciții efectuate</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>14</td><td>Registrele exercițiilor sunt la zi</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>15</td><td>Rapoarte exerciții</td><td>—</td><td></td></tr>\n  </tbody></table></section>\n<section><h2>Nereguli</h2>\n<p class=\"f-small\">Nicio rubrică verificată.</p>\n<p class=\"f-small\">16 rubrici neverificate (nu apar în tabel).</p>\n</section>\n<footer class=\"f-foot\">Generat la joi, 15 octombrie 2026, 09:00 · Agenda inspectorului</footer>",
    "fisaFisier": "Fisa-control-Gradinita-cu-Program-Prelungit-nr-2-2026-10-13.html"
   },
   {
    "id": "mv94q8003joh17",
    "controlStats": {
     "acteDone": 0,
-    "acteTotal": 14,
+    "acteTotal": 15,
     "acteNok": 0,
     "nereguliChecked": 0,
-    "nereguliTotal": 15,
+    "nereguliTotal": 16,
     "constatate": 0,
     "netrecute": 0,
     "fines": [],
@@ -27358,7 +28751,7 @@
    },
    "secStats": {
     "ner": {
-     "total": 15,
+     "total": 16,
      "checked": 0,
      "hidden": 32,
      "constatate": 0,
@@ -27370,14 +28763,14 @@
     {
      "id": "acte",
      "level": "todo",
-     "text": "14 acte neverificate",
+     "text": "15 acte neverificate",
      "tab": "acte",
      "focus": "act-ctpsi"
     },
     {
      "id": "todo-ner",
      "level": "todo",
-     "text": "Nereguli: 15 nereguli neverificate",
+     "text": "Nereguli: 16 nereguli neverificate",
      "tab": "nereguli",
      "focus": "ah"
     },
@@ -27728,6 +29121,60 @@
      "amenda": null
     },
     {
+     "key": "ao",
+     "sec": "ner",
+     "litera": "ao",
+     "eticheta": "Nu a prezentat acte de autoritate / evidențe",
+     "constatare": "Nu a prezentat acte de autoritate / evidențe",
+     "categorie": "docs",
+     "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
+     "amenda": null
+    },
+    {
+     "key": "ap",
+     "sec": "ner",
+     "litera": "ap",
+     "eticheta": "Lipsă controale proprii",
+     "constatare": "Lipsă controale proprii",
+     "categorie": "docs",
+     "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
+     "amenda": null
+    },
+    {
+     "key": "aq",
+     "sec": "ner",
+     "litera": "aq",
+     "eticheta": "Lipsă analiză semestrială",
+     "constatare": "Lipsă analiză semestrială",
+     "categorie": "docs",
+     "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [],
+     "amenda": null
+    },
+    {
      "key": "b1",
      "sec": "ner",
      "litera": "b1",
@@ -28095,6 +29542,26 @@
      "constatare": "Ușă RF 60 minute cameră IDSAI",
      "categorie": "electric",
      "aplicabil": false,
+     "status": "",
+     "grav": false,
+     "veche": {
+      "veche": false,
+      "auto": null,
+      "manual": false
+     },
+     "constructii": [
+      "mv94q800l21rv1"
+     ],
+     "amenda": null
+    },
+    {
+     "key": "an",
+     "sec": "ner",
+     "litera": "an",
+     "eticheta": "Chepengul / ușa de acces în pod nu este RF 30 / 45 minute",
+     "constatare": "Chepengul / ușa de acces în pod nu este RF 30 / 45 minute",
+     "categorie": "electric",
+     "aplicabil": true,
      "status": "",
      "grav": false,
      "veche": {
@@ -28668,7 +30135,7 @@
      "amenda": null
     }
    ],
-   "fisaHtml": "<header class=\"f-head\">\n    <div class=\"f-kicker\">Fișa controlului</div>\n    <h1>Centrul Comercial Nord</h1>\n    <div class=\"f-meta\">\n      <span><b>Tip:</b> OPEC / Instituție</span>\n      <span><b>Perioada:</b> din 15.10.2026 (în desfășurare)</span>\n      <span><b>Administrator:</b> SC Nord Retail SRL</span>\n      <span><b>Telefon:</b> 0212 345 678</span>\n      \n      \n    </div>\n    <div class=\"f-sum\">\n      <div><b>0</b><span>nereguli / neconformități</span></div>\n      <div><b>0</b><span>netrecute în PV</span></div>\n      <div><b>0</b><span>amenzi</span></div>\n      <div><b>0</b><span>nereguli vechi</span></div>\n      <div><b>0</b><span>acte lipsă</span></div>\n    </div>\n  </header>\n<section><h2>Construcții (1)</h2>\n<div class=\"f-constr\">\n      <h3>1. Hală comercială</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>—</td>\n        <td><b>Regim înălțime</b><br>—</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>—</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>—</td>\n        <td><b>Pereți</b><br>—</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> —</p>\n      <p class=\"f-dot\"><b>NU:</b> — · <b>NEC:</b> —</p>\n      \n    </div>\n</section>\n<section><h2>Adăposturi de protecție civilă</h2><p><b>Adăposturi de protecție civilă:</b> —</p></section>\n<section><h2>Acte de autoritate și evidențe</h2><table class=\"f-table\">\n    <thead><tr><th>#</th><th>Act / evidență</th><th>Situație</th><th>Observații</th></tr></thead><tbody>\n    <tr class=\"\">\n      <td>1</td><td>Dispoziție CTPSI / RESP</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>2</td><td>Dispoziție LFD</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>3</td><td>Dispoziție instruire</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>4</td><td>Dispoziție organizarea apărării împotriva incendiilor</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>5</td><td>Comisie PSI</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>6</td><td>Dispoziție măsuri sezon canicular / secetos / rece</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>7</td><td>Controale proprii</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>8</td><td>Analiza semestrială</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>9</td><td>Fișe de instruire completate corect</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>10</td><td>Verificare lunară a stingătoarelor</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>11</td><td>Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>12</td><td>Exerciții efectuate</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>13</td><td>Registrele exercițiilor sunt la zi</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>14</td><td>Rapoarte exerciții</td><td>—</td><td></td></tr>\n  </tbody></table></section>\n<section><h2>Nereguli</h2>\n<p class=\"f-small\">Nicio rubrică verificată.</p>\n<p class=\"f-small\">15 rubrici neverificate (nu apar în tabel).</p>\n</section>\n<footer class=\"f-foot\">Generat la joi, 15 octombrie 2026, 09:00 · Agenda inspectorului</footer>",
+   "fisaHtml": "<header class=\"f-head\">\n    <div class=\"f-kicker\">Fișa controlului</div>\n    <h1>Centrul Comercial Nord</h1>\n    <div class=\"f-meta\">\n      <span><b>Tip:</b> OPEC / Instituție</span>\n      <span><b>Perioada:</b> din 15.10.2026 (în desfășurare)</span>\n      <span><b>Administrator:</b> SC Nord Retail SRL</span>\n      \n      <span><b>Telefon:</b> 0212 345 678</span>\n      \n      \n    </div>\n    <div class=\"f-sum\">\n      <div><b>0</b><span>nereguli / neconformități</span></div>\n      <div><b>0</b><span>netrecute în PV</span></div>\n      <div><b>0</b><span>amenzi</span></div>\n      <div><b>0</b><span>nereguli vechi</span></div>\n      <div><b>0</b><span>acte lipsă</span></div>\n    </div>\n  </header>\n<section><h2>Construcții (1)</h2>\n<div class=\"f-constr\">\n      <h3>1. Hală comercială</h3>\n      <table class=\"f-kv\"><tr>\n        <td><b>Suprafață desf.</b><br>—</td>\n        <td><b>Regim înălțime</b><br>—</td>\n        <td><b>GRF / NSI</b><br>—</td>\n        <td><b>Nr. angajați</b><br>—</td>\n        <td><b>Anul construirii</b><br>—</td>\n        <td><b>Structură</b><br>—</td>\n        <td><b>Pereți</b><br>—</td>\n      </tr></table>\n      <p class=\"f-dot\"><b>Coordonate GPS:</b> necompletate</p>\n      \n      <p class=\"f-dot\"><b>DA:</b> —</p>\n      <p class=\"f-dot\"><b>NU:</b> — · <b>NEC:</b> —</p>\n      \n    </div>\n</section>\n<section><h2>Adăposturi de protecție civilă</h2><p><b>Adăposturi de protecție civilă:</b> —</p></section>\n<section><h2>Acte de autoritate și evidențe</h2><table class=\"f-table\">\n    <thead><tr><th>#</th><th>Act / evidență</th><th>Situație</th><th>Observații</th></tr></thead><tbody>\n    <tr class=\"\">\n      <td>1</td><td>Dispoziție CTPSI / RESP</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>2</td><td>Dispoziție LFD</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>3</td><td>Dispoziție de reglementare a fumatului</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>4</td><td>Dispoziție instruire</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>5</td><td>Dispoziție organizarea apărării împotriva incendiilor</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>6</td><td>Comisie PSI</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>7</td><td>Dispoziție măsuri sezon canicular / secetos / rece</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>8</td><td>Controale proprii</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>9</td><td>Analiza semestrială</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>10</td><td>Fișe de instruire completate corect</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>11</td><td>Verificare lunară a stingătoarelor</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>12</td><td>Contract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>13</td><td>Exerciții efectuate</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>14</td><td>Registrele exercițiilor sunt la zi</td><td>—</td><td></td></tr><tr class=\"\">\n      <td>15</td><td>Rapoarte exerciții</td><td>—</td><td></td></tr>\n  </tbody></table></section>\n<section><h2>Nereguli</h2>\n<p class=\"f-small\">Nicio rubrică verificată.</p>\n<p class=\"f-small\">16 rubrici neverificate (nu apar în tabel).</p>\n</section>\n<footer class=\"f-foot\">Generat la joi, 15 octombrie 2026, 09:00 · Agenda inspectorului</footer>",
    "fisaFisier": "Fisa-control-Centrul-Comercial-Nord-2026-10-15.html"
   }
  ],
@@ -28834,7 +30301,7 @@
    "mv94q8003joh17"
   ],
   "incheiate": 1,
-  "constatate": 7,
+  "constatate": 8,
   "amenzi": [
    {
     "control": "mv94q800hi7el8",
@@ -29019,7 +30486,7 @@
    ]
   ]
  },
- "raportOctombrieHtml": "<header class=\"f-head\">\n    <div class=\"f-kicker\">Plan lunar · raport de activitate</div>\n    <h1>Octombrie 2026</h1>\n    <div class=\"f-meta\"><span><b>Generat:</b> joi, 15 octombrie 2026</span></div>\n    <div class=\"f-sum f-sum-6\">\n      <div><b>3</b><span>controale începute (1 încheiat)</span></div>\n      <div><b>7</b><span>nereguli constatate</span></div>\n      <div><b>2</b><span>amenzi aplicate · 4.500 lei</span></div>\n      <div><b>2</b><span>activități efectuate</span></div>\n      <div><b>3</b><span>activități planificate (neconfirmate)</span></div>\n      <div><b>9</b><span>zile libere (22 lucrătoare)</span></div>\n    </div>\n  </header><section><h2>Activități efectuate, pe tipuri</h2><table class=\"f-table\"><thead><tr><th>Tip</th><th>Activități</th><th>Zile</th></tr></thead><tbody>\n      <tr><td>Instruire / pregătire</td><td>1</td><td>1</td></tr><tr><td>Informare publică</td><td>1</td><td>1</td></tr></tbody></table></section><section><h2>Zile libere</h2><table class=\"f-table\"><thead><tr><th></th><th>Zile</th></tr></thead><tbody>\n      <tr><td>Weekend (fără sărbătorile căzute în weekend)</td><td>9</td></tr>\n      <tr><td>Sărbători legale</td><td>0</td></tr>\n      <tr><td>Efectuate (până azi)</td><td>4</td></tr>\n      <tr><td>Planificate</td><td>5</td></tr>\n      <tr><td><b>Zile lucrătoare în lună</b></td><td><b>22</b></td></tr></tbody></table>\n      </section><section><h2>Zi cu zi</h2><h3>vineri, 9 octombrie 2026</h3><ul class=\"f-list\"><li><b>Control: Comuna Valea Mare</b> — încheiat 10.10.2026; 7 nereguli constatate; 2 amenzi</li></ul><h3>luni, 12 octombrie 2026</h3><ul class=\"f-list\"><li><b>Instruire / pregătire: Pregătire profesională lunară</b> — 12.10.2026, ora 09:00 · <i>Efectuată</i></li></ul><h3>marți, 13 octombrie 2026</h3><ul class=\"f-list\"><li><b>Control: Grădinița cu Program Prelungit nr. 2</b> — în desfășurare; 0 nereguli constatate</li><li><b>Informare publică: Informare preventivă elevi</b> — 13.10.2026, ora 11:00 · Școala Gimnazială nr. 3 · <i>Efectuată</i></li></ul><h3>miercuri, 14 octombrie 2026</h3><ul class=\"f-list\"><li><b>Activitate de birou: Rapoarte și corespondență</b> — 14.10.2026 · <i>Planificată</i></li></ul><h3>joi, 15 octombrie 2026</h3><ul class=\"f-list\"><li><b>Control: Centrul Comercial Nord</b> — în desfășurare; 0 nereguli constatate</li></ul><h3>sâmbătă, 17 octombrie 2026</h3><ul class=\"f-list\"><li><b>Ședință: Analiza activității</b> — 17.10.2026, ora 09:30 · <i>Planificată</i></li></ul><h3>duminică, 25 octombrie 2026</h3><ul class=\"f-list\"><li><b>Concediu / liber: Concediu de odihnă</b> — 25.10.2026 – 27.10.2026 (3 zile) · <i>Planificată</i></li></ul></section><section><h2>Amenzi aplicate în lună</h2><table class=\"f-table\"><thead><tr><th>Data</th><th>Obiectiv</th><th>Seria și nr.</th><th>Suma</th></tr></thead><tbody>\n      <tr><td>10.10.2026</td><td>Comuna Valea Mare</td><td>—</td><td>1.500 lei</td></tr><tr><td>10.10.2026</td><td>Comuna Valea Mare</td><td>—</td><td>3.000 lei</td></tr></tbody></table>\n      </section>",
+ "raportOctombrieHtml": "<header class=\"f-head\">\n    <div class=\"f-kicker\">Plan lunar · raport de activitate</div>\n    <h1>Octombrie 2026</h1>\n    <div class=\"f-meta\"><span><b>Generat:</b> joi, 15 octombrie 2026</span></div>\n    <div class=\"f-sum f-sum-6\">\n      <div><b>3</b><span>controale începute (1 încheiat)</span></div>\n      <div><b>8</b><span>nereguli constatate</span></div>\n      <div><b>2</b><span>amenzi aplicate · 4.500 lei</span></div>\n      <div><b>2</b><span>activități efectuate</span></div>\n      <div><b>3</b><span>activități planificate (neconfirmate)</span></div>\n      <div><b>9</b><span>zile libere (22 lucrătoare)</span></div>\n    </div>\n  </header><section><h2>Activități efectuate, pe tipuri</h2><table class=\"f-table\"><thead><tr><th>Tip</th><th>Activități</th><th>Zile</th></tr></thead><tbody>\n      <tr><td>Instruire / pregătire</td><td>1</td><td>1</td></tr><tr><td>Informare publică</td><td>1</td><td>1</td></tr></tbody></table></section><section><h2>Zile libere</h2><table class=\"f-table\"><thead><tr><th></th><th>Zile</th></tr></thead><tbody>\n      <tr><td>Weekend (fără sărbătorile căzute în weekend)</td><td>9</td></tr>\n      <tr><td>Sărbători legale</td><td>0</td></tr>\n      <tr><td>Efectuate (până azi)</td><td>4</td></tr>\n      <tr><td>Planificate</td><td>5</td></tr>\n      <tr><td><b>Zile lucrătoare în lună</b></td><td><b>22</b></td></tr></tbody></table>\n      </section><section><h2>Zi cu zi</h2><h3>vineri, 9 octombrie 2026</h3><ul class=\"f-list\"><li><b>Control: Comuna Valea Mare</b> — încheiat 10.10.2026; 8 nereguli constatate; 2 amenzi</li></ul><h3>luni, 12 octombrie 2026</h3><ul class=\"f-list\"><li><b>Instruire / pregătire: Pregătire profesională lunară</b> — 12.10.2026, ora 09:00 · <i>Efectuată</i></li></ul><h3>marți, 13 octombrie 2026</h3><ul class=\"f-list\"><li><b>Control: Grădinița cu Program Prelungit nr. 2</b> — în desfășurare; 0 nereguli constatate</li><li><b>Informare publică: Informare preventivă elevi</b> — 13.10.2026, ora 11:00 · Școala Gimnazială nr. 3 · <i>Efectuată</i></li></ul><h3>miercuri, 14 octombrie 2026</h3><ul class=\"f-list\"><li><b>Activitate de birou: Rapoarte și corespondență</b> — 14.10.2026 · <i>Planificată</i></li></ul><h3>joi, 15 octombrie 2026</h3><ul class=\"f-list\"><li><b>Control: Centrul Comercial Nord</b> — în desfășurare; 0 nereguli constatate</li></ul><h3>sâmbătă, 17 octombrie 2026</h3><ul class=\"f-list\"><li><b>Ședință: Analiza activității</b> — 17.10.2026, ora 09:30 · <i>Planificată</i></li></ul><h3>duminică, 25 octombrie 2026</h3><ul class=\"f-list\"><li><b>Concediu / liber: Concediu de odihnă</b> — 25.10.2026 – 27.10.2026 (3 zile) · <i>Planificată</i></li></ul></section><section><h2>Amenzi aplicate în lună</h2><table class=\"f-table\"><thead><tr><th>Data</th><th>Obiectiv</th><th>Suma</th></tr></thead><tbody>\n      <tr><td>10.10.2026</td><td>Comuna Valea Mare</td><td>1.500 lei</td></tr><tr><td>10.10.2026</td><td>Comuna Valea Mare</td><td>3.000 lei</td></tr></tbody></table>\n      </section>",
  "nativ": {
   "v": 1,
   "generat": "2026-10-15T06:00:00.000Z",
@@ -29581,12 +31048,12 @@
  },
  "backup": {
   "app": "agenda-inspectorului",
-  "schema": 11,
+  "schema": 12,
   "exportedAt": "2026-10-15T06:00:00.000Z",
   "controls": [
    {
     "id": "mv94q800f9a9az",
-    "schema": 11,
+    "schema": 12,
     "objectiveId": "mv94q800do3uiy",
     "createdAt": "2026-10-15T06:00:00.000Z",
     "updatedAt": "2026-10-15T06:00:00.000Z",
@@ -29597,6 +31064,9 @@
     "email": "secretariat@scoala3.ro",
     "adresa": "",
     "localitate": "",
+    "persoanaParticipanta": "",
+    "observatiiGenerale": "",
+    "deIntrebat": [],
     "dataInceput": "2025-09-10",
     "dataIncheiere": "2025-09-11",
     "constructii": [
@@ -29685,10 +31155,22 @@
          "GAZOS"
         ],
         "nuAre": false,
-        "obs": ""
+        "obs": "",
+        "ct": [
+         {
+          "id": "ct1",
+          "tipuri": [
+           "GAZOS"
+          ]
+         }
+        ]
        },
        "ipt": {
         "v": "DA",
+        "obs": ""
+       },
+       "ascensor": {
+        "v": "",
         "obs": ""
        }
       },
@@ -29778,9 +31260,14 @@
        "centrala": {
         "tipuri": [],
         "nuAre": false,
-        "obs": ""
+        "obs": "",
+        "ct": []
        },
        "ipt": {
+        "v": "",
+        "obs": ""
+       },
+       "ascensor": {
         "v": "",
         "obs": ""
        }
@@ -29795,6 +31282,10 @@
       "obs": ""
      },
      "lfd": {
+      "status": "ok",
+      "obs": ""
+     },
+     "fumat": {
       "status": "ok",
       "obs": ""
      },
@@ -30300,6 +31791,93 @@
       "grav": false,
       "sigiliu": false,
       "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "ao",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "ap",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "aq",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "nok",
+      "obs": "",
+      "inPV": true,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": true,
       "verificari": {},
       "obsAuto": "",
       "asiTermen": false,
@@ -30840,6 +32418,35 @@
      },
      {
       "key": "i",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "an",
       "custom": false,
       "sec": "ner",
       "label": "",
@@ -32242,11 +33849,11 @@
      "documentData": "2025-09-13"
     },
     "demo": true,
-    "catalog": 11
+    "catalog": 12
    },
    {
     "id": "mv94q8000t8fj6",
-    "schema": 11,
+    "schema": 12,
     "objectiveId": "mv94q800do3uiy",
     "createdAt": "2026-10-15T06:00:00.000Z",
     "updatedAt": "2026-10-15T06:00:00.000Z",
@@ -32257,6 +33864,9 @@
     "email": "secretariat@scoala3.ro",
     "adresa": "",
     "localitate": "",
+    "persoanaParticipanta": "",
+    "observatiiGenerale": "",
+    "deIntrebat": [],
     "dataInceput": "2026-09-03",
     "dataIncheiere": "2026-09-04",
     "constructii": [
@@ -32345,10 +33955,22 @@
          "GAZOS"
         ],
         "nuAre": false,
-        "obs": ""
+        "obs": "",
+        "ct": [
+         {
+          "id": "ct1",
+          "tipuri": [
+           "GAZOS"
+          ]
+         }
+        ]
        },
        "ipt": {
         "v": "DA",
+        "obs": ""
+       },
+       "ascensor": {
+        "v": "",
         "obs": ""
        }
       },
@@ -32438,9 +34060,14 @@
        "centrala": {
         "tipuri": [],
         "nuAre": false,
-        "obs": ""
+        "obs": "",
+        "ct": []
        },
        "ipt": {
+        "v": "",
+        "obs": ""
+       },
+       "ascensor": {
         "v": "",
         "obs": ""
        }
@@ -32455,6 +34082,10 @@
       "obs": ""
      },
      "lfd": {
+      "status": "ok",
+      "obs": ""
+     },
+     "fumat": {
       "status": "ok",
       "obs": ""
      },
@@ -32977,6 +34608,93 @@
       }
      },
      {
+      "key": "ao",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "nok",
+      "obs": "Fișe de instruire completate corect\nVerificare lunară a stingătoarelor",
+      "inPV": true,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": true,
+      "verificari": {},
+      "obsAuto": "Fișe de instruire completate corect\nVerificare lunară a stingătoarelor",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "ap",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "aq",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
       "key": "b1",
       "custom": false,
       "sec": "ner",
@@ -33346,7 +35064,7 @@
       "asiDataPierdere": "",
       "amenda": {
        "aplicata": true,
-       "serieNr": "DB 0012345",
+       "serieNr": "",
        "data": "",
        "suma": "2500",
        "achitata": false,
@@ -33500,6 +35218,35 @@
      },
      {
       "key": "i",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "an",
       "custom": false,
       "sec": "ner",
       "label": "",
@@ -34904,11 +36651,11 @@
      "documentData": "2026-09-06"
     },
     "demo": true,
-    "catalog": 11
+    "catalog": 12
    },
    {
     "id": "mv94q80065jb0x",
-    "schema": 11,
+    "schema": 12,
     "objectiveId": "mv94q800ok0c8c",
     "createdAt": "2026-10-15T06:00:00.000Z",
     "updatedAt": "2026-10-15T06:00:00.000Z",
@@ -34919,6 +36666,9 @@
     "email": "administrativ@spital-vv.ro",
     "adresa": "",
     "localitate": "",
+    "persoanaParticipanta": "",
+    "observatiiGenerale": "",
+    "deIntrebat": [],
     "dataInceput": "2026-09-24",
     "dataIncheiere": "2026-09-25",
     "constructii": [
@@ -35008,9 +36758,27 @@
          "ELECTRIC"
         ],
         "nuAre": false,
-        "obs": ""
+        "obs": "",
+        "ct": [
+         {
+          "id": "ct1",
+          "tipuri": [
+           "GAZOS"
+          ]
+         },
+         {
+          "id": "ct2",
+          "tipuri": [
+           "ELECTRIC"
+          ]
+         }
+        ]
        },
        "ipt": {
+        "v": "DA",
+        "obs": ""
+       },
+       "ascensor": {
         "v": "DA",
         "obs": ""
        }
@@ -35101,9 +36869,14 @@
        "centrala": {
         "tipuri": [],
         "nuAre": false,
-        "obs": ""
+        "obs": "",
+        "ct": []
        },
        "ipt": {
+        "v": "",
+        "obs": ""
+       },
+       "ascensor": {
         "v": "",
         "obs": ""
        }
@@ -35118,6 +36891,10 @@
       "obs": ""
      },
      "lfd": {
+      "status": "ok",
+      "obs": ""
+     },
+     "fumat": {
       "status": "ok",
       "obs": ""
      },
@@ -35624,6 +37401,93 @@
       "verificari": {},
       "obsAuto": "",
       "asiTermen": true,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "ao",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "nok",
+      "obs": "Dispoziție măsuri sezon canicular / secetos / rece",
+      "inPV": true,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": true,
+      "verificari": {},
+      "obsAuto": "Dispoziție măsuri sezon canicular / secetos / rece",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "ap",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "aq",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
       "asiPrezentat": false,
       "asiDataPrezentare": "",
       "asiPierdere": false,
@@ -36189,6 +38053,35 @@
       }
      },
      {
+      "key": "an",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
       "key": "j",
       "custom": false,
       "sec": "ner",
@@ -36500,7 +38393,7 @@
       "asiDataPierdere": "",
       "amenda": {
        "aplicata": true,
-       "serieNr": "DB 0012377",
+       "serieNr": "",
        "data": "",
        "suma": "5000",
        "achitata": false,
@@ -37563,11 +39456,11 @@
      "documentData": "2026-09-27"
     },
     "demo": true,
-    "catalog": 11
+    "catalog": 12
    },
    {
     "id": "mv94q800hi7el8",
-    "schema": 11,
+    "schema": 12,
     "objectiveId": "mv94q800f14se0",
     "createdAt": "2026-10-15T06:00:00.000Z",
     "updatedAt": "2026-10-15T06:00:00.000Z",
@@ -37578,6 +39471,9 @@
     "email": "primaria@valeamare.ro",
     "adresa": "",
     "localitate": "",
+    "persoanaParticipanta": "",
+    "observatiiGenerale": "",
+    "deIntrebat": [],
     "dataInceput": "2026-10-09",
     "dataIncheiere": "2026-10-10",
     "constructii": [
@@ -37666,10 +39562,22 @@
          "SOLID"
         ],
         "nuAre": false,
-        "obs": ""
+        "obs": "",
+        "ct": [
+         {
+          "id": "ct1",
+          "tipuri": [
+           "SOLID"
+          ]
+         }
+        ]
        },
        "ipt": {
         "v": "NU",
+        "obs": ""
+       },
+       "ascensor": {
+        "v": "",
         "obs": ""
        }
       },
@@ -37683,6 +39591,10 @@
       "obs": ""
      },
      "lfd": {
+      "status": "ok",
+      "obs": ""
+     },
+     "fumat": {
       "status": "ok",
       "obs": ""
      },
@@ -38175,6 +40087,93 @@
      },
      {
       "key": "a",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "ao",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "nok",
+      "obs": "Comisie PSI\nContract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)",
+      "inPV": true,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": true,
+      "verificari": {},
+      "obsAuto": "Comisie PSI\nContract de transmitere temporară a unui bun imobil (art. 9 din Legea 307/2006)",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "ap",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "aq",
       "custom": false,
       "sec": "ner",
       "label": "",
@@ -38726,6 +40725,35 @@
      },
      {
       "key": "i",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "an",
       "custom": false,
       "sec": "ner",
       "label": "",
@@ -40157,11 +42185,11 @@
      "documentData": ""
     },
     "demo": true,
-    "catalog": 11
+    "catalog": 12
    },
    {
     "id": "mv94q800burnig",
-    "schema": 11,
+    "schema": 12,
     "objectiveId": "mv94q800jg8ey9",
     "createdAt": "2026-10-15T06:00:00.000Z",
     "updatedAt": "2026-10-15T06:00:00.000Z",
@@ -40172,6 +42200,9 @@
     "email": "",
     "adresa": "",
     "localitate": "",
+    "persoanaParticipanta": "",
+    "observatiiGenerale": "",
+    "deIntrebat": [],
     "dataInceput": "2026-08-16",
     "dataIncheiere": "2026-08-16",
     "constructii": [
@@ -40260,9 +42291,21 @@
          "SOLID"
         ],
         "nuAre": false,
-        "obs": ""
+        "obs": "",
+        "ct": [
+         {
+          "id": "ct1",
+          "tipuri": [
+           "SOLID"
+          ]
+         }
+        ]
        },
        "ipt": {
+        "v": "",
+        "obs": ""
+       },
+       "ascensor": {
         "v": "",
         "obs": ""
        }
@@ -40277,6 +42320,10 @@
       "obs": ""
      },
      "lfd": {
+      "status": "ok",
+      "obs": ""
+     },
+     "fumat": {
       "status": "ok",
       "obs": ""
      },
@@ -40769,6 +42816,93 @@
      },
      {
       "key": "a",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "ao",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "ap",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "aq",
       "custom": false,
       "sec": "ner",
       "label": "",
@@ -41320,6 +43454,35 @@
      },
      {
       "key": "i",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "an",
       "custom": false,
       "sec": "ner",
       "label": "",
@@ -42722,11 +44885,11 @@
      "documentData": "2026-08-18"
     },
     "demo": true,
-    "catalog": 11
+    "catalog": 12
    },
    {
     "id": "mv94q800zkeezx",
-    "schema": 11,
+    "schema": 12,
     "objectiveId": "mv94q800tntegh",
     "createdAt": "2026-10-15T06:00:00.000Z",
     "updatedAt": "2026-10-15T06:00:00.000Z",
@@ -42737,6 +44900,20 @@
     "email": "gpp2@edu.ro",
     "adresa": "",
     "localitate": "",
+    "persoanaParticipanta": "Ana Stoica, administrator de clădire",
+    "observatiiGenerale": "Acces auto prin curtea din spate. Program cu publicul: 7:00–17:00.",
+    "deIntrebat": [
+     {
+      "id": "q1",
+      "text": "Cererea certificatului de verificare IPT (trimis ulterior pe email)",
+      "gata": false
+     },
+     {
+      "id": "q2",
+      "text": "Verificarea registrului de instruire",
+      "gata": true
+     }
+    ],
     "dataInceput": "2026-10-13",
     "dataIncheiere": "",
     "constructii": [
@@ -42823,9 +45000,14 @@
        "centrala": {
         "tipuri": [],
         "nuAre": false,
-        "obs": ""
+        "obs": "",
+        "ct": []
        },
        "ipt": {
+        "v": "",
+        "obs": ""
+       },
+       "ascensor": {
         "v": "",
         "obs": ""
        }
@@ -42840,6 +45022,10 @@
       "obs": ""
      },
      "lfd": {
+      "status": "",
+      "obs": ""
+     },
+     "fumat": {
       "status": "",
       "obs": ""
      },
@@ -43330,6 +45516,93 @@
      },
      {
       "key": "a",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "ao",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "ap",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "aq",
       "custom": false,
       "sec": "ner",
       "label": "",
@@ -43881,6 +46154,35 @@
      },
      {
       "key": "i",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "an",
       "custom": false,
       "sec": "ner",
       "label": "",
@@ -45286,7 +47588,7 @@
    },
    {
     "id": "mv94q8003joh17",
-    "schema": 11,
+    "schema": 12,
     "objectiveId": "mv94q800ybjla2",
     "createdAt": "2026-10-15T06:00:00.000Z",
     "updatedAt": "2026-10-15T06:00:00.000Z",
@@ -45297,6 +47599,9 @@
     "email": "",
     "adresa": "",
     "localitate": "",
+    "persoanaParticipanta": "",
+    "observatiiGenerale": "",
+    "deIntrebat": [],
     "dataInceput": "2026-10-15",
     "dataIncheiere": "",
     "constructii": [
@@ -45383,9 +47688,14 @@
        "centrala": {
         "tipuri": [],
         "nuAre": false,
-        "obs": ""
+        "obs": "",
+        "ct": []
        },
        "ipt": {
+        "v": "",
+        "obs": ""
+       },
+       "ascensor": {
         "v": "",
         "obs": ""
        }
@@ -45400,6 +47710,10 @@
       "obs": ""
      },
      "lfd": {
+      "status": "",
+      "obs": ""
+     },
+     "fumat": {
       "status": "",
       "obs": ""
      },
@@ -45890,6 +48204,93 @@
      },
      {
       "key": "a",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "ao",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "ap",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "aq",
       "custom": false,
       "sec": "ner",
       "label": "",
@@ -46441,6 +48842,35 @@
      },
      {
       "key": "i",
+      "custom": false,
+      "sec": "ner",
+      "label": "",
+      "status": "",
+      "obs": "",
+      "inPV": false,
+      "constructieIds": [],
+      "vecheManual": false,
+      "grav": false,
+      "sigiliu": false,
+      "auto": false,
+      "verificari": {},
+      "obsAuto": "",
+      "asiTermen": false,
+      "asiPrezentat": false,
+      "asiDataPrezentare": "",
+      "asiPierdere": false,
+      "asiDataPierdere": "",
+      "amenda": {
+       "aplicata": false,
+       "serieNr": "",
+       "data": "",
+       "suma": "",
+       "achitata": false,
+       "dataAchitare": ""
+      }
+     },
+     {
+      "key": "an",
       "custom": false,
       "sec": "ner",
       "label": "",

@@ -20,6 +20,12 @@ const inchis = (c) => isISO(c.dataIncheiere);
 const secOf = (n) => n.sec || 'ner';
 const activ = (c) => c.nereguli.filter((n) => secOf(n) === 'ner' || c.tip === 'LOCALITATE');
 const nokOf = (c) => activ(c).filter((n) => n.status === 'nok');
+// lista controlului: cele încheiate păstrează versiunea încheierii; v1.25 (12): actul „fumat”, dotarea „ascensor”,
+// „Iluminat Hint” ascuns fără hidranți interiori (NU / NEC), actele lipsă trec în neregulile ao / ap / aq
+const catOf = (c) => (inchis(c) ? (c.catalog || c.schema || 1) : 12);
+const acteC = (c) => Object.entries(c.acte).filter(([k]) => k !== 'fumat' || catOf(c) >= 12).map(([, a]) => a);
+const dotariC = (c, k) => Object.entries(k.dotari).filter(([key]) => (key !== 'ascensor' || catOf(c) >= 12)
+  && !(key === 'ilumHint' && catOf(c) >= 12 && ['NU', 'NEC'].includes(k.dotari.hidInt?.v)));
 function amenda(c, n) {
   const a = n.amenda;
   if (a.achitata) return { lv: 'green', msg: a.dataAchitare ? `Dovadă primită · ${fmt(a.dataAchitare)}` : 'Dovadă de plată primită' };
@@ -158,10 +164,10 @@ const cnt = (lv) => fines.filter((f) => f.s.lv === lv).length;
     await p.goto(`http://localhost:8080/#/control/${c.id}/nereguli`); await p.waitForTimeout(350);
     const tabs = await p.locator('.ed-tab').evaluateAll((els) => els.map((e) => ({ st: e.querySelector('.tab-txt small:not(.tab-prog-txt)').innerText.trim(), pr: e.querySelector('.tab-prog-txt').innerText.trim() })));
     // Obiectiv: construcții + dotări completate (independent, din date)
-    const set = c.constructii.reduce((s, k) => s + Object.entries(k.dotari).filter(([key, v]) => (key === 'centrala' ? (v.tipuri || []).length || v.nuAre : v.v)).length, 0);
-    const totD = c.constructii.reduce((s, k) => s + Object.keys(k.dotari).length, 0);
+    const set = c.constructii.reduce((s, k) => s + dotariC(c, k).filter(([key, v]) => (key === 'centrala' ? (v.ct || []).length || (v.tipuri || []).length || v.nuAre : v.v)).length, 0);
+    const totD = c.constructii.reduce((s, k) => s + dotariC(c, k).length, 0);
     eq(`${tabs[0].st} | ${tabs[0].pr}`, `${c.constructii.length} ${c.constructii.length === 1 ? 'construcție' : 'construcții'} | Dotări ${set}/${totD}`, `${c.denumire}: tabul Obiectiv`);
-    const acte = Object.values(c.acte); const lipsa = acte.filter((a) => a.status === 'nok').length; const ver = acte.filter((a) => a.status).length;
+    const acte = acteC(c); const lipsa = acte.filter((a) => a.status === 'nok').length; const ver = acte.filter((a) => a.status).length;
     eq(`${tabs[1].st} | ${tabs[1].pr}`, `${lipsa} lipsă | Verificate ${ver}/${acte.length}`, `${c.denumire}: tabul Acte`);
     const secs = c.tip === 'LOCALITATE' ? ['plan', 'pc', 'ner'] : ['ner'];
     const nev = {};
@@ -196,7 +202,7 @@ const cnt = (lv) => fines.filter((f) => f.s.lv === lv).length;
     await p.goto(`http://localhost:8080/#/control/${c.id}/obiectiv`); await p.waitForTimeout(250);
     if (await p.locator('[data-act="todo-toggle"]').count()) { await p.click('[data-act="todo-toggle"]'); await p.waitForTimeout(200); }
     const todo = (await p.locator('.todo').innerText().catch(() => '')).replace(/\s+/g, ' ');
-    const actNev = Object.values(c.acte).filter((a) => !a.status).length;
+    const actNev = acteC(c).filter((a) => !a.status).length;
     const SL = { ner: 'Nereguli', plan: 'Planuri și SVSU', pc: 'Protecție civilă' };
     for (const [sec, k] of Object.entries(nev)) {
       if (k) ok(todo.includes(`${SL[sec]}: ${k} `), `${c.denumire}: „Ce mai aveți de făcut” → ${SL[sec]}: ${k} (= filtrul Neverificate) — „${todo.slice(0, 200)}”`);
@@ -208,8 +214,13 @@ const cnt = (lv) => fines.filter((f) => f.s.lv === lv).length;
     await p.click('[data-act="pv-text"]'); await p.waitForTimeout(250);
     const pv = await p.locator('.pv-text').inputValue();
     const pvLines = pv.split('\n').filter((x) => /^\s*\d+\.\s/.test(x)).length;
-    const lipsaActe = Object.values(c.acte).filter((a) => a.status === 'nok').length;
+    // de la v1.25, actele lipsă sunt constatări (ao / ap / aq); înainte, o listă separată numerotată
+    const lipsaActe = catOf(c) >= 12 ? 0 : acteC(c).filter((a) => a.status === 'nok').length;
     eq(pvLines, nokOf(c).length + lipsaActe, `${c.denumire}: Text PV — rânduri numerotate (constatări + acte lipsă)`);
+    if (catOf(c) >= 12) {
+      const grup = Object.entries(c.acte).filter(([k, a]) => a.status === 'nok' && !['controale', 'analiza'].includes(k)).length;
+      ok(!grup || nokOf(c).some((n) => n.key === 'ao'), `${c.denumire}: ${grup} acte lipsă → neregula ao constatată`);
+    }
     await p.keyboard.press('Escape'); await p.goto('about:blank'); await p.goto(`http://localhost:8080/#/control/${c.id}/nereguli`); await p.waitForTimeout(200);
     // fișa
     await p.goto(`http://localhost:8080/#/fisa/${c.id}`); await p.waitForTimeout(300);

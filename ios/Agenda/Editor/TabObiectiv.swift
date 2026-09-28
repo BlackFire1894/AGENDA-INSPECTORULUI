@@ -28,6 +28,12 @@ struct TabObiectiv: View {
                 }
             }
             .id("sec-date")
+            Intrebari(m: m.intrebari).id("sec-intrebari")
+            Card {
+                TitluSectiune(iconita: "doc", text: "Observații generale")
+                CampTextLung(cale: "observatiiGenerale", valoare: m.observatiiGenerale, indiciu: "Orice notițe despre obiectiv sau despre control", minRanduri: 3)
+            }
+            .id("sec-observatii")
             Card {
                 TitluSectiune(iconita: "calendar", text: "Perioada controlului")
                 GrilaCampuri(coloane: 2) {
@@ -254,17 +260,31 @@ struct ConstructieVedere: View {
 
     @State private var gravLaIntrare = false
 
+    /// Antetul: numărul, denumirea și, sub ea, pastilele și sumarul; butoanele (▲▼, restrângerea) rămân în dreapta
     private var antet: some View {
-        FlexWrap(spatiu: 0.6667 * rem) {
+        HStack(alignment: .center, spacing: 0.6667 * rem) {
             Text("\(m.nr)").font(.system(size: 1.0556 * rem, weight: .heavy)).foregroundStyle(.white)
                 .frame(width: 2.3333 * rem, height: 2.3333 * rem)
                 .background(Color.ink2, in: RoundedRectangle(cornerRadius: 0.7222 * rem, style: .continuous))
-            NumeConstructie(m: m.denumire).flexCreste(min: 11.1111 * rem)
-            if let l = m.lipsa { VederePastila(p: PastilaUI("red", l, "alert")) }
-            if m.grfV { VederePastila(p: PastilaUI("red", "GRF/NSI V peste parter", "alert")) }
-            Text(m.sumar).font(.system(size: 0.8333 * rem, weight: .semibold)).foregroundStyle(Color.muted)
-            ButonIconita(iconita: "chevD", eticheta: m.deschisa ? "Restrânge" : "Extinde", rotit: .degrees(m.deschisa ? 180 : 0)) {
-                ses.click("constr-toggle", ["id": m.id])
+            FlexWrap(spatiu: 0.6667 * rem, spatiuRanduri: 0.2222 * rem) {
+                NumeConstructie(m: m.denumire).flexCreste(min: 11.1111 * rem)
+                if let l = m.lipsa { VederePastila(p: PastilaUI("red", l, "alert")) }
+                if m.grfV { VederePastila(p: PastilaUI("red", "GRF/NSI V peste parter", "alert")) }
+                Text(m.sumar).font(.system(size: 0.8333 * rem, weight: .semibold)).foregroundStyle(Color.muted)
+                    .padding(.leading, 0.6667 * rem)
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            HStack(spacing: 0) {
+                // ▲▼: ordinea construcțiilor (la mai multe)
+                if let o = m.ordine {
+                    ButonIconita(iconita: "up", eticheta: "Mută mai sus") { ses.click("constr-up", ["id": m.id]) }
+                        .disabled(!o.sus).opacity(o.sus ? 1 : 0.35)
+                    ButonIconita(iconita: "up", eticheta: "Mută mai jos", rotit: .degrees(180)) { ses.click("constr-down", ["id": m.id]) }
+                        .disabled(!o.jos).opacity(o.jos ? 1 : 0.35)
+                }
+                ButonIconita(iconita: "chevD", eticheta: m.deschisa ? "Restrânge" : "Extinde", rotit: .degrees(m.deschisa ? 180 : 0)) {
+                    ses.click("constr-toggle", ["id": m.id])
+                }
             }
         }
         .padding(EdgeInsets(top: 0.5556 * rem, leading: 0.6667 * rem, bottom: 0.5556 * rem, trailing: 0.5556 * rem))
@@ -364,6 +384,7 @@ struct GpsVedere: View {
                         Buton(text: "Copiază", iconita: "doc", mare: false) { ses.click("gps-copy", ["id": m.id]) }
                         Buton(text: m.cautare ? "Se caută…" : "Actualizează", iconita: "history", mare: false) { ses.click("gps-get", ["id": m.id]) }
                             .disabled(m.cautare)
+                        Buton(text: "Introdu coordonatele", iconita: "pin", mare: false) { ses.click("gps-manual", ["id": m.id]) }
                         ButonIconita(iconita: "trash", eticheta: "Șterge coordonatele", culoare: .red) { ses.click("gps-clear", ["id": m.id]) }
                             .flexDreapta()
                     }
@@ -372,6 +393,7 @@ struct GpsVedere: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .background(Color.surface2, in: RoundedRectangle(cornerRadius: 0.8889 * rem, style: .continuous))
                 .overlay(RoundedRectangle(cornerRadius: 0.8889 * rem, style: .continuous).strokeBorder(Color.line, lineWidth: 2))
+                caPrima
             } else {
                 FlexWrap(spatiu: 0.8889 * rem) {
                     Text("Necompletat").font(.system(size: rem, weight: .semibold)).italic().foregroundStyle(Color.muted).padding(.leading, 0.3333 * rem)
@@ -379,17 +401,27 @@ struct GpsVedere: View {
                         .flexCreste(min: 10 * rem)
                     Buton(text: m.cautare ? "Se caută semnalul…" : "Completează coordonatele", iconita: "locate", tip: .primar) { ses.click("gps-get", ["id": m.id]) }
                         .disabled(m.cautare)
+                    Buton(text: "Introdu coordonatele", iconita: "pin") { ses.click("gps-manual", ["id": m.id]) }
                 }
                 .padding(0.5556 * rem)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .overlay(RoundedRectangle(cornerRadius: 0.8889 * rem, style: .continuous).strokeBorder(Color.lineStrong, style: StrokeStyle(lineWidth: 2, dash: [6, 4])))
+                caPrima
                 Text("Doar la cerere: poziția se citește o singură dată, când apăsați, lângă această construcție. Nu se urmărește locația.")
                     .font(.system(size: 0.8056 * rem)).foregroundStyle(Color.muted).padding(.top, 0.3333 * rem - 0.3889 * rem)
             }
         }
     }
 
-    private var culoareCalitate: Color { m.calitate == "buna" ? .green : m.calitate == "medie" ? .yellowInk : .red }
+    /// De la a doua construcție: „Aceleași coordonate ca la …” (copiate o dată; din nou = se golesc)
+    @ViewBuilder private var caPrima: some View {
+        if let x = m.caPrima {
+            BifaActiune(text: x.text, activ: x.activ, dezactivat: !x.disponibil) { ses.click("gps-ca-prima", ["id": m.id]) }
+                .padding(.top, 0.2222 * rem)
+        }
+    }
+
+    private var culoareCalitate: Color { m.calitate == "buna" ? .green : m.calitate == "medie" ? .yellowInk : m.calitate == "manual" ? .accent : .red }
 }
 
 // ───────── dotările (.dot-row) ─────────
@@ -403,7 +435,9 @@ struct DotareVedere: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0.6667 * rem) {
-            if lat {
+            if m.centrala {
+                centrala
+            } else if lat {
                 HStack(alignment: .top, spacing: 0.6667 * rem) {
                     eticheta.frame(width: 10.5556 * rem, alignment: .leading).frame(minHeight: tinta(2.4444 * rem) + 6)
                     alegere.frame(minHeight: tinta(2.4444 * rem) + 6)
@@ -449,17 +483,146 @@ struct DotareVedere: View {
         }
     }
 
-    @ViewBuilder private var alegere: some View {
-        if m.centrala {
-            FlowLayout(spatiu: 0.3333 * rem) {
-                ForEach(K.centralaTipuri, id: \.self) { t in
-                    Cip(text: t, ales: m.tipuri.contains(t)) { ses.click("centrala", ["path": m.cale, "val": t]) }
-                }
-                Cip(text: "NU ARE", ales: m.nuAre, culoareAles: .ink2) { ses.click("centrala", ["path": m.cale, "val": "NU_ARE"]) }
+    /// Centrala termică: câte centrale (CT 1, CT 2…), fiecare cu tipurile ei; fără centrale, tipul ales declară CT 1;
+    /// „NU ARE” le șterge. Pe orizontal: rândurile CT sub coloana alegerilor; pe vertical: sub etichetă, pe toată lățimea.
+    @ViewBuilder private var centrala: some View {
+        let comenzi = HStack(spacing: 0.5556 * rem) {
+            Pasi(numar: m.centrale.count, unitate: m.centrale.count == 1 ? "centrală" : "centrale", minim: 4.4444,
+                 gol: m.centrale.isEmpty, minusActiv: !m.centrale.isEmpty,
+                 minus: { ses.click("ct-count", ["path": m.cale, "val": "-1"]) }, plus: { ses.click("ct-count", ["path": m.cale, "val": "1"]) })
+            Cip(text: "NU ARE", ales: m.nuAre, culoareAles: .ink2) { ses.click("centrala", ["path": m.cale, "val": "NU_ARE"]) }
+        }
+        .fixedSize()
+        if lat {
+            HStack(alignment: .center, spacing: 0.6667 * rem) {
+                eticheta.frame(width: 10.5556 * rem, alignment: .leading)
+                comenzi
+                CampObs(m: m.obs).frame(maxWidth: .infinity, alignment: .leading)
             }
-        } else if let s = m.segment {
+            randuriCT.padding(.leading, 11.2222 * rem)
+        } else {
+            HStack(alignment: .center, spacing: 0.6667 * rem) {
+                eticheta.frame(maxWidth: .infinity, alignment: .leading)
+                if !m.obs.deschis { CampObs(m: m.obs) }
+            }
+            FlowLayout(spatiu: 0.5556 * rem) { comenzi }
+            randuriCT
+            if m.obs.deschis { CampObs(m: m.obs) }
+        }
+    }
+
+    @ViewBuilder private var randuriCT: some View {
+        if !m.centrale.isEmpty || !m.nuAre {
+            VStack(alignment: .leading, spacing: 0.4444 * rem) {
+                ForEach(m.centrale, id: \.id) { x in
+                    randCT("CT \(x.nr)", nou: false) { t in
+                        Cip(text: t, ales: x.tipuri.contains(t)) { ses.click("centrala", ["path": m.cale, "ct": x.id, "val": t]) }
+                    }
+                }
+                if m.centrale.isEmpty && !m.nuAre {
+                    randCT("CT 1", nou: true) { t in
+                        Cip(text: t, ales: false) { ses.click("centrala", ["path": m.cale, "val": t]) }
+                    }
+                }
+            }
+        }
+    }
+
+    @ViewBuilder private var alegere: some View {
+        if let s = m.segment {
             Segment(m: s, stil: .dnn, grav: m.grav) { ses.click("set", ["path": s.cale, "val": $0, "toggle": "1"]) }
         }
+    }
+}
+
+extension DotareVedere {
+    /// `.ct-row`: „CT n” și tipurile ei
+    func randCT<C: View>(_ nr: String, nou: Bool, @ViewBuilder _ cip: @escaping (String) -> C) -> some View {
+        HStack(spacing: 0.5556 * rem) {
+            Text(nr).font(.system(size: 0.8889 * rem, weight: .heavy)).foregroundStyle(Color.muted.opacity(nou ? 0.55 : 1))
+                .frame(minWidth: 2.6667 * rem, alignment: .leading)
+            FlowLayout(spatiu: 0.3333 * rem) { ForEach(K.centralaTipuri, id: \.self) { cip($0) } }
+        }
+    }
+}
+
+// ───────── De întrebat până la finalizarea controlului ─────────
+struct Intrebari: View {
+    @Environment(SesiuneEditor.self) private var ses
+    @Environment(\.rem) private var rem
+    let m: ModelIntrebari
+
+    var body: some View {
+        Card {
+            FlexWrap(spatiu: 0.7778 * rem, intre: true) {
+                TitluSectiune(iconita: "list", text: "De întrebat până la finalizarea controlului").padding(.bottom, -0.7778 * rem)
+                if let p = m.pastila { VederePastila(p: p) }
+            }
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .padding(.bottom, 0.7778 * rem)
+            if m.randuri.isEmpty {
+                Text("Sarcini, întrebări sau verificări de făcut până la încheiere (ex.: documente de cerut mai târziu). Cele nebifate apar în „Ce mai aveți de făcut”.")
+                    .font(.system(size: 0.8611 * rem)).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
+                    .padding(.bottom, 0.6667 * rem)
+            } else {
+                VStack(spacing: 0.4444 * rem) {
+                    ForEach(m.randuri, id: \.id) { r in rand(r).id("intreb-\(r.id)") }
+                }
+                .padding(.bottom, 0.6667 * rem)
+            }
+            Buton(text: "Adaugă", iconita: "plus", mare: false) { ses.click("intreb-add") }
+        }
+    }
+
+    private func rand(_ r: ModelIntrebari.Rand) -> some View {
+        HStack(alignment: .top, spacing: 0.5556 * rem) {
+            Button { ses.click("flag", ["path": "deIntrebat.#\(r.id).gata"]) } label: {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 0.5556 * rem, style: .continuous).fill(r.gata ? Color.green : Color.surface)
+                    RoundedRectangle(cornerRadius: 0.5556 * rem, style: .continuous).strokeBorder(r.gata ? Color.green : Color.lineStrong, lineWidth: 2.5)
+                    if r.gata { Iconita(nume: "check", marime: 1.2222 * rem, grosime: 2.8).foregroundStyle(.white) }
+                }
+                .frame(width: 1.7778 * rem, height: 1.7778 * rem)
+                .frame(width: tinta(2.6667 * rem), height: tinta(2.6667 * rem))
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel(r.gata ? "Rezolvată" : "Nerezolvată")
+            .accessibilityAddTraits(r.gata ? .isSelected : [])
+            CampTextLung(cale: "deIntrebat.#\(r.id).text", valoare: r.text, indiciu: "Ce trebuie întrebat, cerut sau verificat", taiat: r.gata)
+            ButonIconita(iconita: "trash", eticheta: "Șterge", culoare: .red) { ses.click("intreb-del", ["id": r.id]) }
+        }
+    }
+}
+
+/// Text pe mai multe rânduri (`<textarea>`), care crește în jos: observațiile generale, sarcinile „De întrebat”
+struct CampTextLung: View {
+    @Environment(SesiuneEditor.self) private var ses
+    @Environment(\.rem) private var rem
+    @Environment(\.focusEditor) private var focus
+    let cale: String
+    let valoare: String
+    let indiciu: String
+    var minRanduri = 1
+    /// sarcină rezolvată: textul tăiat, estompat
+    var taiat = false
+    @FocusState private var activ: Bool
+
+    var body: some View {
+        TextField("", text: Binding(get: { valoare }, set: { ses.input(cale, $0) }),
+                  prompt: Text(indiciu).foregroundStyle(Color.muted.opacity(0.7)), axis: .vertical)
+            .lineLimit(minRanduri...)
+            .font(.system(size: max(16, 0.9722 * rem)))
+            .lineSpacing(0.2 * rem)
+            .strikethrough(taiat && !activ)
+            .foregroundStyle(taiat && !activ ? Color.muted : Color.text)
+            .focused($activ)
+            .focusCale(focus, cale)
+            .padding(.vertical, 0.5556 * rem).padding(.horizontal, 0.7778 * rem)
+            .frame(minHeight: tinta(2.6667 * rem), alignment: .topLeading)
+            .background(activ ? Color.surface : Color.surface2, in: RoundedRectangle(cornerRadius: 0.7778 * rem, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 0.7778 * rem, style: .continuous).strokeBorder(activ ? Color.accent : Color.line, lineWidth: 2))
+            .frame(maxWidth: .infinity)
     }
 }
 

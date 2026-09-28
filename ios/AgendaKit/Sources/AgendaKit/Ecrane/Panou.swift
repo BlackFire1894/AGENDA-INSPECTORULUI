@@ -153,9 +153,7 @@ public func modelPanou(_ cs: [Control], _ activitati: [Activitate], _ meta: Meta
 
     func elementAmenda(_ f: AmendaInControl) -> ElementPanou {
         let c = f.c, n = f.n, st = f.st
-        var sub = ["\(neregulaLetter(c, n)). \(constatareLabel(n))\(c.constructii.count > 1 && secOf(n) == "ner" ? " · \(constructiiNume(c, n))" : "")"]
-        let sn = amendaSerieNr(n.amenda)
-        if !sn.isEmpty { sub.append("Amenda \(sn)") }
+        let sub = ["\(neregulaLetter(c, n)). \(constatareLabel(n))\(c.constructii.count > 1 && secOf(n) == "ner" ? " · \(constructiiNume(c, n))" : "")"]
         return ElementPanou(id: "\(c.id)-\(n.key)", nivel: st.level, titlu: nume(c), sub: sub, mesaj: st.msg,
                             avertizare: (st.nelucr ?? "").isEmpty ? nil : "⚠ \(st.nelucr!)", veche: vecheInfo(cs, c, n).veche,
                             pastileDreapta: [.amenda(st.level, st.label)], suma: n.amenda.suma.isEmpty ? nil : money(n.amenda.suma),
