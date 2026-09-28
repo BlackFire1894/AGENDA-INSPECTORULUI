@@ -811,6 +811,8 @@ public struct ModelDetaliuNeregula: Equatable, Sendable {
     public let sigiliu: ModelComutator?
     public let asi: ModelASI?
     public let amendaBox: ModelAmenda?
+    /// fotografiile constatării (adăugire nativă)
+    public var fotografii: [Fotografie] = []
 }
 
 public struct ModelASI: Equatable, Sendable {
@@ -1027,5 +1029,5 @@ func modelDetaliu(_ c: Control, _ n: Neregula, _ path: String, _ vi: InfoVeche, 
         vecheManual: vi.auto == nil ? comutator("\(path).vecheManual", n.vecheManual, "Neregulă veche", nivel: "veche", iconita: "history") : nil,
         grav: n.custom && !n.adapost ? comutator("\(path).grav", n.grav, "Neregulă gravă", nivel: "red", iconita: "alert") : nil,
         sigiliu: isGrav(n) ? comutator("\(path).sigiliu", n.sigiliu, "Sigiliu", nivel: "red", iconita: "lock") : nil,
-        asi: asi, amendaBox: box)
+        asi: asi, amendaBox: box, fotografii: n.fotografii)
 }

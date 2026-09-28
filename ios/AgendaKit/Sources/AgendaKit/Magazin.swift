@@ -147,10 +147,27 @@ public final class Magazin {
 
     // ───────── backup ─────────
 
-    /// Fișierul de exportat (după salvarea a tot ce așteaptă)
+    /// Fișierul de exportat (după salvarea a tot ce așteaptă), cu fotografiile folosite de controale
     public func pregatesteExport() -> FisierBackup {
         flush()
-        return exportBackup(controls, activitati)
+        var foto: [String: Data] = [:]
+        for id in fotografiiFolosite(controls) { if let d = depozit.fotografie(id) { foto[id] = d } }
+        return exportBackup(controls, activitati, fotografii: foto)
+    }
+
+    // ───────── fotografiile ─────────
+
+    public func fotografie(_ id: String) -> Data? { depozit.fotografie(id) }
+
+    /// Scrie fișierul imediat (înainte ca rândul să-l folosească)
+    public func adaugaFotografie(_ id: String, _ d: Data) throws { try depozit.salveazaFotografie(id, d) }
+
+    /// La pornire: fișierele pe care nu le mai folosește niciun control de 30 de zile
+    @discardableResult
+    public func curataFotografii() -> Int {
+        flush()
+        coada.sync {}
+        return depozit.stergeFotografiiNefolosite(fotografiiFolosite(controls))
     }
 
     /// După ce fișierul a fost trimis / salvat: momentul backupului. Întoarce mesajul pentru utilizator.
@@ -164,6 +181,7 @@ public final class Magazin {
     /// Aplică importul: „Înlocuiește tot” sau „Combină”. Întoarce mesajul pentru utilizator.
     public func aplicaImport(_ p: ImportPregatit, inlocuieste: Bool) -> String {
         flush()
+        for (id, d) in p.fotografii { try? depozit.salveazaFotografie(id, d) }
         let rezultat = inlocuieste ? p.controls : combina(controls, p.controls)
         controls = rezultat
         scrieInFundal { try $0.inlocuiesteTot(rezultat) }

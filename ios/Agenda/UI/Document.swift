@@ -12,12 +12,12 @@ enum StiluriFisa {
     }()
 
     /// Pagina pentru afișarea în aplicație: foaia albă, cu marginea cardului (`.fisa-doc.card { padding: 1.6667rem }`)
-    static func pagina(_ markup: String, margine: CGFloat) -> String {
+    static func pagina(_ markup: String, margine: CGFloat, cssExtra: String = "") -> String {
         """
         <!doctype html><html lang="ro"><head><meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <style>html, body { margin: 0; padding: 0; background: #fff; -webkit-text-size-adjust: 100%; } \(css)
-        .fisa-doc { padding: \(margine)px; }</style></head>
+        .fisa-doc { padding: \(margine)px; } \(cssExtra)</style></head>
         <body><div class="fisa-doc">\(markup)</div></body></html>
         """
     }

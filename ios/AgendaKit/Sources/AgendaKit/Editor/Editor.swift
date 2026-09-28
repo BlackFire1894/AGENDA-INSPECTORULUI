@@ -220,6 +220,15 @@ public final class Editor {
     /// Pasul de istoric după o pauză în tastare (1 s), sau la cerere
     public func pauza(_ c: Control) { istoric.checkpoint(c) }
 
+    /// Modificare nativă a unui rând (ex. fotografiile): salvată imediat, cu pas în Anulează / Refă
+    public func modificaRand(_ key: String, _ c: inout Control, _ f: (inout Neregula) -> Void) -> RezultatPas {
+        var r = RezultatPas()
+        guard c.neregula(key) != nil else { return r }
+        c.modificaNeregula(key, f)
+        atinge(&c, acum: true, &r)
+        return r
+    }
+
     // ───────── câmpurile ─────────
 
     /// Evenimentul „input” pe un câmp `data-bind`

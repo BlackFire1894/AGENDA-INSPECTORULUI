@@ -411,6 +411,7 @@ struct DetaliuNeregula: View {
                 }
             }
             if let f = m.amendaBox { CasetaAmenda(m: f) }
+            SectiuneFotografii(key: key, fotografii: m.fotografii)
         }
         .padding(0.8889 * rem)
         .frame(maxWidth: .infinity, alignment: .leading)

@@ -11,6 +11,11 @@ struct EcranFisa: View {
     let id: String
     @State private var inaltime: CGFloat = 600
 
+    /// fotografiile constatărilor, ca imagini în document (adăugire nativă)
+    private func anexa(_ c: Control) -> String {
+        anexaFotografii(c, magazin.controls) { id in magazin.fotografie(id).map { "data:image/jpeg;base64," + $0.base64EncodedString() } }
+    }
+
     var body: some View {
         if let c = magazin.control(id) {
             ScrollView {
@@ -19,10 +24,10 @@ struct EcranFisa: View {
                                 inapoi: { nav.mergi(.control(id: c.id, tab: "obiectiv", focus: nil)) }) {
                         FlowLayout(spatiu: 0.6667 * rem) {
                             Buton(text: "Tipărește / PDF", iconita: "download", tip: .primar) {
-                                Tiparire.tipareste(html: fisaDocument(c, magazin.controls, css: StiluriFisa.css), titlu: "Fișa controlului – \(c.denumire)")
+                                Tiparire.tipareste(html: fisaDocument(c, magazin.controls, css: StiluriFisa.css, anexa: anexa(c)), titlu: "Fișa controlului – \(c.denumire)")
                             }
                             Buton(text: "Partajează fișierul", iconita: "upload") {
-                                Partajare.fisier(nume: fisaFileName(c), text: fisaDocument(c, magazin.controls, css: StiluriFisa.css)) { r in
+                                Partajare.fisier(nume: fisaFileName(c), text: fisaDocument(c, magazin.controls, css: StiluriFisa.css, anexa: anexa(c))) { r in
                                     if r == .esuat { ui.toast("Partajarea a eșuat", avertizare: true) }
                                 }
                             }
@@ -31,7 +36,7 @@ struct EcranFisa: View {
                     textBogat("Pentru PDF: **Tipărește / PDF** → în fereastra de tipărire, butonul Partajare → **Salvează în Fișiere**. Dacă tipărirea nu pornește, folosiți **Partajează fișierul**.")
                         .font(.system(size: rem)).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
                         .padding(.top, -0.4444 * rem).padding(.bottom, rem)
-                    VedereDocument(html: StiluriFisa.pagina(fisaMarkup(c, magazin.controls), margine: 1.6667 * rem), inaltime: $inaltime)
+                    VedereDocument(html: StiluriFisa.pagina(fisaMarkup(c, magazin.controls) + anexa(c), margine: 1.6667 * rem, cssExtra: CSS_FOTOGRAFII), inaltime: $inaltime)
                         .frame(height: inaltime)
                         .clipShape(RoundedRectangle(cornerRadius: 1.1111 * rem, style: .continuous))
                         .umbra()

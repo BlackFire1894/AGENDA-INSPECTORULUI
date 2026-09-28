@@ -18,12 +18,17 @@ public struct FisierBackup: Sendable {
     public let text: String
 }
 
-/// `{ app, schema, exportedAt, controls, activitati }`, scris ca `JSON.stringify(payload, null, 1)`
-public func exportBackup(_ controls: [Control], _ activitati: [Activitate], acum: Date = Ceas.acum()) -> FisierBackup {
-    let payload = JSObiect([
+/// `{ app, schema, exportedAt, controls, activitati }`, scris ca `JSON.stringify(payload, null, 1)`.
+/// Adăugire nativă: `fotografii` = { id: JPEG în base64 }, doar dacă există (aplicația web ignoră cheia).
+public func exportBackup(_ controls: [Control], _ activitati: [Activitate], fotografii: [String: Data] = [:],
+                         acum: Date = Ceas.acum()) -> FisierBackup {
+    var payload = JSObiect([
         ("app", .string(APP_BACKUP)), ("schema", .number(Double(SCHEMA_VERSION))), ("exportedAt", .string(isoMs(acum))),
         ("controls", .array(controls.map(\.json))), ("activitati", .array(activitati.map(\.json))),
     ])
+    if !fotografii.isEmpty {
+        payload["fotografii"] = .object(JSObiect(fotografii.keys.sorted().map { ($0, .string(fotografii[$0]!.base64EncodedString())) }))
+    }
     let p = Ceas.calendar.dateComponents([.hour, .minute], from: acum)
     let nume = "agenda-inspectorului-backup-\(todayISO(acum))_\(pad2(p.hour!))-\(pad2(p.minute!)).json"
     return FisierBackup(nume: nume, text: JSONValue.object(payload).text(indentare: 1))
@@ -50,6 +55,8 @@ public struct ImportPregatit: Sendable {
     public let activitati: [Activitate]?
     /// `data.exportedAt`, dacă există
     public let exportedAt: String?
+    /// fotografiile din backup (adăugire nativă): id → JPEG
+    public var fotografii: [String: Data] = [:]
 
     /// „joi, 15 octombrie 2026” (ziua exportului, în ora locală), sau nil
     public var dataExportului: String? {
@@ -85,7 +92,11 @@ public func pregatesteImport(_ date: Data) throws -> ImportPregatit {
         activitati = a.compactMap(\.obiect).filter { o in o["id"]?.truthy == true && isISO(o["data"]?.sir ?? "") }.map(normalizeActivitate)
     }
     let e = data.obiect?["exportedAt"]
-    return ImportPregatit(controls: controls, activitati: activitati, exportedAt: e?.truthy == true ? e!.textJS : nil)
+    var p = ImportPregatit(controls: controls, activitati: activitati, exportedAt: e?.truthy == true ? e!.textJS : nil)
+    for (id, v) in data.obiect?.obj("fotografii") ?? JSObiect() {
+        if idFotografieValid(id), let b = v.sir, let d = Data(base64Encoded: b) { p.fotografii[id] = d }
+    }
+    return p
 }
 
 /// „Combină”: adaugă cele noi; la cele existente păstrează versiunea modificată cel mai recent (`updatedAt`).

@@ -55,6 +55,14 @@ enum Tur {
             }
         }
         if let o = opec { await pas("fisa", asteapta: 3) { nav.mergi(.fisa(o.id)) } }
+        // fotografiile: două imagini de probă pe rândul „d”, arătate, apoi Fișa cu anexa (la final)
+        if let o = opec, doar?.contains("foto") == true {
+            await pas("foto-rand", inainte: { nav.mergi(.control(id: o.id, tab: "nereguli", focus: "d")) }) {
+                ses.adaugaFotografii("d", [imagineProba(.systemOrange, "1"), imagineProba(.systemTeal, "2")])
+                ses.comutaFotografii("d")
+            }
+            await pas("foto-fisa", asteapta: 3, maxPagini: 40) { nav.mergi(.fisa(o.id)) }
+        }
         await pas("ghid", asteapta: 3, maxPagini: 4) { nav.mergi(.ghid) }
         await pas("setari") { nav.mergi(.setari) }
 
@@ -98,7 +106,15 @@ enum Tur {
     }
 
     /// Un ecran: `inainte` (ex. ecranul de sub fereastră), apoi `f`; se așteaptă desenarea, apoi paginile
-    private static func pas(_ nume: String, asteapta: Double = 1.5, fereastra: Bool = false, maxPagini: Int = 40,
+    private static func imagineProba(_ culoare: UIColor, _ text: String) -> Data {
+        let img = UIGraphicsImageRenderer(size: CGSize(width: 1200, height: 900)).image { ctx in
+            culoare.setFill(); ctx.fill(CGRect(x: 0, y: 0, width: 1200, height: 900))
+            (text as NSString).draw(at: CGPoint(x: 520, y: 300), withAttributes: [.font: UIFont.boldSystemFont(ofSize: 260), .foregroundColor: UIColor.white])
+        }
+        return ProcesareFoto.jpeg(img) ?? Data()
+    }
+
+    private static func pas(_ nume: String, asteapta: Double = 1.5, fereastra: Bool = false, maxPagini: Int = 40, doarEcran: Bool = false,
                             inainte: (() -> Void)? = nil, _ f: () -> Void) async {
         if let doar, !doar.contains(nume) { return }
         nr += 1
@@ -111,6 +127,7 @@ enum Tur {
         // pagina: derularea cea mai mare; fereastra: derularea apărută odată cu ea (dacă are ce derula)
         let sv = fereastra ? toate.last { !vechi.contains(ObjectIdentifier($0)) }
             : toate.max { $0.bounds.width * $0.bounds.height < $1.bounds.width * $1.bounds.height }
+        if doarEcran { salveaza(w, String(format: "%02d-%@-p0", nr, nume)); return }
         await pagini(String(format: "%02d-%@", nr, nume), w, sv, maxPagini)
     }
 

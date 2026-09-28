@@ -41,6 +41,7 @@ struct AgendaApp: App {
         #endif
         let m = Magazin(depozit: .implicit())
         m.incarca()
+        m.curataFotografii()   // fișierele nefolosite de 30 de zile
         _magazin = State(initialValue: m)
         // widgeturi, notificări, iconiță: după fiecare schimbare de date
         Sincronizare.shared.magazin = m

@@ -183,13 +183,14 @@ private func adaposturiFisa(_ c: Control) -> String {
 }
 
 /// Documentul întreg (partajare / tipărire), cu stilurile Fișei
-public func fisaDocument(_ c: Control, _ controls: [Control], css: String) -> String {
+/// `anexa`: fotografiile constatărilor (`anexaFotografii`, adăugire nativă), după fișa din web
+public func fisaDocument(_ c: Control, _ controls: [Control], css: String, anexa: String = "") -> String {
     """
     <!doctype html><html lang="ro"><head><meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Fișa controlului – \(escHTML(c.denumire))</title>
-    <style>@page { size: A4; margin: 14mm; } body { margin: 0; padding: 16px; } \(css)</style></head>
-    <body><div class="fisa-doc">\(fisaMarkup(c, controls))</div></body></html>
+    <style>@page { size: A4; margin: 14mm; } body { margin: 0; padding: 16px; } \(css)\(anexa.isEmpty ? "" : "\n" + CSS_FOTOGRAFII)</style></head>
+    <body><div class="fisa-doc">\(fisaMarkup(c, controls))\(anexa)</div></body></html>
     """
 }
 

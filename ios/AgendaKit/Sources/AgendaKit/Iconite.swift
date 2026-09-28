@@ -28,6 +28,7 @@ public let ICONS: [String: String] = [
     "pv": #"<path d="M6 3h8l4 4v14H6z"/><path d="M14 3v4h4"/><path d="m9 14 2 2 4-4"/>"#,
     "flame": #"<path d="M12 2.5c.8 3.6 5.5 5.6 5.5 11a5.5 5.5 0 0 1-11 0c0-2.8 1.6-4 2.1-6 .9 1.1 1.7 1.6 2.7 1.6-.1-2.6-.4-4.4.7-6.6z"/>"#,
     "layers": #"<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>"#,
+    "camera": #"<path d="M3.5 8.5h3.2l1.8-2.8h7l1.8 2.8h3.2v11h-17z"/><circle cx="12" cy="13.5" r="3.5"/>"#,   // nativ: fotografiile constatărilor
     "shield": #"<path d="M12 3 4.5 6v5.5c0 4.6 3.1 8.3 7.5 9.5 4.4-1.2 7.5-4.9 7.5-9.5V6z"/><path d="m9 12 2 2 4-4"/>"#,
     "info": #"<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>"#,
     "list": #"<path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>"#,

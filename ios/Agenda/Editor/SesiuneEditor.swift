@@ -18,6 +18,8 @@ final class SesiuneEditor {
     private(set) var sus = 0
     /// câmpul care primește focus
     var focusCerut: String?
+    /// rândurile cu fotografiile arătate (implicit ascunse)
+    private(set) var fotoDeschise: Set<String> = []
 
     @ObservationIgnored weak var magazin: Magazin?
     @ObservationIgnored weak var ui: Interfata?
@@ -97,6 +99,31 @@ final class SesiuneEditor {
         pas({ $0.click(act, d, &$1, catEcran: categorii) }, reluare: { [weak self] raspuns in
             self?.pas { $0.click(act, d, &$1, raspuns: raspuns, catEcran: categorii) }
         })
+    }
+
+    // ───────── fotografiile constatărilor (adăugire nativă) ─────────
+
+    func comutaFotografii(_ key: String) {
+        if fotoDeschise.contains(key) { fotoDeschise.remove(key) } else { fotoDeschise.insert(key) }
+    }
+
+    /// Scrie fișierele, apoi le adaugă rândului (un singur pas de Anulează)
+    func adaugaFotografii(_ key: String, _ imagini: [Data]) {
+        guard let magazin, !imagini.isEmpty else { return }
+        var noi: [Fotografie] = []
+        for d in imagini {
+            let id = idFotografie()
+            do { try magazin.adaugaFotografie(id, d); noi.append(Fotografie(id: id, data: isoMs())) } catch {}
+        }
+        guard !noi.isEmpty else { ui?.toast("Fotografia nu a putut fi salvată", avertizare: true); return }
+        pas { ed, c in ed.modificaRand(key, &c) { $0.fotografii += noi } }
+        let n = magazin.control(editor.controlId)?.neregula(key)?.fotografii.count ?? noi.count
+        ui?.toast(noi.count == 1 ? "Fotografie adăugată (\(n) la această constatare)" : "\(noi.count) fotografii adăugate (\(n) la această constatare)")
+    }
+
+    func stergeFotografie(_ key: String, _ id: String) {
+        pas { ed, c in ed.modificaRand(key, &c) { $0.fotografii.removeAll { $0.id == id } } }
+        ui?.toast("Fotografia a fost ștearsă")
     }
 
     /// Textul tastat într-un câmp

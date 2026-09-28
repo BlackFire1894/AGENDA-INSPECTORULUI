@@ -102,4 +102,49 @@ public final class Depozit: @unchecked Sendable {
     public func salveazaMeta(_ m: Meta) throws {
         try scrie(m.json, fisierMeta)
     }
+
+    // ───────── fotografiile constatărilor (JPEG, câte un fișier) ─────────
+
+    private var folderFotografii: URL { folder.appendingPathComponent("fotografii", isDirectory: true) }
+    private func fisierFotografie(_ id: String) -> URL { folderFotografii.appendingPathComponent("\(id).jpg") }
+
+    public func fotografie(_ id: String) -> Data? {
+        guard idFotografieValid(id) else { return nil }
+        return try? Data(contentsOf: fisierFotografie(id))
+    }
+
+    public func salveazaFotografie(_ id: String, _ d: Data) throws {
+        guard idFotografieValid(id) else { return }
+        try fm.createDirectory(at: folderFotografii, withIntermediateDirectories: true)
+        try d.write(to: fisierFotografie(id), options: .atomic)
+    }
+
+    /// Identificatorii fotografiilor salvate
+    public func fotografiiSalvate() -> [String] {
+        ((try? fm.contentsOfDirectory(at: folderFotografii, includingPropertiesForKeys: nil)) ?? [])
+            .filter { $0.pathExtension == "jpg" }.map { $0.deletingPathExtension().lastPathComponent }
+    }
+
+    /// Șterge fișierele fotografiilor pe care niciun control nu le mai folosește de cel puțin `zile` zile (numărate
+    /// de când au rămas nefolosite, în `fotografii/nefolosite.json`): o eroare de citire sau un „Înlocuiește tot”
+    /// nu pierd fotografiile pe loc. Întoarce câte au fost șterse.
+    @discardableResult
+    public func stergeFotografiiNefolosite(_ folosite: Set<String>, zile: Int = 30, azi: String = todayISO()) -> Int {
+        let evidenta = folderFotografii.appendingPathComponent("nefolosite.json")
+        var deLa: [String: String] = [:]
+        if let d = try? Data(contentsOf: evidenta), let o = try? JSONValue.citeste(d).obiect {
+            for (k, v) in o { if let z = v.sir { deLa[k] = z } }
+        }
+        var n = 0
+        var noua: [String: String] = [:]
+        for id in fotografiiSalvate() where !folosite.contains(id) {
+            let din = deLa[id] ?? azi
+            if diffDays(din, azi) >= zile, (try? fm.removeItem(at: fisierFotografie(id))) != nil { n += 1 } else { noua[id] = din }
+        }
+        if noua.isEmpty { try? fm.removeItem(at: evidenta) } else {
+            try? fm.createDirectory(at: folderFotografii, withIntermediateDirectories: true)
+            try? scrie(.object(JSObiect(noua.keys.sorted().map { ($0, .string(noua[$0]!)) })), evidenta)
+        }
+        return n
+    }
 }
