@@ -131,20 +131,37 @@ public func rezumatZi(_ z: CifreZi) -> (titlu: String, text: String)? {
     return (titlu, p.joined(separator: " · "))
 }
 
-/// Avertizarea de expirare a instalării (cont Apple gratuit: 7 zile): la 09:00, cu 2 zile înainte de ziua expirării
-/// (sau cu o zi înainte, dacă a trecut); nil dacă nu mai e timp. `dispozitiv`: „iPad-ul” / „telefonul”.
+/// Ora 09:00 a unei zile ISO, în fusul aplicației
+private func la9(_ d: String) -> Date? {
+    Ceas.calendar.date(from: DateComponents(year: Int(d.prefix(4)), month: Int(d.dropFirst(5).prefix(2)), day: Int(d.suffix(2)), hour: 9))
+}
+
+/// Weekendul de reinstalare (cererea utilizatorului, 29.09.2026: reinstalarea doar sâmbăta sau duminica, nu în timpul
+/// săptămânii): ultima sâmbătă de dinaintea expirării (la ora 9, încă valabilă) și duminica de după ea, dacă e tot
+/// înainte de expirare. Zilele ISO, în ordine.
+public func weekendReinstalare(_ expira: Date) -> [String] {
+    let zi = todayISO(expira)
+    let valabil = { (d: String) in la9(d).map { $0 < expira } ?? false }
+    guard let sam = (0...7).map({ addDays(zi, -$0) }).first(where: { ziSaptamana($0) == 6 && valabil($0) }) else { return [] }
+    return [sam, addDays(sam, 1)].filter(valabil)
+}
+
+/// Avertizarea de expirare a instalării, la 09:00: sâmbăta weekendului de reinstalare (duminică, dacă sâmbăta a trecut);
+/// dacă a trecut și weekendul, în ziua dinaintea expirării, ca aplicația să nu se oprească fără veste.
 public func notificareExpirare(_ expira: Date, acum: Date, dispozitiv: String) -> NotificarePlanificata? {
     let zi = todayISO(expira)
     let ora = Ceas.calendar.dateComponents([.hour, .minute], from: expira)
-    let cand = [addDays(zi, -2), addDays(zi, -1)].first { d in
-        guard let t = Ceas.calendar.date(from: DateComponents(year: Int(d.prefix(4)), month: Int(d.dropFirst(5).prefix(2)), day: Int(d.suffix(2)), hour: 9)) else { return false }
-        return t > acum && t < expira
-    }
-    guard let cand else { return nil }
+    let weekend = weekendReinstalare(expira)
+    let candidati = weekend + [addDays(zi, -1)].filter { d in weekend.last.map { d > $0 } ?? true }
+    guard let cand = candidati.first(where: { d in la9(d).map { $0 > acum && $0 < expira } ?? false }) else { return nil }
+    let oraText = String(format: "%02d:%02d", ora.hour ?? 0, ora.minute ?? 0)
+    let inWeekend = weekend.contains(cand)
     return NotificarePlanificata(
         id: "agenda-expirare-\(zi)", data: cand, ora: "09:00",
-        titlu: "Aplicația expiră pe \(fmtDateLong(zi))",
-        text: String(format: "Instalarea de pe Mac e valabilă până la ora %02d:%02d. Conectați %@ la Mac și faceți dublu-clic pe „Reinstalează Agenda” (pe Birou). Datele rămân.", ora.hour ?? 0, ora.minute ?? 0, dispozitiv),
+        titlu: inWeekend ? "Reinstalați aplicația în acest weekend" : "Aplicația expiră pe \(fmtDateLong(zi))",
+        text: inWeekend
+            ? "Instalarea de pe Mac e valabilă până \(fmtDateLong(zi)), ora \(oraText). Conectați \(dispozitiv) la Mac și faceți dublu-clic pe „Reinstalează Agenda” (pe Birou). Datele rămân."
+            : "Instalarea de pe Mac e valabilă până la ora \(oraText). Conectați \(dispozitiv) la Mac și faceți dublu-clic pe „Reinstalează Agenda” (pe Birou). Datele rămân.",
         categorie: .expirare, insigna: nil, activitate: nil)
 }
 
