@@ -1004,18 +1004,19 @@ func textConstrNU(_ c: Control, _ t: RandSablon) -> String? {
 }
 
 /// Data ultimei verificări, pe fiecare construcție relevantă (la verificarea CT: pe fiecare centrală); expirarea se
-/// calculează față de data controlului. De la al doilea rând: „Aceeași dată ca la …” copiază data primului rând.
+/// calculează față de data controlului. De la al doilea rând: „Aceeași dată ca la …” copiază data rândului de referință
+/// (CT 2… → CT 1 al construcției lor; restul → primul rând).
 func modelVerificare(_ c: Control, _ n: Neregula) -> ModelVerificare {
     let t = sablon(n.key)
     let exp = verifExpirate(c, n)
     let list = verifUnitati(c, n)
-    let prima = list.first.map { verifStare(c, n, $0) }
-    let randuri = list.enumerated().map { i, u -> ModelVerificare.Rand in
+    let randuri = list.map { u -> ModelVerificare.Rand in
         let s = verifStare(c, n, u)
         let text = s.stare == "lipsa" ? "fără dată" : s.stare == "expirata" ? "expirată — era valabilă până la \(fmtDate(s.expira ?? ""))" : "valabilă până la \(fmtDate(s.expira ?? ""))"
         var ca: ModelVerificare.CaPrima?
-        if i > 0, let prima, !prima.data.isEmpty {
-            ca = .init(activ: s.data == prima.data && s.luni == prima.luni, text: "Aceeași dată ca la \(list[0].denumire)")
+        if let ref = verifReferinta(list, u) {
+            let prima = verifStare(c, n, ref)
+            if !prima.data.isEmpty { ca = .init(activ: s.data == prima.data && s.luni == prima.luni, text: "Aceeași dată ca la \(ref.denumire)") }
         }
         return .init(id: u.id, nume: u.denumire, data: s.data, expirata: s.stare == "expirata",
                      alegeri: t?.verifAlegeri, luni: s.luni, stare: s.stare, text: text, caPrima: ca)

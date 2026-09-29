@@ -6,7 +6,7 @@ import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
   fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat, pvText, sectiuniActive, secOf,
   todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality, constructiiOf, schimbare, grfVPesteParter, constructiiEligibile, verifExpirate, ascunsaDeDotari, neregulaLetter, neregulaLabel, AUTO_NU, syncAutoNU,
-  adaposturi, emptyAdapost, acteOf, syncAutoActe, gpsEgal, parseCoord, verifUnitati, verifStare, CENTRALA_TIPURI,
+  adaposturi, emptyAdapost, acteOf, syncAutoActe, gpsEgal, parseCoord, verifUnitati, verifStare, verifReferinta, CENTRALA_TIPURI,
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
@@ -521,12 +521,14 @@ document.addEventListener('click', async (e) => {
       break;
     }
     case 'verif-ca-prima': {
-      // aceeași dată (și periodicitate) ca la primul rând de verificare; din nou = se golește
+      // aceeași dată (și periodicitate) ca la rândul de referință (CT 2… → CT 1 al construcției lor; restul → primul rând);
+      // din nou = se golește
       const n = c.nereguli.find((x) => x.key === el.dataset.key);
       const list = n ? verifUnitati(c, n) : [];
       const u = list.find((x) => x.id === el.dataset.id);
-      if (!u || !list[0]) return;
-      const p = verifStare(c, n, list[0]);
+      const ref = u && verifReferinta(list, u);
+      if (!ref) return;
+      const p = verifStare(c, n, ref);
       const s = verifStare(c, n, u);
       // periodicitatea se copiază doar unde se alege (b2: 12 / 24 de luni)
       n.verificari[u.id] = s.data === p.data && s.luni === p.luni ? { ...(n.verificari[u.id] || {}), data: '' }
