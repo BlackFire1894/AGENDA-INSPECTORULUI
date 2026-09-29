@@ -74,7 +74,21 @@ Criterii de acceptare: ios/teste.sh 100% (vectori, verificarea încrucișată pe
 La final: commit + PR; raport scurt.
 ```
 
-### v1.25.1 — „Aceeași dată ca la …” pe construcție (28.09.2026)
+### v1.25.1 — corecturi telefon (dotări) și GPS (poziția aproximativă) (28.09.2026)
+
+```
+Actualizare la versiunea web v1.25.1. Rulează `git pull` pe main.
+Ce s-a schimbat (css/telefon.css, js/app.js, js/help.js; testele tests/e2e/telefon.cjs, tests/e2e/gps2.cjs):
+- Telefon, tabul Obiectiv, Dotări: denumirea și butoanele (DA / NU / NEC; la centrala termică − / + și NU ARE) stau pe același rând doar dacă încap; altfel butoanele coboară sub denumire. Niciun buton nu acoperă textul și nu iese din rând (verificat la 428, 390, 375 pt). Rândurile CT 1, CT 2… și Obs. rămân mereu dedesubt.
+- GPS, ordinea cererilor: 1) precis (20 s, fără poziție din cache); 2) dacă precisul dă „fără poziție” sau „timp depășit” → aproximativ (15 s, poziție de cel mult 2 minute), salvat cu precizia lui (> 100 m = „precizie slabă”, mesaj „… Afară, apăsați „Actualizează”.”); 3) dacă nici aproximativul nu vine → fereastra cu variantele din v1.25.0 („Nu s-a găsit semnal la timp” / „Poziția nu a putut fi aflată”, cu „Introdu coordonatele”). Refuzul permisiunii (la oricare cerere) → fereastra „Activați localizarea”.
+- Fereastra „Activați localizarea”: motivul („… nu dă aplicației permisiunea de localizare (localizarea poate fi oprită)”), denumirile „Configurări → Confidențialitate și securitate → Servicii de localizare”, „Site-uri Safari”, „Configurări → Aplicații → Safari → Localizare” (în web). Pasul „reinstalați iconița după Backup rapid” apare doar în aplicația web de pe ecranul principal — în nativ NU se aplică.
+- Ghidul, capitolul Obiectiv, paragraful „Coordonatele GPS”.
+Date comune regenerate: docs/nativ/date/catalog.json, ghid.json (versiuneAplicatieWeb = 1.25.1 și paragraful GPS din ghid).
+Vectori regenerați: niciunul schimbat.
+Ce ai de făcut în Swift: 1) Dotări (TabObiectiv / ComponenteEditor): pe lățimi compacte, denumirea + controalele într-un ViewThatFits (HStack, altfel VStack cu controalele sub denumire), fără trunchiere; 2) GPS (Ferestre / SesiuneEditor): CLLocationManager — întâi kCLLocationAccuracyBest cu 20 s; la eroare locationUnknown sau timp depășit, a doua încercare cu kCLLocationAccuracyReduced / kCLLocationAccuracyKilometer, 15 s, acceptând o poziție de cel mult 2 minute; apoi fereastra cu variantele (coordonatele de mână). La .denied / .restricted: fereastra „Activați localizarea” cu buton care deschide Configurările aplicației (UIApplication.openSettingsURLString), fără pașii despre Safari; 3) textul ghidului din ghid.json; 4) testele.
+Criterii de acceptare: ios/teste.sh 100%; pe iPhone (portret, text Mare), la Centrală termică, Hidranți interiori / exteriori, nimic nu se suprapune; în interior, fără semnal GPS, se salvează poziția aproximativă cu „precizie slabă”; cu localizarea refuzată apare fereastra de activare; versiunea din Setări = 1.25.1.
+La final: versiunea nativă = v1.25.1; commit + PR; raport scurt pentru mine.
+### v1.25.2 — „Aceeași dată ca la …” pe construcție; „Achitat / Executat silit” (29.09.2026)
 Aplicată deja în aplicația nativă, în același PR. Promptul rămâne pentru istoric:
 
 ```

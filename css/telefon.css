@@ -83,8 +83,17 @@ h1 { font-size: 1.5556rem; }
 .tools-row { gap: 0.4444rem; }
 .tools-row .searchbar { min-width: 0; }
 .form-grid, .form-grid.g3 { grid-template-columns: minmax(0, 1fr); }
-.dot-row { grid-template-columns: minmax(0, 1fr) auto; }
-.dot-row .obs-add, .dot-row .obs-wrap { grid-column: 1 / -1; justify-self: start; }
+/* Dotările: denumirea și butoanele DA / NU / NEC pe același rând când încap; altfel butoanele coboară pe rândul
+   următor (nimic peste text, nimic tăiat). Observațiile și rândurile CT 1, CT 2… ale centralei: mereu dedesubt. */
+.dot-row { display: flex; flex-wrap: wrap; align-items: center; column-gap: 0.6667rem; row-gap: 0.4444rem; }
+.dot-row .dot-label { order: 0; flex: 1 1 0; min-width: min-content; }   /* se strânge până la cel mai lung cuvânt */
+.dot-row .segmented { order: 1; flex: none; margin-left: auto; }
+.dot-ct .ct-head { order: 1; flex: 0 1 auto; min-width: 0; margin-left: auto; }   /* − / + și NU ARE: NU ARE coboară dacă nu încap */
+.dot-row .segmented button { padding: 0 0.6667rem; }
+.dot-ct .ct-row { order: 1; flex: 1 1 100%; }
+.dot-row::after { content: ""; order: 2; flex-basis: 100%; height: 0; }   /* rândul se rupe aici: Obs. mereu dedesubt */
+.dot-row .obs-add { order: 3; flex: none; margin-top: -0.4444rem; }
+.dot-row .obs-wrap, .dot-row .dot-nr { order: 3; flex: 1 1 100%; margin-top: -0.4444rem; }
 
 /* ───────── calendar: buline în celule, detaliile la ziua atinsă ───────── */
 .cal-card { padding: 0.4444rem; }
@@ -137,6 +146,5 @@ h1 { font-size: 1.5556rem; }
 .fisa-doc .f-kv, .fisa-doc .f-kv tbody { display: block; overflow: visible; }
 .fisa-doc .f-kv tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
 
-/* v1.25 – centralele termice și alegerea lor la constatare */
-.dot-ct .ct-row { grid-column: 1 / -1; }
+/* v1.25 – alegerea centralei la constatare */
 .ct-pick { padding-left: 0; }
