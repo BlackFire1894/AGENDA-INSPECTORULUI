@@ -33,7 +33,7 @@ export function currentFont() {
 }
 
 // aceleași denumiri ca pastilele din Panou (fineStatus)
-const LEVEL_LABEL = { blue: 'În curs', yellow: 'Termen 15 zile expirat', red: 'Trimite la ANAF / Taxe și impozite', green: 'Achitată' };
+const LEVEL_LABEL = { blue: 'În curs', yellow: 'Termen 15 zile expirat', red: 'Trimite la ANAF / Taxe și impozite', green: 'Achitată / executată silit' };
 
 export function money(v) {
   const n = parseSuma(v);
@@ -60,7 +60,7 @@ const FILTRE = [
   { key: 'am-blue', label: 'Amendă în curs', ic: 'fine', lv: 'blue', test: (c, st) => st.fines.some((f) => f.st.level === 'blue') },
   { key: 'am-yellow', label: 'Termen 15 zile expirat', ic: 'fine', lv: 'yellow', test: (c, st) => st.fines.some((f) => f.st.level === 'yellow') },
   { key: 'am-red', label: 'Trimite la ANAF / Taxe și impozite', ic: 'fine', lv: 'red', test: (c, st) => st.fines.some((f) => f.st.level === 'red') },
-  { key: 'am-green', label: 'Amendă achitată', ic: 'fine', lv: 'green', test: (c, st) => st.fines.some((f) => f.st.level === 'green') },
+  { key: 'am-green', label: 'Amendă achitată / executată silit', ic: 'fine', lv: 'green', test: (c, st) => st.fines.some((f) => f.st.level === 'green') },
   { key: 'asi', label: 'ASI în curs', ic: 'hourglass', lv: 'red', test: (c, st) => !!st.asi && !st.asi.resolved && !st.asi.pending },
   { key: 'inc', label: 'De încărcat', ic: 'upload', lv: 'warn', test: (c, st) => !!st.incarcare && !st.incarcare.gata },
   { key: 'pv', label: 'Netrecute în PV', ic: 'pv', lv: 'warn', test: (c, st) => st.netrecute > 0 },
@@ -104,7 +104,7 @@ export function controlRow(c, { showName = true } = {}) {
   const byLevel = {};
   st.fines.forEach((f) => { byLevel[f.st.level] = (byLevel[f.st.level] || 0) + 1; });
   for (const lv of ['red', 'yellow', 'blue', 'green']) {
-    if (byLevel[lv]) chips.push(finePill(lv, `${byLevel[lv]} ${byLevel[lv] === 1 ? 'amendă' : 'amenzi'} · ${lv === 'green' && byLevel[lv] > 1 ? 'Achitate' : LEVEL_LABEL[lv]}`));
+    if (byLevel[lv]) chips.push(finePill(lv, `${byLevel[lv]} ${byLevel[lv] === 1 ? 'amendă' : 'amenzi'} · ${lv === 'green' && byLevel[lv] > 1 ? 'Achitate / executate silit' : LEVEL_LABEL[lv]}`));
   }
   if (st.asi && !st.asi.resolved) {
     const z = st.asi.daysLeft;
@@ -209,7 +209,7 @@ export function viewDashboard() {
         ['yellow', cnt.yellow, 'cu termen de plată expirat'],
         ['blue', cnt.blue, 'în curs'],
       ].filter(([, n]) => n).map(([l, n, t]) => `<span><i class="dot dot-${l}"></i><b>${n}</b> ${t}</span>`).join('')}</span>
-      <span class="kpi-foot">${cnt.green ? `+ ${cnt.green} ${cnt.green === 1 ? 'achitată' : 'achitate'} (nu intră în total)` : active.length ? '' : 'nicio amendă activă'}</span>
+      <span class="kpi-foot">${cnt.green ? `+ ${cnt.green} ${cnt.green === 1 ? 'achitată / executată silit' : 'achitate / executate silit'} (nu intră în total)` : active.length ? '' : 'nicio amendă activă'}</span>
     </button>
     <button class="kpi kpi-open" data-act="scroll" data-target="sec-open">
       <span class="kpi-top"><span class="kpi-ic">${icon('clock')}</span><span class="kpi-num">${open.length}</span></span>
@@ -253,10 +253,10 @@ export function viewDashboard() {
       <span><i class="dot dot-blue"></i>în curs (≤ 15 zile)</span>
       <span><i class="dot dot-yellow"></i>termen de 15 zile expirat</span>
       <span><i class="dot dot-red"></i>+25 zile: trimite la ANAF / Taxe și impozite</span>
-      <span><i class="dot dot-green"></i>achitată cu dovadă</span>
+      <span><i class="dot dot-green"></i>achitată / executată silit</span>
     </div>
     ${active.length ? `<div class="items">${active.map(fineItem).join('')}</div>` : '<p class="muted pad">Nicio amendă activă.</p>'}
-    ${paid.length ? `<details class="paid"><summary>Achitate (${paid.length})</summary><div class="items">${paid.map(fineItem).join('')}</div></details>` : ''}
+    ${paid.length ? `<details class="paid"><summary>Achitate / executate silit (${paid.length})</summary><div class="items">${paid.map(fineItem).join('')}</div></details>` : ''}
   </section>`;
 
   const secAsi = `<section class="card dash-sec k-asi" id="sec-asi">
@@ -454,7 +454,7 @@ export function objListHTML() {
           ${asi ? pill('red', asi === 1 ? 'ASI în curs' : `ASI în curs la ${asi} controale`, 'hourglass') : ''}
           ${netrec ? pill('warn', `${netrec} ${netrec === 1 ? 'netrecută' : 'netrecute'} în PV`, 'pv') : ''}
           ${['red', 'yellow', 'blue'].map((lv) => { const k = peNivel(lv); return k ? finePill(lv, `${k} ${k === 1 ? 'amendă' : 'amenzi'} · ${LEVEL_LABEL[lv]}`) : ''; }).join('')}
-          ${achitate ? finePill('green', `${achitate} ${achitate === 1 ? 'amendă achitată' : 'amenzi achitate'}`) : ''}
+          ${achitate ? finePill('green', `${achitate} ${achitate === 1 ? 'amendă achitată / executată silit' : 'amenzi achitate / executate silit'}`) : ''}
         </span>
       </span>
       ${icon('chevR', 'row-chev')}
@@ -757,7 +757,7 @@ export function viewSettings(persisted) {
         <span class="rule-row"><i class="dot dot-blue"></i> zilele 1–15: în curs</span>
         <span class="rule-row"><i class="dot dot-yellow"></i> zilele 16–39: termenul de 15 zile expirat</span>
         <span class="rule-row"><i class="dot dot-red"></i> din ziua 40: „Mai aveți 5 zile până să o trimiteți la ANAF / Taxe și impozite” (termen: ziua 45)</span>
-        <span class="rule-row"><i class="dot dot-green"></i> achitată, cu dovadă primită</span></li>
+        <span class="rule-row"><i class="dot dot-green"></i> achitată / executată silit</span></li>
       <li><b>ASI:</b> 90 de zile de la data încheierii controlului; dacă documentația nu a fost prezentată, încă 5 zile calendaristice pentru constatarea pierderii valabilității.</li>
       <li><b>Încărcarea</b> în aplicația ISU și a documentului: 3 zile lucrătoare de la data încheierii.</li>
       <li>Termenele care cad într-o zi nelucrătoare (weekend sau sărbătoare legală) <b>nu se mută automat</b>; aplicația vă avertizează și vă recomandă următoarea zi lucrătoare; verificați prelungirea.</li>

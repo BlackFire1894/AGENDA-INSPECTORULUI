@@ -1104,8 +1104,8 @@ func modelDetaliu(_ c: Control, _ n: Neregula, _ path: String, _ vi: InfoVeche, 
             dataImplicita: a.data.isEmpty ? "Implicit: data încheierii\(fd.isEmpty ? " — necompletată" : " (\(fmtDate(fd)))")" : nil,
             folosesteIncheierea: !a.data.isEmpty,
             suma: ModelCamp(eticheta: "Sumă", cale: "\(path).amenda.suma", valoare: a.suma, indiciu: "0", unitate: "lei", tip: .zecimal),
-            achitata: comutator("\(path).amenda.achitata", a.achitata, "Achitată – dovadă primită", nivel: "green"),
-            dataAchitare: a.achitata ? ModelCamp(eticheta: "Data dovezii de plată", cale: "\(path).amenda.dataAchitare", valoare: a.dataAchitare, indiciu: "", tip: .data) : nil,
+            achitata: comutator("\(path).amenda.achitata", a.achitata, "Achitat / Executat silit", nivel: "green"),
+            dataAchitare: a.achitata ? ModelCamp(eticheta: "Data achitării / executării", cale: "\(path).amenda.dataAchitare", valoare: a.dataAchitare, indiciu: "", tip: .data) : nil,
             plata: plata, anaf: anaf,
             nelucr: !a.achitata ? fs.nelucr.flatMap { $0.isEmpty ? nil : $0 } : nil)
     }

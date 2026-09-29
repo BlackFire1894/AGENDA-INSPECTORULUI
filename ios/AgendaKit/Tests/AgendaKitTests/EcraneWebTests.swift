@@ -92,7 +92,7 @@ final class EcraneWebTests: TestVectori {
             if s.sectiune == .amenzi { parti += LEGENDA_AMENZI.map(\.1) }
             if s.elemente.isEmpty { parti.append(s.gol) }
             parti += s.elemente.flatMap(element)
-            if !s.achitate.isEmpty { parti.append("Achitate (\(s.achitate.count))"); parti += s.achitate.flatMap(element) }
+            if !s.achitate.isEmpty { parti.append("Achitate / executate silit (\(s.achitate.count))"); parti += s.achitate.flatMap(element) }
         }
         return sir(parti)
     }

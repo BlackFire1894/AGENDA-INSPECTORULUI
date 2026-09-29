@@ -719,14 +719,14 @@ export function nelucrNota(ce, iso, motiv) {
 const maiSunt = (n) => (n === 1 ? 'Mai este 1 zi' : `Mai sunt ${zile(n)}`);
 
 // Stadiul amenzii:
-//   green  = achitată, dovadă primită
+//   green  = achitată / executată silit (v1.25.2: „Închisă · data”)
 //   blue   = în curs (în termenul de 15 zile)
 //   yellow = termenul de 15 zile a expirat
 //   red    = au trecut 25 de zile după cele 15 inițiale → mai sunt ≤ 5 zile până la ANAF / Taxe și impozite
 export function fineStatus(control, n, today = todayISO()) {
   const a = n.amenda || {};
   if (a.achitata) {
-    return { level: 'green', label: 'Achitată', msg: a.dataAchitare ? `Dovadă primită · ${fmtDate(a.dataAchitare)}` : 'Dovadă de plată primită' };
+    return { level: 'green', label: 'Achitată / executată silit', msg: a.dataAchitare ? `Închisă · ${fmtDate(a.dataAchitare)}` : 'Închisă' };
   }
   const d = fineDate(control, n);
   if (!d) {

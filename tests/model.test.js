@@ -62,6 +62,11 @@ test('amenda: roșu după 25 de zile peste cele 15 → „Mai aveți 5 zile”',
 test('amenda: verde când e achitată, indiferent de termen', () => {
   const { c, n } = withFine('2026-09-01', { achitata: true });
   assert.equal(fineStatus(c, n, '2026-12-01').level, 'green');
+  // v1.25.2: „Achitat / Executat silit”
+  assert.equal(fineStatus(c, n, '2026-12-01').label, 'Achitată / executată silit');
+  assert.equal(fineStatus(c, n, '2026-12-01').msg, 'Închisă');
+  n.amenda.dataAchitare = '2026-10-12';
+  assert.equal(fineStatus(c, n, '2026-12-01').msg, 'Închisă · 12.10.2026');
 });
 
 test('amenda: data proprie a amenzii are prioritate față de data încheierii', () => {

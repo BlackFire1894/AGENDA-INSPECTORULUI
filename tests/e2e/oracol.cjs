@@ -28,7 +28,7 @@ const dotariC = (c, k) => Object.entries(k.dotari).filter(([key]) => (key !== 'a
   && !(key === 'ilumHint' && catOf(c) >= 12 && ['NU', 'NEC'].includes(k.dotari.hidInt?.v)));
 function amenda(c, n) {
   const a = n.amenda;
-  if (a.achitata) return { lv: 'green', msg: a.dataAchitare ? `Dovadă primită · ${fmt(a.dataAchitare)}` : 'Dovadă de plată primită' };
+  if (a.achitata) return { lv: 'green', msg: a.dataAchitare ? `Închisă · ${fmt(a.dataAchitare)}` : 'Închisă' };
   const ref = isISO(a.data) ? a.data : inchis(c) ? c.dataIncheiere : '';
   if (!ref) return { lv: 'blue', msg: 'Termenele pornesc de la data încheierii controlului', pending: true };
   const e = days(ref, T); const plata = plus(ref, 15); const anaf = plus(ref, 45);
@@ -38,7 +38,7 @@ function amenda(c, n) {
   const l = 45 - e;
   return { lv: 'red', left: l, plata, anaf, msg: l > 0 ? `Mai aveți ${zile(l)} până să o trimiteți la ANAF / Taxe și impozite; consultați calculatorul de termene` : l === 0 ? 'Astăzi este ultima zi pentru trimiterea la ANAF / Taxe și impozite; consultați calculatorul de termene' : `Termenul de trimitere la ANAF / Taxe și impozite (${fmt(anaf)}) a fost depășit cu ${zile(-l)}` };
 }
-const LABEL = { blue: 'În curs', yellow: 'Termen 15 zile expirat', red: 'Trimite la ANAF / Taxe și impozite', green: 'Achitată' };
+const LABEL = { blue: 'În curs', yellow: 'Termen 15 zile expirat', red: 'Trimite la ANAF / Taxe și impozite', green: 'Achitată / executată silit' };
 let fines = [];
 function asi(c) {
   const n = c.nereguli.find((x) => x.key === 'a' && !x.custom);
@@ -99,7 +99,7 @@ const cnt = (lv) => fines.filter((f) => f.s.lv === lv).length;
   const expLeg = [[cnt('red'), 'de trimis la ANAF / Taxe și impozite'], [cnt('yellow'), 'cu termen de plată expirat'], [cnt('blue'), 'în curs']].filter(([n]) => n).map(([n, t]) => `${n} ${t}`);
   eq(leg.join(' | '), expLeg.join(' | '), 'Panou: legenda amenzilor');
   ok(leg.reduce((s, x) => s + parseInt(x, 10), 0) === active.length, 'Panou: legenda însumează totalul');
-  eq((await p.locator('.kpi-fines .kpi-foot').innerText()).trim(), cnt('green') ? `+ ${cnt('green')} ${cnt('green') === 1 ? 'achitată' : 'achitate'} (nu intră în total)` : '', 'Panou: achitate');
+  eq((await p.locator('.kpi-fines .kpi-foot').innerText()).trim(), cnt('green') ? `+ ${cnt('green')} ${cnt('green') === 1 ? 'achitată / executată silit' : 'achitate / executate silit'} (nu intră în total)` : '', 'Panou: achitate');
   const oldest = C.filter((c) => !inchis(c)).map((c) => c.dataInceput).sort()[0];
   eq((await p.locator('.kpi-open .kpi-foot').innerText()).trim(), `cel mai vechi: ${fmt(oldest)}`, 'Panou: cel mai vechi control');
   const near = asiAct.map((x) => x.a.left).sort((a, b) => a - b)[0];
@@ -114,7 +114,7 @@ const cnt = (lv) => fines.filter((f) => f.s.lv === lv).length;
     const s = shown[i] || {};
     eq(`${s.t} | ${s.st} | ${s.msg}`, `${f.c.denumire} | ${LABEL[f.s.lv]} | ${f.s.msg}`, `Panou: amenda #${i + 1} (${f.c.denumire}, ${f.n.key})`);
   });
-  eq(await p.locator('#sec-fines details.paid summary').innerText().catch(() => ''), cnt('green') ? `Achitate (${cnt('green')})` : '', 'Panou: achitate (listă)');
+  eq(await p.locator('#sec-fines details.paid summary').innerText().catch(() => ''), cnt('green') ? `Achitate / executate silit (${cnt('green')})` : '', 'Panou: achitate (listă)');
   // ── Panou: ASI
   const asiItems = await p.locator('#sec-asi .item').evaluateAll((els) => els.map((e) => ({ t: e.querySelector('.item-title').innerText, side: e.querySelector('.item-side').innerText.replace(/\s+/g, ' ').trim() })));
   const cd = (d, lucr) => { const n = Math.abs(d); const u = `${n === 1 ? 'zi' : 'zile'}${lucr && d > 0 ? ' lucrătoare' : ''}`; return `${n} ${d < 0 ? `${u} peste termen` : d === 0 ? 'ultima zi: azi' : `${u} rămase`}`; };
@@ -143,7 +143,7 @@ const cnt = (lv) => fines.filter((f) => f.s.lv === lv).length;
     if (nk.length) exp.push(`${nk.length} ${nk.length === 1 ? 'neregulă' : 'nereguli'}`);
     if (nr) exp.push(`${nr} ${nr === 1 ? 'netrecută' : 'netrecute'} în PV`);
     const fl = {}; nk.filter((n) => n.amenda?.aplicata).forEach((n) => { const lv = amenda(c, n).lv; fl[lv] = (fl[lv] || 0) + 1; });
-    for (const lv of ['red', 'yellow', 'blue', 'green']) if (fl[lv]) exp.push(`${fl[lv]} ${fl[lv] === 1 ? 'amendă' : 'amenzi'} · ${lv === 'green' && fl[lv] > 1 ? 'Achitate' : LABEL[lv]}`);
+    for (const lv of ['red', 'yellow', 'blue', 'green']) if (fl[lv]) exp.push(`${fl[lv]} ${fl[lv] === 1 ? 'amendă' : 'amenzi'} · ${lv === 'green' && fl[lv] > 1 ? 'Achitate / executate silit' : LABEL[lv]}`);
     const a = asi(c);
     if (a && !a.resolved) {
       const cand = a.left > 0 ? (a.left === 1 ? 'mai este 1 zi' : `mai sunt ${zile(a.left)}`) : a.left === 0 ? (a.faza ? 'ultima zi azi' : 'expiră azi') : `depășit cu ${zile(-a.left)}`;

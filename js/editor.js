@@ -956,9 +956,9 @@ function neregulaDetail(c, n, path) {
         ${field('Sumă', `${path}.amenda.suma`, a.suma, { mode: 'decimal', unit: 'lei', ph: '0' })}
         <div class="field">
           <span class="lbl">Plată</span>
-          ${toggle(`${path}.amenda.achitata`, a.achitata, 'Achitată – dovadă primită', { level: 'green' })}
+          ${toggle(`${path}.amenda.achitata`, a.achitata, 'Achitat / Executat silit', { level: 'green' })}
         </div>
-        ${a.achitata ? `<label class="field"><span class="lbl">Data dovezii de plată</span><span class="inp-wrap"><input type="date" data-bind="${path}.amenda.dataAchitare" data-rerender="1" value="${esc(a.dataAchitare)}"></span></label>` : ''}
+        ${a.achitata ? `<label class="field"><span class="lbl">Data achitării / executării</span><span class="inp-wrap"><input type="date" data-bind="${path}.amenda.dataAchitare" data-rerender="1" value="${esc(a.dataAchitare)}"></span></label>` : ''}
       </div>
       ${fs.plataPana && !a.achitata ? `<div class="fine-timeline">
         <span class="${fs.level === 'blue' ? 'cur' : 'past'}"><i class="dot dot-blue"></i>Plată până la <b>${fmtDate(fs.plataPana)}</b>${fs.plataNelucr ? ` <em class="nelucr">(${esc(fs.plataNelucr)} → ${esc(fmtDate(nextWorkingDay(fs.plataPana)))})</em>` : ''}</span>

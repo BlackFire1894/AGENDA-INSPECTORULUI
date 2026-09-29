@@ -827,7 +827,7 @@ public final class Editor {
         atinge(&c, acum: true, &r)
         let m = rotunjesteJS(acc)
         r.mesaje.append(gpsQuality(acc) == "slaba"
-            ? MesajEditor("Coordonate preluate, dar precizie slabă (± \(m) m)", "warn")
+            ? MesajEditor("Coordonate preluate, dar precizie slabă (± \(m) m). Afară, apăsați „Actualizează”.", "warn")
             : MesajEditor("Coordonate preluate (± \(m) m)"))
         return r
     }

@@ -15,7 +15,7 @@ public func nelucrNota(_ ce: String, _ iso: String, _ motiv: String) -> String {
 }
 func maiSunt(_ n: Int) -> String { n == 1 ? "Mai este 1 zi" : "Mai sunt \(zile(n))" }
 
-/// Stadiul amenzii. level: "green" (achitată) | "blue" (în curs) | "yellow" (15 zile expirat) | "red" (trimite la ANAF)
+/// Stadiul amenzii. level: "green" (achitată / executată silit) | "blue" (în curs) | "yellow" (15 zile expirat) | "red" (trimite la ANAF)
 public struct StadiuAmenda: Equatable, Sendable {
     public var level: String
     public var label: String
@@ -48,7 +48,7 @@ public struct StadiuAmenda: Equatable, Sendable {
 public func fineStatus(_ c: Control, _ n: Neregula, _ today: String = todayISO()) -> StadiuAmenda {
     let a = n.amenda
     if a.achitata {
-        return StadiuAmenda(level: "green", label: "Achitată", msg: a.dataAchitare.isEmpty ? "Dovadă de plată primită" : "Dovadă primită · \(fmtDate(a.dataAchitare))")
+        return StadiuAmenda(level: "green", label: "Achitată / executată silit", msg: a.dataAchitare.isEmpty ? "Închisă" : "Închisă · \(fmtDate(a.dataAchitare))")
     }
     let d = fineDate(c, n)
     if d.isEmpty {

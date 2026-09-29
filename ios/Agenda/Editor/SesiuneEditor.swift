@@ -242,7 +242,9 @@ final class SesiuneEditor {
     }
 }
 
-/// Poziția, citită o singură dată, la cerere (cu limită de timp, ca aplicația să nu rămână blocată)
+/// Poziția, citită o singură dată, la cerere (cu limită de timp, ca aplicația să nu rămână blocată).
+/// v1.25.1: întâi precisă (GPS, 20 s, fără poziție veche); dacă nu vine, aproximativă (Wi-Fi, rețea mobilă, 15 s,
+/// o poziție de cel mult 2 minute), salvată cu precizia ei („precizie slabă”); abia apoi fereastra cu variantele.
 @MainActor
 final class Localizare: NSObject, CLLocationManagerDelegate {
     /// faraSemnal = timpul a expirat; faraPozitie = CoreLocation nu a putut afla poziția; fara = localizarea oprită / refuzată
@@ -251,32 +253,59 @@ final class Localizare: NSObject, CLLocationManagerDelegate {
     private let m = CLLocationManager()
     private var asteptare: CheckedContinuation<Rezultat, Never>?
     private var limita: Task<Void, Never>?
+    /// începutul încercării și vechimea acceptată a poziției (0 = doar poziții noi)
+    private var start = Date()
+    private var vechimeMax: TimeInterval = 0
 
     override init() {
         super.init()
         m.delegate = self
-        m.desiredAccuracy = kCLLocationAccuracyBest
     }
 
     func citeste() async -> Rezultat {
+        let r = await incearca(precizie: kCLLocationAccuracyBest, secunde: 20, vechime: 0)
+        switch r {
+        case .faraSemnal, .faraPozitie:
+            // GPS-ul precis nu a răspuns: poziția aproximativă, marcată „precizie slabă”
+            return await incearca(precizie: kCLLocationAccuracyKilometer, secunde: 15, vechime: 120)
+        default:
+            return r
+        }
+    }
+
+    private func incearca(precizie: CLLocationAccuracy, secunde: Double, vechime: TimeInterval) async -> Rezultat {
         if let a = asteptare { asteptare = nil; a.resume(returning: .faraSemnal) }
         return await withCheckedContinuation { cont in
             asteptare = cont
+            start = Date()
+            vechimeMax = vechime
+            m.desiredAccuracy = precizie
             limita = Task { [weak self] in
-                try? await Task.sleep(nanoseconds: 20_000_000_000)
+                try? await Task.sleep(nanoseconds: UInt64(secunde * 1_000_000_000))
                 guard !Task.isCancelled else { return }
                 self?.termina(.faraSemnal)
             }
             switch m.authorizationStatus {
             case .notDetermined: m.requestWhenInUseAuthorization()
             case .denied, .restricted: termina(.fara)
-            default: m.requestLocation()
+            default: porneste()
             }
         }
     }
 
+    /// Poziția aproximativă: una deja cunoscută, de cel mult 2 minute, se folosește imediat; altfel se cere
+    private func porneste() {
+        if vechimeMax > 0, let l = m.location, accepta(l) { termina(.pozitie(l.coordinate.latitude, l.coordinate.longitude, l.horizontalAccuracy)); return }
+        m.startUpdatingLocation()
+    }
+
+    private func accepta(_ l: CLLocation) -> Bool {
+        l.horizontalAccuracy >= 0 && l.timestamp >= start.addingTimeInterval(-max(1, vechimeMax))
+    }
+
     private func termina(_ r: Rezultat) {
         limita?.cancel()
+        m.stopUpdatingLocation()
         guard let a = asteptare else { return }
         asteptare = nil
         a.resume(returning: r)
@@ -288,25 +317,25 @@ final class Localizare: NSObject, CLLocationManagerDelegate {
             switch self.m.authorizationStatus {
             case .notDetermined: break
             case .denied, .restricted: self.termina(.fara)
-            default: self.m.requestLocation()
+            default: self.porneste()
             }
         }
     }
 
     nonisolated func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let l = locations.last else { return }
-        let (lat, lon, acc) = (l.coordinate.latitude, l.coordinate.longitude, l.horizontalAccuracy)
-        Task { @MainActor in self.termina(.pozitie(lat, lon, acc)) }
+        let l = locations
+        Task { @MainActor in
+            // o poziție veche (din memoria sistemului) nu contează: se așteaptă una nouă
+            guard self.asteptare != nil, let x = l.last(where: { self.accepta($0) }) else { return }
+            self.termina(.pozitie(x.coordinate.latitude, x.coordinate.longitude, x.horizontalAccuracy))
+        }
     }
 
     nonisolated func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
         let cod = (error as? CLError)?.code
         Task { @MainActor in
-            // fără semnal încă: se încearcă din nou (până la limită); refuzat / oprit: pașii de activare
-            if cod == .locationUnknown {
-                if self.asteptare != nil { self.m.requestLocation() }
-                return
-            }
+            // fără semnal încă: sistemul mai încearcă (până la limită); refuzat / oprit: pașii de activare
+            if cod == .locationUnknown { return }
             self.termina(cod == .denied ? .fara : .faraPozitie)
         }
     }

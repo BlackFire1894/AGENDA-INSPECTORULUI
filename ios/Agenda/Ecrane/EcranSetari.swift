@@ -166,7 +166,7 @@ struct ContinutSetari: View {
                     regula("**Amendă:** data aplicării (implicit data încheierii controlului).")
                     ForEach([(Color.blue, "zilele 1–15: în curs"), (Color.yellow, "zilele 16–39: termenul de 15 zile expirat"),
                              (Color.red, "din ziua 40: „Mai aveți 5 zile până să o trimiteți la ANAF / Taxe și impozite” (termen: ziua 45)"),
-                             (Color.green, "achitată, cu dovadă primită")], id: \.1) { c, t in
+                             (Color.green, "achitată / executată silit")], id: \.1) { c, t in
                         HStack(spacing: 0.5556 * rem) {
                             Circle().fill(c).frame(width: 0.6667 * rem, height: 0.6667 * rem)
                             Text(t).font(.system(size: rem)).foregroundStyle(Color.text).fixedSize(horizontal: false, vertical: true)

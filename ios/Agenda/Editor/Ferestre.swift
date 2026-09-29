@@ -155,10 +155,10 @@ struct FereastraLocalizare: View {
         VStack(alignment: .leading, spacing: 0) {
             TitluFereastra(iconita: "locate", text: "Activați localizarea")
             VStack(alignment: .leading, spacing: rem) {
-                Text("Coordonatele nu pot fi completate: localizarea e oprită sau aplicația nu are permisiune. Pe \(dsp("iPad", "telefon")):")
+                Text("Coordonatele nu pot fi completate: \(dsp("iPad-ul", "telefonul")) nu dă aplicației permisiunea de localizare (localizarea poate fi oprită). Pe \(dsp("iPad", "telefon")):")
                     .font(.system(size: 1.0556 * rem)).fixedSize(horizontal: false, vertical: true)
                 VStack(alignment: .leading, spacing: 0.5556 * rem) {
-                    pas(1, "**Setări → Confidențialitate și securitate → Localizare**: porniți **Localizare**.")
+                    pas(1, "**Configurări → Confidențialitate și securitate → Servicii de localizare**: porniți **Servicii de localizare**.")
                     pas(2, "În aceeași listă, **Agenda**: alegeți **Cât timp folosesc aplicația** și porniți **Localizare precisă**.")
                     pas(3, "Reveniți aici și apăsați **Încearcă din nou**.")
                 }
@@ -169,7 +169,7 @@ struct FereastraLocalizare: View {
             .padding(EdgeInsets(top: 0.5556 * rem, leading: 1.4444 * rem, bottom: 1.3333 * rem, trailing: 1.4444 * rem))
             SubsolFereastra {
                 Buton(text: "Renunță") { ui.inchide() }
-                Buton(text: "Setări") { if let u = URL(string: UIApplication.openSettingsURLString) { openURL(u) } }
+                Buton(text: "Configurări") { if let u = URL(string: UIApplication.openSettingsURLString) { openURL(u) } }
                 Buton(text: "Încearcă din nou", iconita: "locate", tip: .primar) { reincearca() }
             }
         }

@@ -444,10 +444,20 @@ struct DotareVedere: View {
                     CampObs(m: m.obs).frame(maxWidth: .infinity, alignment: .leading)
                 }
             } else {
-                HStack(alignment: .center, spacing: 0.6667 * rem) {
-                    eticheta.frame(maxWidth: .infinity, alignment: .leading)
-                    alegere
-                    if !m.obs.deschis { CampObs(m: m.obs) }
+                // pe lățimi înguste (telefon): butoanele coboară sub denumire când nu încap; nimic peste text
+                ViewThatFits(in: .horizontal) {
+                    HStack(alignment: .center, spacing: 0.6667 * rem) {
+                        eticheta.frame(maxWidth: .infinity, alignment: .leading)
+                        alegere
+                        if !m.obs.deschis { CampObs(m: m.obs) }
+                    }
+                    VStack(alignment: .leading, spacing: 0.4444 * rem) {
+                        eticheta.frame(maxWidth: .infinity, alignment: .leading)
+                        HStack(spacing: 0.6667 * rem) {
+                            alegere
+                            if !m.obs.deschis { CampObs(m: m.obs) }
+                        }
+                    }
                 }
                 if m.obs.deschis { CampObs(m: m.obs) }
             }
