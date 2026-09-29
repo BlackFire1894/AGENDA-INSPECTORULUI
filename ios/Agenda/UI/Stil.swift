@@ -21,8 +21,25 @@ extension EnvironmentValues {
     }
 }
 
-/// Măsoară dacă scena e mai mică decât ecranul (fereastră), pentru spațiul butoanelor ferestrei
+/// Aspectul de telefon (css/telefon.css: `(max-width: 599px), (max-height: 519px)`): pe iPhone și în ferestrele
+/// înguste de pe iPad. `telefonCulcat`: înălțime mică (telefonul culcat) — barele fixe, cât mai subțiri.
+private struct CheieTelefon: EnvironmentKey { static let defaultValue = false }
+private struct CheieCulcat: EnvironmentKey { static let defaultValue = false }
+extension EnvironmentValues {
+    var telefon: Bool {
+        get { self[CheieTelefon.self] }
+        set { self[CheieTelefon.self] = newValue }
+    }
+    var telefonCulcat: Bool {
+        get { self[CheieCulcat.self] }
+        set { self[CheieCulcat.self] = newValue }
+    }
+}
+
+/// Măsoară dacă scena e mai mică decât ecranul (fereastră), pentru spațiul butoanelor ferestrei, și dacă e de
+/// mărimea unui telefon (aspectul compact, cu textul 17 / 16 / 15 pt, ca în web)
 struct DetecteazaFereastra: ViewModifier {
+    @Environment(Preferinte.self) private var pref
     func body(content: Content) -> some View {
         GeometryReader { g in
             let ecran = (UIApplication.shared.connectedScenes.compactMap { $0 as? UIWindowScene }.first?.screen.bounds.size) ?? g.size
@@ -30,7 +47,12 @@ struct DetecteazaFereastra: ViewModifier {
                                height: g.size.height + g.safeAreaInsets.top + g.safeAreaInsets.bottom)
             let inFereastra = UIDevice.current.userInterfaceIdiom == .pad
                 && (total.width < ecran.width - 1 || total.height < ecran.height - 1)
-            content.environment(\.inFereastra, inFereastra)
+            let telefon = total.width < 600 || total.height < 520
+            content
+                .environment(\.inFereastra, inFereastra)
+                .environment(\.telefon, telefon)
+                .environment(\.telefonCulcat, total.height < 520)
+                .environment(\.rem, pref.rem(telefon: telefon))
         }
     }
 }
@@ -64,13 +86,14 @@ extension View {
 // ───────── .card ─────────
 struct Card<Continut: View>: View {
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     var pericol = false
     @ViewBuilder var continut: Continut
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) { continut }
             .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(1.2222 * rem)
+            .padding((telefon ? 0.8889 : 1.2222) * rem)
             .background(Color.surface, in: RoundedRectangle(cornerRadius: 1.1111 * rem, style: .continuous))
             .overlay {
                 if pericol { RoundedRectangle(cornerRadius: 1.1111 * rem, style: .continuous).strokeBorder(Color.redSoft, lineWidth: 2) }
@@ -131,25 +154,41 @@ struct RandStare: View {
 // ───────── .page-head ─────────
 struct AntetPagina<Dreapta: View>: View {
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     let iconita: String
     let supratitlu: String
     let titlu: String
     @ViewBuilder var dreapta: Dreapta
 
     var body: some View {
-        HStack(alignment: .bottom, spacing: 0.8889 * rem) {
-            VStack(alignment: .leading, spacing: 0.3333 * rem) {
-                HStack(spacing: 0.4444 * rem) {
-                    Iconita(nume: iconita, marime: 1.1111 * rem)
-                    Text(supratitlu).font(.system(size: 0.8889 * rem, weight: .semibold))
-                }
-                .foregroundStyle(Color.muted)
-                Text(titlu).font(.system(size: 1.8889 * rem, weight: .heavy)).tracking(-0.015 * 1.8889 * rem).foregroundStyle(Color.text)
+        if telefon {
+            // telefon (`.page-head > .row-gap { width: 100% }`, `h1` 1,5556rem): butoanele pe rândul de dedesubt
+            VStack(alignment: .leading, spacing: 0.6667 * rem) {
+                titluri
+                dreapta
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-            dreapta
+            .padding(.bottom, 0.8889 * rem)
+        } else {
+            HStack(alignment: .bottom, spacing: 0.8889 * rem) {
+                titluri
+                dreapta
+            }
+            .padding(.bottom, 1.2222 * rem)
         }
-        .padding(.bottom, 1.2222 * rem)
+    }
+
+    private var titluri: some View {
+        let h1 = (telefon ? 1.5556 : 1.8889) * rem
+        return VStack(alignment: .leading, spacing: 0.3333 * rem) {
+            HStack(spacing: 0.4444 * rem) {
+                Iconita(nume: iconita, marime: 1.1111 * rem)
+                Text(supratitlu).font(.system(size: 0.8889 * rem, weight: .semibold))
+            }
+            .foregroundStyle(Color.muted)
+            Text(titlu).font(.system(size: h1, weight: .heavy)).tracking(-0.015 * h1).foregroundStyle(Color.text)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 }
 
@@ -206,7 +245,9 @@ struct Buton: View {
         Button(action: actiune) {
             HStack(spacing: 0.5556 * rem) {
                 if let iconita { Iconita(nume: iconita, marime: 1.3333 * rem) }
-                Text(text)
+                // fără loc, textul se rupe doar între cuvinte (`min-width: min-content`), centrat
+                Text(text).multilineTextAlignment(.center).faraRupere()
+                    .frame(minWidth: latimeCuvant(text, marime: (mare ? 1 : 0.9444) * rem, greutate: .bold))
             }
         }
         .buttonStyle(StilButon(tip: tip, mare: mare))
@@ -273,6 +314,85 @@ struct FlowLayout: Layout {
         }
         aseaza()
     }
+}
+
+/// `.dot-row` pe telefon: denumirea și comenzile (DA / NU / NEC, − / +) pe același rând când încap — denumirea se strânge
+/// până la cel mai lung cuvânt al ei (`min-width: min-content`) —, altfel comenzile coboară pe rândul următor, la dreapta
+/// (`margin-left: auto`). Nimic peste text, nimic tăiat.
+struct EtichetaSiComenzi: Layout {
+    /// lățimea sub care denumirea nu se mai strânge (cel mai lung cuvânt)
+    var minEticheta: CGFloat
+    var spatiu: CGFloat
+    var spatiuRand: CGFloat
+
+    private func alaturi(_ latime: CGFloat, _ c: CGSize) -> Bool { latime - c.width - spatiu >= minEticheta }
+
+    private func asezare(_ latime: CGFloat, _ s: Subviews) -> (e: CGRect, c: CGRect, marime: CGSize) {
+        let c = s[1].sizeThatFits(.unspecified)
+        guard latime.isFinite else {
+            let e = s[0].sizeThatFits(.unspecified)
+            let h = max(e.height, c.height)
+            return (CGRect(x: 0, y: (h - e.height) / 2, width: e.width, height: e.height),
+                    CGRect(x: e.width + spatiu, y: (h - c.height) / 2, width: c.width, height: c.height),
+                    CGSize(width: e.width + spatiu + c.width, height: h))
+        }
+        if alaturi(latime, c) {
+            let we = latime - c.width - spatiu
+            let e = s[0].sizeThatFits(ProposedViewSize(width: we, height: nil))
+            let h = max(e.height, c.height)
+            return (CGRect(x: 0, y: (h - e.height) / 2, width: we, height: e.height),
+                    CGRect(x: latime - c.width, y: (h - c.height) / 2, width: c.width, height: c.height),
+                    CGSize(width: latime, height: h))
+        }
+        let e = s[0].sizeThatFits(ProposedViewSize(width: latime, height: nil))
+        let wc = min(c.width, latime)
+        let c2 = wc < c.width ? s[1].sizeThatFits(ProposedViewSize(width: wc, height: nil)) : c
+        return (CGRect(x: 0, y: 0, width: latime, height: e.height),
+                CGRect(x: latime - min(c2.width, latime), y: e.height + spatiuRand, width: min(c2.width, latime), height: c2.height),
+                CGSize(width: latime, height: e.height + spatiuRand + c2.height))
+    }
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        guard subviews.count == 2 else { return .zero }
+        return asezare(proposal.width ?? .infinity, subviews).marime
+    }
+
+    func placeSubviews(in b: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        guard subviews.count == 2 else { return }
+        let a = asezare(b.width, subviews)
+        for (s, r) in zip(subviews, [a.e, a.c]) {
+            s.place(at: CGPoint(x: b.minX + r.minX, y: b.minY + r.minY), proposal: ProposedViewSize(width: r.width, height: r.height))
+        }
+    }
+}
+
+/// Un text pus exact la lățimea lui ideală se poate rupe din rotunjirea la pixeli (pe iPhone, 3×: „Adaug / ă”).
+/// Când lățimea primită e cel mult cu 1 pt mai mică decât cea ideală, textul se așază la mărimea lui naturală;
+/// altfel (loc cu adevărat insuficient) se rupe pe rânduri, ca în web.
+struct FaraRupere: Layout {
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        guard let s = subviews.first else { return .zero }
+        let i = s.sizeThatFits(.unspecified)
+        guard let w = proposal.width, w < i.width - 1 else { return i }
+        return s.sizeThatFits(ProposedViewSize(width: w, height: nil))
+    }
+
+    func placeSubviews(in b: CGRect, proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) {
+        guard let s = subviews.first else { return }
+        let i = s.sizeThatFits(.unspecified)
+        s.place(at: b.origin, proposal: b.width >= i.width - 1 ? .unspecified : ProposedViewSize(width: b.width, height: nil))
+    }
+}
+
+extension View {
+    func faraRupere() -> some View { FaraRupere { self } }
+}
+
+/// lățimea celui mai lung cuvânt din text (pentru `EtichetaSiComenzi.minEticheta`)
+func latimeCuvant(_ text: String, marime: CGFloat, greutate: UIFont.Weight) -> CGFloat {
+    let f = UIFont.systemFont(ofSize: marime, weight: greutate)
+    let w = text.split(whereSeparator: \.isWhitespace).map { (String($0) as NSString).size(withAttributes: [.font: f]).width }.max() ?? 0
+    return ceil(w) + 1
 }
 
 /// `.page-head` (`display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end`) cu două

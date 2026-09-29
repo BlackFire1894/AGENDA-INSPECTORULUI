@@ -11,6 +11,15 @@ enum StiluriFisa {
         return s
     }()
 
+    /// Telefon (css/telefon.css, „Setări, fișă, raport”): tabelele late se derulează orizontal, rezumatul pe două coloane,
+    /// caracteristicile construcției pe două coloane în loc de un tabel lat
+    static let telefon = """
+    .fisa-doc .f-sum { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .fisa-doc table { display: block; overflow-x: auto; }
+    .fisa-doc .f-kv, .fisa-doc .f-kv tbody { display: block; overflow: visible; }
+    .fisa-doc .f-kv tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    """
+
     /// Pagina pentru afișarea în aplicație: foaia albă, cu marginea cardului (`.fisa-doc.card { padding: 1.6667rem }`)
     static func pagina(_ markup: String, margine: CGFloat, cssExtra: String = "") -> String {
         """

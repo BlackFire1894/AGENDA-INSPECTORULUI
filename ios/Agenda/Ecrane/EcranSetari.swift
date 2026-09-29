@@ -22,6 +22,7 @@ struct ContinutSetari: View {
     @Environment(Interfata.self) private var ui
     @Environment(Preferinte.self) private var pref
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     @State private var alegeFisier = false
     @State private var anDeschis: Set<Int> = []
 
@@ -57,7 +58,7 @@ struct ContinutSetari: View {
         Card {
             TitluSectiune(iconita: "settings", text: "Mărimea textului")
             Paragraf(text: "Se aplică imediat în toată aplicația: text, butoane, spațieri și iconițe se ajustează împreună.")
-            Grid(horizontalSpacing: 0.6667 * rem) {
+            Grid(horizontalSpacing: (telefon ? 0.4444 : 0.6667) * rem) {
                 GridRow {
                     ForEach(MARIMI_TEXT, id: \.key) { f in
                         OptiuneMare(ales: pref.marimeText == f.key, eticheta: f.label, indiciu: f.hint) {
@@ -74,7 +75,7 @@ struct ContinutSetari: View {
         Card {
             TitluSectiune(iconita: "moon", text: "Tema")
             Paragraf(text: "**Automat** urmează \(dsp("iPad-ul", "telefonul")) (Setări → Afișaj și luminozitate): luminoasă ziua, întunecată seara, dacă așa e setat. Sau alegeți una fixă.")
-            Grid(horizontalSpacing: 0.6667 * rem) {
+            Grid(horizontalSpacing: (telefon ? 0.4444 : 0.6667) * rem) {
                 GridRow {
                     ForEach(temeAplicatie(), id: \.key) { t in
                         OptiuneMare(ales: pref.tema == t.key, eticheta: t.label, indiciu: t.hint) {
@@ -292,6 +293,7 @@ struct FereastraImport: View {
 /// `.font-opt`: o variantă mare (mărimea textului, tema)
 struct OptiuneMare<Mostra: View>: View {
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     let ales: Bool
     let eticheta: String
     let indiciu: String
@@ -303,11 +305,12 @@ struct OptiuneMare<Mostra: View>: View {
             VStack(spacing: 0.2222 * rem) {
                 mostra
                 Text(eticheta).font(.system(size: rem, weight: .bold))
-                Text(indiciu).font(.system(size: 0.8333 * rem, weight: .semibold)).foregroundStyle(ales ? Color.accentInk : Color.muted)
+                // telefon (`.font-opt small`): indiciul mai mic
+                Text(indiciu).font(.system(size: (telefon ? 0.7222 : 0.8333) * rem, weight: .semibold)).foregroundStyle(ales ? Color.accentInk : Color.muted)
                     .multilineTextAlignment(.center)
             }
             .foregroundStyle(ales ? Color.accentInk : Color.text)
-            .padding(0.4444 * rem)
+            .padding(.vertical, (telefon ? 0.5556 : 0.4444) * rem).padding(.horizontal, (telefon ? 0.3333 : 0.4444) * rem)
             .frame(maxWidth: .infinity, minHeight: max(88, 6 * rem))
             .background(ales ? Color.accentSoft : Color.surface2, in: RoundedRectangle(cornerRadius: rem, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: rem, style: .continuous).strokeBorder(ales ? Color.accent : Color.line, lineWidth: 2.5))

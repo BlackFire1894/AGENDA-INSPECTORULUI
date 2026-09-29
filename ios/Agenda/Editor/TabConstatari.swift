@@ -222,15 +222,31 @@ struct RandUnelte: View {
 struct BaraFiltru: View {
     @Environment(SesiuneEditor.self) private var ses
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     let filtru: [ModelFiltru]
     let rest: String?
     let sec: String
 
     var body: some View {
-        FlexWrap(spatiu: 0.6667 * rem, intre: true) {
-            Segment(m: ModelSegment(cale: "", optiuni: filtru.map { ($0.key, $0.text) }, ales: filtru.first(where: \.activ)?.key ?? ""), stil: .filtru) {
-                ses.click("ner-filter", ["val": $0])
-            }
+        // telefon (`.toolbar .segmented`): filtrele pe tot rândul, „Restul conform” dedesubt
+        if telefon {
+            VStack(alignment: .leading, spacing: 0.6667 * rem) { segment; restConform }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 0.8889 * rem)
+        } else {
+            FlexWrap(spatiu: 0.6667 * rem, intre: true) { segment; restConform }
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.bottom, 0.8889 * rem)
+        }
+    }
+
+    private var segment: some View {
+        Segment(m: ModelSegment(cale: "", optiuni: filtru.map { ($0.key, $0.text) }, ales: filtru.first(where: \.activ)?.key ?? ""), stil: .filtru) {
+            ses.click("ner-filter", ["val": $0])
+        }
+    }
+
+    @ViewBuilder private var restConform: some View {
             if let r = rest {
                 Button { ses.click("rest-ok", ["sec": sec]) } label: {
                     HStack(spacing: 0.5556 * rem) {
@@ -244,9 +260,6 @@ struct BaraFiltru: View {
                 }
                 .buttonStyle(ApasareRand())
             }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(.bottom, 0.8889 * rem)
     }
 }
 

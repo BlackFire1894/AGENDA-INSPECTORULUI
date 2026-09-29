@@ -121,10 +121,12 @@ struct TabObiectiv: View {
 /// `.form-grid`: 2 coloane (g3: 3 pe orizontal, 2 pe vertical); `.field.wide` ocupă tot rândul
 struct GrilaCampuri<Continut: View>: View {
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     let coloane: Int
     @ViewBuilder var continut: Continut
     var body: some View {
-        AsezareFormular(coloane: coloane, spatiuColoane: rem, spatiuRanduri: 0.8889 * rem) { continut }
+        // telefon: o singură coloană (`.form-grid { grid-template-columns: 1fr }`)
+        AsezareFormular(coloane: telefon ? 1 : coloane, spatiuColoane: rem, spatiuRanduri: 0.8889 * rem) { continut }
     }
 }
 
@@ -213,6 +215,7 @@ struct ConstructieVedere: View {
     @Environment(SesiuneEditor.self) private var ses
     @Environment(\.rem) private var rem
     @Environment(\.cuBaraLaterala) private var lat
+    @Environment(\.telefon) private var telefon
     let c: Control
     let m: ModelConstructie
 
@@ -260,36 +263,62 @@ struct ConstructieVedere: View {
 
     @State private var gravLaIntrare = false
 
-    /// Antetul: numărul, denumirea și, sub ea, pastilele și sumarul; butoanele (▲▼, restrângerea) rămân în dreapta
-    private var antet: some View {
-        HStack(alignment: .center, spacing: 0.6667 * rem) {
-            Text("\(m.nr)").font(.system(size: 1.0556 * rem, weight: .heavy)).foregroundStyle(.white)
-                .frame(width: 2.3333 * rem, height: 2.3333 * rem)
-                .background(Color.ink2, in: RoundedRectangle(cornerRadius: 0.7222 * rem, style: .continuous))
-            FlexWrap(spatiu: 0.6667 * rem, spatiuRanduri: 0.2222 * rem) {
-                NumeConstructie(m: m.denumire).flexCreste(min: 11.1111 * rem)
-                if let l = m.lipsa { VederePastila(p: PastilaUI("red", l, "alert")) }
-                if m.grfV { VederePastila(p: PastilaUI("red", "GRF/NSI V peste parter", "alert")) }
-                Text(m.sumar).font(.system(size: 0.8333 * rem, weight: .semibold)).foregroundStyle(Color.muted)
-                    .padding(.leading, 0.6667 * rem)
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            HStack(spacing: 0) {
-                // ▲▼: ordinea construcțiilor (la mai multe)
-                if let o = m.ordine {
-                    ButonIconita(iconita: "up", eticheta: "Mută mai sus") { ses.click("constr-up", ["id": m.id]) }
-                        .disabled(!o.sus).opacity(o.sus ? 1 : 0.35)
-                    ButonIconita(iconita: "up", eticheta: "Mută mai jos", rotit: .degrees(180)) { ses.click("constr-down", ["id": m.id]) }
-                        .disabled(!o.jos).opacity(o.jos ? 1 : 0.35)
+    /// Antetul: numărul, denumirea și, sub ea, pastilele și sumarul; butoanele (▲▼, restrângerea) rămân în dreapta.
+    /// Pe telefon (`.constr-head` se rupe pe rânduri): denumirea pe tot rândul, pastilele, sumarul și butoanele dedesubt.
+    @ViewBuilder private var antet: some View {
+        Group {
+            if telefon {
+                VStack(alignment: .leading, spacing: 0.2222 * rem) {
+                    HStack(alignment: .center, spacing: 0.6667 * rem) { numar; NumeConstructie(m: m.denumire) }
+                    HStack(alignment: .center, spacing: 0.6667 * rem) {
+                        FlexWrap(spatiu: 0.6667 * rem, spatiuRanduri: 0.2222 * rem) { pastileSiSumar }
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                        butoaneAntet
+                    }
                 }
-                ButonIconita(iconita: "chevD", eticheta: m.deschisa ? "Restrânge" : "Extinde", rotit: .degrees(m.deschisa ? 180 : 0)) {
-                    ses.click("constr-toggle", ["id": m.id])
+            } else {
+                HStack(alignment: .center, spacing: 0.6667 * rem) {
+                    numar
+                    FlexWrap(spatiu: 0.6667 * rem, spatiuRanduri: 0.2222 * rem) {
+                        NumeConstructie(m: m.denumire).flexCreste(min: 11.1111 * rem)
+                        pastileSiSumar
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    butoaneAntet
                 }
             }
         }
         .padding(EdgeInsets(top: 0.5556 * rem, leading: 0.6667 * rem, bottom: 0.5556 * rem, trailing: 0.5556 * rem))
         .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.surface2)
+    }
+
+    private var numar: some View {
+        Text("\(m.nr)").font(.system(size: 1.0556 * rem, weight: .heavy)).foregroundStyle(.white)
+            .frame(width: 2.3333 * rem, height: 2.3333 * rem)
+            .background(Color.ink2, in: RoundedRectangle(cornerRadius: 0.7222 * rem, style: .continuous))
+    }
+
+    @ViewBuilder private var pastileSiSumar: some View {
+        if let l = m.lipsa { VederePastila(p: PastilaUI("red", l, "alert")) }
+        if m.grfV { VederePastila(p: PastilaUI("red", "GRF/NSI V peste parter", "alert")) }
+        Text(m.sumar).font(.system(size: 0.8333 * rem, weight: .semibold)).foregroundStyle(Color.muted)
+            .padding(.leading, 0.6667 * rem)
+    }
+
+    private var butoaneAntet: some View {
+        HStack(spacing: 0) {
+            // ▲▼: ordinea construcțiilor (la mai multe)
+            if let o = m.ordine {
+                ButonIconita(iconita: "up", eticheta: "Mută mai sus") { ses.click("constr-up", ["id": m.id]) }
+                    .disabled(!o.sus).opacity(o.sus ? 1 : 0.35)
+                ButonIconita(iconita: "up", eticheta: "Mută mai jos", rotit: .degrees(180)) { ses.click("constr-down", ["id": m.id]) }
+                    .disabled(!o.jos).opacity(o.jos ? 1 : 0.35)
+            }
+            ButonIconita(iconita: "chevD", eticheta: m.deschisa ? "Restrânge" : "Extinde", rotit: .degrees(m.deschisa ? 180 : 0)) {
+                ses.click("constr-toggle", ["id": m.id])
+            }
+        }
     }
 }
 
@@ -429,6 +458,7 @@ struct DotareVedere: View {
     @Environment(SesiuneEditor.self) private var ses
     @Environment(\.rem) private var rem
     @Environment(\.cuBaraLaterala) private var lat
+    @Environment(\.telefon) private var telefon
     let m: ModelDotare
     let par: Bool
     let prima: Bool
@@ -443,8 +473,12 @@ struct DotareVedere: View {
                     alegere.frame(minHeight: tinta(2.4444 * rem) + 6)
                     CampObs(m: m.obs).frame(maxWidth: .infinity, alignment: .leading)
                 }
+            } else if telefon {
+                // telefon (`.dot-row` flex-wrap): denumirea și DA / NU / NEC pe un rând când încap; „+ Obs.” mereu dedesubt
+                EtichetaSiComenzi(minEticheta: minEticheta, spatiu: 0.6667 * rem, spatiuRand: 0.4444 * rem) { eticheta; alegere }
+                CampObs(m: m.obs).padding(.top, -0.4444 * rem)
             } else {
-                // pe lățimi înguste (telefon): butoanele coboară sub denumire când nu încap; nimic peste text
+                // pe lățimi înguste: butoanele coboară sub denumire când nu încap; nimic peste text
                 ViewThatFits(in: .horizontal) {
                     HStack(alignment: .center, spacing: 0.6667 * rem) {
                         eticheta.frame(maxWidth: .infinity, alignment: .leading)
@@ -469,7 +503,7 @@ struct DotareVedere: View {
                         Spacer(minLength: 0)
                     }
                 } else {
-                    CampText(m: n)
+                    CampText(m: n).padding(.top, telefon ? -0.4444 * rem : 0)
                 }
             }
         }
@@ -478,6 +512,14 @@ struct DotareVedere: View {
         .background(m.grav ? Color.redSoft : par ? Color.surface2 : Color.surface)
         .overlay(alignment: .leading) { if m.grav { Rectangle().fill(Color.red).frame(width: 0.3333 * rem) } }
         .overlay(alignment: .top) { if !prima { Rectangle().fill(Color.line).frame(height: 1.5) } }
+    }
+
+    /// cel mai lung cuvânt al denumirii (sau „⚠ Neregulă gravă”): sub această lățime butoanele coboară
+    private var minEticheta: CGFloat {
+        let e = latimeCuvant(m.eticheta, marime: 0.9444 * rem, greutate: .bold)
+        guard m.grav else { return e }
+        let g = UIFont.systemFont(ofSize: 0.8889 * rem, weight: .heavy)
+        return max(e, 1.3889 * rem + ceil(("Neregulă gravă" as NSString).size(withAttributes: [.font: g]).width) + 1)
     }
 
     private var eticheta: some View {
@@ -510,6 +552,19 @@ struct DotareVedere: View {
                 CampObs(m: m.obs).frame(maxWidth: .infinity, alignment: .leading)
             }
             randuriCT.padding(.leading, 11.2222 * rem)
+        } else if telefon {
+            // telefon: denumirea și − / + / NU ARE pe un rând când încap; rândurile CT pe toată lățimea; „+ Obs.” la final
+            EtichetaSiComenzi(minEticheta: minEticheta, spatiu: 0.6667 * rem, spatiuRand: 0.4444 * rem) {
+                eticheta
+                FlowLayout(spatiu: 0.5556 * rem) {
+                    Pasi(numar: m.centrale.count, unitate: m.centrale.count == 1 ? "centrală" : "centrale", minim: 4.4444,
+                         gol: m.centrale.isEmpty, minusActiv: !m.centrale.isEmpty,
+                         minus: { ses.click("ct-count", ["path": m.cale, "val": "-1"]) }, plus: { ses.click("ct-count", ["path": m.cale, "val": "1"]) })
+                    Cip(text: "NU ARE", ales: m.nuAre, culoareAles: .ink2) { ses.click("centrala", ["path": m.cale, "val": "NU_ARE"]) }
+                }
+            }
+            randuriCT
+            CampObs(m: m.obs).padding(.top, -0.4444 * rem)
         } else {
             HStack(alignment: .center, spacing: 0.6667 * rem) {
                 eticheta.frame(maxWidth: .infinity, alignment: .leading)
@@ -640,16 +695,48 @@ struct CampTextLung: View {
 struct RandAdapost: View {
     @Environment(SesiuneEditor.self) private var ses
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     let m: ModelRandAdapost
 
     var body: some View {
-        HStack(alignment: .top, spacing: 0.7778 * rem) {
-            Group {
-                if let l = m.litera { Text(l).font(.system(size: 1.1111 * rem, weight: .heavy)) } else { Iconita(nume: "shield", marime: 1.3333 * rem) }
+        Group {
+            if telefon {
+                // telefon (`.check-row`): DA / NU / NEC coboară sub denumire, în coloana textului
+                HStack(alignment: .top, spacing: 0.5556 * rem) {
+                    index
+                    VStack(alignment: .leading, spacing: 0.5556 * rem) {
+                        continut
+                        segment
+                    }
+                }
+                .padding(0.5556 * rem)
+            } else {
+                HStack(alignment: .top, spacing: 0.7778 * rem) {
+                    index
+                    continut
+                    segment
+                }
+                .padding(0.7778 * rem)
             }
-            .foregroundStyle(Color.muted)
-            .frame(width: tinta(2.4444 * rem), height: tinta(2.4444 * rem))
-            .background(Color.surface2, in: RoundedRectangle(cornerRadius: 0.7222 * rem, style: .continuous))
+        }
+        .background(Color.surface, in: RoundedRectangle(cornerRadius: rem, style: .continuous))
+        .overlay(RoundedRectangle(cornerRadius: rem, style: .continuous).strokeBorder(Color.line, lineWidth: 2))
+    }
+
+    private var index: some View {
+        Group {
+            if let l = m.litera { Text(l).font(.system(size: 1.1111 * rem, weight: .heavy)) } else { Iconita(nume: "shield", marime: 1.3333 * rem) }
+        }
+        .foregroundStyle(Color.muted)
+        .frame(width: tinta(2.4444 * rem), height: tinta(2.4444 * rem))
+        .background(Color.surface2, in: RoundedRectangle(cornerRadius: 0.7222 * rem, style: .continuous))
+    }
+
+    private var segment: some View {
+        Segment(m: m.segment, stil: .adapost) { ses.click("set", ["path": "adapostPC.v", "val": $0, "toggle": "1"]) }
+    }
+
+    private var continut: some View {
             VStack(alignment: .leading, spacing: 0.5556 * rem) {
                 (Text("Adăposturi de protecție civilă") + Text("  NEC = nu este cazul").font(.system(size: 0.8333 * rem, weight: .semibold)).foregroundColor(Color.muted))
                     .font(.system(size: 1.0278 * rem, weight: .bold)).foregroundStyle(Color.text)
@@ -668,10 +755,5 @@ struct RandAdapost: View {
             }
             .padding(.top, 0.4444 * rem)
             .frame(maxWidth: .infinity, alignment: .leading)
-            Segment(m: m.segment, stil: .adapost) { ses.click("set", ["path": "adapostPC.v", "val": $0, "toggle": "1"]) }
-        }
-        .padding(0.7778 * rem)
-        .background(Color.surface, in: RoundedRectangle(cornerRadius: rem, style: .continuous))
-        .overlay(RoundedRectangle(cornerRadius: rem, style: .continuous).strokeBorder(Color.line, lineWidth: 2))
     }
 }

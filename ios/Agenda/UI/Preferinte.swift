@@ -27,8 +27,10 @@ final class Preferinte {
     }
 
     /// 1 rem: Mare 18 / Mediu 16,5 / Mic 15 pe tabletă; 17 / 16 / 15 pe telefon (css/telefon.css)
-    var rem: CGFloat {
-        let telefon = UIDevice.current.userInterfaceIdiom == .phone
+    var rem: CGFloat { rem(telefon: UIDevice.current.userInterfaceIdiom == .phone) }
+
+    /// la fel, după aspect: telefonul și ferestrele înguste de pe iPad (sub 600 pt lățime sau 520 pt înălțime)
+    func rem(telefon: Bool) -> CGFloat {
         switch marimeText {
         case "mic": return 15
         case "mediu": return telefon ? 16 : 16.5

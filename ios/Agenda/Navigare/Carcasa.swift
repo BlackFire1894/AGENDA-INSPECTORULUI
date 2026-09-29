@@ -215,6 +215,8 @@ struct BaraJos: View {
     @Environment(Magazin.self) private var magazin
     @Environment(Interfata.self) private var ui
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
+    @Environment(\.telefonCulcat) private var culcat
 
     var body: some View {
         let (urgente, neincheiate) = cifreMeniu(magazin.controls, azi: aziUI())
@@ -223,7 +225,7 @@ struct BaraJos: View {
             buton("building", "Obiective", "obiective") { nav.mergi(.obiective) }
             Button { ui.controlNou() } label: {
                 Iconita(nume: "plus", marime: 1.7778 * rem).foregroundStyle(.white)
-                    .frame(width: tinta(3.5556 * rem), height: tinta(3.5556 * rem))
+                    .frame(width: tinta((culcat ? 2.8889 : 3.5556) * rem), height: culcat ? 44 : tinta(3.5556 * rem))
                     .background(Color.accent, in: RoundedRectangle(cornerRadius: 1.2222 * rem, style: .continuous))
                     .shadow(color: Color.accent.opacity(0.45), radius: 10, y: 8)
             }
@@ -232,11 +234,12 @@ struct BaraJos: View {
             .frame(maxWidth: .infinity)
             buton("calendar", "Calendar", "calendar") { nav.mergi(.calendar) }
             buton("history", "Istoric", "istoric", bulina: neincheiate) { nav.mergi(.istoric) }
-            buton("settings", "Setări", "setari") { nav.mergi(.setari) }
+            // telefon: 5 butoane; Setări se deschide din Panou
+            if !telefon { buton("settings", "Setări", "setari") { nav.mergi(.setari) } }
         }
         .padding(.horizontal, 0.6667 * rem)
-        .padding(.top, 0.4444 * rem)
-        .padding(.bottom, 0.4444 * rem)
+        .padding(.top, (culcat ? 0.2222 : 0.4444) * rem)
+        .padding(.bottom, (culcat ? 0.2222 : 0.4444) * rem)
         .background(.regularMaterial)
         .background(Color.surface.opacity(0.88))
         .overlay(alignment: .top) { Rectangle().fill(Color.line).frame(height: 1) }
@@ -244,25 +247,36 @@ struct BaraJos: View {
 
     private func buton(_ ic: String, _ t: String, _ k: String, bulina: Int = 0, rosu: Bool = false, _ a: @escaping () -> Void) -> some View {
         Button(action: a) {
-            VStack(spacing: 3) {
-                Iconita(nume: ic, marime: 1.5556 * rem)
-                Text(t).font(.system(size: 0.7778 * rem, weight: .semibold)).lineLimit(1)
+            // telefon culcat: iconița și textul pe un rând, bara cât mai subțire
+            let l = culcat ? AnyLayout(HStackLayout(spacing: 0.4444 * rem)) : AnyLayout(VStackLayout(spacing: 3))
+            l {
+                Iconita(nume: ic, marime: (culcat ? 1.3333 : 1.5556) * rem)
+                Text(t).font(.system(size: (culcat ? 0.8333 : telefon ? 0.7222 : 0.7778) * rem, weight: .semibold)).lineLimit(1)
+                // telefon culcat (`.tabbar .nav-badge { position: static; order: 3 }`): bulina după text
+                if culcat && bulina > 0 { Bulina(n: bulina, rosu: rosu) }
             }
             .foregroundStyle(nav.meniuActiv == k ? Color.accent : Color.muted)
-            .padding(.vertical, 0.3333 * rem)
+            .padding(.vertical, culcat ? 0 : 0.3333 * rem)
             .frame(maxWidth: .infinity)
             .frame(minHeight: 44)
             .overlay(alignment: .top) {
-                if bulina > 0 {
-                    Text("\(bulina)").font(.system(size: 0.7222 * rem, weight: .bold)).foregroundStyle(.white)
-                        .padding(.horizontal, 0.4444 * rem).frame(minWidth: 1.2222 * rem, minHeight: 1.2222 * rem)
-                        .background(rosu ? Color.red : Color.accent, in: Capsule())
-                        .offset(x: 0.3333 * rem + 0.6111 * rem)
-                }
+                if !culcat && bulina > 0 { Bulina(n: bulina, rosu: rosu).offset(x: 0.3333 * rem + 0.6111 * rem) }
             }
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)
+    }
+}
+
+/// `.nav-badge`: câte sunt (urgente / neîncheiate) pe butonul barei de jos
+private struct Bulina: View {
+    @Environment(\.rem) private var rem
+    let n: Int
+    let rosu: Bool
+    var body: some View {
+        Text("\(n)").font(.system(size: 0.7222 * rem, weight: .bold)).foregroundStyle(.white)
+            .padding(.horizontal, 0.4444 * rem).frame(minWidth: 1.2222 * rem, minHeight: 1.2222 * rem)
+            .background(rosu ? Color.red : Color.accent, in: Capsule())
     }
 }
 
@@ -287,6 +301,7 @@ struct MargineEcran: ViewModifier {
     @Environment(\.rem) private var rem
     @Environment(\.cuBaraLaterala) private var lat
     @Environment(\.inFereastra) private var inFereastra
+    @Environment(\.telefon) private var telefon
     /// în control, pe vertical: loc și pentru banda Anulează / Sus / Refă
     var inControl = false
     /// spațiul pentru butoanele ferestrei e pus de ecran (editorul: pe zona derulată)
@@ -295,7 +310,7 @@ struct MargineEcran: ViewModifier {
     func body(content: Content) -> some View {
         content
             .padding(.top, 1.3333 * rem + (inFereastra && !lat && !faraFereastra ? 1.6667 * rem : 0))
-            .padding(.horizontal, 1.5556 * rem)
+            .padding(.horizontal, (telefon ? 0.8889 : 1.5556) * rem)   // telefon: --gutter
             .padding(.bottom, lat ? 2.6667 * rem : inControl ? 9.3333 * rem : 6.6667 * rem)
             .frame(maxWidth: lat ? .infinity : 71.1111 * rem, alignment: .leading)
             .frame(maxWidth: .infinity)

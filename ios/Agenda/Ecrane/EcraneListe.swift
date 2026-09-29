@@ -45,6 +45,7 @@ struct ContinutObiective: View {
 /// `.obj-card`
 struct CardObiectiv: View {
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     let c: ModelCardObiectiv
     let deschide: () -> Void
 
@@ -58,7 +59,7 @@ struct CardObiectiv: View {
                                                startPoint: .topLeading, endPoint: .bottomTrailing),
                                 in: RoundedRectangle(cornerRadius: rem, style: .continuous))
                 VStack(alignment: .leading, spacing: 0.3333 * rem) {
-                    Text(c.titlu).font(.system(size: 1.1667 * rem, weight: .bold)).foregroundStyle(Color.text).multilineTextAlignment(.leading)
+                    Text(c.titlu).font(.system(size: (telefon ? 1.0556 : 1.1667) * rem, weight: .bold)).foregroundStyle(Color.text).multilineTextAlignment(.leading)
                     FlowLayout(spatiu: 0.4444 * rem) {
                         EtichetaTip(text: c.tip)
                         if let l = c.localitate { HStack(spacing: 0.2222 * rem) { Iconita(nume: "pin", marime: rem); Text(l) } }
@@ -69,9 +70,9 @@ struct CardObiectiv: View {
                     Pastile(l: c.pastile)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                Iconita(nume: "chevR", marime: 1.4444 * rem).foregroundStyle(Color.lineStrong)
+                if !telefon { Iconita(nume: "chevR", marime: 1.4444 * rem).foregroundStyle(Color.lineStrong) }
             }
-            .padding(.vertical, 0.8889 * rem).padding(.horizontal, rem)
+            .padding(.vertical, (telefon ? 0.7778 : 0.8889) * rem).padding(.horizontal, (telefon ? 0.7778 : 1) * rem)
             .frame(minHeight: 4.8889 * rem)
             .background(Color.surface, in: RoundedRectangle(cornerRadius: 1.1111 * rem, style: .continuous))
             .umbra()
@@ -94,6 +95,7 @@ struct ContinutObiectiv: View {
     @Environment(Interfata.self) private var ui
     @Environment(\.openURL) private var deschideURL
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     let id: String
 
     var body: some View {
@@ -103,18 +105,18 @@ struct ContinutObiectiv: View {
                         Buton(text: "Control nou pe acest obiectiv", iconita: "plus", tip: .primar) { ui.controlNou(oid: id) }
                     }
                     info(m)
-                    Grid(horizontalSpacing: 0.7778 * rem, verticalSpacing: 0.7778 * rem) {
-                        GridRow {
-                            ForEach(Array(m.statistici.enumerated()), id: \.offset) { _, s in
-                                VStack(alignment: .leading, spacing: 0) {
-                                    Text("\(s.0)").font(.system(size: 2 * rem, weight: .heavy)).foregroundStyle(Color.text)
-                                    Text(s.1).font(.system(size: 0.8611 * rem, weight: .semibold)).foregroundStyle(Color.muted)
-                                }
-                                .frame(maxWidth: .infinity, alignment: .leading)
-                                .padding(.vertical, 0.8889 * rem).padding(.horizontal, rem)
-                                .background(Color.surface, in: RoundedRectangle(cornerRadius: 1.1111 * rem, style: .continuous))
-                                .umbra()
+                    // telefon: casetele pe două coloane (pe patru, cuvintele s-ar rupe literă cu literă)
+                    LazyVGrid(columns: Array(repeating: GridItem(.flexible(), spacing: 0.7778 * rem, alignment: .top), count: telefon ? 2 : max(1, m.statistici.count)),
+                              alignment: .leading, spacing: 0.7778 * rem) {
+                        ForEach(Array(m.statistici.enumerated()), id: \.offset) { _, s in
+                            VStack(alignment: .leading, spacing: 0) {
+                                Text("\(s.0)").font(.system(size: 2 * rem, weight: .heavy)).foregroundStyle(Color.text)
+                                Text(s.1).font(.system(size: 0.8611 * rem, weight: .semibold)).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
                             }
+                            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
+                            .padding(.vertical, 0.8889 * rem).padding(.horizontal, rem)
+                            .background(Color.surface, in: RoundedRectangle(cornerRadius: 1.1111 * rem, style: .continuous))
+                            .umbra()
                         }
                     }
                     .padding(.bottom, 0.4444 * rem)

@@ -25,6 +25,7 @@ struct ContinutCalendar: View {
     @Environment(Interfata.self) private var ui
     @Environment(\.rem) private var rem
     @Environment(\.cuBaraLaterala) private var lat
+    @Environment(\.telefon) private var telefon
     /// pe vertical, după alegerea unei zile: derulare la panoul zilei
     var laZi: () -> Void = {}
 
@@ -55,7 +56,7 @@ struct ContinutCalendar: View {
             .padding(.bottom, 1.2222 * rem)
 
             VStack(alignment: .leading, spacing: 0) {
-                Grid(horizontalSpacing: 0.3333 * rem, verticalSpacing: 0.3333 * rem) {
+                Grid(horizontalSpacing: (telefon ? 0.2222 : 0.3333) * rem, verticalSpacing: (telefon ? 0.2222 : 0.3333) * rem) {
                     GridRow {
                         ForEach(ZILE_SCURT, id: \.self) { z in
                             Text(z).font(.system(size: 0.8333 * rem, weight: .heavy)).foregroundStyle(Color.muted)
@@ -72,7 +73,7 @@ struct ContinutCalendar: View {
                 }
                 Legenda().padding(.top, 0.7778 * rem).padding(.horizontal, 0.2222 * rem).padding(.bottom, 2)
             }
-            .padding(0.8889 * rem)
+            .padding((telefon ? 0.4444 : 0.8889) * rem)
             .background(Color.surface, in: RoundedRectangle(cornerRadius: 1.1111 * rem, style: .continuous))
             .umbra()
             .padding(.bottom, 1.1111 * rem)
@@ -134,10 +135,55 @@ struct PasiCalendar: View {
 struct CelulaVedere: View {
     @Environment(\.rem) private var rem
     @Environment(\.cuBaraLaterala) private var lat
+    @Environment(\.telefon) private var telefon
     let c: CelulaCalendar
     let alege: () -> Void
 
     var body: some View {
+        if telefon { compacta } else { tableta }
+    }
+
+    /// Telefon (`.cal-cell` pe telefon): numărul, bulinele evenimentelor (culoarea lor) și ale termenelor; ziua liberă
+    /// se vede din fundalul gri; detaliile apar la ziua atinsă
+    private var compacta: some View {
+        Button(action: alege) {
+            VStack(spacing: 0.2222 * rem) {
+                Text("\(c.numar)").font(.system(size: 0.8889 * rem, weight: .heavy))
+                    .foregroundStyle(c.azi ? Color.white : Color.text)
+                    .frame(width: 1.5556 * rem, height: 1.5556 * rem)
+                    .background(c.azi ? Color.red : .clear, in: Circle())
+                let ev = c.etichete.filter { $0.tip != "liber" }
+                if !ev.isEmpty || c.maiMulte > 0 {
+                    HStack(spacing: 2) {
+                        ForEach(Array(ev.enumerated()), id: \.offset) { _, e in
+                            Circle().fill(e.tip == "open" ? Color.accent : e.tip == "done" ? Color.ink2 : culoareActivitate(e.tipActivitate))
+                                .frame(width: 0.5556 * rem, height: 0.5556 * rem)
+                        }
+                        if c.maiMulte > 0 { Text("+\(c.maiMulte)").font(.system(size: 0.6667 * rem, weight: .heavy)).foregroundStyle(Color.muted) }
+                    }
+                }
+                if !c.termene.isEmpty {
+                    HStack(spacing: 2) {
+                        ForEach(Array(c.termene.enumerated()), id: \.offset) { _, t in
+                            Circle().fill(culoareNivel(t)).frame(width: 0.4444 * rem, height: 0.4444 * rem)
+                        }
+                    }
+                }
+                Spacer(minLength: 0)
+            }
+            .padding(0.2222 * rem)
+            .frame(maxWidth: .infinity, minHeight: 3.6667 * rem, alignment: .top)
+            .background(fundal, in: RoundedRectangle(cornerRadius: 0.5556 * rem, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 0.5556 * rem, style: .continuous).strokeBorder(c.selectata ? Color.accent : .clear, lineWidth: 2))
+            .opacity(c.inLuna ? 1 : 0.42)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("\(fmtDateLong(c.d))\(c.etichete.isEmpty ? "" : ": " + c.etichete.map(\.text).joined(separator: ", "))")
+        .accessibilityAddTraits(c.selectata ? .isSelected : [])
+    }
+
+    private var tableta: some View {
         Button(action: alege) {
             VStack(alignment: .leading, spacing: 0.2222 * rem) {
                 Text("\(c.numar)").font(.system(size: 0.9444 * rem, weight: .heavy))
@@ -228,12 +274,13 @@ func culoareNivel(_ nivel: String) -> Color {
 /// `.legend.cal-legend`
 struct Legenda: View {
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     var body: some View {
         FlowLayout(spatiu: rem) {
             ForEach(LEGENDA_CALENDAR, id: \.0) { cls, t in
                 HStack(spacing: 0.4444 * rem) { mostra(cls); Text(t) }
             }
-            HStack(spacing: 0.4444 * rem) { mostra("sw-liber"); Text(legendaLiber(telefon: UIDevice.current.userInterfaceIdiom == .phone)) }
+            HStack(spacing: 0.4444 * rem) { mostra("sw-liber"); Text(legendaLiber(telefon: telefon)) }
         }
         .font(.system(size: 0.8333 * rem))
         .foregroundStyle(Color.muted)
@@ -241,8 +288,8 @@ struct Legenda: View {
 
     @ViewBuilder private func mostra(_ cls: String) -> some View {
         switch cls {
-        case "sw-open": RoundedRectangle(cornerRadius: 0.2222 * rem).fill(Color.accent).frame(width: 1.2222 * rem, height: 0.6667 * rem)
-        case "sw-done": RoundedRectangle(cornerRadius: 0.2222 * rem).fill(Color.ink2).frame(width: 1.2222 * rem, height: 0.6667 * rem)
+        case "sw-open": RoundedRectangle(cornerRadius: telefon ? 0.3333 * rem : 0.2222 * rem).fill(Color.accent).frame(width: (telefon ? 0.6667 : 1.2222) * rem, height: 0.6667 * rem)
+        case "sw-done": RoundedRectangle(cornerRadius: telefon ? 0.3333 * rem : 0.2222 * rem).fill(Color.ink2).frame(width: (telefon ? 0.6667 : 1.2222) * rem, height: 0.6667 * rem)
         case "sw-act":
             RoundedRectangle(cornerRadius: 0.2222 * rem)
                 .fill(LinearGradient(stops: [.init(color: Color(hex: 0x0f766e), location: 0), .init(color: Color(hex: 0x0f766e), location: 0.33),
