@@ -97,7 +97,7 @@ const DAY = 86400000;
   await p.click('#ner-d [data-path$=".amenda.achitata"]'); await p.waitForTimeout(200);
   ok(await p.inputValue('#ner-d [data-bind$=".amenda.dataAchitare"]') === '2026-11-14', 'data dovezii = azi (tabletă)');
   await p.goto('http://localhost:8080/#/panou'); await p.waitForTimeout(300);
-  ok(await p.locator('#sec-fines > .items > .item').count() === 0 && (await p.locator('#sec-fines').innerText()).includes('Nicio amendă activă') && (await p.locator('details.paid summary').innerText()).includes('Achitate (1)'), 'achitată → verde, la „Achitate”');
+  ok(await p.locator('#sec-fines > .items > .item').count() === 0 && (await p.locator('#sec-fines').innerText()).includes('Nicio amendă activă') && (await p.locator('details.paid summary').innerText()).includes('Achitate / executate silit (1)'), 'achitată → verde, la „Achitate / executate silit”');
 
   // ── Control 2 pe același obiectiv, 3 luni mai târziu: neregulă veche automată
   await p.clock.setSystemTime(new Date(2027, 1, 2, 9, 0)); await p.goto('http://localhost:8080/#/panou'); await p.waitForTimeout(300);   // 02.02.2027

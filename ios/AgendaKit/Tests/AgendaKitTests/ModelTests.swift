@@ -945,6 +945,14 @@ final class ModelTests: TestVectori {
         XCTAssertEqual(u.map { "\($0.id)|\($0.denumire)" }, ["k1:ct1|Corp A – CT 1", "k1:ctx|Corp A – CT 2", "k3|Corp C"])
         XCTAssertEqual(verifStare(c, c.n("b3"), u[0]).data, "2025-01-10")
         XCTAssertEqual(verifStare(c, c.n("b3"), u[1]).stare, "lipsa")
+        // „Aceeași dată ca la …” (v1.25.1): CT 2… → CT 1 al aceleiași construcții; CT 1 al celorlalte → primul rând
+        c.modificaConstructie(2) { $0.modificaDotare("centrala") { d in
+            d.ct = ["a", "b", "c"].map { Centrala(JSObiect([("id", .string($0)), ("tipuri", [])])) }
+        } }
+        let u2 = verifUnitati(c, c.n("b3"))
+        XCTAssertEqual(u2.map(\.id), ["k1:ct1", "k1:ctx", "k3:a", "k3:b", "k3:c"])
+        XCTAssertEqual(u2.map { verifReferinta(u2, $0)?.id ?? "-" }, ["-", "k1:ct1", "k1:ct1", "k3:a", "k3:a"])
+        c.modificaConstructie(2) { $0.modificaDotare("centrala") { $0.ct = [] } }
         c.n("g") { $0.status = "nok"; $0.constructieIds = ["k1"]; $0.ctIds = ["k1:ctx"] }
         XCTAssertEqual(centraleAlese(c, c.n("g")).map(\.id), ["k1:ctx"])
         XCTAssertEqual(constructiiNume(c, c.n("g")), "Corp A – CT 2")

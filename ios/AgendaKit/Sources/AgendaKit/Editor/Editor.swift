@@ -350,11 +350,12 @@ public final class Editor {
             }
 
         case "verif-ca-prima":
-            // aceeași dată (și periodicitate) ca la primul rând de verificare; din nou = se golește
+            // aceeași dată (și periodicitate) ca la rândul de referință (CT 2… → CT 1 al construcției lor; restul → primul
+            // rând); din nou = se golește
             guard let key = d["key"], let n = c.neregula(key) else { return r }
             let list = verifUnitati(c, n)
-            guard let u = list.first(where: { $0.id == d["id"] }), let u0 = list.first else { return r }
-            let p = verifStare(c, n, u0), st = verifStare(c, n, u)
+            guard let u = list.first(where: { $0.id == d["id"] }), let ref = verifReferinta(list, u) else { return r }
+            let p = verifStare(c, n, ref), st = verifStare(c, n, u)
             // periodicitatea se copiază doar unde se alege (b2: 12 / 24 de luni)
             let alegeri = sablon(key)?.verifAlegeri != nil
             c.modificaNeregula(key) { n in
@@ -826,7 +827,7 @@ public final class Editor {
         atinge(&c, acum: true, &r)
         let m = rotunjesteJS(acc)
         r.mesaje.append(gpsQuality(acc) == "slaba"
-            ? MesajEditor("Coordonate preluate, dar precizie slabă (± \(m) m)", "warn")
+            ? MesajEditor("Coordonate preluate, dar precizie slabă (± \(m) m). Afară, apăsați „Actualizează”.", "warn")
             : MesajEditor("Coordonate preluate (± \(m) m)"))
         return r
     }

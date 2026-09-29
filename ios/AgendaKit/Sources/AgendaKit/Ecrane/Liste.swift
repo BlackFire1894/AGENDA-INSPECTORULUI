@@ -15,7 +15,7 @@ public struct PastilaUI: Equatable, Sendable, Hashable {
 }
 
 /// aceleași denumiri ca pastilele din Panou (fineStatus)
-public let LEVEL_LABEL = ["blue": "În curs", "yellow": "Termen 15 zile expirat", "red": "Trimite la ANAF / Taxe și impozite", "green": "Achitată"]
+public let LEVEL_LABEL = ["blue": "În curs", "yellow": "Termen 15 zile expirat", "red": "Trimite la ANAF / Taxe și impozite", "green": "Achitată / executată silit"]
 
 /// `money(v)`: suma scrisă de inspector, în lei („2.500 lei”), sau "" dacă nu e o sumă
 public func money(_ v: String) -> String { parseSuma(v).map(lei) ?? "" }
@@ -56,7 +56,7 @@ public let FILTRE: [Filtru] = [
     Filtru(key: "am-blue", label: "Amendă în curs", iconita: "fine", nivel: "blue", ultim: false) { _, st in st.fines.contains { $0.st.level == "blue" } },
     Filtru(key: "am-yellow", label: "Termen 15 zile expirat", iconita: "fine", nivel: "yellow", ultim: false) { _, st in st.fines.contains { $0.st.level == "yellow" } },
     Filtru(key: "am-red", label: "Trimite la ANAF / Taxe și impozite", iconita: "fine", nivel: "red", ultim: false) { _, st in st.fines.contains { $0.st.level == "red" } },
-    Filtru(key: "am-green", label: "Amendă achitată", iconita: "fine", nivel: "green", ultim: false) { _, st in st.fines.contains { $0.st.level == "green" } },
+    Filtru(key: "am-green", label: "Amendă achitată / executată silit", iconita: "fine", nivel: "green", ultim: false) { _, st in st.fines.contains { $0.st.level == "green" } },
     Filtru(key: "asi", label: "ASI în curs", iconita: "hourglass", nivel: "red", ultim: false) { _, st in st.asi.map { $0.resolved != true && $0.pending != true } ?? false },
     Filtru(key: "inc", label: "De încărcat", iconita: "upload", nivel: "warn", ultim: false) { _, st in st.incarcare.map { !$0.gata } ?? false },
     Filtru(key: "pv", label: "Netrecute în PV", iconita: "pv", nivel: "warn", ultim: false) { _, st in st.netrecute > 0 },
@@ -128,7 +128,7 @@ public func modelRandControl(_ c: Control, _ controls: [Control], _ azi: String,
     for f in st.fines { peNivel[f.st.level, default: 0] += 1 }
     for lv in ["red", "yellow", "blue", "green"] {
         if let k = peNivel[lv], k > 0 {
-            chips.append(.amenda(lv, "\(k) \(k == 1 ? "amendă" : "amenzi") · \(lv == "green" && k > 1 ? "Achitate" : LEVEL_LABEL[lv]!)"))
+            chips.append(.amenda(lv, "\(k) \(k == 1 ? "amendă" : "amenzi") · \(lv == "green" && k > 1 ? "Achitate / executate silit" : LEVEL_LABEL[lv]!)"))
         }
     }
     if let a = st.asi, a.resolved != true {
@@ -250,7 +250,7 @@ public func modelListaObiective(_ controls: [Control], q: String, tip: String, f
             let k = peNivel(lv)
             if k > 0 { ch.append(.amenda(lv, "\(k) \(k == 1 ? "amendă" : "amenzi") · \(LEVEL_LABEL[lv]!)")) }
         }
-        if achitate > 0 { ch.append(.amenda("green", "\(achitate) \(achitate == 1 ? "amendă achitată" : "amenzi achitate")")) }
+        if achitate > 0 { ch.append(.amenda("green", "\(achitate) \(achitate == 1 ? "amendă achitată / executată silit" : "amenzi achitate / executate silit")")) }
         return ModelCardObiectiv(
             id: o.id, initiale: initiale, localitateTip: o.tip == "LOCALITATE", titlu: o.denumire.isEmpty ? "Obiectiv fără denumire" : o.denumire,
             tip: textTip(o.tip), localitate: o.localitate.isEmpty ? nil : o.localitate,

@@ -281,6 +281,14 @@ public func verifUnitati(_ c: Control, _ n: Neregula) -> [UnitateVerif] {
     }
 }
 
+/// „Aceeași dată ca la …” (v1.25.1, regula utilizatorului): CT 2, CT 3… copiază de la CT 1 al construcției lor;
+/// celelalte rânduri (construcțiile, CT 1 al fiecărei construcții) de la primul rând. Primul rând: nil.
+public func verifReferinta(_ list: [UnitateVerif], _ u: UnitateVerif) -> UnitateVerif? {
+    guard let prim = list.first, u.id != prim.id else { return nil }
+    if u.ct != nil && u.nr > 1 { return list.first { $0.ct != nil && $0.k.id == u.k.id && $0.nr == 1 } ?? prim }
+    return prim
+}
+
 /// Starea verificării unei unități (construcție sau centrală), față de data începerii controlului.
 /// Prima centrală a unei construcții preia data scrisă pe construcție înainte de v1.25.
 public func verifStare(_ c: Control, _ n: Neregula, _ u: UnitateVerif) -> StareVerificare {

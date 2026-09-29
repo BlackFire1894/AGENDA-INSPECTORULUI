@@ -334,7 +334,7 @@ struct SectiuneVedere: View {
                 Button { withAnimation { achitateDeschise.toggle() } } label: {
                     HStack(spacing: 0.4444 * rem) {
                         Iconita(nume: achitateDeschise ? "chevD" : "chevR", marime: rem)
-                        Text("Achitate (\(s.achitate.count))").font(.system(size: rem, weight: .bold))
+                        Text("Achitate / executate silit (\(s.achitate.count))").font(.system(size: rem, weight: .bold))
                     }
                     .foregroundStyle(Color.greenInk)
                     .frame(minHeight: tinta(2.4444 * rem))

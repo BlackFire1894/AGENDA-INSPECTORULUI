@@ -10,7 +10,7 @@ import {
   fmtCoord, googleMapsUrl, gpsQuality, constructiiOf, constructiiNume, matchNeregula, pesteParter, grfVPesteParter, sablon, isGrav, syncAutoNU,
   constructiiEligibile, verifStare, verifExpirate, verifText, catalogOf, fixeazaCatalog, migreazaDeschis, schimbare, SCHEMA_VERSION, matchAct,
   syncAutoActe, acteOf, acteLipsa, dotariVizibile, valDotare, ilumHintAscuns, areCentrala, centraleOf, verifUnitati, centraleAlese,
-  parseCoord, gpsEgal, DOTARI, neregulaLabel,
+  parseCoord, gpsEgal, DOTARI, neregulaLabel, verifReferinta,
   incarcareStatus, parseSuma,
   sigiliiControl, sigiliiText, emptyNeregula,
   emptyAdapost, adaposturi, adaposturiStats, adaposturiText, syncAdaposturi,
@@ -62,6 +62,11 @@ test('amenda: roșu după 25 de zile peste cele 15 → „Mai aveți 5 zile”',
 test('amenda: verde când e achitată, indiferent de termen', () => {
   const { c, n } = withFine('2026-09-01', { achitata: true });
   assert.equal(fineStatus(c, n, '2026-12-01').level, 'green');
+  // v1.25.2: „Achitat / Executat silit”
+  assert.equal(fineStatus(c, n, '2026-12-01').label, 'Achitată / executată silit');
+  assert.equal(fineStatus(c, n, '2026-12-01').msg, 'Închisă');
+  n.amenda.dataAchitare = '2026-10-12';
+  assert.equal(fineStatus(c, n, '2026-12-01').msg, 'Închisă · 12.10.2026');
 });
 
 test('amenda: data proprie a amenzii are prioritate față de data încheierii', () => {
@@ -1103,6 +1108,13 @@ test('v1.25: centralele termice pe număr; verificarea CT (b3) și camera CT (g,
   assert.equal(constructiiNume(c, g), 'Corp A – CT 2');
   delete g.ctIds;
   assert.equal(constructiiNume(c, g), 'Corp A');
+  // „Aceeași dată ca la …” (v1.25.1): CT 2… → CT 1 al aceleiași construcții; CT 1 al celorlalte → primul rând
+  k3.dotari.centrala.ct = [{ id: 'a', tipuri: ['GAZOS'] }, { id: 'b', tipuri: [] }, { id: 'c', tipuri: [] }];
+  const u2 = verifUnitati(c, b3);
+  const ref = (id) => verifReferinta(u2, u2.find((x) => x.id === id))?.id ?? null;
+  assert.deepEqual(u2.map((x) => x.id), ['k1:ct1', 'k1:ctx', 'k3:a', 'k3:b', 'k3:c']);
+  assert.deepEqual(['k1:ct1', 'k1:ctx', 'k3:a', 'k3:b', 'k3:c'].map(ref), [null, 'k1:ct1', 'k1:ct1', 'k3:a', 'k3:a']);
+  k3.dotari.centrala.ct = [];
   // controalele încheiate înainte: pe construcție
   const vechi = normalizeControl({ ...JSON.parse(JSON.stringify(c)), dataIncheiere: '2026-10-02', catalog: 11 });
   assert.deepEqual(verifUnitati(vechi, vechi.nereguli.find((x) => x.key === 'b3')).map((x) => x.id), ['k1', 'k2', 'k3']);

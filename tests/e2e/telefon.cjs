@@ -27,6 +27,17 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
     const rele = [];
     for (const h of ecrane) { await p.goto(`http://localhost:8080/${h}`); await p.waitForTimeout(350); const r = await iese(p); if (r.lat || r.bad.length) rele.push(`${h}: ${r.bad.join(', ')}`); }
     ok(!rele.length, `${W}×${H}: ${ecrane.length} ecrane, nimic nu iese din ecran${rele.length ? ` — ${rele.join(' | ')}` : ''}`);
+    // în lista dotărilor, niciun buton peste denumire sau în afara rândului (ex. tipurile centralei termice)
+    await p.goto(`http://localhost:8080/#/control/${ids.opec}/obiectiv`); await p.waitForTimeout(400);
+    const peste = await p.$$eval('.dot-row', (rows) => rows.map((row) => {
+      const et = row.querySelector('.dot-label'); if (!et) return null;
+      const rg = document.createRange(); rg.selectNodeContents(et); const l = rg.getBoundingClientRect();   // textul efectiv, chiar dacă iese din coloana lui
+      if (!l.width) return null;
+      const r = row.getBoundingClientRect();
+      return [...row.querySelectorAll('button')].some((btn) => { const b = btn.getBoundingClientRect(); return b.width && ((b.left < l.right - 1 && b.right > l.left + 1 && b.top < l.bottom - 1 && b.bottom > l.top + 1) || b.right > r.right + 1 || b.left < r.left - 1); }) ? row.querySelector('.dot-label').innerText : null;
+    }).filter(Boolean));
+    const nrDotari = await p.locator('.dot-row').count();
+    ok(nrDotari > 0 && !peste.length, `${W}×${H}: dotările (${nrDotari} rânduri): niciun buton peste denumire sau în afara rândului${peste.length ? ` — ${peste.join(', ')}` : ''}`);
     await p.goto('http://localhost:8080/#/panou'); await p.waitForTimeout(300);
     ok(await p.evaluate(() => [...document.querySelectorAll('.tabbar > *')].filter((e) => getComputedStyle(e).display !== 'none').length) === 5, `${W}×${H}: bara de jos are 5 butoane`);
     ok(await p.locator('.dash-actions .set-btn').isVisible(), `${W}×${H}: Setări din Panou`);

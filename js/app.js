@@ -6,7 +6,7 @@ import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
   fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat, pvText, sectiuniActive, secOf,
   todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality, constructiiOf, schimbare, grfVPesteParter, constructiiEligibile, verifExpirate, ascunsaDeDotari, neregulaLetter, neregulaLabel, AUTO_NU, syncAutoNU,
-  adaposturi, emptyAdapost, acteOf, syncAutoActe, gpsEgal, parseCoord, verifUnitati, verifStare, CENTRALA_TIPURI,
+  adaposturi, emptyAdapost, acteOf, syncAutoActe, gpsEgal, parseCoord, verifUnitati, verifStare, verifReferinta, CENTRALA_TIPURI,
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
@@ -521,12 +521,14 @@ document.addEventListener('click', async (e) => {
       break;
     }
     case 'verif-ca-prima': {
-      // aceeași dată (și periodicitate) ca la primul rând de verificare; din nou = se golește
+      // aceeași dată (și periodicitate) ca la rândul de referință (CT 2… → CT 1 al construcției lor; restul → primul rând);
+      // din nou = se golește
       const n = c.nereguli.find((x) => x.key === el.dataset.key);
       const list = n ? verifUnitati(c, n) : [];
       const u = list.find((x) => x.id === el.dataset.id);
-      if (!u || !list[0]) return;
-      const p = verifStare(c, n, list[0]);
+      const ref = u && verifReferinta(list, u);
+      if (!ref) return;
+      const p = verifStare(c, n, ref);
       const s = verifStare(c, n, u);
       // periodicitatea se copiază doar unde se alege (b2: 12 / 24 de luni)
       n.verificari[u.id] = s.data === p.data && s.luni === p.luni ? { ...(n.verificari[u.id] || {}), data: '' }
@@ -938,18 +940,24 @@ function getGps(c, k) {
   if (state.ui.gpsBusy) return;
   state.ui.gpsBusy = k.id; rerenderEditor();
   const done = () => { state.ui.gpsBusy = ''; if (route.name === 'control' && route.id === c.id) rerenderEditor(); };
-  navigator.geolocation.getCurrentPosition((pos) => {
+  const salveaza = (pos) => {
     const { latitude: lat, longitude: lon, accuracy: acc } = pos.coords;
     k.gps = { lat, lon, acc, la: new Date().toISOString() };
     touch(c, true);
     done();
     const q = gpsQuality(acc);
-    toast(q === 'slaba' ? `Coordonate preluate, dar precizie slabă (± ${Math.round(acc)} m)` : `Coordonate preluate (± ${Math.round(acc)} m)`, q === 'slaba' ? 'warn' : 'ok');
-  }, (err) => {
-    done();
-    // 1 = permisiune refuzată / Localizarea oprită: pașii din Setări; 2 = fără poziție, 3 = timp depășit
-    if (err.code === 1) { gpsActivatePrompt(c, k); return; }
-    gpsFaraPozitie(c, k, err.code === 3);
+    toast(q === 'slaba' ? `Coordonate preluate, dar precizie slabă (± ${Math.round(acc)} m). Afară, apăsați „Actualizează”.` : `Coordonate preluate (± ${Math.round(acc)} m)`, q === 'slaba' ? 'warn' : 'ok');
+  };
+  // 1 = permisiune refuzată / Localizarea oprită: pașii din Setări; 2 = fără poziție, 3 = timp depășit
+  navigator.geolocation.getCurrentPosition(salveaza, (err) => {
+    if (err.code === 1) { done(); gpsActivatePrompt(c, k); return; }
+    // GPS-ul precis nu a răspuns: poziția aproximativă (Wi-Fi, rețea mobilă), marcată „precizie slabă”;
+    // abia dacă nici ea nu vine, fereastra cu variantele (inclusiv coordonatele de mână)
+    navigator.geolocation.getCurrentPosition(salveaza, (err2) => {
+      done();
+      if (err2.code === 1) { gpsActivatePrompt(c, k); return; }
+      gpsFaraPozitie(c, k, err2.code === 3);
+    }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 120000 });
   }, { enableHighAccuracy: true, timeout: 20000, maximumAge: 0 });
 }
 
@@ -1003,15 +1011,18 @@ function gpsManual(c, k) {
 // Localizarea e oprită sau refuzată. O aplicație web nu poate deschide Setările iPad-ului și nici nu poate porni
 // Localizarea singură, deci arătăm pașii exacți și un buton „Încearcă din nou”.
 function gpsActivatePrompt(c, k) {
+  // aplicația de pe ecranul principal: iOS poate reține un refuz mai vechi, care nu se schimbă din Configurări
+  const deAcasa = navigator.standalone === true || window.matchMedia?.('(display-mode: standalone)').matches;
   const m = openModal(`<div class="modal-head"><h2>${icon('locate')} Activați localizarea</h2></div>
     <div class="modal-body">
-      <p class="lead">Coordonatele nu pot fi completate: localizarea e oprită sau aplicația nu are permisiune. Pe ${dsp('iPad', 'telefon')}:</p>
+      <p class="lead">Coordonatele nu pot fi completate: ${dsp('iPad-ul', 'telefonul')} nu dă aplicației permisiunea de localizare (localizarea poate fi oprită). Pe ${dsp('iPad', 'telefon')}:</p>
       <ol class="gps-steps">
-        <li><b>Setări → Confidențialitate și securitate → Localizare</b>: porniți <b>Localizare</b>.</li>
-        <li>În aceeași listă, <b>Site-uri Safari</b>: alegeți <b>Cât timp folosesc aplicația</b> și porniți <b>Localizare precisă</b>.</li>
-        <li><b>Setări → Aplicații → Safari → Localizare</b>: alegeți <b>Întreabă</b> sau <b>Permite</b>.</li>
+        <li><b>Configurări → Confidențialitate și securitate → Servicii de localizare</b>: porniți <b>Servicii de localizare</b>.</li>
+        <li>În aceeași listă, <b>Site-uri Safari</b> (de aici își ia permisiunea și aplicația de pe ecranul principal): alegeți <b>Cât timp folosesc aplicația</b> și porniți <b>Localizare precisă</b>.</li>
+        <li><b>Configurări → Aplicații → Safari → Localizare</b>: alegeți <b>Întreabă</b> sau <b>Permite</b>.</li>
         <li>Reveniți aici și apăsați <b>Încearcă din nou</b>; la întrebarea ${dsp('iPad-ului', 'telefonului')}, alegeți <b>Permite</b>.</li>
       </ol>
+      ${deAcasa ? `<p class="hint"><b>Dacă fereastra apare din nou</b>, ${dsp('iPad-ul', 'telefonul')} a reținut un refuz mai vechi pentru iconița aplicației. Faceți întâi un <b>Backup rapid</b>, apoi ștergeți iconița Agenda de pe ecranul principal, adăugați-o din nou din Safari (Partajare → Adaugă pe ecranul principal) și importați backupul; la întrebarea de localizare, alegeți <b>Permite</b>.</p>` : ''}
       <p class="hint">Aplicația citește poziția doar când apăsați butonul; nu urmărește locația.</p>
     </div>
     <div class="modal-foot">
