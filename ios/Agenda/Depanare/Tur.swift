@@ -113,7 +113,7 @@ enum Tur {
             ui.inchide()
         }
         await pas("f-confirmare", fereastra: true, inainte: { nav.mergi(.setari) }) {
-            ui.confirma("Ștergeți TOATE datele?", "7 controale și 5 activități vor fi șterse definitiv de pe această tabletă. Operația nu poate fi anulată.", ok: "Șterge tot", pericol: true) {}
+            ui.confirma("Ștergeți TOATE datele?", "7 controale și 5 activități vor fi șterse definitiv de pe \(dsp("această tabletă", "acest telefon")). Operația nu poate fi anulată.", ok: "Șterge tot", pericol: true) {}
         }
         ui.confirmare = nil
         nav.mergi(.panou)

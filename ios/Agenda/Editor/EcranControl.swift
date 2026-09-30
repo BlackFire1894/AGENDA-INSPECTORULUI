@@ -10,6 +10,7 @@ struct EcranControl: View {
     @Environment(Navigare.self) private var nav
     @Environment(Interfata.self) private var ui
     @Environment(\.rem) private var rem
+    @Environment(\.telefonCulcat) private var culcat
     let id: String
     @FocusState private var focus: String?
     @State private var lipici = Lipici()
@@ -24,7 +25,8 @@ struct EcranControl: View {
             Color.bg.frame(height: 1)
             ScrollViewReader { proxy in
                 ScrollView {
-                    LazyVStack(alignment: .leading, spacing: 0, pinnedViews: [.sectionHeaders]) {
+                    // telefonul culcat: taburile nu rămân fixe sus (lasă loc conținutului)
+                    LazyVStack(alignment: .leading, spacing: 0, pinnedViews: culcat ? [] : [.sectionHeaders]) {
                         VStack(alignment: .leading, spacing: 0) {
                             AntetEditor(c: c, m: m.antet)
                             TodoEditor(m: m.todo)
@@ -117,12 +119,13 @@ struct AntetEditor: View {
     @Environment(Interfata.self) private var ui
     @Environment(Magazin.self) private var magazin
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     let c: Control
     let m: ModelAntetEditor
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 0.8889 * rem) {
-            HStack(alignment: .center, spacing: 0.8889 * rem) {
+        VStack(alignment: .leading, spacing: (telefon ? 0.6667 : 0.8889) * rem) {
+            HStack(alignment: telefon ? .top : .center, spacing: (telefon ? 0.5556 : 0.8889) * rem) {
                 Button { nav.mergi(nav.inapoiLa) } label: {
                     Iconita(nume: "back", marime: 1.3333 * rem).foregroundStyle(Color.text)
                         .frame(width: tinta(2.8889 * rem), height: tinta(2.8889 * rem))
@@ -137,7 +140,7 @@ struct AntetEditor: View {
                         VederePastila(p: m.incheiat ? PastilaUI("done", "Încheiat", "check") : PastilaUI("open", "În desfășurare", "clock"))
                     }
                     .padding(.bottom, 0.3333 * rem)
-                    Text(m.titlu).font(.system(size: 1.6667 * rem, weight: .heavy)).tracking(-0.015 * 1.6667 * rem)
+                    Text(m.titlu).font(.system(size: (telefon ? 1.3333 : 1.6667) * rem, weight: .heavy)).tracking(-0.015 * 1.6667 * rem)
                         .foregroundStyle(Color.text).fixedSize(horizontal: false, vertical: true)
                     FlowLayout(spatiu: 0.4444 * rem) {
                         HStack(spacing: 0.4444 * rem) {
@@ -146,13 +149,25 @@ struct AntetEditor: View {
                         }
                         IndicatorSalvare().padding(.leading, 0.4444 * rem)
                     }
-                    .font(.system(size: rem, weight: .semibold))
+                    .font(.system(size: (telefon ? 0.8889 : 1) * rem, weight: .semibold))
                     .foregroundStyle(Color.muted)
                     .padding(.top, 0.2222 * rem)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
             }
-            FlexWrap(spatiu: 0.5556 * rem) {
+            // telefon: butoanele pe un rând care se derulează orizontal (`.ed-actions`)
+            if telefon {
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 0.4444 * rem) { butoane }.padding(.bottom, 2).padding(.horizontal, 1)
+                }
+            } else {
+                FlexWrap(spatiu: 0.5556 * rem) { butoane }
+            }
+        }
+        .padding(.bottom, (telefon ? 0.6667 : 1) * rem)
+    }
+
+    @ViewBuilder private var butoane: some View {
                 Buton(text: "Text PV", iconita: "pv", mare: false) {
                     ses.click("pv-text")
                     ui.deschide(lata: true, laInchidere: { ses.reimprospateaza() }) { FereastraTextPV(id: c.id) }
@@ -177,9 +192,6 @@ struct AntetEditor: View {
                 .buttonStyle(ApasareRand())
                 .accessibilityLabel("Șterge controlul")
                 .flexDreapta()
-            }
-        }
-        .padding(.bottom, rem)
     }
 }
 
@@ -293,14 +305,31 @@ struct TaburiEditor: View {
     @Environment(\.colorScheme) private var schema
     @Environment(\.inFereastra) private var inFereastra
     @Environment(\.cuBaraLaterala) private var lat
+    @Environment(\.telefon) private var telefon
     let taburi: [ModelTabEditor]
 
     var body: some View {
         let cinci = taburi.count == 5
-        HStack(spacing: 0.4444 * rem) {
-            ForEach(taburi, id: \.key) { t in tab(t, cinci) }
+        Group {
+            if telefon {
+                // telefon (`.ed-tabs`): taburile compacte, pe un rând care se derulează; cel activ se aduce în vizor
+                ScrollViewReader { d in
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 0.3333 * rem) {
+                            ForEach(taburi, id: \.key) { t in tabCompact(t).id(t.key) }
+                        }
+                        .padding(.vertical, 0.4444 * rem).padding(.horizontal, 0.3333 * rem)
+                    }
+                    .onAppear { if let a = taburi.first(where: \.activ) { d.scrollTo(a.key, anchor: .center) } }
+                    .onChange(of: taburi.first(where: \.activ)?.key) { _, k in if let k { withAnimation { d.scrollTo(k, anchor: .center) } } }
+                }
+            } else {
+                HStack(spacing: 0.4444 * rem) {
+                    ForEach(taburi, id: \.key) { t in tab(t, cinci) }
+                }
+                .padding(0.4444 * rem)
+            }
         }
-        .padding(0.4444 * rem)
         .background(schema == .dark ? Color(hex: 0x212b48) : Color.ink, in: RoundedRectangle(cornerRadius: 1.2222 * rem, style: .continuous))
         .overlay { if schema == .dark { RoundedRectangle(cornerRadius: 1.2222 * rem, style: .continuous).strokeBorder(Color(hex: 0x34406a), lineWidth: 1) } }
         .shadow(color: Color(red: 18 / 255, green: 24 / 255, blue: 41 / 255).opacity(0.22), radius: 11, y: 8)
@@ -339,6 +368,39 @@ struct TaburiEditor: View {
             .overlay(RoundedRectangle(cornerRadius: rem, style: .continuous).strokeBorder(t.activ ? Color.accent : Color.white.opacity(0.1), lineWidth: 2.5))
             .overlay(alignment: .bottom) { progres(t) }
             .shadow(color: t.activ ? Color.accent.opacity(0.55) : .clear, radius: 8, y: 4)
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .accessibilityAddTraits(t.activ ? .isSelected : [])
+    }
+
+    /// Tabul pe telefon: numărul, denumirea și cele două rânduri mici, fără rupere (lățimea lui)
+    private func tabCompact(_ t: ModelTabEditor) -> some View {
+        Button { ses.mergi(tab: t.key) } label: {
+            HStack(spacing: 0.4444 * rem) {
+                Text("\(t.nr)").font(.system(size: 0.8333 * rem, weight: .heavy))
+                    .foregroundStyle(t.activ ? Color.accent : .white)
+                    .frame(width: 1.5556 * rem, height: 1.5556 * rem)
+                    .background(t.activ ? Color.white : Color.white.opacity(0.14), in: RoundedRectangle(cornerRadius: 0.4444 * rem, style: .continuous))
+                VStack(alignment: .leading, spacing: 0) {
+                    Text(t.label).font(.system(size: 0.9444 * rem, weight: .bold)).foregroundStyle(.white).lineLimit(1)
+                    Text(t.text).font(.system(size: 0.7222 * rem, weight: .semibold))
+                        .foregroundStyle(t.avertizare ? (t.activ ? Color.white : Color(hex: 0xffb37a)) : Color.white.opacity(t.activ ? 0.92 : 0.66))
+                        .underline(t.avertizare && t.activ, color: Color(hex: 0xffb37a))
+                        .lineLimit(1)
+                    (Text("\(t.progres) ") + Text("\(t.gata)/\(t.total)").fontWeight(.heavy))
+                        .font(.system(size: 0.7222 * rem, weight: .semibold))
+                        .foregroundStyle(t.complet ? Color(hex: t.activ ? 0xdcfce7 : 0x86efac) : Color.white.opacity(t.activ ? 1 : 0.8))
+                        .lineLimit(1)
+                        .padding(.bottom, 0.2222 * rem)
+                }
+                .fixedSize()
+            }
+            .padding(.vertical, 0.4444 * rem).padding(.horizontal, 0.6667 * rem)
+            .frame(minHeight: tinta(3.3333 * rem))
+            .background(t.activ ? Color.accent : Color.white.opacity(0.07), in: RoundedRectangle(cornerRadius: 0.8889 * rem, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 0.8889 * rem, style: .continuous).strokeBorder(t.activ ? Color.accent : Color.white.opacity(0.1), lineWidth: 2))
+            .overlay(alignment: .bottom) { progres(t) }
             .contentShape(Rectangle())
         }
         .buttonStyle(.plain)

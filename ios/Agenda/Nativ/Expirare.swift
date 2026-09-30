@@ -2,7 +2,8 @@ import SwiftUI
 import AgendaKit
 
 // Contul Apple gratuit: aplicația instalată de pe Mac e valabilă 7 zile (decizia utilizatorului, 27.09.2026: scriptul
-// „Reinstalează Agenda” pe Mac + avertizare cu 2 zile înainte). Data vine din profilul inclus în aplicație.
+// „Reinstalează Agenda” pe Mac + avertizare; 29.09.2026: reinstalarea doar în weekend, deci avertizarea vine în weekendul
+// dinaintea expirării). Data vine din profilul inclus în aplicație.
 
 enum Expirare {
     /// momentul expirării instalării (nil: fără profil, de ex. în simulator)
@@ -26,10 +27,15 @@ enum Expirare {
         return fmtDateLong(todayISO(d)) + String(format: ", ora %02d:%02d", c.hour ?? 0, c.minute ?? 0)
     }
 
-    /// mesajul din Panou: din a doua zi dinaintea expirării (aceeași zi cu notificarea)
+    /// mesajul din Panou: din sâmbăta weekendului de reinstalare (aceeași zi cu notificarea) până la expirare
     static func deAratat(azi: String) -> Date? {
-        guard let d = data, azi >= addDays(todayISO(d), -2) else { return nil }
+        guard let d = data, azi >= (weekendReinstalare(d).first ?? addDays(todayISO(d), -1)) else { return nil }
         return d
+    }
+
+    /// „sâmbătă, 3 octombrie sau duminică, 4 octombrie” (fără an)
+    static func weekendText(_ d: Date) -> String {
+        weekendReinstalare(d).map { fmtDateLong($0).replacingOccurrences(of: " \($0.prefix(4))", with: "") }.joined(separator: " sau ")
     }
 
     static func notificare(acum: Date) -> NotificarePlanificata? {
@@ -41,6 +47,7 @@ enum Expirare {
 struct MementoExpirare: View {
     @Environment(\.rem) private var rem
     let expira: Date
+    private var inWeekend: Bool { weekendReinstalare(expira).contains(todayISO()) }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0.6667 * rem) {
@@ -49,7 +56,7 @@ struct MementoExpirare: View {
                 Text("Aplicația expiră curând").font(.system(size: 1.2222 * rem, weight: .bold))
             }
             .foregroundStyle(Color.warnInk)
-            textBogat("Instalarea de pe Mac e valabilă până **\(Expirare.text(expira))**. Reinstalați-o înainte: conectați \(dsp("iPad-ul", "telefonul")) la Mac cu cablul și faceți dublu-clic pe **„Reinstalează Agenda”** de pe Birou. Datele rămân.")
+            textBogat("Instalarea de pe Mac e valabilă până **\(Expirare.text(expira))**. \(inWeekend ? "Reinstalați-o în acest weekend" : "Reinstalați-o înainte"): conectați \(dsp("iPad-ul", "telefonul")) la Mac cu cablul și faceți dublu-clic pe **„Reinstalează Agenda”** de pe Birou. Datele rămân.")
                 .font(.system(size: rem)).foregroundStyle(Color.text).lineSpacing(0.3 * rem).fixedSize(horizontal: false, vertical: true)
         }
         .padding(1.2222 * rem)

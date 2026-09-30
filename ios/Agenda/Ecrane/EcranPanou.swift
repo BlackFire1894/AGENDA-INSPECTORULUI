@@ -19,6 +19,7 @@ struct ContinutPanou: View {
     @Environment(Interfata.self) private var ui
     @Environment(\.rem) private var rem
     @Environment(\.cuBaraLaterala) private var lat
+    @Environment(\.telefon) private var telefon
 
     var body: some View {
         let azi = aziUI()
@@ -38,7 +39,35 @@ struct ContinutPanou: View {
     }
 
     // ───────── antetul: data și ora pe un rând (Ghidul și Backup rapid doar pe vertical) ─────────
-    private func antet(_ azi: String) -> some View {
+    @ViewBuilder private func antet(_ azi: String) -> some View {
+        if telefon { antetTelefon(azi) } else { antetTableta(azi) }
+    }
+
+    /// Telefon (`.dash-head` pe o coloană): butoanele (Ghid, Backup rapid, Setări) sus, apoi eticheta și data
+    private func antetTelefon(_ azi: String) -> some View {
+        VStack(alignment: .leading, spacing: 0.4444 * rem) {
+            FlowLayout(spatiu: 0.5556 * rem) {
+                Buton(text: "Ghidul aplicației", iconita: "book", mare: false) { nav.mergi(.ghid) }
+                if !magazin.controls.isEmpty { backupRapid(azi) }
+                Buton(text: "Setări", iconita: "settings", mare: false) { nav.mergi(.setari) }
+            }
+            HStack(spacing: 0.4444 * rem) {
+                Iconita(nume: "clock", marime: 1.1111 * rem)
+                Text("Data și ora \(dsp("tabletei", "telefonului"))").font(.system(size: 0.8889 * rem, weight: .semibold))
+            }
+            .foregroundStyle(Color.muted)
+            TimelineView(.everyMinute) { ctx in
+                FlowLayout(spatiu: 0.6667 * rem) {
+                    Text(ucfirst(fmtDateLong(todayISO(ctx.date)))).foregroundStyle(Color.text)
+                    Text(ctx.date.formatted(.dateTime.hour(.twoDigits(amPM: .omitted)).minute(.twoDigits))).monospacedDigit().foregroundStyle(Color.accentInk)
+                }
+                .font(.system(size: 1.4444 * rem, weight: .heavy))
+            }
+        }
+        .padding(.bottom, 1.1111 * rem)
+    }
+
+    private func antetTableta(_ azi: String) -> some View {
         VStack(alignment: .leading, spacing: 0) {
             HStack(alignment: .bottom, spacing: 0.8889 * rem) {
                 HStack(spacing: 0.4444 * rem) {
@@ -238,6 +267,7 @@ func culoriSectiune(_ s: SectiunePanou) -> (Color, Color) {
 /// `.kpi`
 struct CasetaVedere: View {
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     let c: CasetaPanou
     let actiune: () -> Void
 
@@ -246,14 +276,14 @@ struct CasetaVedere: View {
         Button(action: actiune) {
             VStack(alignment: .leading, spacing: 0.2222 * rem) {
                 HStack(spacing: 0.6667 * rem) {
-                    Iconita(nume: c.iconita, marime: 1.4444 * rem).foregroundStyle(k)
-                        .frame(width: 2.4444 * rem, height: 2.4444 * rem)
+                    Iconita(nume: c.iconita, marime: (telefon ? 1.2222 : 1.4444) * rem).foregroundStyle(k)
+                        .frame(width: (telefon ? 2 : 2.4444) * rem, height: (telefon ? 2 : 2.4444) * rem)
                         .background(kSoft, in: RoundedRectangle(cornerRadius: 0.7778 * rem, style: .continuous))
-                    Text("\(c.numar)").font(.system(size: 2.4444 * rem, weight: .heavy).monospacedDigit()).tracking(-0.03 * 2.4444 * rem)
+                    Text("\(c.numar)").font(.system(size: (telefon ? 2 : 2.4444) * rem, weight: .heavy).monospacedDigit()).tracking(-0.03 * 2.4444 * rem)
                         .foregroundStyle(k.mix(with: .text, by: 0.22))
                 }
                 .padding(.bottom, 0.2222 * rem)
-                Text(c.eticheta).font(.system(size: rem, weight: .bold)).foregroundStyle(Color.text)
+                Text(c.eticheta).font(.system(size: (telefon ? 0.9444 : 1) * rem, weight: .bold)).foregroundStyle(Color.text).fixedSize(horizontal: false, vertical: true)
                 if let bara = c.bara {
                     GeometryReader { g in
                         let total = max(1, bara.reduce(0) { $0 + $1.1 })
@@ -286,7 +316,7 @@ struct CasetaVedere: View {
             }
             .multilineTextAlignment(.leading)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            .padding(.vertical, 0.8889 * rem).padding(.horizontal, rem)
+            .padding(.vertical, (telefon ? 0.6667 : 0.8889) * rem).padding(.horizontal, (telefon ? 0.7778 : 1) * rem)
             .background(LinearGradient(colors: [k.opacity(0.09), .clear], startPoint: .top, endPoint: UnitPoint(x: 0.5, y: 0.7)))
             .background(Color.surface)
             .overlay(alignment: .top) { Rectangle().fill(k).frame(height: 0.3333 * rem) }

@@ -111,22 +111,31 @@ final class WidgetTests: TestVectori {
         }
     }
 
-    /// Expirarea instalării: la 09:00, cu 2 zile înainte de ziua expirării (sau cu una, dacă a trecut); loc rezervat în plan
+    /// Expirarea instalării (29.09.2026: reinstalarea doar în weekend): la 09:00, sâmbăta weekendului dinaintea expirării,
+    /// apoi duminică; dacă a trecut și weekendul, în ziua dinaintea expirării; loc rezervat în plan
     func testExpirarea() {
         func moment(_ s: String) -> Date {   // „2026-10-03 22:17”, ora României
             let p = s.split(whereSeparator: { $0 == "-" || $0 == " " || $0 == ":" }).compactMap { Int($0) }
             return Ceas.calendar.date(from: DateComponents(year: p[0], month: p[1], day: p[2], hour: p[3], minute: p[4]))!
         }
-        let exp = moment("2026-10-03 22:17")
-        let n = notificareExpirare(exp, acum: moment("2026-09-28 10:00"), dispozitiv: "iPad-ul")!
-        XCTAssertEqual([n.data, n.ora, n.id], ["2026-10-01", "09:00", "agenda-expirare-2026-10-03"])
-        XCTAssertEqual(n.titlu, "Aplicația expiră pe sâmbătă, 3 octombrie 2026")
-        XCTAssertEqual(n.text, "Instalarea de pe Mac e valabilă până la ora 22:17. Conectați iPad-ul la Mac și faceți dublu-clic pe „Reinstalează Agenda” (pe Birou). Datele rămân.")
+        // expiră marți, 6 octombrie, 07:13: weekendul de reinstalare = sâmbătă 3 / duminică 4 octombrie
+        let exp = moment("2026-10-06 07:13")
+        XCTAssertEqual(weekendReinstalare(exp), ["2026-10-03", "2026-10-04"])
+        let n = notificareExpirare(exp, acum: moment("2026-09-29 10:00"), dispozitiv: "iPad-ul")!
+        XCTAssertEqual([n.data, n.ora, n.id], ["2026-10-03", "09:00", "agenda-expirare-2026-10-06"])
+        XCTAssertEqual(n.titlu, "Reinstalați aplicația în acest weekend")
+        XCTAssertEqual(n.text, "Instalarea de pe Mac e valabilă până marți, 6 octombrie 2026, ora 07:13. Conectați iPad-ul la Mac și faceți dublu-clic pe „Reinstalează Agenda” (pe Birou). Datele rămân.")
         XCTAssertEqual(n.categorie, .expirare)
-        XCTAssertEqual(notificareExpirare(exp, acum: moment("2026-10-01 09:00"), dispozitiv: "iPad-ul")?.data, "2026-10-02")
-        XCTAssertNil(notificareExpirare(exp, acum: moment("2026-10-02 09:30"), dispozitiv: "iPad-ul"))
-        // expiră la 00:01: avertizarea tot cu 2 zile înainte de ziua expirării
-        XCTAssertEqual(notificareExpirare(moment("2026-10-05 00:01"), acum: moment("2026-09-28 10:00"), dispozitiv: "iPad-ul")?.data, "2026-10-03")
+        XCTAssertEqual(notificareExpirare(exp, acum: moment("2026-10-03 09:30"), dispozitiv: "iPad-ul")?.data, "2026-10-04")
+        // weekendul a trecut: în ziua dinaintea expirării, cu data ei
+        let t = notificareExpirare(exp, acum: moment("2026-10-04 09:30"), dispozitiv: "iPad-ul")!
+        XCTAssertEqual([t.data, t.titlu], ["2026-10-05", "Aplicația expiră pe marți, 6 octombrie 2026"])
+        XCTAssertNil(notificareExpirare(exp, acum: moment("2026-10-05 09:30"), dispozitiv: "iPad-ul"))
+        // reinstalată duminică la 11:00 → expiră duminica următoare la 11:00: sâmbătă și duminică dimineață
+        XCTAssertEqual(weekendReinstalare(moment("2026-10-11 11:00")), ["2026-10-10", "2026-10-11"])
+        // reinstalată sâmbătă la 14:00 → expiră sâmbătă la 14:00: doar sâmbătă dimineață
+        XCTAssertEqual(weekendReinstalare(moment("2026-10-10 14:00")), ["2026-10-10"])
+        XCTAssertEqual(notificareExpirare(moment("2026-10-10 14:00"), acum: moment("2026-10-04 10:00"), dispozitiv: "iPad-ul")?.data, "2026-10-10")
         // în plan: are loc chiar dacă celelalte umplu lista; categoria oprită = fără avertizare
         for (_, controls, activitati) in seturi() {
             let st = stareNativa(controls, activitati, MetaNotificari(), Mediu.AZI, Mediu.ACUM)

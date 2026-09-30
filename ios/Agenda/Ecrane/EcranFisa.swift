@@ -8,6 +8,7 @@ struct EcranFisa: View {
     @Environment(Navigare.self) private var nav
     @Environment(Interfata.self) private var ui
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     let id: String
     @State private var inaltime: CGFloat = 600
 
@@ -36,7 +37,8 @@ struct EcranFisa: View {
                     textBogat("Pentru PDF: **Tipărește / PDF** → în fereastra de tipărire, butonul Partajare → **Salvează în Fișiere**. Dacă tipărirea nu pornește, folosiți **Partajează fișierul**.")
                         .font(.system(size: rem)).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
                         .padding(.top, -0.4444 * rem).padding(.bottom, rem)
-                    VedereDocument(html: StiluriFisa.pagina(fisaMarkup(c, magazin.controls) + anexa(c), margine: 1.6667 * rem, cssExtra: CSS_FOTOGRAFII), inaltime: $inaltime)
+                    VedereDocument(html: StiluriFisa.pagina(fisaMarkup(c, magazin.controls) + anexa(c), margine: (telefon ? 0.7778 : 1.6667) * rem,
+                                                          cssExtra: CSS_FOTOGRAFII + (telefon ? StiluriFisa.telefon : "")), inaltime: $inaltime)
                         .frame(height: inaltime)
                         .clipShape(RoundedRectangle(cornerRadius: 1.1111 * rem, style: .continuous))
                         .umbra()

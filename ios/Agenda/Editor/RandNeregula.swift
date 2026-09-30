@@ -89,6 +89,7 @@ struct RandNeregulaVedere: View, Equatable {
     @Environment(SesiuneEditor.self) private var ses
     @Environment(\.rem) private var rem
     @Environment(\.cuBaraLaterala) private var lat
+    @Environment(\.telefon) private var telefon
     @Environment(\.lipici) private var lipici
     let m: ModelRandNeregula
     /// categoria (culoarea benzii); nil = în afara grupelor (Obiectiv → adăposturi)
@@ -118,7 +119,7 @@ struct RandNeregulaVedere: View, Equatable {
                         }
                     }
                 }
-                .padding(.leading, 3.2222 * rem)
+                .padding(.leading, telefon ? 0 : 3.2222 * rem)   // telefon: `.row-main { padding-left: 0 }`
                 .padding(.top, 0.4444 * rem)
             }
             if let d = m.detaliu { DetaliuNeregula(key: m.key, m: d) }
@@ -132,12 +133,38 @@ struct RandNeregulaVedere: View, Equatable {
 struct BaraNeregula: View {
     @Environment(SesiuneEditor.self) private var ses
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     let m: ModelRandNeregula
     let cat: String?
 
     var body: some View {
-        HStack(alignment: .center, spacing: 0.7778 * rem) {
-            IndexRand(text: m.litera, stare: m.stare, cat: cat, gravAdaugat: m.gravAdaugat).frame(maxHeight: .infinity, alignment: .top)
+        // telefon (`.ner-bar` pe două rânduri): litera, denumirea, săgeata; dedesubt ✓ / ✗ / NEC pe toată lățimea
+        if telefon {
+            VStack(alignment: .leading, spacing: 0.5556 * rem) {
+                HStack(alignment: .top, spacing: 0.5556 * rem) {
+                    IndexRand(text: m.litera, stare: m.stare, cat: cat, gravAdaugat: m.gravAdaugat)
+                    continut
+                    sageata
+                }
+                if let o = m.okNok { OkNok(m: o, intins: true) }
+            }
+        } else {
+            HStack(alignment: .center, spacing: 0.7778 * rem) {
+                IndexRand(text: m.litera, stare: m.stare, cat: cat, gravAdaugat: m.gravAdaugat).frame(maxHeight: .infinity, alignment: .top)
+                continut
+                if let o = m.okNok { OkNok(m: o) }
+                sageata
+            }
+        }
+    }
+
+    private var sageata: some View {
+        ButonIconita(iconita: "chevD", eticheta: "\(m.restrans ? "Deschide" : "Restrânge") rândul \(m.litera)", rotit: .degrees(m.restrans ? -90 : 0)) {
+            ses.click("row-toggle", ["key": m.key])
+        }
+    }
+
+    private var continut: some View {
             VStack(alignment: .leading, spacing: 0.4444 * rem) {
                 if m.adapost {
                     Text("Adăpost de protecție civilă").font(.system(size: 1.0278 * rem, weight: .bold)).foregroundStyle(Color.text)
@@ -160,11 +187,6 @@ struct BaraNeregula: View {
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())
             .onTapGesture { if m.campEticheta == nil { ses.click("row-toggle", ["key": m.key]) } }
-            if let o = m.okNok { OkNok(m: o) }
-            ButonIconita(iconita: "chevD", eticheta: "\(m.restrans ? "Deschide" : "Restrânge") rândul \(m.litera)", rotit: .degrees(m.restrans ? -90 : 0)) {
-                ses.click("row-toggle", ["key": m.key])
-            }
-        }
     }
 }
 
@@ -192,6 +214,7 @@ struct CampEticheta: View {
 struct RandActVedere: View, Equatable {
     @Environment(SesiuneEditor.self) private var ses
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     @Environment(\.lipici) private var lipici
     let m: ModelRandAct
 
@@ -201,7 +224,7 @@ struct RandActVedere: View, Equatable {
         VStack(alignment: .leading, spacing: 0.6667 * rem) {
             BaraAct(m: m).baraRandului("act-\(m.key)", lipici)
             if let o = m.obs {
-                CampObs(m: o).padding(.leading, 3.2222 * rem).padding(.top, 0.4444 * rem)
+                CampObs(m: o).padding(.leading, telefon ? 0 : 3.2222 * rem).padding(.top, 0.4444 * rem)
             }
         }
         .modifier(CadruRand(stare: m.stare, cat: "acte", restrans: m.restrans))
@@ -213,11 +236,37 @@ struct RandActVedere: View, Equatable {
 struct BaraAct: View {
     @Environment(SesiuneEditor.self) private var ses
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     let m: ModelRandAct
 
     var body: some View {
+        // telefon: numărul, denumirea, săgeata; dedesubt Prezentat / Lipsă / NEC pe toată lățimea
+        if telefon {
+            VStack(alignment: .leading, spacing: 0.5556 * rem) {
+                HStack(alignment: .top, spacing: 0.5556 * rem) {
+                    IndexRand(text: "\(m.nr)", stare: m.stare, cat: "acte", litera: false)
+                    continut
+                    sageata
+                }
+                if let o = m.okNok { OkNok(m: o, intins: true) }
+            }
+        } else {
             HStack(alignment: .center, spacing: 0.7778 * rem) {
                 IndexRand(text: "\(m.nr)", stare: m.stare, cat: "acte", litera: false).frame(maxHeight: .infinity, alignment: .top)
+                continut
+                if let o = m.okNok { OkNok(m: o) }
+                sageata
+            }
+        }
+    }
+
+    private var sageata: some View {
+        ButonIconita(iconita: "chevD", eticheta: "\(m.restrans ? "Deschide" : "Restrânge") actul \(m.nr)", rotit: .degrees(m.restrans ? -90 : 0)) {
+            ses.click("row-toggle", ["key": "act:\(m.key)"])
+        }
+    }
+
+    private var continut: some View {
                 VStack(alignment: .leading, spacing: 0.4444 * rem) {
                     Text(m.eticheta).font(.system(size: 1.0278 * rem, weight: .bold))
                         .foregroundStyle(m.stare == "nec" ? Color.muted : Color.text)
@@ -233,11 +282,6 @@ struct BaraAct: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .contentShape(Rectangle())
                 .onTapGesture { ses.click("row-toggle", ["key": "act:\(m.key)"]) }
-                if let o = m.okNok { OkNok(m: o) }
-                ButonIconita(iconita: "chevD", eticheta: "\(m.restrans ? "Deschide" : "Restrânge") actul \(m.nr)", rotit: .degrees(m.restrans ? -90 : 0)) {
-                    ses.click("row-toggle", ["key": "act:\(m.key)"])
-                }
-            }
     }
 }
 

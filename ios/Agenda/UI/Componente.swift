@@ -52,10 +52,12 @@ struct VederePastila: View {
 /// `.chips`: pastilele pe rânduri
 struct Pastile: View {
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     let l: [PastilaUI]
     var rupe = false
     var body: some View {
-        FlowLayout(spatiu: 0.4444 * rem) { ForEach(Array(l.enumerated()), id: \.offset) { VederePastila(p: $0.element, rupe: rupe) } }
+        // telefon: pastilele lungi se rup pe rânduri, nu se taie (`.chips .pill { white-space: normal }`)
+        FlowLayout(spatiu: 0.4444 * rem) { ForEach(Array(l.enumerated()), id: \.offset) { VederePastila(p: $0.element, rupe: rupe || telefon) } }
     }
 }
 
@@ -204,13 +206,30 @@ struct Segmentat: View {
 // ───────── .flt-row ─────────
 struct RandFiltre: View {
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
+    @Environment(\.telefonCulcat) private var culcat
     let butoane: [ButonFiltru]
     let sterge: Bool
     let comuta: (String) -> Void
     let curata: () -> Void
 
     var body: some View {
-        FlowLayout(spatiu: 0.4444 * rem) {
+        Group {
+            if telefon {
+                // telefon: două rânduri (culcat: unul) care se derulează orizontal (`.flt-row`)
+                ScrollView(.horizontal, showsIndicators: false) {
+                    LazyHGrid(rows: Array(repeating: GridItem(.fixed(tinta(2.4444 * rem)), spacing: 0.4444 * rem, alignment: .leading), count: culcat ? 1 : 2),
+                              alignment: .top, spacing: 0.4444 * rem) { elemente }
+                        .padding(.bottom, 2)
+                }
+            } else {
+                FlowLayout(spatiu: 0.4444 * rem) { elemente }
+            }
+        }
+        .padding(.bottom, 0.8889 * rem)
+    }
+
+    @ViewBuilder private var elemente: some View {
             ForEach(butoane, id: \.key) { b in
                 let culoare = culoareFiltru(b.nivel)
                 Button { comuta(b.key) } label: {
@@ -249,8 +268,6 @@ struct RandFiltre: View {
                 }
                 .buttonStyle(.plain)
             }
-        }
-        .padding(.bottom, 0.8889 * rem)
     }
 
     private func culoareFiltru(_ nivel: String) -> Color {
@@ -303,6 +320,7 @@ struct TextNumar: View {
 // ───────── .ctl-row ─────────
 struct RandControl: View {
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     let m: ModelRandControl
     /// în panoul zilei (Calendar): fără umbră, pe fundal gri (`.day-panel .ctl-row`)
     var fara = false
@@ -332,7 +350,7 @@ struct RandControl: View {
                     Pastile(l: m.pastile)
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
-                Iconita(nume: "chevR", marime: 1.4444 * rem).foregroundStyle(Color.lineStrong)
+                if !telefon { Iconita(nume: "chevR", marime: 1.4444 * rem).foregroundStyle(Color.lineStrong) }
             }
             .padding(.vertical, 0.8889 * rem)
             .padding(.horizontal, rem)

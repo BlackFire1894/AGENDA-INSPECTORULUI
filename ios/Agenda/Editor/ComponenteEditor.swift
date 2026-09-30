@@ -139,6 +139,7 @@ struct CampData: View {
                 Text(valoare.isEmpty ? "ZZ.LL.AAAA" : fmtDate(valoare))
                     .font(.system(size: max(16, 1.0556 * rem)).monospacedDigit())
                     .foregroundStyle(valoare.isEmpty ? Color.muted.opacity(0.7) : Color.text)
+                    .faraRupere()
                     .padding(.horizontal, 0.8889 * rem)
                 Spacer(minLength: 0)
                 Iconita(nume: "calendar", marime: 1.2222 * rem).foregroundStyle(Color.muted).padding(.trailing, 0.7778 * rem)
@@ -197,7 +198,7 @@ struct Comutator: View {
                     if m.activ { Iconita(nume: m.iconita, marime: 1.2222 * rem, grosime: 2.8) }
                 }
                 .frame(width: 1.7778 * rem, height: 1.7778 * rem)
-                Text(m.text).font(.system(size: 0.9444 * rem, weight: .bold)).multilineTextAlignment(.leading)
+                Text(m.text).font(.system(size: 0.9444 * rem, weight: .bold)).multilineTextAlignment(.leading).faraRupere()
                     .frame(maxWidth: intins ? .infinity : nil, alignment: .leading)
             }
             .foregroundStyle(m.activ ? Color.white : netrecut ? Color.warnInk : Color.text)
@@ -230,6 +231,7 @@ enum StilSegment { case dnn, mare, adapost, filtru, luni }
 
 struct Segment: View {
     @Environment(\.rem) private var rem
+    @Environment(\.telefon) private var telefon
     let m: ModelSegment
     var stil: StilSegment = .dnn
     /// `.dot-row.is-grav`: NU ales = roșu
@@ -238,16 +240,24 @@ struct Segment: View {
     var intinsa = false
     let alege: (String) -> Void
 
+    /// telefon, filtrele Toate / Constatate / Neverificate: pe tot rândul, lățimi egale, textul se poate rupe
+    private var egale: Bool { stil == .filtru && telefon }
+
     var body: some View {
-        HStack(spacing: stil == .dnn ? 0.2222 * rem : 0.2222 * rem) {
+        // `.segmented { flex-wrap: wrap }`: butoanele care nu încap trec pe rândul următor (nu se trunchiază)
+        let asezare = egale ? AnyLayout(HStackLayout(spacing: 0.2222 * rem)) : AnyLayout(FlowLayout(spatiu: 0.2222 * rem))
+        asezare {
             ForEach(m.optiuni, id: \.key) { o in
                 let on = m.ales == o.key
                 Button { alege(o.key) } label: {
                     Text(o.label)
                         .font(.system(size: marime, weight: .bold))
-                        .lineLimit(1)
+                        .lineLimit(egale ? 2 : 1)
+                        .multilineTextAlignment(.center)
                         .foregroundStyle(on ? culoareText(o.key) : Color.muted)
-                        .padding(.horizontal, stil == .mare ? 1.2222 * rem : stil == .filtru ? rem : 0.6667 * rem)
+                        .padding(.horizontal, egale ? 0.3333 * rem : stil == .mare ? 1.2222 * rem : stil == .filtru ? rem : 0.6667 * rem)
+                        .padding(.vertical, egale ? 0.2222 * rem : 0)
+                        .frame(maxWidth: egale ? .infinity : nil)
                         .frame(minWidth: stil == .dnn ? 3.5556 * rem : stil == .adapost ? tinta(4 * rem) : nil)
                         .frame(minHeight: tinta((stil == .mare ? 2.8889 : 2.4444) * rem))
                         .background(on ? fundal(o.key) : .clear, in: RoundedRectangle(cornerRadius: 0.6111 * rem, style: .continuous))
@@ -260,10 +270,10 @@ struct Segment: View {
             }
         }
         .padding(stil == .dnn || stil == .adapost ? 3 : 0.2222 * rem)
-        .frame(maxWidth: intinsa ? .infinity : nil, alignment: .leading)
+        .frame(maxWidth: intinsa || egale ? .infinity : nil, alignment: .leading)
         .background(stil == .filtru ? Color.surface : Color.surface2, in: RoundedRectangle(cornerRadius: 0.8333 * rem, style: .continuous))
         .overlay(RoundedRectangle(cornerRadius: 0.8333 * rem, style: .continuous).strokeBorder(Color.line, lineWidth: 1.5))
-        .fixedSize(horizontal: !intinsa, vertical: true)
+        .fixedSize(horizontal: !intinsa && !egale, vertical: true)
     }
 
     private var marime: CGFloat {
@@ -321,6 +331,8 @@ struct OkNok: View {
     @Environment(SesiuneEditor.self) private var ses
     @Environment(\.rem) private var rem
     let m: ModelOkNok
+    /// telefon: pe toată lățimea rândului, butoane egale (`.oknok { width: 100% }`)
+    var intins = false
 
     var body: some View {
         HStack(spacing: 0.3333 * rem) {
@@ -333,7 +345,8 @@ struct OkNok: View {
                         Text("nu e cazul").font(.system(size: 0.6111 * rem, weight: .bold))
                     }
                     .foregroundStyle(m.stare == "nec" ? necText : Color.muted)
-                    .frame(width: 3.8889 * rem, height: tinta(3.3333 * rem))
+                    .frame(width: intins ? nil : 3.8889 * rem, height: tinta((intins ? 3.1111 : 3.3333) * rem))
+                    .frame(maxWidth: intins ? .infinity : nil)
                     .background(m.stare == "nec" ? necFundal : Color.surface2, in: RoundedRectangle(cornerRadius: 0.8889 * rem, style: .continuous))
                     .overlay(RoundedRectangle(cornerRadius: 0.8889 * rem, style: .continuous).strokeBorder(m.stare == "nec" ? necFundal : Color.line, lineWidth: 2))
                 }
@@ -356,7 +369,8 @@ struct OkNok: View {
                 Text(text).font(.system(size: 0.7222 * rem, weight: .heavy)).lineLimit(1).minimumScaleFactor(0.8)
             }
             .foregroundStyle(on ? Color.white : Color.muted)
-            .frame(width: 4.6667 * rem, height: tinta(3.3333 * rem))
+            .frame(width: intins ? nil : 4.6667 * rem, height: tinta((intins ? 3.1111 : 3.3333) * rem))
+            .frame(maxWidth: intins ? .infinity : nil)
             .background(on ? culoare : Color.surface2, in: RoundedRectangle(cornerRadius: 0.8889 * rem, style: .continuous))
             .overlay(RoundedRectangle(cornerRadius: 0.8889 * rem, style: .continuous).strokeBorder(on ? culoare : Color.line, lineWidth: 2))
         }
@@ -402,7 +416,7 @@ struct CampObs: View {
             Button { ses.click("obs-open", ["path": m.cale]) } label: {
                 HStack(spacing: 0.3333 * rem) {
                     Iconita(nume: "plus", marime: (mic ? 0.8889 : 1.1111) * rem)
-                    Text("Obs.")
+                    Text("Obs.").faraRupere()
                 }
                 .font(.system(size: (mic ? 0.7778 : 0.8333) * rem, weight: .semibold))
                 .foregroundStyle(Color.muted)
@@ -548,7 +562,7 @@ struct ButonMic: View {
     let actiune: () -> Void
     var body: some View {
         Button(action: actiune) {
-            Text(text).font(.system(size: 0.8333 * rem, weight: .semibold))
+            Text(text).font(.system(size: 0.8333 * rem, weight: .semibold)).faraRupere()
                 .foregroundStyle(pericol ? Color.red : Color.text)
                 .padding(.horizontal, 0.7778 * rem)
                 .frame(minHeight: tinta(2.2222 * rem))
