@@ -167,9 +167,74 @@ public struct ModelTabObiectiv: Equatable, Sendable {
     /// „Data încheierii este înaintea datei de începere.”
     public let eroareIncheiere: Bool
     public let incarcare: ModelIncarcare?
+    /// numărul construcțiilor (− / +)
+    public let nrConstructii: Int
+    /// căutarea și „Filtre” din Construcții (v1.26; nil la o singură construcție)
+    public let unelteConstructii: ModelUnelteConstructii?
+    /// cu căutarea / filtrele active: etichetele ✕ și „2 din 6 construcții”
+    public let constructiiFiltrate: ModelConstructiiFiltrate?
+    /// construcțiile afișate (toate sau cele găsite)
     public let constructii: [ModelConstructie]
+    /// „Nicio construcție nu se potrivește…”
+    public let constructiiGol: String?
     /// nil la Localitate (adăposturile sunt în tabul Protecție civilă)
     public let adaposturi: ModelAdaposturi?
+}
+
+/// Construcții (v1.26): căutarea (denumire sau dotare DA) și panoul „Filtre”
+public struct ModelUnelteConstructii: Equatable, Sendable {
+    public let valoare: String
+    public let deschis: Bool
+    /// câte filtre sunt active (cifra de pe „Filtre”)
+    public let active: Int
+    /// „Dotate cu (DA)”, „Fără (NU)”, „Stare” (doar grupele cu alegeri); gol = încă nimic de filtrat
+    public let grupe: [ModelGrupFiltre]
+}
+
+public struct ModelGrupFiltre: Equatable, Sendable {
+    public let titlu: String
+    public let optiuni: [ModelOptiuneFiltru]
+}
+
+/// O alegere din „Filtre”, cu numărul construcțiilor
+public struct ModelOptiuneFiltru: Equatable, Sendable {
+    public let val: String, text: String, n: Int, activ: Bool
+}
+
+public struct ModelConstructiiFiltrate: Equatable, Sendable {
+    public let etichete: [ModelEticheta]
+    /// „2 din 6 construcții”
+    public let numar: String
+}
+
+/// Un filtru activ, ca etichetă cu ✕: acțiunea care îl scoate
+public struct ModelEticheta: Equatable, Sendable {
+    public let act: String, date: [String: String], text: String
+    /// eticheta construcției (cu iconița clădirii)
+    public var constructie = false
+}
+
+/// „Sprinklere: DA”, „IDSAI: NU”, „Dotări necompletate”, „Instalații lipsă”
+func numeFiltruConstr(_ f: String) -> String {
+    let p = f.split(separator: ":", omittingEmptySubsequences: false).map(String.init)
+    if p[0] == "necomplet" { return "Dotări necompletate" }
+    if p[0] == "lipsa" { return "Instalații lipsă" }
+    let key = p.count > 1 ? p[1] : ""
+    return "\(K.dotari.first { $0.key == key }?.label ?? key): \(p[0] == "da" ? "DA" : "NU")"
+}
+
+func modelUnelteConstructii(_ c: Control, _ ed: Editor) -> ModelUnelteConstructii {
+    let u = ed.ui
+    let o = optiuniFiltreConstructii(c, u.constrFlt.ordine)
+    let opt = { (val: String, text: String, n: Int) in ModelOptiuneFiltru(val: val, text: text, n: n, activ: u.constrFlt.are(val)) }
+    var grupe: [ModelGrupFiltre] = []
+    if !o.da.isEmpty { grupe.append(ModelGrupFiltre(titlu: "Dotate cu (DA)", optiuni: o.da.map { opt("da:\($0.key)", $0.label, $0.n) })) }
+    if !o.nu.isEmpty { grupe.append(ModelGrupFiltre(titlu: "Fără (NU)", optiuni: o.nu.map { opt("nu:\($0.key)", $0.label, $0.n) })) }
+    var stare: [ModelOptiuneFiltru] = []
+    if o.necomplet > 0 || u.constrFlt.are("necomplet") { stare.append(opt("necomplet", "Dotări necompletate", o.necomplet)) }
+    if o.lipsa > 0 || u.constrFlt.are("lipsa") { stare.append(opt("lipsa", "Instalații lipsă", o.lipsa)) }
+    if !stare.isEmpty { grupe.append(ModelGrupFiltre(titlu: "Stare", optiuni: stare)) }
+    return ModelUnelteConstructii(valoare: u.constrQuery, deschis: u.constrFltOpen, active: u.constrFlt.count, grupe: grupe)
 }
 
 /// „De întrebat până la finalizarea controlului”: sarcini cu bifă; cele nebifate apar în „Ce mai aveți de făcut”
@@ -216,6 +281,11 @@ public func modelTabObiectiv(_ c: Control, _ controls: [Control], _ ed: Editor, 
                               randuri: adaposturi(c).filter { isApplicable(c, $0) }.map { modelRandNeregula(c, controls, ed, $0, azi: azi) },
                               notaNeconforme: (adaposturiStats(c)?.neconforme ?? 0) > 0)
     }
+    // Construcții: toate sau, cu căutarea / filtrele (v1.26), doar cele găsite
+    let filtrat = ed.constrFiltrat(c)
+    let rez = filtrat ? constructiiFiltrate(c, ed.ui.constrQuery, ed.ui.constrFlt.ordine)
+        : c.constructii.enumerated().map { ConstructieGasita(k: $1, i: $0, potriviri: []) }
+    let q = ed.ui.constrQuery.trimJS
     return ModelTabObiectiv(
         tip: ModelSegment(cale: "tip", optiuni: K.tipObiectiv, ales: c.tip),
         campuri: campuri, telefon: c.telefon, email: c.email,
@@ -223,7 +293,13 @@ public func modelTabObiectiv(_ c: Control, _ controls: [Control], _ ed: Editor, 
         dataInceput: c.dataInceput, dataIncheiere: c.dataIncheiere, incheiat: isIncheiat(c),
         eroareIncheiere: isIncheiat(c) && c.dataIncheiere < c.dataInceput,
         incarcare: modelIncarcare(c, azi: azi),
-        constructii: c.constructii.enumerated().map { modelConstructie(c, $1, $0, ed) },
+        nrConstructii: c.constructii.count,
+        unelteConstructii: c.constructii.count > 1 ? modelUnelteConstructii(c, ed) : nil,
+        constructiiFiltrate: filtrat ? ModelConstructiiFiltrate(
+            etichete: ed.ui.constrFlt.ordine.map { ModelEticheta(act: "constr-flt", date: ["val": $0], text: numeFiltruConstr($0)) },
+            numar: "\(rez.count) din \(c.constructii.count) construcții") : nil,
+        constructii: rez.map { modelConstructie(c, $0.k, $0.i, ed, potriviri: $0.potriviri) },
+        constructiiGol: rez.isEmpty ? "Nicio construcție nu se potrivește\(q.isEmpty ? "" : " cu „\(q)”")\(ed.ui.constrFlt.isEmpty ? "" : " și filtrelor alese")." : nil,
         adaposturi: adp)
 }
 
@@ -315,6 +391,8 @@ public struct ModelGps: Equatable, Sendable {
 
 public struct ModelDotare: Equatable, Sendable {
     public let key: String, eticheta: String, cale: String
+    /// dotarea căutată sau aleasă în filtre (evidențiată; v1.26)
+    public var gasit = false
     /// centrala: tipurile alese și „NU ARE”
     public let centrala: Bool
     public var tipuri: [String] = [], nuAre = false
@@ -332,7 +410,7 @@ public struct ModelCentrala: Equatable, Sendable {
     public let id: String, nr: Int, tipuri: [String]
 }
 
-func modelConstructie(_ c: Control, _ k: Constructie, _ i: Int, _ ed: Editor) -> ModelConstructie {
+func modelConstructie(_ c: Control, _ k: Constructie, _ i: Int, _ ed: Editor, potriviri: Set<String> = []) -> ModelConstructie {
     let open = ed.isOpen(c, k, i)
     let p = "constructii.#\(k.id)"
     let s = dotariSummary(c, k)
@@ -357,7 +435,7 @@ func modelConstructie(_ c: Control, _ k: Constructie, _ i: Int, _ ed: Editor) ->
             grf: ModelGrf(cale: "\(p).grf", ales: k.grf, grav: grav,
                           nota: grav ? "Neregulă gravă: GRF/NSI V cu regim de înălțime \(k.regimInaltime) (peste parter). Apare în tabul Nereguli." : nil),
             gps: modelGps(c, k, i, ed),
-            dotari: dotariVizibile(c, k).map { modelDotare(c, p, k, $0, ed) },
+            dotari: dotariVizibile(c, k).map { d in var m = modelDotare(c, p, k, d, ed); m.gasit = potriviri.contains(d.key); return m },
             stergere: c.constructii.count > 1)
     }
     return ModelConstructie(
@@ -454,18 +532,49 @@ func modelRandAdapost(_ c: Control, _ ed: Editor) -> ModelRandAdapost {
 public struct ModelTabActe: Equatable, Sendable {
     public let verificate: Int, total: Int, prezentate: Int, lipsa: Int, nec: Int
     public let cautare: ModelCautare
-    public let filtru: [ModelFiltru]
+    /// filtrele active (etichete ✕)
+    public let etichete: [ModelEticheta]
     public let rest: String?
     public let rezultat: ModelNotaCautare?
     public let grup: ModelGrupActe
 }
 
-/// Căutarea și meniul „⋯” (restrânge / extinde)
+/// Căutarea și butonul „Filtre” (v1.26): starea, construcția (la nereguli) și afișarea (restrânge / extinde)
 public struct ModelCautare: Equatable, Sendable {
     public let sec: String, valoare: String, indiciu: String
+    /// panoul „Filtre” deschis
     public let meniuDeschis: Bool
-    /// butoanele din meniu: (acțiune, date, text, iconiță); gol = fără „⋯”
+    /// câte filtre sunt active (cifra de pe „Filtre”)
+    public let active: Int
+    /// „Stare”: Toate / Constatate / Netrecute în PV / Neverificate (la Acte: Toate / Lipsă / Neverificate)
+    public let stare: [ModelFiltru]
+    /// „Construcția”: Toate (cheia "") + fiecare construcție (cheia = id); gol = fără grup
+    public let constructii: [ModelFiltru]
+    /// „Afișare”: butoanele (acțiune, date, text, iconiță)
     public let meniu: [ButonMeniu]
+}
+
+/// Filtrele active (etichete ✕) ale tabului: starea și, la nereguli, construcția
+func eticheteActive(_ c: Control, _ ed: Editor, _ sec: String, _ stare: [ModelFiltru]) -> [ModelEticheta] {
+    var l: [ModelEticheta] = []
+    if ed.ui.nerFilter != "ALL", let s = stare.first(where: { $0.key == ed.ui.nerFilter }) {
+        l.append(ModelEticheta(act: "ner-filter", date: ["val": "ALL"], text: s.text))
+    }
+    let kId = sec == "acte" ? "" : ed.constrFiltruNer(c)
+    if !kId.isEmpty, let i = c.constructii.firstIndex(where: { $0.id == kId }) {
+        let k = c.constructii[i]
+        l.append(ModelEticheta(act: "ner-constr", date: ["val": ""], text: "\(i + 1). \(k.denumire.isEmpty ? "Construcția \(i + 1)" : k.denumire)", constructie: true))
+    }
+    return l
+}
+
+/// „Construcția” din „Filtre” (nereguli, la mai multe construcții): Toate + fiecare construcție
+func filtruConstructii(_ c: Control, _ ed: Editor) -> [ModelFiltru] {
+    guard c.constructii.count > 1 else { return [] }
+    let kId = ed.constrFiltruNer(c)
+    return [ModelFiltru(key: "", text: "Toate", activ: kId.isEmpty)] + c.constructii.enumerated().map { i, k in
+        ModelFiltru(key: k.id, text: "\(i + 1). \(k.denumire.isEmpty ? "Construcția \(i + 1)" : k.denumire)", activ: kId == k.id)
+    }
 }
 
 public struct ButonMeniu: Equatable, Sendable {
@@ -524,12 +633,13 @@ public func modelTabActe(_ c: Control, _ ed: Editor, azi: String) -> ModelTabAct
     else if vreunaInchisa { meniu = [ButonMeniu(act: "rows-expand", date: ["sec": "acte"], text: "Deschide rândurile", iconita: "chevD")] }
     let f = ed.ui.nerFilter
     let (nota, grup) = acteRezultate(c, ed)
+    let stare = [("ALL", "Toate"), ("NOK", "Lipsă (\(st.acteNok))"), ("TODO", "Neverificate (\(gol))")].map { ModelFiltru(key: $0.0, text: $0.1, activ: f == $0.0) }
     return ModelTabActe(
         verificate: st.acteDone, total: st.acteTotal, prezentate: stari.filter { $0 == "ok" }.count, lipsa: st.acteNok,
         nec: stari.filter { $0 == "nec" }.count,
         cautare: ModelCautare(sec: "acte", valoare: ed.ui.nerQuery, indiciu: "Caută: numărul actului sau text (ex. LFD, instruire)",
-                              meniuDeschis: ed.ui.toolsOpen, meniu: meniu),
-        filtru: [("ALL", "Toate"), ("NOK", "Lipsă (\(st.acteNok))"), ("TODO", "Neverificate (\(gol))")].map { ModelFiltru(key: $0.0, text: $0.1, activ: f == $0.0) },
+                              meniuDeschis: ed.ui.toolsOpen, active: f != "ALL" ? 1 : 0, stare: stare, constructii: [], meniu: meniu),
+        etichete: eticheteActive(c, ed, "acte", stare),
         rest: gol > 0 ? "Restul prezentate (\(gol))" : nil,
         rezultat: nota, grup: grup)
 }
@@ -604,7 +714,8 @@ public struct ModelTabSectiune: Equatable, Sendable {
     /// „Termenele amenzilor și ASI pornesc după ce completați data încheierii (tabul Obiectiv).”
     public let notaTermene: Bool
     public let cautare: ModelCautare
-    public let filtru: [ModelFiltru]
+    /// filtrele active (etichete ✕)
+    public let etichete: [ModelEticheta]
     public let rest: String?
     public let rezultat: ModelNotaCautare?
     public let grupe: [ModelGrupNereguli]
@@ -653,7 +764,9 @@ func sectionRows(_ c: Control, _ ed: Editor, _ sec: String) -> RanduriSectiune {
     let tmpl = rows.filter { !$0.custom && (isApplicable(c, $0) || (showAll && ascunsaDeDotari(c, $0))) }
     let custom = rows.filter { $0.custom && !$0.adapost }
     let adp = rows.filter { $0.adapost && isApplicable(c, $0) }
-    let show = { (n: Neregula) in (f == "ALL" || (f == "NOK" ? n.status == "nok" : n.status.isEmpty)) && matchNeregula(c, n, q) }
+    let kId = ed.constrFiltruNer(c)
+    let okStare = { (n: Neregula) in f == "ALL" || (f == "NOK" ? n.status == "nok" : f == "PV" ? n.status == "nok" && !n.inPV : n.status.isEmpty) }
+    let show = { (n: Neregula) in okStare(n) && inConstructie(c, n, kId) && matchNeregula(c, n, q) }
     var groups: [(cat: String, rows: [Neregula])] = []
     for n in tmpl {
         let cat = neregulaCat(n)
@@ -720,12 +833,16 @@ public func modelTabSectiune(_ c: Control, _ controls: [Control], _ ed: Editor, 
     let nokCap = ui.nokWord.prefix(1).uppercased() + ui.nokWord.dropFirst()
     let f = ed.ui.nerFilter
     let rez = nerRezultate(c, controls, ed, sec, sr, azi: azi)
+    // filtrele de stare (v1.26: și „Netrecute în PV”)
+    let stare = [("ALL", "Toate"), ("NOK", "\(nokCap) (\(st.constatate))"), ("PV", "Netrecute în PV (\(st.netrecute))"),
+                 ("TODO", "Neverificate (\(st.total - st.checked))")].map { ModelFiltru(key: $0.0, text: $0.1, activ: f == $0.0) }
     return ModelTabSectiune(
         sec: sec, verificate: st.checked, total: st.total, constatate: st.constatate, inPV: st.constatate - st.netrecute,
         netrecute: st.netrecute, amenzi: st.fines.count, nokWord: ui.nokWord, ascunse: ascunse,
         notaTermene: !isIncheiat(c) && anyFineOrAsi,
-        cautare: ModelCautare(sec: sec, valoare: ed.ui.nerQuery, indiciu: "Caută: literă (d, G1) sau text (ex. hidranți, gaz)", meniuDeschis: ed.ui.toolsOpen, meniu: meniu),
-        filtru: [("ALL", "Toate"), ("NOK", "\(nokCap) (\(st.constatate))"), ("TODO", "Neverificate (\(st.total - st.checked))")].map { ModelFiltru(key: $0.0, text: $0.1, activ: f == $0.0) },
+        cautare: ModelCautare(sec: sec, valoare: ed.ui.nerQuery, indiciu: "Caută: literă (d, G1) sau text (ex. hidranți, gaz)", meniuDeschis: ed.ui.toolsOpen,
+                              active: (f != "ALL" ? 1 : 0) + (ed.constrFiltruNer(c).isEmpty ? 0 : 1), stare: stare, constructii: filtruConstructii(c, ed), meniu: meniu),
+        etichete: eticheteActive(c, ed, sec, stare),
         rest: rest > 0 ? "\(sec == "ner" ? "Restul conform" : "Restul conforme") (\(rest))" : nil,
         rezultat: rez.nota, grupe: rez.grupe, gol: rez.gol, adaugate: rez.adaugate)
 }
@@ -768,7 +885,7 @@ func nerRezultate(_ c: Control, _ controls: [Control], _ ed: Editor, _ sec: Stri
     }
     let customVis = sr.custom.filter(sr.show)
     found += customVis.count
-    let fName = f == "NOK" ? "„\(ui.nokWord)”" : "„Neverificate”"
+    let fName = f == "NOK" ? "„\(ui.nokWord)”" : f == "PV" ? "„Netrecute în PV”" : "„Neverificate”"
     var gol: String?
     if grupe.isEmpty {
         gol = !q.isEmpty

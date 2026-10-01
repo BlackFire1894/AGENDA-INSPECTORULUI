@@ -35,7 +35,7 @@ const ok = (c, m) => console.log((c ? 'ok: ' : 'FAIL: ') + m);
     ok(await p.locator('#ner-b1 textarea.obs').inputValue() === 'PRAM 2025 lipsă', 'b1: textul se salvează; după reîncărcare câmpul e afișat');
     // golit → revine la „+ Obs.” la următoarea redesenare
     await p.fill('#ner-b1 textarea.obs', ''); await p.dispatchEvent('#ner-b1 textarea.obs', 'input'); await p.waitForTimeout(300);
-    await p.click('.sum-line'); await p.click('[data-act="ner-filter"][data-val="ALL"]'); await p.waitForTimeout(300);
+    await p.click('.sum-line'); await p.click('[data-act="tools-more"]'); await p.click('[data-act="tools-more"]'); await p.waitForTimeout(300);
     ok(await p.locator('#ner-b1 textarea.obs').count() === 0 && await p.locator('#ner-b1 [data-act="obs-open"]').count() === 1, 'b1 golit → înapoi la „+ Obs.”');
     // Anulează readuce textul (și câmpul)
     await p.click('#edit-strip [data-act="undo"]:visible, #side-edit [data-act="undo"]:visible'); await p.waitForTimeout(500);

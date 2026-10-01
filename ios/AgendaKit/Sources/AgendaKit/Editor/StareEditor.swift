@@ -19,6 +19,7 @@ public struct MultimeOrdonata: Equatable, Sendable {
         return true
     }
     public var isEmpty: Bool { elemente.isEmpty }
+    public var count: Int { ordine.count }
 }
 
 /// Starea de interfață a editorului (js/state.js → state.ui): filtrul, căutarea, ce e deschis sau restrâns.
@@ -36,8 +37,18 @@ public struct StareEditor: Equatable, Sendable {
     public var showAllNer = false
     /// câmpuri de observații goale deschise acum („<idControl>|<cale>”)
     public var obsOpen: Set<String> = []
-    /// meniul „⋯” (restrânge / extinde)
+    /// panoul „Filtre” din Acte / Nereguli (stare, construcție, afișare)
     public var toolsOpen = false
+    /// Nereguli: doar rândurile unei construcții (id; v1.26)
+    public var nerConstr = ""
+    /// căutarea din Construcții (tabul Obiectiv): denumire sau dotare (v1.26)
+    public var constrQuery = ""
+    /// filtrele Construcțiilor, în ordinea alegerii: „da:<dotare>”, „nu:<dotare>”, „necomplet”, „lipsa”
+    public var constrFlt = MultimeOrdonata()
+    /// panoul „Filtre” din Construcții deschis
+    public var constrFltOpen = false
+    /// filtrul de stare pus după o mutare din „Ce mai aveți de făcut” (ex. „PV”)
+    public var revealFilter = ""
     /// lista completă „Ce mai aveți de făcut”
     public var todoOpen = false
     /// construcția pentru care se caută poziția

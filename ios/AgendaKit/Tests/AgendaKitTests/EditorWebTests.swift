@@ -148,6 +148,8 @@ final class EditorWebTests: TestVectori {
                 r = ed.schimbaVerificare(pas.str("verif"), pas.str("valoare"), &c)
             case "cautare":
                 ed.cauta(pas.str("q"))
+            case "cautareConstr":
+                ed.cautaConstructii(pas.str("q"))
             case "pauza":
                 ed.pauza(c)
             case "pv":
@@ -350,8 +352,18 @@ enum Jetoane {
             comutator(i.document, s); s.t(i.documentData)
             termen(i.termen, s)
         }
-        s.t("Construcții"); s.b(); s.t("−"); s.t("\(o.constructii.count)"); s.t(o.constructii.count == 1 ? "construcție" : "construcții"); s.b(); s.t("+")
+        s.t("Construcții"); s.b(); s.t("−"); s.t("\(o.nrConstructii)"); s.t(o.nrConstructii == 1 ? "construcție" : "construcții"); s.b(); s.t("+")
+        if let u = o.unelteConstructii {
+            s.inp(u.valoare, "Caută clădire sau dotare (ex. sprinklere)"); s.b()
+            s.b(u.deschis); s.t("Filtre"); if u.active > 0 { s.t("\(u.active)") }
+            if u.deschis {
+                if u.grupe.isEmpty { s.t("Filtrele apar după ce bifați dotările construcțiilor.") }
+                for g in u.grupe { s.t(g.titlu); for x in g.optiuni { s.b(x.activ); s.t(x.text); s.t("\(x.n)") } }
+            }
+        }
+        if let f = o.constructiiFiltrate { for e in f.etichete { s.b(); s.t(e.text) }; s.t(f.numar) }
         for k in o.constructii { constructie(k, s) }
+        s.t(o.constructiiGol)
         if let a = o.adaposturi {
             s.t("Adăposturi de protecție civilă")
             randAdapost(a.rand, s)
@@ -378,6 +390,7 @@ enum Jetoane {
         s.t("Dotări și instalații"); s.t("NEC = nu este cazul")
         for d in c.dotari {
             if d.centrala {
+                if d.gasit { s.s(["is-match"]) }
                 s.t(d.eticheta)
                 let n = d.centrale.count
                 s.b(dis: n == 0); s.t("−")
@@ -395,7 +408,7 @@ enum Jetoane {
                 obs(d.obs, s)
                 continue
             }
-            if d.grav { s.s(["is-grav"]) }
+            s.s((d.grav ? ["is-grav"] : []) + (d.gasit ? ["is-match"] : []))
             s.t(d.eticheta)
             if d.grav { s.t("Neregulă gravă") }
             if let g = d.segment { segment(g, s) }
@@ -441,11 +454,14 @@ enum Jetoane {
     // ───────── Acte ─────────
     static func cautare(_ c: ModelCautare, _ s: Sir) {
         s.inp(c.valoare, c.indiciu); s.b()
-        if !c.meniu.isEmpty { s.b(c.meniuDeschis) }
-        if c.meniuDeschis { for b in c.meniu { s.b(); s.t(b.text) } }
+        s.b(c.meniuDeschis); s.t("Filtre"); if c.active > 0 { s.t("\(c.active)") }
+        guard c.meniuDeschis else { return }
+        s.t("Stare"); for x in c.stare { s.b(x.activ); s.t(x.text) }
+        if !c.constructii.isEmpty { s.t("Construcția"); for x in c.constructii { s.b(x.activ); s.t(x.text) } }
+        if !c.meniu.isEmpty { s.t("Afișare"); for b in c.meniu { s.b(); s.t(b.text) } }
     }
-    static func filtre(_ f: [ModelFiltru], _ rest: String?, _ s: Sir) {
-        for x in f { s.b(x.activ); s.t(x.text) }
+    static func filtre(_ e: [ModelEticheta], _ rest: String?, _ s: Sir) {
+        for x in e { s.b(); s.t(x.text) }
         if let r = rest { s.b(); s.t(r) }
     }
     static func nota(_ n: ModelNotaCautare?, _ s: Sir) {
@@ -467,7 +483,7 @@ enum Jetoane {
         if a.lipsa > 0 { s.s(["t-red"]); s.t("\(a.lipsa)"); s.t("lipsă") }
         if a.nec > 0 { s.t("\(a.nec)"); s.t("NEC") }
         cautare(a.cautare, s)
-        filtre(a.filtru, a.rest, s)
+        filtre(a.etichete, a.rest, s)
         nota(a.rezultat, s)
         let g = a.grup
         s.g("acte", g.restrans); s.b(dis: g.dezactivat); s.t("Acte de autoritate și evidențe"); s.t(g.numar); info(g.info, s)
@@ -495,7 +511,7 @@ enum Jetoane {
         if let a = x.ascunse { s.b(); s.t(a) }
         if x.notaTermene { s.t("Termenele amenzilor\(x.sec == "ner" ? " și ASI" : "") pornesc după ce completați data încheierii (tabul Obiectiv).") }
         cautare(x.cautare, s)
-        filtre(x.filtru, x.rest, s)
+        filtre(x.etichete, x.rest, s)
         nota(x.rezultat, s)
         for g in x.grupe {
             s.g(g.cat, g.restrans); s.b(dis: g.dezactivat); s.t(g.titlu); s.t(g.numar); info(g.info, s)

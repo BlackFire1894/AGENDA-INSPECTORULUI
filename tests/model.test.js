@@ -14,6 +14,7 @@ import {
   incarcareStatus, parseSuma,
   sigiliiControl, sigiliiText, emptyNeregula,
   emptyAdapost, adaposturi, adaposturiStats, adaposturiText, syncAdaposturi,
+  dotariSummary, dotareVal, constructiiFiltrate, optiuniFiltreConstructii, inConstructie,
 } from '../js/model.js';
 
 function withFine(data, extra = {}) {
@@ -1161,4 +1162,64 @@ test('v1.25: coordonatele scrise de mână și „aceleași coordonate”', () =
   assert.equal(gpsQuality(null), 'manual');
   assert.ok(gpsEgal({ lat: 1, lon: 2, acc: 5 }, { lat: 1, lon: 2, acc: 9 }));
   assert.ok(!gpsEgal(null, { lat: 1, lon: 2 }) && !gpsEgal({ lat: 1, lon: 2 }, { lat: 1, lon: 3 }));
+});
+
+test('v1.26: construcțiile — căutare după denumire sau dotare DA, filtrele DA / NU / necompletate / instalații lipsă', () => {
+  const c = newControl({ denumire: 'Spital', start: '2026-10-01' });
+  c.constructii = [emptyConstructie(), emptyConstructie(), emptyConstructie(), emptyConstructie()];
+  const [a, b, d, e] = c.constructii;
+  a.denumire = 'Pavilion central'; b.denumire = 'Bloc operator'; d.denumire = ''; e.denumire = 'Morgă';
+  normalizeControl(c);
+  a.dotari.sprinklere.v = 'DA'; a.dotari.hidInt.v = 'DA';
+  b.dotari.hidExt.v = 'DA'; b.dotari.idsai.v = 'NU';
+  d.dotari.centrala.ct = [{ id: 'ct1', tipuri: ['GAZOS'] }];
+  e.dotari.centrala.nuAre = true; e.dotari.sprinklere.v = 'NU';
+  const nume = (r) => r.map((x) => x.k.denumire || `#${x.i + 1}`).join('|');
+  assert.equal(nume(constructiiFiltrate(c, 'bloc')), 'Bloc operator');
+  assert.equal(nume(constructiiFiltrate(c, 'construcția 3')), '#3', 'fără denumire: „Construcția 3”');
+  // dotarea: de la 3 litere, fără diacritice, doar DA
+  assert.equal(nume(constructiiFiltrate(c, 'hidranti')), 'Pavilion central|Bloc operator');
+  assert.deepEqual([...constructiiFiltrate(c, 'hidranti')[0].potriviri], ['hidInt']);
+  assert.equal(nume(constructiiFiltrate(c, 'sprinkl')), 'Pavilion central', 'NU la Morgă nu se potrivește');
+  assert.equal(nume(constructiiFiltrate(c, 'centrala')), '#3', 'centrala: DA = are centrale; NU ARE nu');
+  assert.equal(nume(constructiiFiltrate(c, 'hi')), '', 'sub 3 litere: doar denumirea');
+  // filtrele, cumulate
+  assert.equal(nume(constructiiFiltrate(c, '', ['da:hidInt'])), 'Pavilion central');
+  assert.equal(nume(constructiiFiltrate(c, '', ['nu:centrala'])), 'Morgă');
+  assert.equal(nume(constructiiFiltrate(c, '', ['lipsa'])), 'Bloc operator|Morgă', 'NU la IDSAI / sprinklere = instalații lipsă');
+  assert.equal(nume(constructiiFiltrate(c, '', ['necomplet'])), 'Pavilion central|Bloc operator|#3|Morgă');
+  assert.equal(nume(constructiiFiltrate(c, 'pav', ['da:sprinklere', 'necomplet'])), 'Pavilion central');
+  assert.equal(nume(constructiiFiltrate(c, '', ['da:sprinklere', 'nu:sprinklere'])), '');
+  // complet: toate dotările vizibile bifate
+  for (const x of dotariVizibile(c, a)) { if (x.centrala) a.dotari.centrala.nuAre = true; else if (!a.dotari[x.key].v) a.dotari[x.key].v = 'NEC'; }
+  assert.equal(dotariSummary(c, a).set, dotariSummary(c, a).total);
+  assert.equal(nume(constructiiFiltrate(c, '', ['necomplet'])), 'Bloc operator|#3|Morgă');
+  assert.equal(dotareVal(c, a, DOTARI.find((x) => x.key === 'centrala')), 'NU');
+  // opțiunile: doar dotările existente, cu numărul construcțiilor; cele alese rămân
+  const o = optiuniFiltreConstructii(c, ['da:drencere']);
+  assert.deepEqual(o.da.map((x) => `${x.key}:${x.n}`), ['hidInt:1', 'hidExt:1', 'sprinklere:1', 'drencere:0', 'centrala:1']);
+  assert.ok(o.nu.some((x) => x.key === 'idsai' && x.n === 1) && o.nu.some((x) => x.key === 'centrala' && x.n === 2));
+  assert.equal(o.lipsa, 2);
+  assert.equal(o.necomplet, 3);
+});
+
+test('v1.26: neregulile pe construcție — constatările din ea, rândurile care i se aplică, grave doar unde sunt declanșate', () => {
+  const c = newControl({ denumire: 'Spital', start: '2026-10-01' });
+  c.constructii = [emptyConstructie(), emptyConstructie()];
+  normalizeControl(c);
+  const [a, b] = c.constructii;
+  a.dotari.hidInt.v = 'DA'; b.dotari.hidExt.v = 'NU';
+  syncAutoNU(c, 'hidExt');
+  const n = (k) => c.nereguli.find((x) => x.key === k);
+  const hidInt = c.nereguli.find((x) => !x.custom && (sablon(x.key)?.req || []).join() === 'hidInt' && !sablon(x.key)?.grav);
+  const grav = c.nereguli.find((x) => sablon(x.key)?.reqNU === 'hidExt');
+  assert.ok(inConstructie(c, hidInt, a.id) && !inConstructie(c, hidInt, b.id), 'hidranți interiori: doar unde sunt DA');
+  assert.ok(!inConstructie(c, grav, a.id) && inConstructie(c, grav, b.id), 'neregula gravă: doar unde e NU');
+  assert.ok(inConstructie(c, n('d'), a.id) && inConstructie(c, n('d'), b.id), 'rând general: la amândouă');
+  n('d').status = 'nok'; n('d').constructieIds = [b.id];
+  assert.ok(!inConstructie(c, n('d'), a.id) && inConstructie(c, n('d'), b.id), 'constatată: doar în construcția aleasă');
+  assert.ok(inConstructie(c, n('d'), ''), 'fără filtru: tot');
+  c.acte.controale.status = 'nok'; syncAutoActe(c);
+  const ap = c.nereguli.find((x) => sablon(x.key)?.autoActe && x.status === 'nok');
+  assert.ok(ap && inConstructie(c, ap, a.id) && inConstructie(c, ap, b.id), 'actele lipsă țin de obiectiv: la orice construcție');
 });

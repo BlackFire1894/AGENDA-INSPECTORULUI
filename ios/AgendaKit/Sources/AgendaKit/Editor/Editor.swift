@@ -173,10 +173,16 @@ public final class Editor {
             return
         }
         if !r.focus.isEmpty { reveal(c, r.focus) }
-        if prev?.id != r.id { ui.showAllNer = false }
+        if prev?.id != r.id {
+            ui.showAllNer = false
+            // căutarea și filtrele construcțiilor, filtrul pe construcție al neregulilor: doar în controlul curent
+            ui.nerConstr = ""; ui.constrQuery = ""; ui.constrFlt = MultimeOrdonata(); ui.constrFltOpen = false
+        }
         if prev?.id != r.id || prev?.tab != r.tab {
             ui.nerFilter = "ALL"; ui.nerQuery = ""; ui.constrPick = ""; ui.toolsOpen = false
         }
+        // din „Ce mai aveți de făcut”: constatările netrecute în PV se deschid cu filtrul lor
+        if !ui.revealFilter.isEmpty { ui.nerFilter = ui.revealFilter; ui.revealFilter = "" }
         istoric.start(c)
     }
 
@@ -185,6 +191,7 @@ public final class Editor {
         ui.nerFilter = "ALL"
         ui.nerQuery = ""
         if let fn = c.neregula(focus) {
+            if !inConstructie(c, fn, ui.nerConstr) { ui.nerConstr = "" }
             ui.catCollapsed.sterge(neregulaCat(fn))
             if fn.custom { ui.catCollapsed.sterge("custom-\(secOf(fn))") }
             ui.rowCollapsed.sterge(rowKey(c, fn))
@@ -196,6 +203,8 @@ public final class Editor {
         if let m = focus.grupeRegex("^(?:gps|constr)-(.+)$") {
             ui.collapsed.remove(m[1])
             ui.expanded.insert(m[1])
+            // construcția căutată trebuie să fie în listă: căutarea și filtrele construcțiilor se golesc
+            ui.constrQuery = ""; ui.constrFlt = MultimeOrdonata()
         }
     }
 
@@ -291,6 +300,11 @@ public final class Editor {
 
     /// Căutarea din tab
     public func cauta(_ q: String) { ui.nerQuery = q }
+
+    /// Căutarea din Construcții (v1.26): construcțiile găsite se arată ca listă nouă (deschiderile alese de mână se uită)
+    public func cautaConstructii(_ q: String) { ui.constrQuery = q; reseteazaDeschise() }
+
+    private func reseteazaDeschise() { ui.collapsed = []; ui.expanded = [] }
 
     private func mesajGravGrf(_ c: Control, _ k: Constructie) -> MesajEditor {
         MesajEditor("Neregulă gravă: \(k.denumire.isEmpty ? "construcția" : k.denumire) are GRF/NSI V și regim \(k.regimInaltime) (peste parter)",
@@ -585,6 +599,13 @@ public final class Editor {
             return r
 
         case "ner-filter": ui.nerFilter = val; return r
+        case "ner-constr": ui.nerConstr = val; return r
+        case "constr-filtre": ui.constrFltOpen.toggle(); return r
+        case "constr-flt":
+            if !ui.constrFlt.sterge(val) { ui.constrFlt.adauga(val) }
+            reseteazaDeschise()
+            return r
+        case "constr-q-clear": ui.constrQuery = ""; reseteazaDeschise(); r.focusCamp = "constr-search"; return r
         case "ner-q-clear": ui.nerQuery = ""; r.focusCamp = "ner-search"; return r
         case "constr-pick": ui.constrPick = ui.constrPick == d["key"] ? "" : (d["key"] ?? ""); return r
 
@@ -609,8 +630,11 @@ public final class Editor {
         case "todo-toggle": ui.todoOpen.toggle(); return r
 
         case "todo-go":
-            let tab = d["tab"] ?? "obiectiv", f = d["focus"] ?? ""
-            navigheaza("#/control/\(c.id)/\(tab)\(f.isEmpty ? "" : "/\(encodeURIComponent(f))")", c, f, &r)
+            let tab = d["tab"] ?? "obiectiv", f = d["focus"] ?? "", flt = d["flt"] ?? ""
+            let h = "#/control/\(c.id)/\(tab)\(f.isEmpty ? "" : "/\(encodeURIComponent(f))")"
+            // constatările netrecute în PV: tabul se deschide cu filtrul „Netrecute în PV”
+            if h == hash { if !flt.isEmpty { ui.nerFilter = flt } } else { ui.revealFilter = flt }
+            navigheaza(h, c, f, &r)
             return r
 
         case "rest-ok": return restConform(&c, d["sec"] ?? "ner", raspuns: raspuns)
@@ -868,10 +892,23 @@ public func rotunjesteJS(_ x: Double) -> Int {
 }
 
 extension Editor {
-    /// Construcția e deschisă: închisă explicit / deschisă explicit / implicit prima (sau singura)
+    /// Construcția e deschisă: închisă explicit / deschisă explicit / implicit prima (sau singura). Cu căutarea /
+    /// filtrele active: deschisă doar dacă e singura găsită (mai multe: restrânse, ca listă scurtă de antete)
     public func isOpen(_ c: Control, _ k: Constructie, _ i: Int) -> Bool {
         if ui.collapsed.contains(k.id) { return false }
         if ui.expanded.contains(k.id) { return true }
+        if constrFiltrat(c) { return constructiiFiltrate(c, ui.constrQuery, ui.constrFlt.ordine).count == 1 }
         return c.constructii.count == 1 || i == 0
+    }
+
+    /// Căutarea sau filtrele construcțiilor sunt active (doar la mai multe construcții)
+    public func constrFiltrat(_ c: Control) -> Bool {
+        c.constructii.count > 1 && (!ui.constrQuery.trimJS.isEmpty || !ui.constrFlt.isEmpty)
+    }
+
+    /// Construcția aleasă la filtrul neregulilor (doar dacă mai există și controlul are mai multe construcții)
+    public func constrFiltruNer(_ c: Control) -> String {
+        let id = ui.nerConstr
+        return !id.isEmpty && c.constructii.count > 1 && c.constructii.contains { $0.id == id } ? id : ""
     }
 }

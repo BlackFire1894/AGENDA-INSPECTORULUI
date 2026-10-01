@@ -1007,4 +1007,66 @@ final class ModelTests: TestVectori {
         XCTAssertTrue(gpsEgal(gpsTest(1, 2, 5, ""), gpsTest(1, 2, 9, "")))
         XCTAssertFalse(gpsEgal(nil, gpsTest(1, 2, 5, "")) || gpsEgal(gpsTest(1, 2, 5, ""), gpsTest(1, 3, 5, "")))
     }
+
+    // ───────── v1.26 ─────────
+    func testV126CautareaSiFiltreleConstructiilor() {
+        var c = newControl(denumire: "Spital", start: "2026-10-01")
+        c.adaugaConstructie(); c.adaugaConstructie(); c.adaugaConstructie()
+        c.modificaConstructie(0) { $0.denumire = "Pavilion central" }
+        c.modificaConstructie(1) { $0.denumire = "Bloc operator" }
+        c.modificaConstructie(2) { $0.denumire = "" }
+        c.modificaConstructie(3) { $0.denumire = "Morgă" }
+        c.dot(0, "sprinklere", v: "DA"); c.dot(0, "hidInt", v: "DA")
+        c.dot(1, "hidExt", v: "DA"); c.dot(1, "idsai", v: "NU")
+        c.modificaConstructie(2) { $0.modificaDotare("centrala") { $0.ct = [Centrala(JSObiect([("id", "ct1"), ("tipuri", ["GAZOS"])]))] } }
+        c.modificaConstructie(3) { $0.modificaDotare("centrala") { $0.nuAre = true } }
+        c.dot(3, "sprinklere", v: "NU")
+        func nume(_ r: [ConstructieGasita]) -> String { r.map { $0.k.denumire.isEmpty ? "#\($0.i + 1)" : $0.k.denumire }.joined(separator: "|") }
+        XCTAssertEqual(nume(constructiiFiltrate(c, "bloc")), "Bloc operator")
+        XCTAssertEqual(nume(constructiiFiltrate(c, "construcția 3")), "#3")
+        XCTAssertEqual(nume(constructiiFiltrate(c, "hidranti")), "Pavilion central|Bloc operator")
+        XCTAssertEqual(constructiiFiltrate(c, "hidranti")[0].potriviri, ["hidInt"])
+        XCTAssertEqual(nume(constructiiFiltrate(c, "sprinkl")), "Pavilion central")
+        XCTAssertEqual(nume(constructiiFiltrate(c, "centrala")), "#3")
+        XCTAssertEqual(nume(constructiiFiltrate(c, "hi")), "")
+        XCTAssertEqual(nume(constructiiFiltrate(c, "", ["da:hidInt"])), "Pavilion central")
+        XCTAssertEqual(nume(constructiiFiltrate(c, "", ["nu:centrala"])), "Morgă")
+        XCTAssertEqual(nume(constructiiFiltrate(c, "", ["lipsa"])), "Bloc operator|Morgă")
+        XCTAssertEqual(nume(constructiiFiltrate(c, "", ["necomplet"])), "Pavilion central|Bloc operator|#3|Morgă")
+        XCTAssertEqual(nume(constructiiFiltrate(c, "pav", ["da:sprinklere", "necomplet"])), "Pavilion central")
+        XCTAssertEqual(nume(constructiiFiltrate(c, "", ["da:sprinklere", "nu:sprinklere"])), "")
+        for d in dotariVizibile(c, c.constructii[0]) {
+            if d.centrala { c.modificaConstructie(0) { $0.modificaDotare("centrala") { $0.nuAre = true } } }
+            else if (c.constructii[0].dotare(d.key)?.v ?? "").isEmpty { c.dot(0, d.key, v: "NEC") }
+        }
+        XCTAssertEqual(dotariSummary(c, c.constructii[0]).set, dotariSummary(c, c.constructii[0]).total)
+        XCTAssertEqual(nume(constructiiFiltrate(c, "", ["necomplet"])), "Bloc operator|#3|Morgă")
+        XCTAssertEqual(dotareVal(c, c.constructii[0], K.dotari.first { $0.key == "centrala" }!), "NU")
+        let o = optiuniFiltreConstructii(c, ["da:drencere"])
+        XCTAssertEqual(o.da.map { "\($0.key):\($0.n)" }, ["hidInt:1", "hidExt:1", "sprinklere:1", "drencere:0", "centrala:1"])
+        XCTAssertTrue(o.nu.contains { $0.key == "idsai" && $0.n == 1 } && o.nu.contains { $0.key == "centrala" && $0.n == 2 })
+        XCTAssertEqual(o.lipsa, 2)
+        XCTAssertEqual(o.necomplet, 3)
+    }
+
+    func testV126NereguliPeConstructie() {
+        var c = newControl(denumire: "Spital", start: "2026-10-01")
+        c.adaugaConstructie()
+        let (a, b) = (c.constructii[0].id, c.constructii[1].id)
+        c.dot(0, "hidInt", v: "DA"); c.dot(1, "hidExt", v: "NU")
+        _ = syncAutoNU(&c, "hidExt")
+        let hidInt = c.nereguli.first { !$0.custom && (sablon($0.key)?.req ?? []) == ["hidInt"] && !(sablon($0.key)?.grav ?? false) }!
+        let grav = c.nereguli.first { sablon($0.key)?.reqNU == "hidExt" }!
+        XCTAssertTrue(inConstructie(c, hidInt, a) && !inConstructie(c, hidInt, b))
+        XCTAssertTrue(!inConstructie(c, grav, a) && inConstructie(c, grav, b))
+        XCTAssertTrue(inConstructie(c, c.n("d"), a) && inConstructie(c, c.n("d"), b))
+        c.n("d") { $0.status = "nok"; $0.constructieIds = [b] }
+        XCTAssertTrue(!inConstructie(c, c.n("d"), a) && inConstructie(c, c.n("d"), b))
+        XCTAssertTrue(inConstructie(c, c.n("d"), ""))
+        c.modificaAct("controale") { $0.status = "nok" }
+        _ = syncAutoActe(&c)
+        let ap = c.nereguli.first { sablon($0.key)?.autoActe != nil && $0.status == "nok" }
+        XCTAssertNotNil(ap)
+        if let ap { XCTAssertTrue(inConstructie(c, ap, a) && inConstructie(c, ap, b)) }
+    }
 }

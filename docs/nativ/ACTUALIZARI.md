@@ -106,3 +106,19 @@ Ce ai de făcut în Swift: verifReferinta (Nereguli.swift), Editor.swift (verif-
 Criterii de acceptare: ios/teste.sh 100%; la b3 cu 2 construcții a câte 2 centrale: CT 2 al Construcției 2 arată „Aceeași dată ca la Construcția 2 – CT 1”; la o amendă bifată „Achitat / Executat silit”, stadiul verde „Achitată / executată silit” peste tot.
 La final: commit + PR; raport scurt.
 ```
+
+### v1.26.0 — căutare și filtre la construcții; butonul „Filtre” la acte și nereguli (01.10.2026)
+Aplicată deja în aplicația nativă, în același PR (lucrul s-a făcut din chatul nativ). Promptul rămâne pentru istoric:
+
+```
+Actualizare la versiunea web v1.26.0. Rulează `git pull` pe main.
+Ce s-a schimbat:
+- Construcții (tabul Obiectiv, de la 2 construcții): căutare (denumire sau, de la 3 litere, dotare bifată DA) și butonul „Filtre” — Dotate cu (DA), Fără (NU) (doar dotările existente, cu numărul construcțiilor), Dotări necompletate, Instalații lipsă; cumulate; etichete ✕ și „N din M construcții”; o singură construcție găsită se deschide, mai multe rămân restrânse; dotarea potrivită e evidențiată (.dot-row.is-match). js/model.js: dotariSummary (mutat din editor.js), dotareVal, constructiiFiltrate, optiuniFiltreConstructii; js/editor.js: constrToolsHTML, constrResultsHTML, isOpen(…, filtrat, unica), dotareRow(…, gasit); js/app.js: constr-search (input), constr-filtre, constr-flt, constr-q-clear; js/state.js: constrQuery, constrFlt, constrFltOpen.
+- Acte / Nereguli / Planuri / PC: butonul „Filtre” (data-act tools-more, cu cifra filtrelor active) — panoul cu Stare (Toate / Constatate / Netrecute în PV / Neverificate; la Acte: Toate / Lipsă / Neverificate), Construcția (nereguli, la mai multe construcții; js/model.js inConstructie) și Afișare (fostul meniu ⋯); filtrele active sub bară, ca etichete ✕, lângă „Restul …”. Filtrul nou nerFilter = 'PV' (constatate, netrecute în PV). js/state.js: nerConstr, revealFilter; se golesc la ieșirea din control (construcția rămâne între taburi).
+- „Ce mai aveți de făcut” și fereastra „Înainte de încheiere”: rândul „N constatări netrecute în PV” (id pv) are data-flt="PV" → tabul se deschide cu filtrul „Netrecute în PV”.
+- Iconița nouă „filter”; css/app.css (.btn-filtre, .filtre-panel, .flt-grup, .flt-chip, .flt-active, .dot-row.is-match), css/telefon.css (starea pe 2 coloane); js/help.js; versiunea (js/version.js, sw.js).
+Date comune regenerate: catalog.json, ghid.json.
+Ce ai de făcut în Swift: Model/FiltreConstructii.swift (dotareVal, constructiiFiltrate, optiuniFiltreConstructii, inConstructie); StareEditor (nerConstr, constrQuery, constrFlt ordonat, constrFltOpen, revealFilter); Editor.swift (acțiunile noi, cautaConstructii, isOpen cu filtrele, constrFiltruNer, render / reveal / todo-go); ModelEditor.swift (ModelCautare cu stare / construcții / afișare, ModelEticheta, ModelUnelteConstructii, filtrul PV în sectionRows); Iconite.swift („filter”); interfața: RandUnelte + ButonFiltre + PanouFiltre + SegmentStare + EtichetaFiltru + BaraFiltru (TabConstatari.swift), UnelteConstructii (TabObiectiv.swift); EditorWebTests (jetoanele noi, pasul cautareConstr) și Diferential/editor.mjs (constr-search).
+Criterii de acceptare: ios/teste.sh 100% (și pe alte semințe, NR_SECVENTE=200); pe iPad și iPhone: „sprinklere” în Construcții arată doar construcțiile cu sprinklere DA; „Filtre” → „Netrecute în PV” arată doar constatările netrecute; eticheta ✕ scoate filtrul.
+La final: commit + PR; raport scurt.
+```
