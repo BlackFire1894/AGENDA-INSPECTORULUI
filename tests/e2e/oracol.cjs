@@ -186,10 +186,14 @@ const cnt = (lv) => fines.filter((f) => f.s.lv === lv).length;
       if (nk.length) ok(sum.includes(`${nk.length - nr}/${nk.length} în PV`), `${c.denumire} ${sec}: în PV ${nk.length - nr}/${nk.length} — „${sum}”`);
       const nf = nk.filter((n) => n.amenda?.aplicata).length;
       if (nf) ok(sum.includes(`${nf} ${nf === 1 ? 'amendă' : 'amenzi'}`), `${c.denumire} ${sec}: ${nf} amenzi — „${sum}”`);
-      const filt = await p.locator('.segmented button').allInnerTexts();
-      eq(filt[2], `Neverificate (${tot - chk})`, `${c.denumire} ${sec}: filtrul Neverificate`);
+      // v1.26: filtrele de stare stau în panoul „Filtre”
+      await p.click('[data-act="tools-more"]'); await p.waitForTimeout(200);
+      const filt = await p.locator('.filtre-panel .segmented button').allInnerTexts();
+      await p.click('[data-act="tools-more"]'); await p.waitForTimeout(200);
+      eq(filt[3], `Neverificate (${tot - chk})`, `${c.denumire} ${sec}: filtrul Neverificate`);
       nev[sec] = tot - chk;
       eq(filt[1].replace(/\s+/g, ' '), `${sec === 'ner' ? 'Constatate' : 'Neconforme'} (${nk.length})`, `${c.denumire} ${sec}: filtrul Constatate`);
+      eq(filt[2].replace(/\s+/g, ' '), `Netrecute în PV (${nr})`, `${c.denumire} ${sec}: filtrul Netrecute în PV`);
       // barele categoriilor: sumele trebuie să dea totalurile
       const bars = await p.locator('.cat-title .cat-info, .custom-toggle .cat-info').evaluateAll((els) => els.map((e) => e.innerText.replace(/\s+/g, ' ')));
       const s = (re) => bars.reduce((a, t) => a + ((t.match(re) || [])[1] | 0), 0);

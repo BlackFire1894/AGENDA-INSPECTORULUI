@@ -9,6 +9,7 @@ import {
   constructiiEligibile, isVerificare, verifStare, verifExpirate, ascunsaDeDotari, matchAct, verifReferinta,
   adaposturi, adaposturiStats, adaposturiText,
   acteOf, dotariVizibile, centraleOf, unitatiCT, verifUnitati, perCT, centraleAlese, gpsEgal,
+  dotariSummary, constructiiFiltrate, optiuniFiltreConstructii, inConstructie,
 } from './model.js';
 import { icon, esc, pill, finePill, tipBadge } from './ui.js';
 
@@ -68,7 +69,8 @@ export function todoHTML(c) {
     return `<div class="todo todo-done">${icon('check')}<span><b>Totul e completat.</b> Puteți genera Text PV sau Fișa PDF.</span></div>`;
   }
   const open = state.ui.todoOpen;
-  const btn = (x) => `<button class="todo-item t-${x.level}" data-act="todo-go" data-tab="${x.tab}" data-focus="${esc(x.focus || '')}">
+  // constatările netrecute în PV: tabul lor se deschide cu filtrul „Netrecute în PV” (v1.26)
+  const btn = (x) => `<button class="todo-item t-${x.level}" data-act="todo-go" data-tab="${x.tab}" data-focus="${esc(x.focus || '')}"${x.id === 'pv' ? ' data-flt="PV"' : ''}>
       ${icon(x.level === 'warn' ? 'alert' : 'chevR')}<span>${esc(x.text)}</span></button>`;
   return `<div class="todo ${open ? 'open' : ''}">
     <div class="todo-head">
@@ -362,7 +364,8 @@ function tabObiectiv(c) {
         <button class="step-btn" data-act="constr-inc" aria-label="Mai multe">+</button>
       </div>
     </div>
-    <div class="constr-list">${c.constructii.map((k, i) => constructieHTML(c, k, i)).join('')}</div>
+    ${c.constructii.length > 1 ? constrToolsHTML(c) : ''}
+    <div class="constr-list" id="constr-results">${constrResultsHTML(c)}</div>
   </section>
   ${isLocalitate(c) ? '' : `<section class="card form-card" id="sec-adaposturi">
     <h2 class="sec-title">${icon('shield')} Adăposturi de protecție civilă</h2>
@@ -440,30 +443,62 @@ function gpsBlock(c, k, i) {
   </div>`;
 }
 
-function isOpen(c, k, i) {
+// Deschisă: aleasă explicit; altfel prima (sau singura). Cu căutarea / filtrele active: deschisă doar dacă e singura
+// găsită (mai multe: restrânse, ca o listă scurtă de antete)
+function isOpen(c, k, i, filtrat = false, unica = false) {
   const u = state.ui;
   if (u.collapsed.has(k.id)) return false;
   if (u.expanded.has(k.id)) return true;
-  return c.constructii.length === 1 || i === 0;
+  return filtrat ? unica : c.constructii.length === 1 || i === 0;
 }
 
-// Dotările completate (rândurile ascunse nu se numără: iluminat Hint fără hidranți interiori, dotări noi la controalele vechi)
-export function dotariSummary(c, k) {
-  let da = 0, nec = 0, set = 0, lipsa = 0;
-  const vis = dotariVizibile(c, k);
-  for (const d of vis) {
-    const v = k.dotari[d.key];
-    if (d.centrala) { if ((v.ct || []).length || v.tipuri.length || v.nuAre) set++; continue; }
-    if (v.v) set++;
-    if (v.v === 'DA') da++;
-    if (v.v === 'NEC') nec++;
-    if (v.v === 'NU' && LIPSA_DOTARI.includes(d.key)) lipsa++;
-  }
-  return { da, nec, set, lipsa, total: vis.length };
+// ───────── Construcții: căutare și „Filtre” (v1.26) ─────────
+const constrFiltrat = () => !!state.ui.constrQuery.trim() || state.ui.constrFlt.size > 0;
+
+// „Sprinklere: DA”, „IDSAI: NU”, „Dotări necompletate”, „Instalații lipsă”
+function numeFiltruConstr(f) {
+  const [tip, key] = f.split(':');
+  if (tip === 'necomplet') return 'Dotări necompletate';
+  if (tip === 'lipsa') return 'Instalații lipsă';
+  return `${DOTARI.find((d) => d.key === key)?.label || key}: ${tip === 'da' ? 'DA' : 'NU'}`;
 }
 
-function constructieHTML(c, k, i) {
-  const open = isOpen(c, k, i);
+// Butonul „Filtre”, cu numărul filtrelor active
+const filtreBtn = (act, open, n) => `<button class="btn btn-ghost btn-filtre ${open ? 'on' : ''}" data-act="${act}" aria-expanded="${open}">${icon('filter')}<span>Filtre</span>${n ? `<b class="flt-n">${n}</b>` : ''}</button>`;
+
+function constrToolsHTML(c) {
+  const u = state.ui;
+  const o = optiuniFiltreConstructii(c, [...u.constrFlt]);
+  const opt = (val, label, n) => `<button type="button" class="chip-sel ${u.constrFlt.has(val) ? 'on' : ''}" data-act="constr-flt" data-val="${esc(val)}" aria-pressed="${u.constrFlt.has(val)}">${esc(label)} <small>${n}</small></button>`;
+  const grup = (titlu, items) => (items ? `<div class="flt-grup"><span class="lbl">${titlu}</span><div class="chips-sel">${items}</div></div>` : '');
+  const stare = [o.necomplet || u.constrFlt.has('necomplet') ? opt('necomplet', 'Dotări necompletate', o.necomplet) : '',
+    o.lipsa || u.constrFlt.has('lipsa') ? opt('lipsa', 'Instalații lipsă', o.lipsa) : ''].join('');
+  const panou = grup('Dotate cu (DA)', o.da.map((x) => opt(`da:${x.key}`, x.label, x.n)).join(''))
+    + grup('Fără (NU)', o.nu.map((x) => opt(`nu:${x.key}`, x.label, x.n)).join('')) + grup('Stare', stare);
+  return `<div class="tools-row constr-tools">
+      <div class="searchbar">
+        ${icon('search')}
+        <input type="search" id="constr-search" value="${esc(u.constrQuery)}" placeholder="Caută clădire sau dotare (ex. sprinklere)" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" aria-label="Caută în construcții">
+        <button class="icon-btn" data-act="constr-q-clear" aria-label="Șterge căutarea">${icon('x')}</button>
+      </div>
+      ${filtreBtn('constr-filtre', u.constrFltOpen, u.constrFlt.size)}
+    </div>
+    ${u.constrFltOpen ? `<div class="tools-menu filtre-panel">${panou || '<p class="muted">Filtrele apar după ce bifați dotările construcțiilor.</p>'}</div>` : ''}`;
+}
+
+// Lista construcțiilor (se redesenează singură la căutare): filtrele active ca etichete cu ✕, câte s-au găsit
+export function constrResultsHTML(c) {
+  const u = state.ui;
+  const filtrat = c.constructii.length > 1 && constrFiltrat();
+  const rez = filtrat ? constructiiFiltrate(c, u.constrQuery, [...u.constrFlt]) : c.constructii.map((k, i) => ({ k, i, potriviri: new Set() }));
+  const etichete = [...u.constrFlt].map((f) => `<button type="button" class="flt-chip" data-act="constr-flt" data-val="${esc(f)}" aria-label="Scoate filtrul ${esc(numeFiltruConstr(f))}">${esc(numeFiltruConstr(f))}${icon('x')}</button>`).join('');
+  const nota = filtrat ? `<div class="flt-active">${etichete}<span class="flt-count">${rez.length} din ${c.constructii.length} construcții</span></div>` : '';
+  const lista = rez.map(({ k, i, potriviri }) => constructieHTML(c, k, i, filtrat, potriviri, rez.length === 1)).join('');
+  return `${nota}${lista || `<p class="muted pad">Nicio construcție nu se potrivește${u.constrQuery.trim() ? ` cu „${esc(u.constrQuery.trim())}”` : ''}${u.constrFlt.size ? ' și filtrelor alese' : ''}.</p>`}`;
+}
+
+function constructieHTML(c, k, i, filtrat = false, potriviri = new Set(), unica = false) {
+  const open = isOpen(c, k, i, filtrat, unica);
   const p = `constructii.#${k.id}`;
   const s = dotariSummary(c, k);
   const nr = c.constructii.length;
@@ -492,19 +527,20 @@ function constructieHTML(c, k, i) {
       ${grfBlock(c, k, p)}
       ${gpsBlock(c, k, i)}
       <div class="mini-row"><h3 class="mini-title">Dotări și instalații <small>NEC = nu este cazul</small></h3></div>
-      <div class="dotari">${dotariVizibile(c, k).map((d) => dotareRow(p, k, d)).join('')}</div>
+      <div class="dotari">${dotariVizibile(c, k).map((d) => dotareRow(p, k, d, potriviri.has(d.key))).join('')}</div>
       ${c.constructii.length > 1 ? `<div class="constr-foot"><button class="btn btn-ghost danger" data-act="constr-del" data-id="${k.id}">${icon('trash')} Șterge construcția</button></div>` : ''}
     </div>` : ''}
   </article>`;
 }
 
-function dotareRow(p, k, d) {
+// `gasit`: dotarea căutată sau aleasă în filtre (evidențiată)
+function dotareRow(p, k, d, gasit = false) {
   const v = k.dotari[d.key];
   const path = `${p}.dotari.${d.key}`;
   if (d.centrala) {
     // câte centrale (CT 1, CT 2…), fiecare cu tipurile ei; „NU ARE” le șterge
     const ct = v.ct || [];
-    return `<div class="dot-row dot-ct">
+    return `<div class="dot-row dot-ct ${gasit ? 'is-match' : ''}">
       <span class="dot-label">${esc(d.label)}</span>
       <div class="ct-head">
         <div class="stepper sm" aria-label="Număr de centrale termice">
@@ -524,7 +560,7 @@ function dotareRow(p, k, d) {
     </div>`;
   }
   const grav = v.v === 'NU' && LIPSA_DOTARI.includes(d.key);
-  return `<div class="dot-row ${grav ? 'is-grav' : ''}">
+  return `<div class="dot-row ${grav ? 'is-grav' : ''} ${gasit ? 'is-match' : ''}">
     <span class="dot-label">${esc(d.label)}${grav ? `<small class="grav-note">${icon('alert')} Neregulă gravă</small>` : ''}</span>
     ${segBtns(`${path}.v`, v.v, d.opts, 'seg-dnn')}
     ${obsField(`${path}.obs`, v.obs, 'dot-obs')}
@@ -595,8 +631,8 @@ function tabActe(c) {
   const st = controlStats(c, today());
   const acte = acteOf(c);
   const ok = acte.filter((a) => c.acte[a.key].status === 'ok').length;
-  const f = state.ui.nerFilter;
   const gol = acte.filter((a) => !c.acte[a.key].status).length;
+  const stare = [['ALL', 'Toate'], ['NOK', `Lipsă (${st.acteNok})`], ['TODO', `Neverificate (${gol})`]];
   const deschiseGata = acte.filter((a) => c.acte[a.key].status && !state.ui.rowCollapsed.has(actKey(c, a.key))).length;
   const vreunaInchisa = acte.some((a) => state.ui.rowCollapsed.has(actKey(c, a.key)));
   const nec = acte.filter((a) => c.acte[a.key].status === 'nec').length;
@@ -606,15 +642,10 @@ function tabActe(c) {
       ${st.acteNok ? `<span class="t-red"><b>${st.acteNok}</b> lipsă</span>` : ''}
       ${nec ? `<span><b>${nec}</b> NEC</span>` : ''}
     </div>
-    ${toolsRow('acte', 'Caută: numărul actului sau text (ex. LFD, instruire)', 'Caută în acte',
+    ${toolsRow(c, 'acte', 'Caută: numărul actului sau text (ex. LFD, instruire)', 'Caută în acte', stare,
     deschiseGata ? `<button class="btn btn-ghost" data-act="rows-collapse" data-sec="acte">${icon('list')} Restrânge completate (${deschiseGata})</button>`
       : vreunaInchisa ? `<button class="btn btn-ghost" data-act="rows-expand" data-sec="acte">${icon('chevD')} Deschide rândurile</button>` : '')}
-    <div class="toolbar">
-      <div class="segmented">
-        ${[['ALL', 'Toate'], ['NOK', `Lipsă (${st.acteNok})`], ['TODO', `Neverificate (${gol})`]].map(([k, l]) => `<button class="${f === k ? 'on' : ''}" data-act="ner-filter" data-val="${k}">${l}</button>`).join('')}
-      </div>
-      ${restBtn(gol, 'acte', 'Restul prezentate')}
-    </div>
+    ${filtreActive(c, 'acte', stare, restBtn(gol, 'acte', 'Restul prezentate'))}
     <div id="ner-results">${acteResultsHTML(c)}</div>`;
 }
 
@@ -646,7 +677,9 @@ function sectionRows(c, sec) {
   const tmpl = rows.filter((n) => !n.custom && (isApplicable(c, n) || (showAll && ascunsaDeDotari(c, n))));
   const custom = rows.filter((n) => n.custom && !n.adapost);
   const adp = rows.filter((n) => n.adapost && isApplicable(c, n));
-  const show = (n) => (f === 'ALL' || (f === 'NOK' ? n.status === 'nok' : !n.status)) && matchNeregula(c, n, q);
+  const kId = constrFiltruNer(c);
+  const okStare = (n) => f === 'ALL' || (f === 'NOK' ? n.status === 'nok' : f === 'PV' ? n.status === 'nok' && !n.inPV : !n.status);
+  const show = (n) => okStare(n) && inConstructie(c, n, kId) && matchNeregula(c, n, q);
   const groups = [];
   for (const n of tmpl) {
     const cat = neregulaCat(n);
@@ -727,7 +760,7 @@ export function nerResultsHTML(c, sec) {
   }).join('');
   const customVis = custom.filter(show);
   found += customVis.length;
-  const fName = f === 'NOK' ? `„${ui.nokWord}”` : '„Neverificate”';
+  const fName = f === 'NOK' ? `„${ui.nokWord}”` : f === 'PV' ? '„Netrecute în PV”' : '„Neverificate”';
   if (!body) {
     body = q
       ? `<p class="muted pad">Nicio potrivire${customVis.length ? ' în listă (vezi rândurile adăugate, mai jos)' : ''}${f !== 'ALL' ? ` în filtrul ${fName}` : ''}.</p>`
@@ -759,25 +792,58 @@ export function nerResultsHTML(c, sec) {
     </section>`;
 }
 
-// Căutarea și, alături, meniul „⋯” cu acțiunile de afișare (restrânge / extinde)
-function toolsRow(sec, ph, aria, meniu) {
-  const open = state.ui.toolsOpen;
+// Căutarea și, alături, butonul „Filtre” (v1.26): starea rândurilor, construcția (la nereguli, cu mai multe construcții)
+// și opțiunile de afișare (restrânge / extinde). Filtrele active rămân la vedere, sub bară, ca etichete cu ✕.
+function toolsRow(c, sec, ph, aria, stare, afisare) {
+  const u = state.ui;
+  const open = u.toolsOpen;
+  const kId = sec === 'acte' ? '' : constrFiltruNer(c);
+  const n = (u.nerFilter !== 'ALL' ? 1 : 0) + (kId ? 1 : 0);
+  const constr = sec !== 'acte' && c.constructii.length > 1
+    ? [['', 'Toate'], ...c.constructii.map((k, i) => [k.id, `${i + 1}. ${k.denumire || `Construcția ${i + 1}`}`])]
+      .map(([id, l]) => `<button type="button" class="chip-sel ${kId === id ? 'on' : ''}" data-act="ner-constr" data-val="${esc(id)}" aria-pressed="${kId === id}">${esc(l)}</button>`).join('')
+    : '';
   return `<div class="tools-row">
       <div class="searchbar ner-search">
         ${icon('search')}
-        <input type="search" id="ner-search" data-sec="${sec}" value="${esc(state.ui.nerQuery)}" placeholder="${esc(ph)}" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" aria-label="${esc(aria)}">
+        <input type="search" id="ner-search" data-sec="${sec}" value="${esc(u.nerQuery)}" placeholder="${esc(ph)}" autocomplete="off" autocorrect="off" spellcheck="false" enterkeyhint="search" aria-label="${esc(aria)}">
         <button class="icon-btn" data-act="ner-q-clear" aria-label="Șterge căutarea">${icon('x')}</button>
       </div>
-      ${meniu.trim() ? `<button class="icon-btn big tools-more ${open ? 'on' : ''}" data-act="tools-more" aria-expanded="${open}" aria-label="Opțiuni de afișare">${icon('more')}</button>` : ''}
+      ${filtreBtn('tools-more', open, n)}
     </div>
-    ${open && meniu.trim() ? `<div class="tools-menu">${meniu}</div>` : ''}`;
+    ${open ? `<div class="tools-menu filtre-panel">
+      <div class="flt-grup"><span class="lbl">Stare</span><div class="segmented">${stare.map(([k, l]) => `<button class="${u.nerFilter === k ? 'on' : ''}" data-act="ner-filter" data-val="${k}">${l}</button>`).join('')}</div></div>
+      ${constr ? `<div class="flt-grup"><span class="lbl">Construcția</span><div class="chips-sel">${constr}</div></div>` : ''}
+      ${afisare.trim() ? `<div class="flt-grup"><span class="lbl">Afișare</span><div class="row-gap">${afisare}</div></div>` : ''}
+    </div>` : ''}`;
+}
+
+// Construcția aleasă la filtrul neregulilor (doar dacă mai există și controlul are mai multe construcții)
+function constrFiltruNer(c) {
+  const id = state.ui.nerConstr;
+  return id && c.constructii.length > 1 && c.constructii.some((k) => k.id === id) ? id : '';
+}
+
+// Sub bară: filtrele active, ca etichete cu ✕, și „Restul conform”
+function filtreActive(c, sec, stare, rest) {
+  const u = state.ui;
+  const st = u.nerFilter !== 'ALL' ? stare.find(([k]) => k === u.nerFilter) : null;
+  const kId = sec === 'acte' ? '' : constrFiltruNer(c);
+  const i = c.constructii.findIndex((k) => k.id === kId);
+  const numeK = kId ? `${i + 1}. ${c.constructii[i].denumire || `Construcția ${i + 1}`}` : '';
+  const et = `${st ? `<button type="button" class="flt-chip" data-act="ner-filter" data-val="ALL" aria-label="Scoate filtrul ${esc(st[1])}">${esc(st[1])}${icon('x')}</button>` : ''}${kId
+    ? `<button type="button" class="flt-chip" data-act="ner-constr" data-val="" aria-label="Scoate filtrul ${esc(numeK)}">${icon('building')}${esc(numeK)}${icon('x')}</button>` : ''}`;
+  return et || rest ? `<div class="toolbar">${et ? `<div class="flt-active">${et}</div>` : ''}${rest}</div>` : '';
 }
 
 function tabSectiune(c, sec) {
   const ui = SEC_UI[sec];
   const st = secStats(c, sec, today());
-  const { f, groups } = sectionRows(c, sec);
+  const { groups } = sectionRows(c, sec);
   const showAll = state.ui.showAllNer;
+  // filtrele de stare (v1.26: și „Netrecute în PV”)
+  const stare = [['ALL', 'Toate'], ['NOK', `${ui.nokWord[0].toUpperCase()}${ui.nokWord.slice(1)} (${st.constatate})`],
+    ['PV', `Netrecute în PV (${st.netrecute})`], ['TODO', `Neverificate (${st.total - st.checked})`]];
   const inPV = st.constatate - st.netrecute;
   const anyFineOrAsi = st.fines.length || (sec === 'ner' && asiDeadline(c, today()));
 
@@ -795,14 +861,9 @@ function tabSectiune(c, sec) {
     </div>`;
   return `${sumar}
     ${!isIncheiat(c) && anyFineOrAsi ? `<p class="sec-note">${icon('info')} Termenele amenzilor${sec === 'ner' ? ' și ASI' : ''} pornesc după ce completați <b>data încheierii</b> (tabul Obiectiv).</p>` : ''}
-    ${toolsRow(sec, `Caută: literă (d, G1) sau text (ex. hidranți, gaz)`, `Caută în ${ui.title.toLowerCase()}`,
+    ${toolsRow(c, sec, `Caută: literă (d, G1) sau text (ex. hidranți, gaz)`, `Caută în ${ui.title.toLowerCase()}`, stare,
     `<button class="btn btn-ghost" data-act="cats-all" data-val="${allClosed ? 'open' : 'close'}">${icon(allClosed ? 'chevD' : 'list')} ${allClosed ? 'Extinde categoriile' : 'Restrânge categoriile'}</button>${rowsBtn(c, sec)}`)}
-    <div class="toolbar">
-      <div class="segmented">
-        ${[['ALL', 'Toate'], ['NOK', `${ui.nokWord[0].toUpperCase()}${ui.nokWord.slice(1)} (${st.constatate})`], ['TODO', `Neverificate (${st.total - st.checked})`]].map(([k, l]) => `<button class="${f === k ? 'on' : ''}" data-act="ner-filter" data-val="${k}">${l}</button>`).join('')}
-      </div>
-      ${restBtn(rest, sec, sec === 'ner' ? 'Restul conform' : 'Restul conforme')}
-    </div>
+    ${filtreActive(c, sec, stare, restBtn(rest, sec, sec === 'ner' ? 'Restul conform' : 'Restul conforme'))}
     <div id="ner-results">${nerResultsHTML(c, sec)}</div>`;
 }
 

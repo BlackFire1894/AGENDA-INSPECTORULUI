@@ -139,9 +139,9 @@ h1 { font-size: 1.5556rem; }
   .main { padding-left: max(0.8889rem, env(safe-area-inset-left)); padding-right: max(0.8889rem, env(safe-area-inset-right)); }
 }
 
-/* Filtrele Toate / Constatate / Neverificate: pe un rând, lățimi egale (textul se poate rupe pe două rânduri) */
-.toolbar .segmented { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); width: 100%; }
-.toolbar .segmented button { white-space: normal; line-height: 1.15; padding: 0.2222rem 0.3333rem; }
+/* Filtrele de stare (în panoul „Filtre”): pe toată lățimea, câte două pe rând, lățimi egale (textul se poate rupe) */
+.flt-grup .segmented { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; align-self: stretch; }
+.flt-grup .segmented button { white-space: normal; line-height: 1.15; padding: 0.2222rem 0.3333rem; }
 /* Fișa: caracteristicile construcției pe două coloane, nu un tabel lat */
 .fisa-doc .f-kv, .fisa-doc .f-kv tbody { display: block; overflow: visible; }
 .fisa-doc .f-kv tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }

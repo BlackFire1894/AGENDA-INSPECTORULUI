@@ -6,13 +6,13 @@ import {
   newControl, controlFromPrevious, normalizeControl, emptyConstructie, emptyNeregula, objectives,
   fold, uid, SCHEMA_VERSION, TIP_OBIECTIV, allFines, isIncheiat, neregulaCat, pvText, sectiuniActive, secOf,
   todoList, isApplicable, ACTE, LIPSA_DOTARI, DOTARI, sablon, fmtCoord, gpsQuality, constructiiOf, schimbare, grfVPesteParter, constructiiEligibile, verifExpirate, ascunsaDeDotari, neregulaLetter, neregulaLabel, AUTO_NU, syncAutoNU,
-  adaposturi, emptyAdapost, acteOf, syncAutoActe, gpsEgal, parseCoord, verifUnitati, verifStare, verifReferinta, CENTRALA_TIPURI,
+  adaposturi, emptyAdapost, acteOf, syncAutoActe, gpsEgal, parseCoord, verifUnitati, verifStare, verifReferinta, CENTRALA_TIPURI, inConstructie,
 } from './model.js';
 import {
   viewDashboard, viewObjectives, objListHTML, viewObjective, viewHistory, histListHTML,
   viewCalendar, viewSettings, hintText, backupAgeText, backupIsStale, viewGhid, viewLuna,
 } from './views.js';
-import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML, listaHTML, grfBlock, editToolsHTML, rowKey } from './editor.js';
+import { viewControl, edHeadHTML, edTabsHTML, tabHTML, TABS, tabsFor, obsKey, todoHTML, listaHTML, grfBlock, editToolsHTML, rowKey, constrResultsHTML } from './editor.js';
 import { icon, esc, toast, openModal, closeModal, confirmDialog, dsp, peTelefon } from './ui.js';
 import { buildDemo, buildDemoActivitati } from './demo.js';
 import { normalizeActivitate, emptyActivitate, TIPURI_ACTIVITATE, STARI_ACTIVITATE, titluActivitate, raportLunar, raportDocument, raportFileName } from './activitati.js';
@@ -84,10 +84,16 @@ async function render({ keepScroll = false } = {}) {
       if (!c) { location.hash = '#/panou'; return; }
       if (!tabsFor(c).some((t) => t.key === route.tab)) { location.replace(`#/control/${c.id}/obiectiv`); return; }
       if (route.focus) reveal(c, route.focus);
-      if (prev.name !== 'control' || prev.id !== route.id) state.ui.showAllNer = false;
+      if (prev.name !== 'control' || prev.id !== route.id) {
+        state.ui.showAllNer = false;
+        // căutarea și filtrele construcțiilor, filtrul pe construcție al neregulilor: doar în controlul curent
+        state.ui.nerConstr = ''; state.ui.constrQuery = ''; state.ui.constrFlt.clear(); state.ui.constrFltOpen = false;
+      }
       if (prev.name !== 'control' || prev.id !== route.id || prev.tab !== route.tab) {
         state.ui.nerFilter = 'ALL'; state.ui.nerQuery = ''; state.ui.constrPick = ''; state.ui.toolsOpen = false;
       }
+      // din „Ce mai aveți de făcut”: constatările netrecute în PV se deschid cu filtrul lor
+      if (state.ui.revealFilter) { state.ui.nerFilter = state.ui.revealFilter; state.ui.revealFilter = ''; }
       historyStart(c);
       html = viewControl(c, route.tab);
       break;
@@ -124,6 +130,7 @@ function reveal(c, focus) {
   state.ui.nerQuery = '';
   const fn = c.nereguli.find((x) => x.key === focus);
   if (fn) {
+    if (!inConstructie(c, fn, state.ui.nerConstr)) state.ui.nerConstr = '';
     if (state.ui.catCollapsed.delete(neregulaCat(fn))) savePref('agenda-cats-collapsed', [...state.ui.catCollapsed]);
     if (fn.custom && state.ui.catCollapsed.delete(`custom-${secOf(fn)}`)) savePref('agenda-cats-collapsed', [...state.ui.catCollapsed]);
     if (state.ui.rowCollapsed.delete(rowKey(c, fn))) savePref('agenda-rows-collapsed', [...state.ui.rowCollapsed]);
@@ -134,7 +141,11 @@ function reveal(c, focus) {
     if (state.ui.rowCollapsed.delete(`${c.id}|act:${ma[1]}`)) saveRows();
   }
   const m = focus.match(/^(?:gps|constr)-(.+)$/);
-  if (m) { state.ui.collapsed.delete(m[1]); state.ui.expanded.add(m[1]); }
+  if (m) {
+    state.ui.collapsed.delete(m[1]); state.ui.expanded.add(m[1]);
+    // construcția căutată trebuie să fie în listă: căutarea și filtrele construcțiilor se golesc
+    state.ui.constrQuery = ''; state.ui.constrFlt.clear();
+  }
 }
 
 function focusNeregula(key, { strong = false } = {}) {
@@ -261,6 +272,14 @@ document.addEventListener('input', (e) => {
     refreshNerResults(c, el.dataset.sec);
     return;
   }
+  if (el.id === 'constr-search' && route.name === 'control') {
+    const c = getControl(route.id);
+    if (!c) return;
+    state.ui.constrQuery = el.value;
+    reseteazaDeschise();
+    refreshConstrResults(c);
+    return;
+  }
   if (el.dataset.bind && route.name === 'control') {
     const c = getControl(route.id);
     if (!c) return;
@@ -288,6 +307,16 @@ document.addEventListener('input', (e) => {
 });
 
 // Doar lista se redesenează: bara de căutare rămâne activă, cu tastatura deschisă.
+// Construcțiile găsite se arată deschise: o căutare / un filtru nou uită deschiderile și închiderile alese de mână
+function reseteazaDeschise() { state.ui.collapsed.clear(); state.ui.expanded.clear(); }
+
+function refreshConstrResults(c) {
+  const box = document.getElementById('constr-results');
+  if (!box) return;
+  box.innerHTML = constrResultsHTML(c);
+  autosizeAll();
+}
+
 function refreshNerResults(c, sec) {
   const box = document.getElementById('ner-results');
   if (!box) return;
@@ -707,6 +736,22 @@ document.addEventListener('click', async (e) => {
       return;
     }
     case 'ner-filter': state.ui.nerFilter = el.dataset.val; rerenderEditor(); return;
+    case 'ner-constr': state.ui.nerConstr = el.dataset.val; rerenderEditor(); return;
+    case 'constr-filtre': state.ui.constrFltOpen = !state.ui.constrFltOpen; rerenderEditor(); return;
+    case 'constr-flt': {
+      const f = state.ui.constrFlt;
+      if (f.has(el.dataset.val)) f.delete(el.dataset.val); else f.add(el.dataset.val);
+      reseteazaDeschise();
+      rerenderEditor();
+      return;
+    }
+    case 'constr-q-clear': {
+      state.ui.constrQuery = '';
+      reseteazaDeschise();
+      rerenderEditor();
+      document.getElementById('constr-search')?.focus();
+      return;
+    }
     case 'ner-q-clear': {
       state.ui.nerQuery = '';
       rerenderEditor();
@@ -749,7 +794,13 @@ document.addEventListener('click', async (e) => {
     case 'todo-go': {
       closeModal();
       const target = `#/control/${c.id}/${el.dataset.tab}${el.dataset.focus ? `/${encodeURIComponent(el.dataset.focus)}` : ''}`;
-      if (location.hash === target) { if (el.dataset.focus) focusNeregula(el.dataset.focus); } else location.hash = target;
+      if (location.hash === target) {
+        if (el.dataset.flt) { state.ui.nerFilter = el.dataset.flt; rerenderEditor(); }
+        if (el.dataset.focus) focusNeregula(el.dataset.focus);
+      } else {
+        state.ui.revealFilter = el.dataset.flt || '';
+        location.hash = target;
+      }
       return;
     }
     case 'rest-ok': restConform(c, el.dataset.sec); return;
@@ -1103,7 +1154,7 @@ function closeControlFlow(c) {
     <div class="modal-head"><h2>${icon('alert')} Înainte de încheiere</h2><button class="icon-btn big" data-act="modal-close" aria-label="Închide">${icon('x')}</button></div>
     <div class="modal-body">
       <p class="lead">Au rămas ${items.length === 1 ? 'un lucru necompletat' : `${items.length} lucruri necompletate`}. Atingeți unul ca să mergeți direct la el, sau încheiați oricum.</p>
-      <div class="todo-list">${items.map((x) => `<button class="todo-item t-${x.level}" data-act="todo-go" data-tab="${x.tab}" data-focus="${esc(x.focus || '')}">${icon(x.level === 'warn' ? 'alert' : 'chevR')}<span>${esc(x.text)}</span></button>`).join('')}</div>
+      <div class="todo-list">${items.map((x) => `<button class="todo-item t-${x.level}" data-act="todo-go" data-tab="${x.tab}" data-focus="${esc(x.focus || '')}"${x.id === 'pv' ? ' data-flt="PV"' : ''}>${icon(x.level === 'warn' ? 'alert' : 'chevR')}<span>${esc(x.text)}</span></button>`).join('')}</div>
     </div>
     <div class="modal-foot">
       <button class="btn btn-ghost btn-lg" data-act="modal-close">Revin să completez</button>

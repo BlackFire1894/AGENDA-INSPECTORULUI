@@ -34,7 +34,12 @@ export const state = {
     constrPick: '',           // neregula al cărei meniu de construcții e deschis
     showAllNer: false,        // arată și neregulile de instalații nebifate DA la dotări
     obsOpen: new Set(),       // câmpuri de observații goale deschise acum („<idControl>|<cale>”)
-    toolsOpen: false,         // meniul „⋯” (restrânge / extinde) deschis
+    toolsOpen: false,         // panoul „Filtre” din Acte / Nereguli (stare, construcție, afișare) deschis
+    nerConstr: '',            // Nereguli: doar rândurile unei construcții (id; v1.26)
+    constrQuery: '',          // căutarea din Construcții (tabul Obiectiv): denumire sau dotare (v1.26)
+    constrFlt: new Set(),     // filtrele Construcțiilor: „da:<dotare>”, „nu:<dotare>”, „necomplet”, „lipsa”
+    constrFltOpen: false,     // panoul „Filtre” din Construcții deschis
+    revealFilter: '',         // filtrul de stare pus după o mutare din „Ce mai aveți de făcut” (ex. „PV”)
     todoOpen: false,          // lista completă „Ce mai aveți de făcut” deschisă
     ghidQuery: '',            // căutarea din Ghidul aplicației
     gpsBusy: '',              // id-ul construcției pentru care se caută poziția

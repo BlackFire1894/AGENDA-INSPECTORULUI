@@ -50,13 +50,27 @@ struct TabObiectiv: View {
             Card {
                 FlexWrap(spatiu: 0.7778 * rem, intre: true) {
                     TitluSectiune(iconita: "layers", text: "Construcții").padding(.bottom, -0.7778 * rem)
-                    Pasi(numar: m.constructii.count, unitate: m.constructii.count == 1 ? "construcție" : "construcții",
+                    Pasi(numar: m.nrConstructii, unitate: m.nrConstructii == 1 ? "construcție" : "construcții",
                          minus: { ses.click("constr-dec") }, plus: { ses.click("constr-inc") })
                 }
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .padding(.bottom, 0.7778 * rem)
+                // v1.26: căutarea (denumire sau dotare DA) și „Filtre”, de la două construcții
+                if let u = m.unelteConstructii { UnelteConstructii(m: u) }
+                if let f = m.constructiiFiltrate {
+                    FlowLayout(spatiu: 0.4444 * rem) {
+                        ForEach(Array(f.etichete.enumerated()), id: \.offset) { _, e in EtichetaFiltru(m: e) }
+                        Text(f.numar).font(.system(size: 0.8889 * rem, weight: .semibold)).foregroundStyle(Color.muted)
+                            .padding(.horizontal, 0.2222 * rem).frame(minHeight: tinta(2.4444 * rem))
+                    }
+                    .padding(.bottom, 0.6667 * rem)
+                }
                 VStack(spacing: 0.7778 * rem) {
                     ForEach(m.constructii, id: \.id) { k in ConstructieVedere(c: c, m: k).id("constr-\(k.id)") }
+                }
+                if let g = m.constructiiGol {
+                    Text(g).font(.system(size: 0.9444 * rem)).foregroundStyle(Color.muted).fixedSize(horizontal: false, vertical: true)
+                        .padding(.vertical, 0.6667 * rem)
                 }
             }
             .id("sec-constructii")
@@ -322,6 +336,42 @@ struct ConstructieVedere: View {
     }
 }
 
+/// Construcții (v1.26): căutarea după denumire sau dotare și panoul „Filtre” (Dotate cu, Fără, Stare)
+struct UnelteConstructii: View {
+    @Environment(SesiuneEditor.self) private var ses
+    @Environment(\.rem) private var rem
+    let m: ModelUnelteConstructii
+    @FocusState private var activ: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 0) {
+            HStack(spacing: 0.5556 * rem) {
+                CampCautare(valoare: m.valoare, indiciu: "Caută clădire sau dotare (ex. sprinklere)", aria: "Caută în construcții",
+                            cale: "constr-search", activ: $activ, schimba: { ses.cautaConstructii($0) }, goleste: { ses.click("constr-q-clear") })
+                ButonFiltre(deschis: m.deschis, active: m.active) { ses.click("constr-filtre") }
+            }
+            .fixedSize(horizontal: false, vertical: true)
+            .padding(.bottom, 0.6667 * rem)
+            if m.deschis {
+                PanouFiltre {
+                    if m.grupe.isEmpty {
+                        Text("Filtrele apar după ce bifați dotările construcțiilor.").font(.system(size: 0.9444 * rem)).foregroundStyle(Color.muted)
+                    }
+                    ForEach(m.grupe, id: \.titlu) { g in
+                        GrupFiltre(titlu: g.titlu) {
+                            FlowLayout(spatiu: 0.4444 * rem) {
+                                ForEach(g.optiuni, id: \.val) { o in
+                                    CipFiltru(text: o.text, numar: o.n, activ: o.activ) { ses.click("constr-flt", ["val": o.val]) }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 /// `.constr-name`: denumirea construcției, direct în antet
 struct NumeConstructie: View {
     @Environment(SesiuneEditor.self) private var ses
@@ -509,8 +559,9 @@ struct DotareVedere: View {
         }
         .padding(.vertical, 0.5556 * rem).padding(.horizontal, 0.6667 * rem)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(m.grav ? Color.redSoft : par ? Color.surface2 : Color.surface)
-        .overlay(alignment: .leading) { if m.grav { Rectangle().fill(Color.red).frame(width: 0.3333 * rem) } }
+        // v1.26: dotarea căutată / aleasă în filtre e evidențiată (`.dot-row.is-match`)
+        .background(m.gasit ? Color.accentSoft : m.grav ? Color.redSoft : par ? Color.surface2 : Color.surface)
+        .overlay(alignment: .leading) { if m.gasit || m.grav { Rectangle().fill(m.gasit ? Color.accent : Color.red).frame(width: 0.3333 * rem) } }
         .overlay(alignment: .top) { if !prima { Rectangle().fill(Color.line).frame(height: 1.5) } }
     }
 

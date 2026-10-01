@@ -192,6 +192,8 @@ const TEXTE = ['', 'Corp B', 'Ion Pop', '0722 123 456', 'a@b.ro', '1978', '250,5
 const ETICHETE = ['Căi de evacuare blocate', 'Depozitare butelii în subsol', '', 'Ușă blocată'];
 const LOCATII = ['Subsol corp A', 'Demisol', '', 'Sala 3'];
 const CAUTARI = ['', 'd', 'G1', 'A1', 'hidr', 'stingatoare', 'hol', 'evacuare', 'lfd', 'instruire', 'xyz', 'plan', 'adapost'];
+// căutarea din Construcții (v1.26): denumiri și dotări
+const CAUTARI_CONSTR = ['', 'corp', 'B', 'sala', 'hi', 'hidr', 'hidranti', 'sprinklere', 'idsai', 'centrala', 'exit', 'xyz', 'construcția 2', '  corp  '];
 const EXCLUSE = new Set(['backup-export', 'control-delete', 'pv-text', 'scroll-top', 'modal-close']);
 
 // butoanele, legăturile și câmpurile de pe ecran (din HTML-ul curent)
@@ -217,6 +219,7 @@ function candidati(html) {
     const bind = atribut(a, 'data-bind');
     const verif = atribut(a, 'data-verif');
     if (atribut(a, 'id') === 'ner-search') { campuri.push({ t: 'cautare' }); continue; }
+    if (atribut(a, 'id') === 'constr-search') { campuri.push({ t: 'cautareConstr' }); continue; }
     if (bind) campuri.push({ t: 'input', bind: dec(bind), tip: atribut(a, 'type') || m[1], rerender: a.includes('data-rerender'), grav: atribut(a, 'data-grav'), obs: a.includes('data-obs') });
     else if (verif) campuri.push({ t: 'verif', verif: dec(verif) });
   }
@@ -278,6 +281,7 @@ for (const [si, ales] of alese.entries()) {
   Object.assign(S.state.ui, {
     expanded: new Set(), collapsed: new Set(), nerFilter: 'ALL', nerQuery: '', constrPick: '', showAllNer: false,
     obsOpen: new Set(), toolsOpen: false, todoOpen: false, gpsBusy: '', catCollapsed: new Set(), rowCollapsed: new Set(), focusStrong: false,
+    nerConstr: '', constrQuery: '', constrFlt: new Set(), constrFltOpen: false, revealFilter: '',
   });
   const tab0 = alege(E.tabsFor(c).map((t) => t.key));
   location.hash = `#/control/${c.id}/${tab0}`;
@@ -334,6 +338,9 @@ for (const [si, ales] of alese.entries()) {
     } else if (pas.t === 'cautare') {
       pas.q = alege(CAUTARI);
       await eveniment('input', Object.assign(element('ner-search'), { dataset: { sec: tab === 'acte' ? 'acte' : { nereguli: 'ner', planuri: 'plan', pc: 'pc' }[tab] }, value: pas.q }));
+    } else if (pas.t === 'cautareConstr') {
+      pas.q = alege(CAUTARI_CONSTR);
+      await eveniment('input', Object.assign(element('constr-search'), { value: pas.q }));
     } else if (pas.t === 'pauza') {
       S.checkpoint(c);
     } else if (pas.t === 'pv') {

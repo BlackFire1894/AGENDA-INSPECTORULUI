@@ -33,6 +33,7 @@ public let ICONS: [String: String] = [
     "info": #"<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>"#,
     "list": #"<path d="M9 6h11M9 12h11M9 18h11M4.5 6h.01M4.5 12h.01M4.5 18h.01"/>"#,
     "hourglass": #"<path d="M6 3h12M6 21h12M7 3c0 5 10 6 10 9s-10 4-10 9M17 3c0 5-10 6-10 9s10 4 10 9"/>"#,
+    "filter": #"<path d="M3.5 5h17l-6.5 8v5.5l-4 2V13z"/>"#,
     "more": #"<circle cx="5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/>"#,
     "back": #"<path d="M19 12H5M11 5l-7 7 7 7"/>"#,
     "pin": #"<path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/>"#,

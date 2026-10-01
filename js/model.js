@@ -559,6 +559,90 @@ export function areCentrala(k) {
 // Centralele construcției: [{ id, tipuri }]
 export const centraleOf = (k) => k?.dotari?.centrala?.ct || [];
 
+// Dotările completate ale unei construcții (rândurile ascunse nu se numără: iluminat Hint fără hidranți interiori,
+// dotări noi la controalele vechi); `lipsa` = NU la dotările obligatorii (nereguli grave)
+export function dotariSummary(c, k) {
+  let da = 0, nec = 0, set = 0, lipsa = 0;
+  const vis = dotariVizibile(c, k);
+  for (const d of vis) {
+    const v = k.dotari[d.key];
+    if (d.centrala) { if ((v.ct || []).length || v.tipuri.length || v.nuAre) set++; continue; }
+    if (v.v) set++;
+    if (v.v === 'DA') da++;
+    if (v.v === 'NEC') nec++;
+    if (v.v === 'NU' && LIPSA_DOTARI.includes(d.key)) lipsa++;
+  }
+  return { da, nec, set, lipsa, total: vis.length };
+}
+
+// ───────── Construcțiile: căutare și filtre (v1.26) ─────────
+// Valoarea unei dotări pentru filtre: DA / NU / NEC / '' (centrala: DA = are centrale, NU = „NU ARE”)
+export function dotareVal(c, k, d) {
+  if (d.centrala) return k?.dotari?.centrala?.nuAre ? 'NU' : areCentrala(k) ? 'DA' : '';
+  return valDotare(c, k, d.key) || '';
+}
+
+// Construcțiile care trec de căutare și de filtre (toate filtrele deodată), în ordinea din tab, cu dotările potrivite
+// (evidențiate pe ecran). Căutarea: denumirea construcției sau, de la 3 litere, o dotare bifată DA („hidranți” →
+// construcțiile cu hidranți interiori sau exteriori). Filtrele: „da:<dotare>”, „nu:<dotare>”, „necomplet”
+// (mai sunt dotări de bifat), „lipsa” (NU la dotările obligatorii).
+export function constructiiFiltrate(c, q = '', flt = []) {
+  const fq = fold(String(q).trim());
+  const out = [];
+  (c.constructii || []).forEach((k, i) => {
+    const vis = dotariVizibile(c, k);
+    const potriviri = new Set();
+    for (const f of flt) {
+      const [tip, key] = f.split(':');
+      if (tip === 'da' || tip === 'nu') {
+        const d = vis.find((x) => x.key === key);
+        if (!d || dotareVal(c, k, d) !== (tip === 'da' ? 'DA' : 'NU')) return;
+        potriviri.add(key);
+      } else if (tip === 'necomplet') {
+        const s = dotariSummary(c, k);
+        if (s.set >= s.total) return;
+      } else if (tip === 'lipsa' && !dotariSummary(c, k).lipsa) return;
+    }
+    if (fq) {
+      const dot = fq.length >= 3 ? vis.filter((d) => fold(d.label).includes(fq) && dotareVal(c, k, d) === 'DA') : [];
+      if (!fold(k.denumire || `Construcția ${i + 1}`).includes(fq) && !dot.length) return;
+      dot.forEach((d) => potriviri.add(d.key));
+    }
+    out.push({ k, i, potriviri });
+  });
+  return out;
+}
+
+// Opțiunile filtrelor, cu numărul construcțiilor (doar cele care există în acest control, plus cele deja alese)
+export function optiuniFiltreConstructii(c, flt = []) {
+  const list = c.constructii || [];
+  const ales = new Set(flt);
+  const cate = (fn) => list.filter(fn).length;
+  const dot = (v) => DOTARI.filter((d) => inCatalog(c, d))
+    .map((d) => ({ key: d.key, label: d.label, n: cate((k) => dotariVizibile(c, k).includes(d) && dotareVal(c, k, d) === v) }))
+    .filter((o) => o.n || ales.has(`${v === 'DA' ? 'da' : 'nu'}:${o.key}`));
+  return {
+    da: dot('DA'),
+    nu: dot('NU'),
+    necomplet: cate((k) => { const s = dotariSummary(c, k); return s.set < s.total; }),
+    lipsa: cate((k) => dotariSummary(c, k).lipsa > 0),
+  };
+}
+
+// Nereguli, filtrul „Construcția”: constatările făcute în acea construcție și rândurile neconstatate care i se aplică
+// (cele declanșate de NU la dotări / GRF V: doar construcțiile care le declanșează; cele de instalații: după dotările
+// ei). Ce ține de tot obiectivul (ex. actele lipsă ao / ap / aq) apare la orice construcție.
+export function inConstructie(c, n, id) {
+  if (!id) return true;
+  let ks;
+  if (n.status === 'nok') ks = constructiiOf(c, n);
+  else {
+    const decl = (!n.custom && constructiiDeclansate(c, sablon(n.key))) || [];
+    ks = decl.length ? decl : constructiiEligibile(c, n);
+  }
+  return !ks.length || ks.some((k) => k.id === id);
+}
+
 // „Seria AB nr. 123456” (gol dacă nu s-a completat nimic)
 export function amendaSerieNr(a) {
   // un singur câmp („DB 0012345”, „Seria DB nr. 0012345”); datele vechi pot avea încă serie + numar

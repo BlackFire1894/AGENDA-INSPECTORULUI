@@ -152,6 +152,9 @@ final class SesiuneEditor {
 
     func cauta(_ q: String) { editor.cauta(q); versiune += 1 }
 
+    /// Căutarea din Construcții (v1.26)
+    func cautaConstructii(_ q: String) { editor.cautaConstructii(q); versiune += 1 }
+
     /// „Sus”: înapoi la începutul editorului
     func laInceput() { sus += 1 }
 

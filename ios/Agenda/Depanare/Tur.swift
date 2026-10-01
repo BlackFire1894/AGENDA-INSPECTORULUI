@@ -70,6 +70,23 @@ enum Tur {
             await pas("v125-b3", maxPagini: 8) { nav.mergi(.control(id: sp.id, tab: "nereguli", focus: "b3")) }
             await pas("v125-ao", maxPagini: 3) { nav.mergi(.control(id: sp.id, tab: "nereguli", focus: "ao")) }
         }
+        // v1.26: Construcții — „Filtre” deschis, o dotare aleasă; căutarea „hidr”; Nereguli — „Filtre” cu „Netrecute în PV” și o construcție
+        if let sp = cs.first(where: { $0.constructii.count > 1 && !isLocalitate($0) }) {
+            await pas("v126-constructii", maxPagini: 16, inainte: { nav.mergi(.control(id: sp.id, tab: "obiectiv", focus: nil)) }) {
+                ses.click("constr-filtre")
+                if let f = optiuniFiltreConstructii(sp).da.first { ses.click("constr-flt", ["val": "da:\(f.key)"]) }
+            }
+            await pas("v126-cautare", maxPagini: 16) {
+                if let f = optiuniFiltreConstructii(sp).da.first { ses.click("constr-flt", ["val": "da:\(f.key)"]) }
+                ses.click("constr-filtre")
+                ses.cautaConstructii("hidr")
+            }
+            await pas("v126-nereguli", maxPagini: 10, inainte: { nav.mergi(.control(id: sp.id, tab: "nereguli", focus: nil)) }) {
+                ses.click("tools-more")
+                ses.click("ner-filter", ["val": "PV"])
+                ses.click("ner-constr", ["val": sp.constructii[0].id])
+            }
+        }
         await pas("ghid", asteapta: 3, maxPagini: 4) { nav.mergi(.ghid) }
         await pas("setari") { nav.mergi(.setari) }
 

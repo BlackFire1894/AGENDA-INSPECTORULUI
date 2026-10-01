@@ -44,7 +44,7 @@ const catsAll = async (p) => { if (!(await p.locator('[data-act="cats-all"]').co
     ok(await p.locator('.act-row >> nth=2 >> textarea.row-obs').count() === 1, 'al treilea act: câmpul deschis');
     // la ieșirea din câmp nu se redesenează imediat (ca atingerea următoare să nu „sară”); se strânge la următoarea redesenare
     await p.click('.sum-line'); await p.waitForTimeout(200);
-    await p.click('[data-act="ner-filter"][data-val="ALL"]'); await p.waitForTimeout(300);
+    await p.click('[data-act="tools-more"]'); await p.click('[data-act="tools-more"]'); await p.waitForTimeout(300);
     ok(await p.locator('.act-row >> nth=2 >> textarea.row-obs').count() === 0 && await p.locator('.act-row >> nth=2 >> [data-act="obs-open"]').count() === 1, 'lăsat gol, câmpul se strânge la loc în „+ Obs.”');
     ok(await p.locator('.act-row textarea.row-obs').count() === 2 + lipsaN, `rămân vizibile doar observațiile scrise (2) și cele de la Lipsă (${lipsaN})`);
     // persistă după reload
